@@ -19,9 +19,11 @@ export_presets.cfg
 
 # GDExtension build artifacts
 addons/ohmydialog/gdextension/bin/
-addons/ohmydialog/gdextension/godot-cpp/
 addons/ohmydialog/gdextension/thirdparty/llama.cpp/
 addons/ohmydialog/gdextension/thirdparty/piper/
+
+# GDExtension generated files
+gdextension/src/gen/
 
 # SCons build
 .sconsign.dblite
