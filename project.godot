@@ -1,0 +1,25 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="OhMyDialogSystem"
+config/description="AI-powered dialogue system for Godot with local LLM inference, persistent memories, and text-to-speech."
+config/version="0.1.0"
+config/features=PackedStringArray("4.3", "Forward Plus")
+config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/ohmydialog/plugin.cfg")
+
+[rendering]
+
+renderer/rendering_method="forward_plus"

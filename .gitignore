@@ -1,0 +1,60 @@
+# Godot 4+ specific ignores
+.godot/
+
+# Godot-specific ignores
+*.translation
+export_presets.cfg
+
+# Imported resources
+.import/
+
+# Binary files (will be in releases)
+*.dll
+*.so
+*.dylib
+*.obj
+*.o
+*.a
+*.lib
+
+# GDExtension build artifacts
+addons/ohmydialog/gdextension/bin/
+addons/ohmydialog/gdextension/godot-cpp/
+addons/ohmydialog/gdextension/thirdparty/llama.cpp/
+addons/ohmydialog/gdextension/thirdparty/piper/
+
+# SCons build
+.sconsign.dblite
+*.pyc
+__pycache__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Models (too large for git)
+*.gguf
+*.bin
+models/
+
+# TTS voices (download separately)
+voices/
+
+# User data
+user://
+
+# Testing
+*.tmp
+*.log
+
+# Build directories
+build/
+dist/
