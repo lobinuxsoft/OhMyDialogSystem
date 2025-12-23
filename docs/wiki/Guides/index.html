@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guides - OhMyDialogSystem Wiki</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-bg"></canvas>
+
+  <div class="wiki-container">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">🧠</div>
+        <div class="sidebar-logo">OhMyDialogSystem</div>
+        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">General</div>
+        <ul class="nav-links">
+          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Getting Started</div>
+        <ul class="nav-links">
+          <li><a href="quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
+          <li><a href="installation.html"><span class="icon">📦</span> Installation</a></li>
+          <li><a href="first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">API Reference</div>
+        <ul class="nav-links">
+          <li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li>
+          <li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
+          <li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Technical</div>
+        <ul class="nav-links">
+          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
+          <li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Guides</div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="active"><span class="icon">📖</span> Overview</a></li>
+          <li><a href="visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
+          <li><a href="character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
+          <li><a href="tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
+          <li><a href="csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Examples</div>
+        <ul class="nav-links">
+          <li><a href="example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
+          <li><a href="example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
+          <li><a href="example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">External Links</div>
+        <ul class="nav-links">
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Wiki</a> <span>/</span> <span>Guides</span>
+      </div>
+
+      <h1>Guides & Tutorials</h1>
+
+      <p>Guías paso a paso para aprovechar al máximo OhMyDialogSystem.</p>
+
+      <hr>
+
+      <h2>Para Empezar</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="icon">🚀</span>
+          <h3><a href="quickstart.html">Quick Start</a></h3>
+          <p>Tu primer NPC con IA en 10 minutos. Instalación rápida y ejemplo básico.</p>
+          <p><span class="badge badge-green">Principiante</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">📦</span>
+          <h3><a href="installation.html">Installation</a></h3>
+          <p>Instalación completa del addon, descarga de modelos y configuración inicial.</p>
+          <p><span class="badge badge-green">Principiante</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🎮</span>
+          <h3><a href="first-npc.html">Your First NPC</a></h3>
+          <p>Tutorial detallado para crear un NPC con personalidad única.</p>
+          <p><span class="badge badge-green">Principiante</span></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2>Guías de Características</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="icon">🎨</span>
+          <h3><a href="visual-editor.html">Visual Editor</a></h3>
+          <p>Cómo usar el editor de grafos de diálogo. Nodos, conexiones y condiciones.</p>
+          <p><span class="badge badge-cyan">Intermedio</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">👤</span>
+          <h3><a href="character-identity.html">Character Identity</a></h3>
+          <p>Definir personalidades, backgrounds, estilos de habla y conocimientos.</p>
+          <p><span class="badge badge-cyan">Intermedio</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🎤</span>
+          <h3><a href="tts-setup.html">TTS Setup</a></h3>
+          <p>Configurar voces con Piper TTS. Descargar modelos, crear VoiceProfiles.</p>
+          <p><span class="badge badge-cyan">Intermedio</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🔷</span>
+          <h3><a href="csharp-bindings.html">C# Bindings</a></h3>
+          <p>Usar OhMyDialogSystem desde C# con API idiomática.</p>
+          <p><span class="badge badge-purple">Avanzado</span></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2>Ejemplos Completos</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Ejemplo</th>
+            <th>Dificultad</th>
+            <th>Características Demostradas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="example-basic-npc.html">🤖 Basic NPC</a></td>
+            <td><span class="badge badge-green">Fácil</span></td>
+            <td>LlamaInterface, DialogueManager, CharacterIdentity</td>
+          </tr>
+          <tr>
+            <td><a href="example-branching.html">🌳 Branching Dialogue</a></td>
+            <td><span class="badge badge-cyan">Intermedio</span></td>
+            <td>Editor Visual, Condiciones, Eventos, Variables</td>
+          </tr>
+          <tr>
+            <td><a href="example-merchant.html">🛒 Dynamic Merchant</a></td>
+            <td><span class="badge badge-purple">Avanzado</span></td>
+            <td>Memorias, TTS, Localización, Sistema de Regateo</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Learning Path Recomendado</h2>
+
+      <div class="ai-box">
+        <h3>🎯 Ruta de Aprendizaje</h3>
+        <ol>
+          <li><strong>Quick Start</strong> - Familiarízate con el addon</li>
+          <li><strong>Character Identity</strong> - Aprende a definir personalidades</li>
+          <li><strong>Visual Editor</strong> - Domina el editor de grafos</li>
+          <li><strong>Ejemplo: Branching Dialogue</strong> - Practica con condiciones</li>
+          <li><strong>TTS Setup</strong> - Agrega voces a tus NPCs</li>
+          <li><strong>Ejemplo: Dynamic Merchant</strong> - Proyecto completo</li>
+        </ol>
+      </div>
+
+      <hr>
+
+      <h2>Tips Generales</h2>
+
+      <div class="callout-success">
+        <p><strong>Modelos Recomendados:</strong> Mistral 7B o Llama 3 8B en formato Q4_K_M ofrecen buen balance entre calidad y velocidad.</p>
+      </div>
+
+      <div class="callout-warning">
+        <p><strong>Memoria:</strong> Los modelos 7B requieren ~6GB de RAM. Los modelos 13B+ pueden requerir 16GB o más.</p>
+      </div>
+
+      <div class="callout-info">
+        <p><strong>GPU:</strong> Si tenés una GPU compatible con CUDA, habilitá <code>n_gpu_layers</code> para acelerar la inferencia significativamente.</p>
+      </div>
+
+      <hr>
+
+      <a href="../index.html">← Volver a Home</a>
+
+      <footer class="wiki-footer">
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../ai-bg.js"></script>
+</body>
+</html>
