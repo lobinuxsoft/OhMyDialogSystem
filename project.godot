@@ -13,13 +13,13 @@ config_version=5
 config/name="OhMyDialogSystem"
 config/description="AI-powered dialogue system for Godot with local LLM inference, persistent memories, and text-to-speech."
 config/version="0.1.0"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[dotnet]
+
+project/assembly_name="OhMyDialogSystem"
 
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/ohmydialog/plugin.cfg")
-
-[rendering]
-
-renderer/rendering_method="forward_plus"
