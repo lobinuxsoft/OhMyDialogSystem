@@ -124,6 +124,9 @@ func _ready() -> void:
 	repeat_penalty_slider.value_changed.connect(_on_repeat_penalty_changed)
 	min_p_slider.value_changed.connect(_on_min_p_changed)
 
+	# Setup tooltips for sampling parameters
+	_setup_sampling_tooltips()
+
 	# Populate models
 	_populate_models_tree()
 
@@ -145,6 +148,24 @@ func _exit_tree() -> void:
 	# Cleanup HuggingFace API
 	if _hf_api != null:
 		_hf_api.cleanup()
+
+
+func _setup_sampling_tooltips() -> void:
+	temperature_slider.tooltip_text = "Controls randomness in generation.\n0.0 = Deterministic (always picks most likely token)\n0.7 = Balanced creativity\n1.0+ = More random and creative\n\nHigher values produce more varied but potentially less coherent text."
+
+	top_p_slider.tooltip_text = "Nucleus sampling: only considers tokens whose cumulative probability exceeds this threshold.\n0.9 = Conservative, more focused\n0.95 = Balanced (recommended)\n1.0 = Consider all tokens\n\nWorks together with Temperature to control output diversity."
+
+	top_k_spinbox.tooltip_text = "Limits token selection to the K most likely candidates.\n0 = Disabled (no limit)\n40 = Balanced (recommended)\n100 = More diverse\n\nLower values = more focused, higher = more varied responses."
+
+	max_tokens_spinbox.tooltip_text = "Maximum number of tokens to generate.\nThis is the PRIMARY control for response length.\n\n256 = Short responses\n512 = Medium responses\n1024+ = Long responses\n\nNote: Generation may stop earlier if the model produces an end-of-sequence token."
+
+	repeat_penalty_slider.tooltip_text = "Penalizes repeated tokens to avoid loops.\n1.0 = No penalty\n1.1 = Light penalty (recommended)\n1.5+ = Strong penalty\n\nToo high can make responses unnatural or cut them short."
+
+	min_p_slider.tooltip_text = "Filters out tokens with probability below this threshold relative to the top token.\n0.05 = Light filtering (recommended)\n0.1 = Moderate filtering\n0.2+ = Aggressive filtering\n\nHelps eliminate very unlikely tokens while preserving creativity."
+
+	seed_spinbox.tooltip_text = "Seed for random number generation.\n-1 = Random seed each time\nAny other value = Reproducible results\n\nUse a fixed seed to get the same output for the same prompt."
+
+	stop_sequences_input.tooltip_text = "Sequences that will stop generation when encountered.\nOne sequence per line.\n\nCommon examples:\n- User: (for chat format)\n- \\n\\n (double newline)\n- [END]\n\nLeave empty if you don't need early stopping."
 
 
 func _setup_models_tree() -> void:
