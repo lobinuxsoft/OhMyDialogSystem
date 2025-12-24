@@ -1,0 +1,648 @@
+[gd_scene load_steps=3 format=3 uid="uid://test_scene_llama"]
+
+[ext_resource type="Script" path="res://addons/ohmydialog/examples/llama_test_scene.gd" id="1_script"]
+[ext_resource type="Theme" path="res://addons/ohmydialog/examples/neural_theme.tres" id="2_theme"]
+
+[node name="LlamaTestScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="BgPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "LlamaInterface Test Scene"
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VersionLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "OhMyDialogSystem"
+
+[node name="DownloadPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/DownloadPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DownloadPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DownloadLabel" type="Label" parent="MarginContainer/VBoxContainer/DownloadPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Downloading..."
+
+[node name="DownloadProgress" type="ProgressBar" parent="MarginContainer/VBoxContainer/DownloadPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+show_percentage = false
+
+[node name="CancelDownloadBtn" type="Button" parent="MarginContainer/VBoxContainer/DownloadPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cancel"
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Models" type="HSplitContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+layout_mode = 2
+split_offset = 450
+
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ToolbarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel"]
+layout_mode = 2
+
+[node name="SortLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "Sort by:"
+
+[node name="SortOption" type="OptionButton" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ModelsTree" type="Tree" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DownloadModelBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Download"
+
+[node name="LoadModelBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Load"
+
+[node name="DeleteModelBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Delete"
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BrowseHFBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse HuggingFace"
+
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DetailsHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel/DetailsHeader"]
+layout_mode = 2
+text = "📋"
+
+[node name="DetailsLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel/DetailsHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "Model Details"
+
+[node name="DetailsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel/DetailsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel/DetailsPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ModelDetails" type="RichTextLabel" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel/DetailsPanel/ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Select a model to see details"
+fit_content = true
+
+[node name="Generation" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="StatusRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation"]
+layout_mode = 2
+
+[node name="StatusIcon" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/StatusRow"]
+layout_mode = 2
+text = "🔌"
+
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No model loaded"
+
+[node name="UnloadBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Generation/StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Unload Model"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 550
+
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PromptHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/PromptHeader"]
+layout_mode = 2
+text = "📝"
+
+[node name="PromptLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/PromptHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "Prompt"
+
+[node name="PromptInput" type="TextEdit" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Enter your prompt here..."
+wrap_mode = 1
+scroll_smooth = true
+
+[node name="GenerateRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GenerateBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Generate"
+
+[node name="ClearBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear"
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TimeLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.063, 0.725, 0.506, 1)
+
+[node name="OutputHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/OutputHeader"]
+layout_mode = 2
+text = "💬"
+
+[node name="OutputLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/OutputHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "Output"
+
+[node name="OutputDisplay" type="TextEdit" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+editable = false
+wrap_mode = 1
+scroll_smooth = true
+
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ModelInfoSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="ModelInfoHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection/ModelInfoHeader"]
+layout_mode = 2
+text = "🦙"
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection/ModelInfoHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "Loaded Model"
+
+[node name="ModelInfoPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection/ModelInfoPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="LoadedModelInfo" type="RichTextLabel" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection/ModelInfoPanel/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = "No model loaded.
+Go to Models tab to load one."
+fit_content = true
+
+[node name="ParamsSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ParamsHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsHeader"]
+layout_mode = 2
+text = "⚙️"
+
+[node name="ParamsLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "Sampling Parameters"
+
+[node name="ParamsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ParamsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="TempRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TempRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Temperature"
+
+[node name="TemperatureSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TempRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 2.0
+step = 0.01
+value = 0.7
+
+[node name="TemperatureValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TempRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "0.70"
+horizontal_alignment = 2
+
+[node name="TopPRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopPRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Top P"
+
+[node name="TopPSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopPRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.95
+
+[node name="TopPValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopPRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "0.95"
+horizontal_alignment = 2
+
+[node name="TopKRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopKRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Top K"
+
+[node name="TopKSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopKRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 100.0
+value = 40.0
+
+[node name="MaxTokensRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MaxTokensRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Max Tokens"
+
+[node name="MaxTokensSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MaxTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 4096.0
+value = 256.0
+
+[node name="RepeatPenaltyRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/RepeatPenaltyRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Repeat Penalty"
+
+[node name="RepeatPenaltySlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/RepeatPenaltyRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 2.0
+step = 0.01
+value = 1.1
+
+[node name="RepeatPenaltyValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/RepeatPenaltyRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "1.10"
+horizontal_alignment = 2
+
+[node name="MinPRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MinPRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Min P"
+
+[node name="MinPSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MinPRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.05
+
+[node name="MinPValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MinPRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "0.05"
+horizontal_alignment = 2
+
+[node name="SeedRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/SeedRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Seed"
+
+[node name="SeedSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/SeedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -1.0
+max_value = 999999.0
+value = -1.0
+suffix = "(-1=random)"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="StopLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Stop Sequences (one per line):"
+
+[node name="StopSequencesInput" type="TextEdit" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+placeholder_text = "\\n
+User:"
+scroll_smooth = true
+
+[node name="HFDialog" type="Window" parent="."]
+unique_name_in_owner = true
+title = "Browse HuggingFace Models"
+initial_position = 2
+size = Vector2i(900, 600)
+visible = false
+exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="HFDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HFDialog/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/TitleRow"]
+layout_mode = 2
+text = "🤗"
+
+[node name="Title" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/TitleRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "HuggingFace Model Browser"
+
+[node name="SearchRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HFSearchInput" type="LineEdit" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search GGUF models (e.g., llama, qwen, phi, instruct)..."
+
+[node name="HFSearchBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Search"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 400
+
+[node name="LeftPanel" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ModelsLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "Models (sorted by downloads)"
+
+[node name="HFResultsTree" type="Tree" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightPanel" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FilesLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "GGUF Files (select one to add)"
+
+[node name="HFFilesTree" type="Tree" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BottomRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HFStatusLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Search for models to browse available GGUF files"
+
+[node name="HFAddBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Add to List"
+
+[node name="HFCloseBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Close"

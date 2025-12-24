@@ -130,6 +130,142 @@
         </tbody>
       </table>
 
+      <h3>Generación de Texto</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Retorno</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>String</code></td>
+            <td><a href="#generate">generate</a>(prompt: String)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Parámetros de Sampling</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Retorno</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_temperature">set_temperature</a>(temperature: float)</td>
+          </tr>
+          <tr>
+            <td><code>float</code></td>
+            <td><a href="#get_temperature">get_temperature</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_top_p">set_top_p</a>(top_p: float)</td>
+          </tr>
+          <tr>
+            <td><code>float</code></td>
+            <td><a href="#get_top_p">get_top_p</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_top_k">set_top_k</a>(top_k: int)</td>
+          </tr>
+          <tr>
+            <td><code>int</code></td>
+            <td><a href="#get_top_k">get_top_k</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_max_tokens">set_max_tokens</a>(max_tokens: int)</td>
+          </tr>
+          <tr>
+            <td><code>int</code></td>
+            <td><a href="#get_max_tokens">get_max_tokens</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_repeat_penalty">set_repeat_penalty</a>(penalty: float)</td>
+          </tr>
+          <tr>
+            <td><code>float</code></td>
+            <td><a href="#get_repeat_penalty">get_repeat_penalty</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_min_p">set_min_p</a>(min_p: float)</td>
+          </tr>
+          <tr>
+            <td><code>float</code></td>
+            <td><a href="#get_min_p">get_min_p</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_seed">set_seed</a>(seed: int)</td>
+          </tr>
+          <tr>
+            <td><code>int</code></td>
+            <td><a href="#get_seed">get_seed</a>() const</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Stop Sequences</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Retorno</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_stop_sequences">set_stop_sequences</a>(sequences: PackedStringArray)</td>
+          </tr>
+          <tr>
+            <td><code>PackedStringArray</code></td>
+            <td><a href="#get_stop_sequences">get_stop_sequences</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#clear_stop_sequences">clear_stop_sequences</a>()</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Timeout</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Retorno</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_timeout">set_timeout</a>(timeout_ms: int)</td>
+          </tr>
+          <tr>
+            <td><code>int</code></td>
+            <td><a href="#get_timeout">get_timeout</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>bool</code></td>
+            <td><a href="#has_generation_timed_out">has_generation_timed_out</a>() const</td>
+          </tr>
+        </tbody>
+      </table>
+
       <hr>
 
       <h2>Descripciones de Métodos</h2>
@@ -422,6 +558,241 @@ if not info.is_empty():
 
       <hr>
 
+      <h2>Generación de Texto</h2>
+
+      <h3 id="generate">generate</h3>
+
+      <pre data-lang="GDSCRIPT"><code>String generate(prompt: String)</code></pre>
+
+      <p>Genera texto de forma síncrona (bloqueante) a partir de un prompt.</p>
+
+      <h4>Parámetros</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>prompt</code></td>
+            <td>String</td>
+            <td>El texto de entrada para continuar</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Retorno</h4>
+
+      <p>El texto generado, o un String vacío si hay error o no hay modelo cargado.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>var llama = LlamaInterface.new()
+llama.load_model("res://models/mistral-7b-q4.gguf")
+
+# Configurar parámetros
+llama.set_temperature(0.7)
+llama.set_max_tokens(100)
+
+# Generar texto
+var response = llama.generate("The quick brown fox")
+print(response)  # " jumps over the lazy dog..."</code></pre>
+
+      <blockquote>
+        <strong>Nota:</strong> Esta operación es bloqueante. Para generación asíncrona, usa un Thread o espera la implementación de <code>generate_async()</code>.
+      </blockquote>
+
+      <hr>
+
+      <h2>Parámetros de Sampling</h2>
+
+      <h3 id="set_temperature">set_temperature / get_temperature</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_temperature(temperature: float)
+float get_temperature() const</code></pre>
+
+      <p>Controla la aleatoriedad de la generación.</p>
+
+      <ul>
+        <li><strong>0.0</strong> = Greedy (siempre elige el token más probable)</li>
+        <li><strong>0.7-0.9</strong> = Balance creatividad/coherencia (recomendado)</li>
+        <li><strong>1.0+</strong> = Más aleatorio/creativo</li>
+      </ul>
+
+      <p><strong>Default:</strong> <code>0.8</code></p>
+
+      <hr>
+
+      <h3 id="set_top_p">set_top_p / get_top_p</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_top_p(top_p: float)
+float get_top_p() const</code></pre>
+
+      <p>Nucleus sampling - considera solo tokens cuya probabilidad acumulada sea ≤ top_p.</p>
+
+      <p><strong>Default:</strong> <code>0.95</code> | <strong>Rango:</strong> <code>0.0 - 1.0</code></p>
+
+      <hr>
+
+      <h3 id="set_top_k">set_top_k / get_top_k</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_top_k(top_k: int)
+int get_top_k() const</code></pre>
+
+      <p>Considera solo los top-k tokens más probables. <code>0</code> = desactivado.</p>
+
+      <p><strong>Default:</strong> <code>40</code></p>
+
+      <hr>
+
+      <h3 id="set_max_tokens">set_max_tokens / get_max_tokens</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_max_tokens(max_tokens: int)
+int get_max_tokens() const</code></pre>
+
+      <p>Número máximo de tokens a generar. Mínimo: <code>1</code>.</p>
+
+      <p><strong>Default:</strong> <code>256</code></p>
+
+      <hr>
+
+      <h3 id="set_repeat_penalty">set_repeat_penalty / get_repeat_penalty</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_repeat_penalty(penalty: float)
+float get_repeat_penalty() const</code></pre>
+
+      <p>Penaliza la repetición de tokens. <code>1.0</code> = sin penalización.</p>
+
+      <p><strong>Default:</strong> <code>1.1</code> | <strong>Rango:</strong> <code>1.0 - 2.0</code></p>
+
+      <hr>
+
+      <h3 id="set_min_p">set_min_p / get_min_p</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_min_p(min_p: float)
+float get_min_p() const</code></pre>
+
+      <p>Filtra tokens con probabilidad menor a min_p * prob_max.</p>
+
+      <p><strong>Default:</strong> <code>0.05</code> | <strong>Rango:</strong> <code>0.0 - 1.0</code></p>
+
+      <hr>
+
+      <h3 id="set_seed">set_seed / get_seed</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_seed(seed: int)
+int get_seed() const</code></pre>
+
+      <p>Semilla para reproducibilidad. <code>0xFFFFFFFF</code> = aleatorio.</p>
+
+      <p><strong>Default:</strong> <code>0xFFFFFFFF</code> (aleatorio)</p>
+
+      <hr>
+
+      <h2>Stop Sequences</h2>
+
+      <h3 id="set_stop_sequences">set_stop_sequences</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_stop_sequences(sequences: PackedStringArray)</code></pre>
+
+      <p>Define secuencias que detienen la generación cuando se encuentran.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code># Detener en fin de turno de diálogo
+llama.set_stop_sequences(["User:", "\n\n", "[END]"])</code></pre>
+
+      <hr>
+
+      <h3 id="get_stop_sequences">get_stop_sequences</h3>
+
+      <pre data-lang="GDSCRIPT"><code>PackedStringArray get_stop_sequences() const</code></pre>
+
+      <p>Retorna las secuencias de stop configuradas.</p>
+
+      <hr>
+
+      <h3 id="clear_stop_sequences">clear_stop_sequences</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void clear_stop_sequences()</code></pre>
+
+      <p>Elimina todas las secuencias de stop.</p>
+
+      <hr>
+
+      <h2>Timeout</h2>
+
+      <h3 id="set_timeout">set_timeout / get_timeout</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_timeout(timeout_ms: int)
+int get_timeout() const</code></pre>
+
+      <p>Configura el timeout máximo para la generación en milisegundos.</p>
+
+      <ul>
+        <li><strong>0</strong> = Sin timeout (espera indefinidamente)</li>
+        <li><strong>>0</strong> = Tiempo máximo en ms</li>
+      </ul>
+
+      <p><strong>Default:</strong> <code>0</code> (sin timeout)</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code># Limitar generación a 10 segundos
+llama.set_timeout(10000)
+
+var response = llama.generate("Tell me a story")
+
+if llama.has_generation_timed_out():
+    print("Generation timed out!")
+    print("Partial response: ", response)</code></pre>
+
+      <hr>
+
+      <h3 id="has_generation_timed_out">has_generation_timed_out</h3>
+
+      <pre data-lang="GDSCRIPT"><code>bool has_generation_timed_out() const</code></pre>
+
+      <p>Verifica si la última generación terminó por timeout.</p>
+
+      <h4>Retorno</h4>
+
+      <p><code>true</code> si la última llamada a <code>generate()</code> terminó por timeout.</p>
+
+      <hr>
+
+      <h2>Señales</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Señal</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>generation_timeout()</code></td>
+            <td>Emitida cuando la generación excede el tiempo límite configurado</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>func _ready():
+    llama = LlamaInterface.new()
+    llama.generation_timeout.connect(_on_timeout)
+
+func _on_timeout():
+    print("Generation took too long!")</code></pre>
+
+      <hr>
+
       <h2>Ejemplo Completo</h2>
 
       <pre data-lang="GDSCRIPT"><code>extends Node
@@ -430,6 +801,7 @@ var llama: LlamaInterface
 
 func _ready():
     llama = LlamaInterface.new()
+    llama.generation_timeout.connect(_on_generation_timeout)
 
     # Cargar modelo con configuración personalizada
     var err = llama.load_model("user://models/qwen2.5-7b-q4_k_m.gguf", {
@@ -448,8 +820,24 @@ func _ready():
     print("Description: ", info.get("description", "Unknown"))
     print("Size: ", info.get("size_bytes", 0) / (1024 * 1024), " MB")
     print("Parameters: ", info.get("n_params", 0))
-    print("Context: ", info.get("n_ctx", 0), " tokens")
-    print("Vocab size: ", info.get("vocab_size", 0))
+
+    # Configurar generación
+    llama.set_temperature(0.7)
+    llama.set_max_tokens(150)
+    llama.set_timeout(30000)  # 30 segundos máximo
+    llama.set_stop_sequences(["User:", "\n\n"])
+
+    # Generar respuesta
+    var response = llama.generate("Hello! How are you today?")
+
+    if llama.has_generation_timed_out():
+        print("Warning: Generation timed out")
+        print("Partial response: ", response)
+    else:
+        print("Response: ", response)
+
+func _on_generation_timeout():
+    print("Generation exceeded time limit!")
 
 func _exit_tree():
     if llama and llama.is_model_loaded():
