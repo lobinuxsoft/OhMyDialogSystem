@@ -104,9 +104,6 @@ func parse_model_files(json_array: Array) -> Array[Dictionary]:
 			var size_bytes: float = 0.0
 			var raw_size = item.get("size")
 
-			# Debug: print raw value info for troubleshooting
-			print("HuggingFaceAPI DEBUG: %s -> raw_size=%s (type=%d)" % [path.get_file(), raw_size, typeof(raw_size)])
-
 			if raw_size != null:
 				# Handle both int and float JSON numbers
 				match typeof(raw_size):
@@ -118,7 +115,10 @@ func parse_model_files(json_array: Array) -> Array[Dictionary]:
 						push_warning("HuggingFaceAPI: Unexpected size type for %s: %s (type: %d)" % [path, raw_size, typeof(raw_size)])
 
 			var size_mb = size_bytes / (1024.0 * 1024.0)
-			print("HuggingFaceAPI DEBUG: %s -> size_bytes=%.0f, size_mb=%.2f" % [path.get_file(), size_bytes, size_mb])
+
+			# Skip stub/empty files (size=0 usually means split model pointer)
+			if size_bytes <= 0:
+				continue
 
 			# Skip files that are too large
 			if size_bytes > float(max_file_size_bytes):
