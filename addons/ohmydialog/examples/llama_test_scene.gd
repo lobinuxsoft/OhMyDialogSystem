@@ -14,6 +14,17 @@ extends Control
 @onready var download_model_btn: Button = %DownloadModelBtn
 @onready var load_model_btn: Button = %LoadModelBtn
 @onready var delete_model_btn: Button = %DeleteModelBtn
+@onready var browse_hf_btn: Button = %BrowseHFBtn
+
+# UI References - HuggingFace Browser Dialog
+@onready var hf_dialog: Window = %HFDialog
+@onready var hf_search_input: LineEdit = %HFSearchInput
+@onready var hf_search_btn: Button = %HFSearchBtn
+@onready var hf_results_tree: Tree = %HFResultsTree
+@onready var hf_files_tree: Tree = %HFFilesTree
+@onready var hf_status_label: Label = %HFStatusLabel
+@onready var hf_add_btn: Button = %HFAddBtn
+@onready var hf_close_btn: Button = %HFCloseBtn
 
 # UI References - Generation Tab
 @onready var status_label: Label = %StatusLabel
@@ -55,6 +66,12 @@ var _is_generating: bool = false
 var _current_sort: SortBy = SortBy.NAME
 var _selected_model_id: String = ""
 
+# HuggingFace Browser
+var _hf_api: HuggingFaceAPI
+var _hf_search_results: Array[Dictionary] = []
+var _hf_selected_model_id: String = ""
+var _hf_selected_file: Dictionary = {}
+
 
 func _ready() -> void:
 	# Initialize ModelManager
@@ -85,10 +102,21 @@ func _ready() -> void:
 	download_model_btn.pressed.connect(_on_download_model_pressed)
 	load_model_btn.pressed.connect(_on_load_model_pressed)
 	delete_model_btn.pressed.connect(_on_delete_model_pressed)
+	browse_hf_btn.pressed.connect(_on_browse_hf_pressed)
 	unload_btn.pressed.connect(_on_unload_pressed)
 	generate_btn.pressed.connect(_on_generate_pressed)
 	clear_btn.pressed.connect(_on_clear_pressed)
 	cancel_download_btn.pressed.connect(_on_cancel_download_pressed)
+
+	# Initialize HuggingFace API
+	_hf_api = HuggingFaceAPI.new()
+	_hf_api.search_completed.connect(_on_hf_search_completed)
+	_hf_api.search_failed.connect(_on_hf_search_failed)
+	_hf_api.model_details_completed.connect(_on_hf_model_details_completed)
+	_hf_api.model_details_failed.connect(_on_hf_model_details_failed)
+
+	# Setup HuggingFace dialog
+	_setup_hf_dialog()
 
 	# Connect slider value changed
 	temperature_slider.value_changed.connect(_on_temperature_changed)
@@ -107,6 +135,8 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if _generation_thread != null and _generation_thread.is_started():
 		_generation_thread.wait_to_finish()
+	if _hf_api != null:
+		_hf_api.cleanup()
 
 
 func _setup_models_tree() -> void:
@@ -565,3 +595,211 @@ func _on_repeat_penalty_changed(value: float) -> void:
 
 func _on_min_p_changed(value: float) -> void:
 	min_p_value.text = "%.2f" % value
+
+
+# ===== HuggingFace Browser =====
+
+func _setup_hf_dialog() -> void:
+	# Setup results tree
+	hf_results_tree.columns = 3
+	hf_results_tree.set_column_title(0, "Model")
+	hf_results_tree.set_column_title(1, "Downloads")
+	hf_results_tree.set_column_title(2, "Likes")
+	hf_results_tree.column_titles_visible = true
+	hf_results_tree.set_column_expand(0, true)
+	hf_results_tree.set_column_expand(1, false)
+	hf_results_tree.set_column_expand(2, false)
+	hf_results_tree.set_column_custom_minimum_width(1, 80)
+	hf_results_tree.set_column_custom_minimum_width(2, 60)
+
+	# Setup files tree
+	hf_files_tree.columns = 3
+	hf_files_tree.set_column_title(0, "File")
+	hf_files_tree.set_column_title(1, "Size")
+	hf_files_tree.set_column_title(2, "Quant")
+	hf_files_tree.column_titles_visible = true
+	hf_files_tree.set_column_expand(0, true)
+	hf_files_tree.set_column_expand(1, false)
+	hf_files_tree.set_column_expand(2, false)
+	hf_files_tree.set_column_custom_minimum_width(1, 80)
+	hf_files_tree.set_column_custom_minimum_width(2, 70)
+
+	# Connect dialog signals
+	hf_search_btn.pressed.connect(_on_hf_search_pressed)
+	hf_search_input.text_submitted.connect(_on_hf_search_submitted)
+	hf_results_tree.item_selected.connect(_on_hf_result_selected)
+	hf_files_tree.item_selected.connect(_on_hf_file_selected)
+	hf_add_btn.pressed.connect(_on_hf_add_pressed)
+	hf_close_btn.pressed.connect(_on_hf_close_pressed)
+	hf_dialog.close_requested.connect(_on_hf_close_pressed)
+
+	# Initial state
+	hf_add_btn.disabled = true
+
+
+func _on_browse_hf_pressed() -> void:
+	hf_dialog.popup_centered(Vector2i(900, 600))
+	hf_search_input.grab_focus()
+
+
+func _on_hf_search_pressed() -> void:
+	_do_hf_search()
+
+
+func _on_hf_search_submitted(_text: String) -> void:
+	_do_hf_search()
+
+
+func _do_hf_search() -> void:
+	var query = hf_search_input.text.strip_edges()
+	if query.is_empty():
+		query = "instruct gguf"
+
+	hf_status_label.text = "Searching..."
+	hf_search_btn.disabled = true
+	hf_results_tree.clear()
+	hf_files_tree.clear()
+	_hf_selected_model_id = ""
+	_hf_selected_file = {}
+	hf_add_btn.disabled = true
+
+	_hf_api.search_models(query, 100)
+
+
+func _on_hf_search_completed(results: Array[Dictionary]) -> void:
+	hf_search_btn.disabled = false
+	_hf_search_results = results
+
+	hf_results_tree.clear()
+	var root = hf_results_tree.create_item()
+	hf_results_tree.hide_root = true
+
+	if results.is_empty():
+		hf_status_label.text = "No GGUF models found"
+		return
+
+	hf_status_label.text = "Found %d models" % results.size()
+
+	for result in results:
+		var item = hf_results_tree.create_item(root)
+		item.set_text(0, result.get("name", ""))
+		item.set_metadata(0, result.get("id", ""))
+
+		var downloads = result.get("downloads", 0)
+		var downloads_str = _format_number(downloads)
+		item.set_text(1, downloads_str)
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		item.set_text(2, str(result.get("likes", 0)))
+		item.set_text_alignment(2, HORIZONTAL_ALIGNMENT_RIGHT)
+
+
+func _on_hf_search_failed(error: String) -> void:
+	hf_search_btn.disabled = false
+	hf_status_label.text = "Search failed: %s" % error
+
+
+func _on_hf_result_selected() -> void:
+	var selected = hf_results_tree.get_selected()
+	if selected == null:
+		return
+
+	var model_id = selected.get_metadata(0) as String
+	if model_id.is_empty():
+		return
+
+	_hf_selected_model_id = model_id
+	_hf_selected_file = {}
+	hf_add_btn.disabled = true
+
+	hf_files_tree.clear()
+	hf_status_label.text = "Loading files for %s..." % model_id
+
+	_hf_api.get_model_files(model_id)
+
+
+func _on_hf_model_details_completed(model_id: String, files: Array[Dictionary]) -> void:
+	if model_id != _hf_selected_model_id:
+		return
+
+	hf_files_tree.clear()
+	var root = hf_files_tree.create_item()
+	hf_files_tree.hide_root = true
+
+	if files.is_empty():
+		hf_status_label.text = "No GGUF files found (or all files > 4GB)"
+		return
+
+	hf_status_label.text = "Found %d GGUF files" % files.size()
+
+	for file_info in files:
+		var item = hf_files_tree.create_item(root)
+
+		var filename = file_info.get("filename", "")
+		item.set_text(0, filename)
+		item.set_metadata(0, file_info)
+
+		var size_mb = file_info.get("size_mb", 0.0)
+		if size_mb >= 1024:
+			item.set_text(1, "%.1f GB" % (size_mb / 1024.0))
+		else:
+			item.set_text(1, "%.0f MB" % size_mb)
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		var quant = file_info.get("quantization", "")
+		item.set_text(2, quant)
+
+		# Highlight preferred quantizations
+		if file_info.get("is_preferred", false):
+			item.set_custom_color(2, Color(0, 0.831, 1))
+
+
+func _on_hf_model_details_failed(model_id: String, error: String) -> void:
+	if model_id != _hf_selected_model_id:
+		return
+
+	hf_status_label.text = "Failed to load files: %s" % error
+
+
+func _on_hf_file_selected() -> void:
+	var selected = hf_files_tree.get_selected()
+	if selected == null:
+		hf_add_btn.disabled = true
+		_hf_selected_file = {}
+		return
+
+	_hf_selected_file = selected.get_metadata(0) as Dictionary
+	hf_add_btn.disabled = _hf_selected_file.is_empty()
+
+
+func _on_hf_add_pressed() -> void:
+	if _hf_selected_model_id.is_empty() or _hf_selected_file.is_empty():
+		return
+
+	# Create ModelConfig from HuggingFace info
+	var config = _hf_api.create_model_config(_hf_selected_model_id, _hf_selected_file)
+
+	# Add to registry
+	_model_manager.registry.add_custom_model(config)
+
+	# Refresh the models list
+	_populate_models_tree()
+
+	# Close dialog
+	hf_dialog.hide()
+
+	# Show feedback
+	status_label.text = "Added: %s" % config.display_name
+	status_label.add_theme_color_override("font_color", Color(0, 0.831, 1))
+
+
+func _on_hf_close_pressed() -> void:
+	hf_dialog.hide()
+
+
+func _format_number(n: int) -> String:
+	if n >= 1000000:
+		return "%.1fM" % (n / 1000000.0)
+	elif n >= 1000:
+		return "%.1fK" % (n / 1000.0)
+	return str(n)

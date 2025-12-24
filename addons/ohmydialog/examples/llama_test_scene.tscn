@@ -144,6 +144,15 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Delete"
 
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BrowseHFBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse HuggingFace"
+
 [node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models"]
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
@@ -527,3 +536,113 @@ layout_mode = 2
 placeholder_text = "\\n
 User:"
 scroll_smooth = true
+
+[node name="HFDialog" type="Window" parent="."]
+unique_name_in_owner = true
+title = "Browse HuggingFace Models"
+initial_position = 2
+size = Vector2i(900, 600)
+visible = false
+exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="HFDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HFDialog/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/TitleRow"]
+layout_mode = 2
+text = "🤗"
+
+[node name="Title" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/TitleRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "HuggingFace Model Browser"
+
+[node name="SearchRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HFSearchInput" type="LineEdit" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search GGUF models (e.g., llama, qwen, phi, instruct)..."
+
+[node name="HFSearchBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Search"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 400
+
+[node name="LeftPanel" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ModelsLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "Models (sorted by downloads)"
+
+[node name="HFResultsTree" type="Tree" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightPanel" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FilesLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "GGUF Files (select one to add)"
+
+[node name="HFFilesTree" type="Tree" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BottomRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HFStatusLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Search for models to browse available GGUF files"
+
+[node name="HFAddBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Add to List"
+
+[node name="HFCloseBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Close"
