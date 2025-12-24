@@ -98,26 +98,38 @@ func parse_model_files(json_array: Array) -> Array[Dictionary]:
 			if not path.ends_with(".gguf"):
 				continue
 
-			# Get size - prefer LFS size (actual file size) over pointer size
-			var size: int = 0
-			var lfs = item.get("lfs")
-			if lfs is Dictionary and lfs.has("size"):
-				# LFS files: use actual file size from lfs.size
-				size = int(lfs.get("size", 0))
-			else:
-				# Non-LFS files: use direct size
-				size = int(item.get("size", 0))
+			# Get file size - the "size" field at root level contains the actual file size
+			# (same value as lfs.size for LFS files)
+			# Use float to handle large file sizes (>4GB) correctly
+			var size_bytes: float = 0.0
+			var raw_size = item.get("size")
+
+			# Debug: print raw value info for troubleshooting
+			print("HuggingFaceAPI DEBUG: %s -> raw_size=%s (type=%d)" % [path.get_file(), raw_size, typeof(raw_size)])
+
+			if raw_size != null:
+				# Handle both int and float JSON numbers
+				match typeof(raw_size):
+					TYPE_INT:
+						size_bytes = float(raw_size)
+					TYPE_FLOAT:
+						size_bytes = raw_size
+					_:
+						push_warning("HuggingFaceAPI: Unexpected size type for %s: %s (type: %d)" % [path, raw_size, typeof(raw_size)])
+
+			var size_mb = size_bytes / (1024.0 * 1024.0)
+			print("HuggingFaceAPI DEBUG: %s -> size_bytes=%.0f, size_mb=%.2f" % [path.get_file(), size_bytes, size_mb])
 
 			# Skip files that are too large
-			if size > max_file_size_bytes:
+			if size_bytes > float(max_file_size_bytes):
 				continue
 
 			var quant = _extract_quantization(path)
 
 			files.append({
 				"filename": path,
-				"size_bytes": size,
-				"size_mb": size / (1024.0 * 1024.0),
+				"size_bytes": size_bytes,
+				"size_mb": size_mb,
 				"quantization": quant,
 				"is_preferred": quant in preferred_quantizations
 			})
