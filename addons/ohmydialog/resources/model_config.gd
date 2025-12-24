@@ -87,33 +87,11 @@ func is_downloaded() -> bool:
 
 
 ## Returns the effective path where the model can be found
-## Checks user://models/ first (development), then res://models/ (export)
+## Checks res://models/ (project directory, included in exports)
 func get_effective_path() -> String:
 	if model_path.is_empty():
 		# Default path based on id
-		var user_path = "user://models/%s.gguf" % id
-		var res_path = "res://models/%s.gguf" % id
-
-		if FileAccess.file_exists(user_path):
-			return user_path
-		elif FileAccess.file_exists(res_path):
-			return res_path
-		else:
-			return user_path  # Default to user:// for downloads
-
-	# If explicit path is set, use it
-	if FileAccess.file_exists(model_path):
-		return model_path
-
-	# Try alternate location
-	if model_path.begins_with("res://"):
-		var user_alt = model_path.replace("res://models/", "user://models/")
-		if FileAccess.file_exists(user_alt):
-			return user_alt
-	elif model_path.begins_with("user://"):
-		var res_alt = model_path.replace("user://models/", "res://models/")
-		if FileAccess.file_exists(res_alt):
-			return res_alt
+		return "res://models/%s.gguf" % id
 
 	return model_path
 

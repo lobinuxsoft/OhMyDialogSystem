@@ -20,7 +20,7 @@ signal download_failed(model_id: String, error_message: String)
 ## Emitted when download is cancelled
 signal download_cancelled(model_id: String)
 
-const DOWNLOAD_DIR = "user://models/"
+const DOWNLOAD_DIR = "res://models/"
 const USER_AGENT = "OhMyDialogSystem/1.0 (Godot GDExtension)"
 
 var _http_request: HTTPRequest
