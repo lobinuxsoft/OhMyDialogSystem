@@ -76,8 +76,9 @@ def generate(env):
     # Configure library paths and libraries
     _configure_linking(env, build_dir)
 
-    # Add preprocessor definitions
-    env.Append(CPPDEFINES=["LLAMA_SHARED=0"])  # Static linking
+    # Note: Do NOT define LLAMA_SHARED - we want static linking
+    # The headers use #ifdef LLAMA_SHARED, not #if LLAMA_SHARED
+    # So leaving it undefined gives us the static LLAMA_API (empty macro)
 
     backend = env.get("llama_backend", "cpu")
     if backend == "cuda":
@@ -186,11 +187,12 @@ def _configure_linking(env, build_dir):
 
     # Add all library directories
     lib_dirs = _find_all_library_dirs(build_dir, platform)
+    print(f"[llama.py] Library directories found: {lib_dirs}")
     for lib_dir in lib_dirs:
         env.Append(LIBPATH=[lib_dir])
 
     # Core libraries (order matters for static linking)
-    core_libs = ["common", "llama", "ggml", "ggml-cpu", "ggml-base"]
+    core_libs = ["llama", "common", "ggml", "ggml-cpu", "ggml-base"]
     env.Append(LIBS=core_libs)
 
     # Backend-specific libraries
@@ -223,7 +225,8 @@ def _configure_linking(env, build_dir):
         env.Append(LIBS=["pthread"])
         env.Append(FRAMEWORKS=["Accelerate"])
     elif platform == "windows":
-        pass  # Windows doesn't need extra system libs typically
+        # advapi32: Windows Registry API (used by ggml-cpu for CPU detection)
+        env.Append(LIBS=["advapi32"])
 
 
 def _find_all_library_dirs(build_dir, platform):

@@ -160,7 +160,18 @@ echo.
 
 REM Build CMake flags
 set CMAKE_FLAGS=-DBUILD_SHARED_LIBS=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
+set CMAKE_FLAGS=%CMAKE_FLAGS% -DLLAMA_CURL=OFF -DLLAMA_BUILD_TOOLS=OFF
 set CMAKE_FLAGS=%CMAKE_FLAGS% -DGGML_NATIVE=%NATIVE% -DGGML_AVX2=%AVX2%
+
+REM Use static CRT to match godot-cpp (/MT instead of /MD)
+REM CMAKE_MSVC_RUNTIME_LIBRARY requires CMP0091=NEW which llama.cpp might not set
+REM So we use the direct approach: override compiler flags
+set CMAKE_FLAGS=!CMAKE_FLAGS! -DCMAKE_POLICY_DEFAULT_CMP0091=NEW
+if /i "%BUILD_TYPE%"=="Release" (
+    set CMAKE_FLAGS=!CMAKE_FLAGS! -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+) else (
+    set CMAKE_FLAGS=!CMAKE_FLAGS! -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreadedDebug
+)
 
 REM Configure backend-specific flags
 if /i "%BACKEND%"=="cpu" (
