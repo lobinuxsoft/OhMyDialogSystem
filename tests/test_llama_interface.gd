@@ -1,14 +1,22 @@
 ## Tests básicos para LlamaInterface
-## Ejecutar desde Godot: godot --headless --script res://tests/test_llama_interface.gd
-extends SceneTree
+## Ejecutar desde editor: Abrir tests/test_scene.tscn y presionar F6
+## Ejecutar headless: godot --headless --path "." --script res://tests/test_llama_interface.gd
+extends Node
 
+
+## Si true, cierra Godot al terminar (para CI/headless)
+@export var auto_quit: bool = false
 
 var _tests_passed: int = 0
 var _tests_failed: int = 0
 var _current_test: String = ""
 
 
-func _init() -> void:
+func _ready() -> void:
+	# Detectar si estamos en modo headless
+	if DisplayServer.get_name() == "headless":
+		auto_quit = true
+
 	print("\n" + "=".repeat(60))
 	print("  LlamaInterface - Tests Básicos")
 	print("=".repeat(60) + "\n")
@@ -16,10 +24,14 @@ func _init() -> void:
 	run_all_tests()
 
 	print("\n" + "=".repeat(60))
-	print("  Resultados: %d passed, %d failed" % [_tests_passed, _tests_failed])
+	if _tests_failed == 0:
+		print("  Resultados: %d passed, %d failed" % [_tests_passed, _tests_failed])
+	else:
+		print("  Resultados: %d passed, %d FAILED" % [_tests_passed, _tests_failed])
 	print("=".repeat(60) + "\n")
 
-	quit(0 if _tests_failed == 0 else 1)
+	if auto_quit:
+		get_tree().quit(0 if _tests_failed == 0 else 1)
 
 
 func run_all_tests() -> void:
