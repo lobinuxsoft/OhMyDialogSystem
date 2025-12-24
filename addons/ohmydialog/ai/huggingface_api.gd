@@ -98,11 +98,15 @@ func parse_model_files(json_array: Array) -> Array[Dictionary]:
 			if not path.ends_with(".gguf"):
 				continue
 
-			var size = item.get("size", 0) as int
-			# Also check LFS size
-			var lfs = item.get("lfs", {}) as Dictionary
-			if lfs.has("size"):
-				size = lfs.get("size", size) as int
+			# Get size - prefer LFS size (actual file size) over pointer size
+			var size: int = 0
+			var lfs = item.get("lfs")
+			if lfs is Dictionary and lfs.has("size"):
+				# LFS files: use actual file size from lfs.size
+				size = int(lfs.get("size", 0))
+			else:
+				# Non-LFS files: use direct size
+				size = int(item.get("size", 0))
 
 			# Skip files that are too large
 			if size > max_file_size_bytes:
