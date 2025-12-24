@@ -53,7 +53,7 @@ desktop.ini
 # Models (too large for git)
 *.gguf
 *.bin
-models/
+models/*.gguf
 
 # TTS voices (download separately)
 voices/
@@ -68,3 +68,4 @@ user://
 # Build directories
 build/
 dist/
+*.os
