@@ -160,10 +160,30 @@ gh pr create --base development --title "Titulo" --body "Closes #XX"
 gh pr merge <number>
 ```
 
+### Cierre de Issues - Campos del Proyecto:
+Al cerrar una issue, SIEMPRE actualizar los campos de fecha en el proyecto para que aparezcan en el roadmap:
+
+```bash
+# Obtener el item ID de la issue en el proyecto
+gh project item-list 5 --owner lobinuxsoft --format json | grep -A5 "number\":X"
+
+# Actualizar Start Date (fecha en que se comenzo a trabajar)
+gh project item-edit --project-id PVT_kwHOAVGx6s4BLOYT --id <ITEM_ID> --field-id PVTF_lAHOAVGx6s4BLOYTzg63ghM --date YYYY-MM-DD
+
+# Actualizar End Date (fecha de cierre)
+gh project item-edit --project-id PVT_kwHOAVGx6s4BLOYT --id <ITEM_ID> --field-id PVTF_lAHOAVGx6s4BLOYTzg63ghQ --date YYYY-MM-DD
+```
+
+**IDs de referencia:**
+- Project ID: `PVT_kwHOAVGx6s4BLOYT`
+- Start Date Field: `PVTF_lAHOAVGx6s4BLOYTzg63ghM`
+- End Date Field: `PVTF_lAHOAVGx6s4BLOYTzg63ghQ`
+
 ### Importante - NO Saltear el Proceso:
 - NO empezar a codear sin issue creado
 - NO trabajar directamente en `development` o `main`
 - NO hacer commits de features sin branch dedicada
+- NO cerrar issues sin actualizar Start Date y End Date en el proyecto
 - SI crear issue primero, aunque sea pequena la tarea
 - SI usar branches descriptivas
 - SI mantener `development` siempre funcional
