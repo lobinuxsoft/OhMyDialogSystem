@@ -216,7 +216,9 @@ def _configure_linking(env, build_dir):
 
     # Platform-specific system libraries
     if platform == "linux":
-        env.Append(LIBS=["pthread", "dl", "m"])
+        env.Append(LIBS=["pthread", "dl", "m", "gomp"])
+        env.Append(CCFLAGS=["-fopenmp"])
+        env.Append(LINKFLAGS=["-fopenmp"])
     elif platform == "macos":
         env.Append(LIBS=["pthread"])
         env.Append(FRAMEWORKS=["Accelerate"])

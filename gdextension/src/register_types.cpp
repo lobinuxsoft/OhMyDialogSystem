@@ -2,7 +2,10 @@
 
 #include <gdextension_interface.h>
 #include <godot_cpp/core/defs.hpp>
+#include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/godot.hpp>
+
+#include "llama_interface.h"
 
 using namespace godot;
 
@@ -11,8 +14,7 @@ void initialize_ohmydialog_module(ModuleInitializationLevel p_level) {
         return;
     }
 
-    // Register classes here as they are created
-    // Example: ClassDB::register_class<MyClass>();
+    GDREGISTER_CLASS(LlamaInterface);
 }
 
 void uninitialize_ohmydialog_module(ModuleInitializationLevel p_level) {

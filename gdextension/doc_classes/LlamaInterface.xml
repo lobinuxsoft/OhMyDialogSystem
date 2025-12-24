@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="LlamaInterface" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Interface for loading and managing GGUF language models via llama.cpp.
+	</brief_description>
+	<description>
+		LlamaInterface provides a high-level API for loading GGUF format language models using the llama.cpp library. This class handles model loading, memory management, and provides model information.
+		[b]Example usage:[/b]
+		[codeblock]
+		var llama = LlamaInterface.new()
+		var err = llama.load_model("user://models/mistral-7b-q4.gguf", {
+		    "n_ctx": 4096,
+		    "n_gpu_layers": 0
+		})
+		if err == OK:
+		    print(llama.get_model_info())
+		[/codeblock]
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="load_model">
+			<return type="int" enum="Error" />
+			<param index="0" name="path" type="String" />
+			<param index="1" name="params" type="Dictionary" default="{}" />
+			<description>
+				Loads a GGUF model from the specified path.
+				[b]Parameters in params Dictionary:[/b]
+				- [code]n_ctx[/code] (int): Context size in tokens. Default: model's training context.
+				- [code]n_gpu_layers[/code] (int): Number of layers to offload to GPU. Default: 0 (CPU only).
+				- [code]n_batch[/code] (int): Batch size for prompt processing. Default: 512.
+				- [code]n_threads[/code] (int): Number of threads for generation. Default: auto.
+				- [code]n_threads_batch[/code] (int): Number of threads for batch processing. Default: auto.
+				- [code]use_mmap[/code] (bool): Use memory-mapped file. Default: true.
+				- [code]use_mlock[/code] (bool): Lock model in RAM. Default: false.
+				- [code]vocab_only[/code] (bool): Only load vocabulary. Default: false.
+				Returns [constant OK] on success, or an error code on failure.
+			</description>
+		</method>
+		<method name="unload_model">
+			<return type="void" />
+			<description>
+				Unloads the currently loaded model and frees all associated resources.
+			</description>
+		</method>
+		<method name="is_model_loaded" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if a model is currently loaded, [code]false[/code] otherwise.
+			</description>
+		</method>
+		<method name="get_model_info" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns a Dictionary containing information about the currently loaded model.
+				[b]Returned keys:[/b]
+				- [code]description[/code] (String): Model description.
+				- [code]path[/code] (String): Path to the loaded model.
+				- [code]size_bytes[/code] (int): Model size in bytes.
+				- [code]n_params[/code] (int): Number of parameters.
+				- [code]n_ctx_train[/code] (int): Training context size.
+				- [code]n_embd[/code] (int): Embedding dimension.
+				- [code]n_layer[/code] (int): Number of layers.
+				- [code]n_head[/code] (int): Number of attention heads.
+				- [code]n_ctx[/code] (int): Current context size.
+				- [code]n_batch[/code] (int): Current batch size.
+				- [code]vocab_size[/code] (int): Vocabulary size.
+				- [code]vocab_type[/code] (int): Vocabulary type.
+				- [code]bos_token[/code] (int): Beginning of sentence token ID.
+				- [code]eos_token[/code] (int): End of sentence token ID.
+				- [code]has_encoder[/code] (bool): Model has encoder.
+				- [code]has_decoder[/code] (bool): Model has decoder.
+				- [code]is_recurrent[/code] (bool): Model is recurrent (Mamba, RWKV).
+				- [code]rope_type[/code] (int): RoPE type.
+				Returns an empty Dictionary if no model is loaded.
+			</description>
+		</method>
+		<method name="get_model_path" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the path of the currently loaded model, or an empty string if no model is loaded.
+			</description>
+		</method>
+	</methods>
+</class>

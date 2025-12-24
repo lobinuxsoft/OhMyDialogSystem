@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LlamaInterface - OhMyDialogSystem Wiki</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-bg"></canvas>
+
+  <div class="wiki-container">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">🧠</div>
+        <div class="sidebar-logo">OhMyDialogSystem</div>
+        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">General</div>
+        <ul class="nav-links">
+          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Getting Started</div>
+        <ul class="nav-links">
+          <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
+          <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
+          <li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">API Reference</div>
+        <ul class="nav-links">
+          <li><a href="index.html"><span class="icon">📚</span> Overview</a></li>
+          <li><a href="llama-interface.html" class="active"><span class="icon">🦙</span> LlamaInterface</a></li>
+          <li><a href="dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
+          <li><a href="memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
+          <li><a href="tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
+          <li><a href="resources.html"><span class="icon">📄</span> Resources</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Technical</div>
+        <ul class="nav-links">
+          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
+          <li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
+          <li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">External Links</div>
+        <ul class="nav-links">
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
+          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">API Reference</a> <span>/</span> <span>LlamaInterface</span>
+      </div>
+
+      <h1>🦙 LlamaInterface</h1>
+
+      <p><span class="badge badge-cyan">GDExtension</span> <span class="badge badge-purple">C++</span></p>
+
+      <p>Interfaz de bajo nivel para <a href="https://github.com/ggerganov/llama.cpp" target="_blank">llama.cpp</a>. Permite cargar modelos GGUF y gestionar su ciclo de vida.</p>
+
+      <blockquote>
+        <strong>Nota:</strong> Esta clase es parte del módulo GDExtension nativo. Requiere que el addon esté correctamente compilado para tu plataforma.
+      </blockquote>
+
+      <hr>
+
+      <h2>Herencia</h2>
+
+      <p><code>RefCounted</code> → <code>LlamaInterface</code></p>
+
+      <hr>
+
+      <h2>Descripción</h2>
+
+      <p><code>LlamaInterface</code> proporciona una API de alto nivel para cargar modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
+
+      <p>Es la base sobre la cual se construyen los componentes de más alto nivel como <code>DialogueManager</code>.</p>
+
+      <hr>
+
+      <h2>Métodos</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Retorno</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>Error</code></td>
+            <td><a href="#load_model">load_model</a>(path: String, params: Dictionary = {})</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#unload_model">unload_model</a>()</td>
+          </tr>
+          <tr>
+            <td><code>bool</code></td>
+            <td><a href="#is_model_loaded">is_model_loaded</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>Dictionary</code></td>
+            <td><a href="#get_model_info">get_model_info</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>String</code></td>
+            <td><a href="#get_model_path">get_model_path</a>() const</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Descripciones de Métodos</h2>
+
+      <h3 id="load_model">load_model</h3>
+
+      <pre data-lang="GDSCRIPT"><code>Error load_model(path: String, params: Dictionary = {})</code></pre>
+
+      <p>Carga un modelo GGUF desde la ruta especificada.</p>
+
+      <h4>Parámetros</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>path</code></td>
+            <td>String</td>
+            <td>Ruta al archivo .gguf. Soporta <code>res://</code> y <code>user://</code></td>
+          </tr>
+          <tr>
+            <td><code>params</code></td>
+            <td>Dictionary</td>
+            <td>Parámetros opcionales de configuración</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Parámetros del Dictionary</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Tipo</th>
+            <th>Default</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>n_ctx</code></td>
+            <td>int</td>
+            <td>modelo</td>
+            <td>Tamaño de contexto en tokens</td>
+          </tr>
+          <tr>
+            <td><code>n_gpu_layers</code></td>
+            <td>int</td>
+            <td>0</td>
+            <td>Capas a offload a GPU (0 = solo CPU)</td>
+          </tr>
+          <tr>
+            <td><code>n_batch</code></td>
+            <td>int</td>
+            <td>512</td>
+            <td>Tamaño de batch para procesamiento</td>
+          </tr>
+          <tr>
+            <td><code>n_threads</code></td>
+            <td>int</td>
+            <td>auto</td>
+            <td>Threads para generación</td>
+          </tr>
+          <tr>
+            <td><code>n_threads_batch</code></td>
+            <td>int</td>
+            <td>auto</td>
+            <td>Threads para procesamiento de batch</td>
+          </tr>
+          <tr>
+            <td><code>use_mmap</code></td>
+            <td>bool</td>
+            <td>true</td>
+            <td>Usar memory-mapped file</td>
+          </tr>
+          <tr>
+            <td><code>use_mlock</code></td>
+            <td>bool</td>
+            <td>false</td>
+            <td>Bloquear modelo en RAM</td>
+          </tr>
+          <tr>
+            <td><code>vocab_only</code></td>
+            <td>bool</td>
+            <td>false</td>
+            <td>Solo cargar vocabulario (sin pesos)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Retorno</h4>
+
+      <p>Retorna <code>OK</code> si el modelo se cargó correctamente, o un código de error:</p>
+
+      <ul>
+        <li><code>ERR_FILE_NOT_FOUND</code> - El archivo no existe</li>
+        <li><code>ERR_CANT_OPEN</code> - No se pudo abrir/parsear el modelo</li>
+        <li><code>ERR_CANT_CREATE</code> - No se pudo crear el contexto</li>
+      </ul>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>var llama = LlamaInterface.new()
+var err = llama.load_model("user://models/mistral-7b-q4.gguf", {
+    "n_ctx": 4096,
+    "n_gpu_layers": 0
+})
+
+if err != OK:
+    push_error("Failed to load model: " + str(err))
+    return
+
+print("Model loaded successfully!")</code></pre>
+
+      <hr>
+
+      <h3 id="unload_model">unload_model</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void unload_model()</code></pre>
+
+      <p>Descarga el modelo actual y libera todos los recursos asociados (contexto, backend, memoria).</p>
+
+      <p>Es seguro llamar este método incluso si no hay modelo cargado.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>llama.unload_model()
+print("Model unloaded")</code></pre>
+
+      <hr>
+
+      <h3 id="is_model_loaded">is_model_loaded</h3>
+
+      <pre data-lang="GDSCRIPT"><code>bool is_model_loaded() const</code></pre>
+
+      <p>Verifica si hay un modelo cargado y listo para usar.</p>
+
+      <h4>Retorno</h4>
+
+      <p><code>true</code> si hay un modelo cargado, <code>false</code> en caso contrario.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>if llama.is_model_loaded():
+    print("Ready to generate!")
+else:
+    print("No model loaded")</code></pre>
+
+      <hr>
+
+      <h3 id="get_model_info">get_model_info</h3>
+
+      <pre data-lang="GDSCRIPT"><code>Dictionary get_model_info() const</code></pre>
+
+      <p>Retorna información detallada sobre el modelo cargado.</p>
+
+      <h4>Retorno</h4>
+
+      <p>Un Dictionary con las siguientes keys (vacío si no hay modelo cargado):</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>description</code></td>
+            <td>String</td>
+            <td>Descripción del modelo</td>
+          </tr>
+          <tr>
+            <td><code>path</code></td>
+            <td>String</td>
+            <td>Ruta del archivo cargado</td>
+          </tr>
+          <tr>
+            <td><code>size_bytes</code></td>
+            <td>int</td>
+            <td>Tamaño del modelo en bytes</td>
+          </tr>
+          <tr>
+            <td><code>n_params</code></td>
+            <td>int</td>
+            <td>Número de parámetros</td>
+          </tr>
+          <tr>
+            <td><code>n_ctx_train</code></td>
+            <td>int</td>
+            <td>Contexto de entrenamiento</td>
+          </tr>
+          <tr>
+            <td><code>n_embd</code></td>
+            <td>int</td>
+            <td>Dimensión de embeddings</td>
+          </tr>
+          <tr>
+            <td><code>n_layer</code></td>
+            <td>int</td>
+            <td>Número de capas</td>
+          </tr>
+          <tr>
+            <td><code>n_head</code></td>
+            <td>int</td>
+            <td>Número de attention heads</td>
+          </tr>
+          <tr>
+            <td><code>n_ctx</code></td>
+            <td>int</td>
+            <td>Contexto actual configurado</td>
+          </tr>
+          <tr>
+            <td><code>n_batch</code></td>
+            <td>int</td>
+            <td>Batch size actual</td>
+          </tr>
+          <tr>
+            <td><code>vocab_size</code></td>
+            <td>int</td>
+            <td>Tamaño del vocabulario</td>
+          </tr>
+          <tr>
+            <td><code>vocab_type</code></td>
+            <td>int</td>
+            <td>Tipo de tokenizador (0=SPM, 1=BPE, etc.)</td>
+          </tr>
+          <tr>
+            <td><code>bos_token</code></td>
+            <td>int</td>
+            <td>ID del token BOS</td>
+          </tr>
+          <tr>
+            <td><code>eos_token</code></td>
+            <td>int</td>
+            <td>ID del token EOS</td>
+          </tr>
+          <tr>
+            <td><code>has_encoder</code></td>
+            <td>bool</td>
+            <td>Si el modelo tiene encoder</td>
+          </tr>
+          <tr>
+            <td><code>has_decoder</code></td>
+            <td>bool</td>
+            <td>Si el modelo tiene decoder</td>
+          </tr>
+          <tr>
+            <td><code>is_recurrent</code></td>
+            <td>bool</td>
+            <td>Si es recurrente (Mamba, RWKV)</td>
+          </tr>
+          <tr>
+            <td><code>rope_type</code></td>
+            <td>int</td>
+            <td>Tipo de RoPE</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>var info = llama.get_model_info()
+if not info.is_empty():
+    print("Model: ", info.description)
+    print("Parameters: ", info.n_params / 1_000_000_000.0, "B")
+    print("Context: ", info.n_ctx, " tokens")
+    print("Layers: ", info.n_layer)</code></pre>
+
+      <hr>
+
+      <h3 id="get_model_path">get_model_path</h3>
+
+      <pre data-lang="GDSCRIPT"><code>String get_model_path() const</code></pre>
+
+      <p>Retorna la ruta del modelo actualmente cargado.</p>
+
+      <h4>Retorno</h4>
+
+      <p>La ruta del modelo, o un String vacío si no hay modelo cargado.</p>
+
+      <hr>
+
+      <h2>Ejemplo Completo</h2>
+
+      <pre data-lang="GDSCRIPT"><code>extends Node
+
+var llama: LlamaInterface
+
+func _ready():
+    llama = LlamaInterface.new()
+
+    # Cargar modelo con configuración personalizada
+    var err = llama.load_model("user://models/qwen2.5-7b-q4_k_m.gguf", {
+        "n_ctx": 8192,
+        "n_gpu_layers": 35,  # Offload a GPU si está disponible
+        "n_threads": 8
+    })
+
+    if err != OK:
+        push_error("Error loading model")
+        return
+
+    # Mostrar información del modelo
+    var info = llama.get_model_info()
+    print("=== Model Info ===")
+    print("Description: ", info.get("description", "Unknown"))
+    print("Size: ", info.get("size_bytes", 0) / (1024 * 1024), " MB")
+    print("Parameters: ", info.get("n_params", 0))
+    print("Context: ", info.get("n_ctx", 0), " tokens")
+    print("Vocab size: ", info.get("vocab_size", 0))
+
+func _exit_tree():
+    if llama and llama.is_model_loaded():
+        llama.unload_model()</code></pre>
+
+      <hr>
+
+      <h2>Modelos Compatibles</h2>
+
+      <p>LlamaInterface soporta cualquier modelo en formato <strong>GGUF</strong>. Algunos modelos recomendados:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>Tamaño</th>
+            <th>VRAM (Q4)</th>
+            <th>Uso Recomendado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Qwen2.5-3B</td>
+            <td>~2 GB</td>
+            <td>~3 GB</td>
+            <td>NPCs simples, respuestas cortas</td>
+          </tr>
+          <tr>
+            <td>Mistral-7B</td>
+            <td>~4 GB</td>
+            <td>~6 GB</td>
+            <td>Balance calidad/velocidad</td>
+          </tr>
+          <tr>
+            <td>Qwen2.5-7B</td>
+            <td>~4 GB</td>
+            <td>~6 GB</td>
+            <td>Diálogos complejos</td>
+          </tr>
+          <tr>
+            <td>Llama-3.1-8B</td>
+            <td>~5 GB</td>
+            <td>~7 GB</td>
+            <td>Alta calidad general</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <blockquote>
+        <strong>Tip:</strong> Usa cuantizaciones Q4_K_M o Q5_K_M para el mejor balance entre calidad y rendimiento.
+      </blockquote>
+
+      <hr>
+
+      <h2>Notas Técnicas</h2>
+
+      <ul>
+        <li>La clase inicializa automáticamente el backend de llama.cpp al cargar un modelo</li>
+        <li>Solo puede haber un modelo cargado a la vez. Cargar un nuevo modelo descarga el anterior</li>
+        <li>El destructor libera automáticamente todos los recursos</li>
+        <li>Compatible con multi-threading via OpenMP</li>
+        <li>Soporta GPU offloading con CUDA, Vulkan o Metal (según compilación)</li>
+      </ul>
+
+      <hr>
+
+      <a href="index.html">← Volver a API Reference</a>
+
+      <footer class="wiki-footer">
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../ai-bg.js"></script>
+</body>
+</html>
