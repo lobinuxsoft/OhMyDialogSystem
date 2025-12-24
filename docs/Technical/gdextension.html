@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDExtension Build - OhMyDialogSystem Wiki</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-bg"></canvas>
+
+  <div class="wiki-container">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">🧠</div>
+        <div class="sidebar-logo">OhMyDialogSystem</div>
+        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">General</div>
+        <ul class="nav-links">
+          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Getting Started</div>
+        <ul class="nav-links">
+          <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
+          <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">API Reference</div>
+        <ul class="nav-links">
+          <li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li>
+          <li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
+          <li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Technical</div>
+        <ul class="nav-links">
+          <li><a href="index.html"><span class="icon">⚙️</span> Overview</a></li>
+          <li><a href="architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
+          <li><a href="gdextension.html" class="active"><span class="icon">🔧</span> GDExtension Build</a></li>
+          <li><a href="memory-system.html"><span class="icon">💾</span> Memory System</a></li>
+          <li><a href="localization.html"><span class="icon">🌐</span> Localization</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">External Links</div>
+        <ul class="nav-links">
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
+          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">Technical</a> <span>/</span> <span>GDExtension Build</span>
+      </div>
+
+      <h1>GDExtension Build Guide</h1>
+
+      <p>Guia completa para compilar la GDExtension de OhMyDialogSystem con integracion de llama.cpp.</p>
+
+      <hr>
+
+      <h2>Prerequisitos</h2>
+
+      <h3>Todas las Plataformas</h3>
+
+      <ul>
+        <li><strong>Python 3.10+</strong> con pip</li>
+        <li><strong>SCons 4.x+</strong>: <code>pip install scons</code></li>
+        <li><strong>CMake 3.20+</strong></li>
+        <li><strong>Ninja</strong> (recomendado para builds mas rapidos)</li>
+        <li><strong>Git</strong> (para submodulos)</li>
+      </ul>
+
+      <h3>Linux</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Paquete</th>
+            <th>Fedora/Bazzite</th>
+            <th>Ubuntu/Debian</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Compilador C++</td>
+            <td><code>gcc-c++</code></td>
+            <td><code>build-essential</code></td>
+          </tr>
+          <tr>
+            <td>Headers de desarrollo</td>
+            <td><code>libstdc++-devel</code></td>
+            <td><code>libstdc++-dev</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout-warning">
+        <p><strong>Bazzite/Fedora Silverblue (rpm-ostree):</strong> Si hay conflictos de version con gcc, descargar la version exacta desde <a href="https://kojipkgs.fedoraproject.org/packages/" target="_blank">Koji</a>.</p>
+      </div>
+
+      <h3>Windows</h3>
+
+      <ul>
+        <li><strong>Visual Studio 2022</strong> con workload de C++, o</li>
+        <li><strong>MinGW-w64</strong> (GCC 12+)</li>
+        <li><strong>CMake</strong> (desde cmake.org o Visual Studio)</li>
+      </ul>
+
+      <h3>macOS</h3>
+
+      <ul>
+        <li><strong>Xcode Command Line Tools</strong>: <code>xcode-select --install</code></li>
+        <li><strong>CMake</strong>: <code>brew install cmake ninja</code></li>
+      </ul>
+
+      <hr>
+
+      <h2>Compilacion</h2>
+
+      <h3>1. Clonar con submodulos</h3>
+
+      <pre data-lang="BASH"><code>git clone --recursive https://github.com/lobinuxsoft/OhMyDialogSystem.git
+cd OhMyDialogSystem</code></pre>
+
+      <p>Si ya esta clonado:</p>
+
+      <pre data-lang="BASH"><code>git submodule update --init --recursive</code></pre>
+
+      <h3>2. Compilar llama.cpp (primera vez)</h3>
+
+      <pre data-lang="BASH"><code># Linux/macOS
+./gdextension/scripts/build_llama.sh --cpu
+
+# Windows
+gdextension\scripts\build_llama.bat --cpu</code></pre>
+
+      <h3>3. Compilar GDExtension</h3>
+
+      <pre data-lang="BASH"><code>cd gdextension
+
+# Linux
+scons platform=linux target=template_debug
+
+# Windows
+scons platform=windows target=template_debug
+
+# macOS
+scons platform=macos target=template_debug</code></pre>
+
+      <hr>
+
+      <h2>Opciones de Build</h2>
+
+      <h3>Opciones de llama.cpp</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Opcion</th>
+            <th>Valores</th>
+            <th>Default</th>
+            <th>Descripcion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>llama_backend</code></td>
+            <td>cpu, cuda, vulkan, metal, sycl</td>
+            <td>cpu</td>
+            <td>Backend de computo</td>
+          </tr>
+          <tr>
+            <td><code>llama_native</code></td>
+            <td>yes, no</td>
+            <td>yes</td>
+            <td>Optimizaciones nativas de CPU</td>
+          </tr>
+          <tr>
+            <td><code>llama_avx2</code></td>
+            <td>yes, no</td>
+            <td>yes</td>
+            <td>Instrucciones AVX2 (x86_64)</td>
+          </tr>
+          <tr>
+            <td><code>llama_rebuild</code></td>
+            <td>yes, no</td>
+            <td>no</td>
+            <td>Forzar rebuild de llama.cpp</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Ejemplo:</p>
+
+      <pre data-lang="BASH"><code>scons platform=linux target=template_release llama_backend=cpu llama_native=yes</code></pre>
+
+      <h3>Opciones estandar de godot-cpp</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Opcion</th>
+            <th>Valores</th>
+            <th>Descripcion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>platform</code></td>
+            <td>linux, windows, macos, ios, android</td>
+            <td>Plataforma objetivo</td>
+          </tr>
+          <tr>
+            <td><code>target</code></td>
+            <td>editor, template_debug, template_release</td>
+            <td>Tipo de build</td>
+          </tr>
+          <tr>
+            <td><code>arch</code></td>
+            <td>x86_64, arm64</td>
+            <td>Arquitectura objetivo</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Aceleracion GPU (Opcional)</h2>
+
+      <h3>Vulkan</h3>
+
+      <p>Requiere paquetes adicionales:</p>
+
+      <pre data-lang="BASH"><code># Linux (Fedora)
+sudo dnf install vulkan-devel shaderc
+
+# Luego recompilar con:
+./gdextension/scripts/build_llama.sh --vulkan --clean
+scons platform=linux llama_backend=vulkan</code></pre>
+
+      <div class="callout-info">
+        <p>Ver <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/53" target="_blank">Issue #53</a> para el estado del soporte Vulkan.</p>
+      </div>
+
+      <h3>CUDA</h3>
+
+      <p>Requiere NVIDIA CUDA Toolkit 11.7+.</p>
+
+      <pre data-lang="BASH"><code>./gdextension/scripts/build_llama.sh --cuda
+scons platform=linux llama_backend=cuda</code></pre>
+
+      <hr>
+
+      <h2>Troubleshooting</h2>
+
+      <h3>"cannot find -lstdc++"</h3>
+
+      <p>El build requiere libstdc++ estatico por defecto. Si no esta disponible, el SConstruct automaticamente usa linkeo dinamico. Para distribucion, considerar:</p>
+
+      <pre data-lang="BASH"><code># Fedora
+sudo dnf install libstdc++-static</code></pre>
+
+      <h3>"llama.cpp not found"</h3>
+
+      <p>Asegurar que los submodulos estan inicializados:</p>
+
+      <pre data-lang="BASH"><code>git submodule update --init --recursive</code></pre>
+
+      <h3>Errores de CMake durante build de llama.cpp</h3>
+
+      <p>Los scripts de build usan estos flags para evitar dependencias opcionales:</p>
+
+      <ul>
+        <li><code>-DLLAMA_CURL=OFF</code> - Desactiva descarga de modelos (no necesario)</li>
+        <li><code>-DLLAMA_BUILD_TOOLS=OFF</code> - Salta herramientas CLI (no necesario)</li>
+      </ul>
+
+      <hr>
+
+      <h2>Output</h2>
+
+      <p>Las librerias compiladas se colocan en:</p>
+
+      <pre data-lang="TREE"><code>addons/ohmydialog/gdextension/
+├── libohmydialog.linux.template_debug.x86_64.so
+├── libohmydialog.windows.template_debug.x86_64.dll
+└── libohmydialog.macos.template_debug.framework/</code></pre>
+
+      <hr>
+
+      <a href="index.html">← Volver a Technical</a>
+
+      <footer class="wiki-footer">
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../ai-bg.js"></script>
+</body>
+</html>
