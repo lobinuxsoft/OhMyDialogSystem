@@ -16,6 +16,7 @@ export_presets.cfg
 *.o
 *.a
 *.lib
+*.exp
 
 # GDExtension build artifacts
 addons/ohmydialog/gdextension/bin/
