@@ -204,7 +204,7 @@ func _get_selected_model() -> ModelConfig:
 func _update_model_details() -> void:
 	var model = _get_selected_model()
 	if model == null:
-		model_details.text = "Select a model to see details"
+		model_details.text = "[color=#8b949e]Select a model to see details[/color]"
 		return
 
 	var is_downloaded = model.is_downloaded()
@@ -216,51 +216,58 @@ func _update_model_details() -> void:
 			file_size_actual = file.get_length() / (1024.0 * 1024.0)
 			file.close()
 
-	var text = "[b]%s[/b]\n\n" % model.display_name
+	# Title
+	var text = "[color=#00d4ff][b]%s[/b][/color]\n" % model.display_name
+	text += "[color=#21262d]━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n"
 
 	# Description
 	if not model.description.is_empty():
-		text += "[color=gray]%s[/color]\n\n" % model.description
+		text += "[color=#8b949e]%s[/color]\n\n" % model.description
 
-	# Status
-	text += "[b]Status:[/b] "
+	# Status badge
+	text += "[color=#a855f7]Status:[/color] "
 	if _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id:
-		text += "[color=green]Loaded[/color]\n"
+		text += "[color=#10b981][b]● LOADED[/b][/color]\n"
 	elif is_downloaded:
-		text += "[color=cyan]Downloaded[/color]\n"
+		text += "[color=#00d4ff]● Downloaded[/color]\n"
 	else:
-		text += "[color=gray]Not Downloaded[/color]\n"
+		text += "[color=#484f58]○ Not Downloaded[/color]\n"
 
-	text += "\n[b]Specifications:[/b]\n"
+	# Specifications section
+	text += "\n[color=#10b981][b]Specifications[/b][/color]\n"
 
 	# Size
 	if is_downloaded and file_size_actual > 0:
-		text += "  File Size: %.1f MB\n" % file_size_actual
+		text += "[color=#8b949e]File Size:[/color] %.1f MB\n" % file_size_actual
 	else:
-		text += "  Est. Size: ~%.0f MB\n" % model.size_mb
+		text += "[color=#8b949e]Est. Size:[/color] ~%.0f MB\n" % model.size_mb
 
 	# Context
-	text += "  Context Window: %d tokens\n" % model.n_ctx
+	text += "[color=#8b949e]Context Window:[/color] [color=#00d4ff]%d[/color] tokens\n" % model.n_ctx
 
-	# Estimate memory (rough: ~1.1x file size for Q8, varies by quantization)
+	# Estimate memory
 	var est_memory = model.size_mb * 1.2
-	text += "  Est. RAM Usage: ~%.0f MB\n" % est_memory
+	text += "[color=#8b949e]Est. RAM Usage:[/color] ~%.0f MB\n" % est_memory
 
 	# GPU layers
-	text += "  GPU Layers: %d\n" % model.n_gpu_layers
+	text += "[color=#8b949e]GPU Layers:[/color] %d\n" % model.n_gpu_layers
 
 	# Batch size
-	text += "  Batch Size: %d\n" % model.n_batch
+	text += "[color=#8b949e]Batch Size:[/color] %d\n" % model.n_batch
 
-	text += "\n[b]Default Sampling:[/b]\n"
-	text += "  Temperature: %.2f\n" % model.default_temperature
-	text += "  Top P: %.2f\n" % model.default_top_p
-	text += "  Top K: %d\n" % model.default_top_k
-	text += "  Max Tokens: %d\n" % model.default_max_tokens
+	# Default sampling section
+	text += "\n[color=#a855f7][b]Default Sampling[/b][/color]\n"
+	text += "[color=#8b949e]Temperature:[/color] %.2f\n" % model.default_temperature
+	text += "[color=#8b949e]Top P:[/color] %.2f\n" % model.default_top_p
+	text += "[color=#8b949e]Top K:[/color] %d\n" % model.default_top_k
+	text += "[color=#8b949e]Max Tokens:[/color] %d\n" % model.default_max_tokens
+	text += "[color=#8b949e]Repeat Penalty:[/color] %.2f\n" % model.default_repeat_penalty
+	text += "[color=#8b949e]Min P:[/color] %.2f\n" % model.default_min_p
 
+	# Custom model warning
 	if model.is_custom:
-		text += "\n[color=yellow][b]Custom Model[/b][/color]\n"
-		text += "[color=yellow]Use at your own responsibility.[/color]"
+		text += "\n[color=#f97316][b]⚠ CUSTOM MODEL[/b][/color]\n"
+		text += "[color=#f97316]Use at your own responsibility.[/color]"
 
 	model_details.text = text
 	_selected_model_id = model.id
@@ -268,27 +275,48 @@ func _update_model_details() -> void:
 
 func _update_loaded_model_info() -> void:
 	if not _model_manager.is_model_loaded():
-		loaded_model_info.text = "No model loaded.\nGo to Models tab to load one."
+		loaded_model_info.text = "[color=#8b949e]No model loaded.[/color]\n[color=#484f58]Go to Models tab to load one.[/color]"
 		return
 
 	var config = _model_manager.current_config
 	var info = _model_manager.get_model_info()
 
-	var text = "[b]%s[/b]\n" % config.display_name
+	# Title with gradient-like effect using colors
+	var text = "[color=#00d4ff][b]%s[/b][/color]\n" % config.display_name
+	text += "[color=#21262d]━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n"
 
+	# Model stats
 	if info.has("n_params"):
 		var params = info["n_params"]
 		var params_str = "%.2fB" % (params / 1_000_000_000.0) if params >= 1_000_000_000 else "%.0fM" % (params / 1_000_000.0)
-		text += "Parameters: %s\n" % params_str
+		text += "[color=#a855f7]Parameters:[/color] %s\n" % params_str
 
 	if info.has("n_ctx"):
-		text += "Context: %d tokens\n" % info["n_ctx"]
+		text += "[color=#a855f7]Context:[/color] %d tokens\n" % info["n_ctx"]
 
 	if info.has("vocab_size"):
-		text += "Vocabulary: %d\n" % info["vocab_size"]
+		text += "[color=#a855f7]Vocabulary:[/color] %d tokens\n" % info["vocab_size"]
 
 	if info.has("n_layer"):
-		text += "Layers: %d\n" % info["n_layer"]
+		text += "[color=#a855f7]Layers:[/color] %d\n" % info["n_layer"]
+
+	# Config info
+	text += "\n[color=#10b981][b]Configuration[/b][/color]\n"
+	text += "[color=#8b949e]GPU Layers:[/color] %d\n" % config.n_gpu_layers
+	text += "[color=#8b949e]Batch Size:[/color] %d\n" % config.n_batch
+
+	# File size if available
+	var path = config.get_effective_path()
+	if FileAccess.file_exists(path):
+		var file = FileAccess.open(path, FileAccess.READ)
+		if file:
+			var size_mb = file.get_length() / (1024.0 * 1024.0)
+			file.close()
+			text += "[color=#8b949e]File Size:[/color] %.1f MB\n" % size_mb
+
+	# Estimated RAM
+	var est_ram = config.size_mb * 1.2
+	text += "[color=#8b949e]Est. RAM:[/color] ~%.0f MB\n" % est_ram
 
 	loaded_model_info.text = text
 
