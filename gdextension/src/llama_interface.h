@@ -8,6 +8,7 @@
 
 #include "llama.h"
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -39,6 +40,10 @@ private:
 
 	// Stop sequences
 	std::vector<std::string> m_stop_sequences;
+
+	// Timeout configuration
+	int64_t m_timeout_ms = 0; // 0 = no timeout
+	bool m_generation_timed_out = false;
 
 	// Internal methods
 	void _cleanup();
@@ -132,6 +137,15 @@ public:
 
 	/// Clear all stop sequences
 	void clear_stop_sequences();
+
+	// ==================== Timeout ====================
+
+	/// Set generation timeout in milliseconds (0 = no timeout)
+	void set_timeout(int64_t timeout_ms);
+	int64_t get_timeout() const;
+
+	/// Check if the last generation timed out
+	bool has_generation_timed_out() const;
 };
 
 } // namespace godot

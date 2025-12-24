@@ -115,6 +115,14 @@ void LlamaInterface::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_stop_sequences"), &LlamaInterface::get_stop_sequences);
 	ClassDB::bind_method(D_METHOD("clear_stop_sequences"), &LlamaInterface::clear_stop_sequences);
 
+	// Timeout
+	ClassDB::bind_method(D_METHOD("set_timeout", "timeout_ms"), &LlamaInterface::set_timeout);
+	ClassDB::bind_method(D_METHOD("get_timeout"), &LlamaInterface::get_timeout);
+	ClassDB::bind_method(D_METHOD("has_generation_timed_out"), &LlamaInterface::has_generation_timed_out);
+
+	// Signals
+	ADD_SIGNAL(MethodInfo("generation_timeout"));
+
 	// Properties
 	ADD_GROUP("Sampling", "");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "temperature", PROPERTY_HINT_RANGE, "0.0,2.0,0.01"), "set_temperature", "get_temperature");
@@ -124,6 +132,9 @@ void LlamaInterface::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "repeat_penalty", PROPERTY_HINT_RANGE, "1.0,2.0,0.01"), "set_repeat_penalty", "get_repeat_penalty");
 	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "min_p", PROPERTY_HINT_RANGE, "0.0,1.0,0.01"), "set_min_p", "get_min_p");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "seed"), "set_seed", "get_seed");
+
+	ADD_GROUP("Timeout", "");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "timeout", PROPERTY_HINT_RANGE, "0,300000,100"), "set_timeout", "get_timeout");
 }
 
 Error LlamaInterface::load_model(const String &path, const Dictionary &params) {
@@ -283,6 +294,9 @@ String LlamaInterface::get_model_path() const {
 // ==================== Text Generation ====================
 
 String LlamaInterface::generate(const String &prompt) {
+	// Reset timeout flag
+	m_generation_timed_out = false;
+
 	if (!is_model_loaded()) {
 		UtilityFunctions::push_error("LlamaInterface: No model loaded");
 		return String();
@@ -339,7 +353,22 @@ String LlamaInterface::generate(const String &prompt) {
 	std::string generated_text;
 	int n_decoded = 0;
 
+	// Start time for timeout check
+	auto start_time = std::chrono::steady_clock::now();
+
 	while (n_decoded < m_max_tokens) {
+		// Check timeout
+		if (m_timeout_ms > 0) {
+			auto current_time = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+			if (elapsed_ms >= m_timeout_ms) {
+				m_generation_timed_out = true;
+				UtilityFunctions::push_warning("LlamaInterface: Generation timed out after ", elapsed_ms, "ms");
+				emit_signal("generation_timeout");
+				break;
+			}
+		}
+
 		// Sample next token
 		llama_token new_token = llama_sampler_sample(smpl, m_context, -1);
 
@@ -492,6 +521,20 @@ PackedStringArray LlamaInterface::get_stop_sequences() const {
 
 void LlamaInterface::clear_stop_sequences() {
 	m_stop_sequences.clear();
+}
+
+// ==================== Timeout ====================
+
+void LlamaInterface::set_timeout(int64_t timeout_ms) {
+	m_timeout_ms = timeout_ms >= 0 ? timeout_ms : 0;
+}
+
+int64_t LlamaInterface::get_timeout() const {
+	return m_timeout_ms;
+}
+
+bool LlamaInterface::has_generation_timed_out() const {
+	return m_generation_timed_out;
 }
 
 } // namespace godot
