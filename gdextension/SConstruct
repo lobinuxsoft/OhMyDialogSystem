@@ -1,0 +1,95 @@
+#!/usr/bin/env python
+"""
+SConstruct for OhMyDialogSystem GDExtension
+Builds the native C++ extension for Godot 4.5+
+
+Supports llama.cpp integration with multiple backends:
+  llama_backend=cpu|cuda|vulkan|metal|sycl (default: cpu)
+  llama_native=yes|no (default: yes)
+  llama_avx2=yes|no (default: yes)
+  llama_rebuild=yes|no (default: no)
+"""
+
+import os
+import sys
+
+# Add tools directory to path for custom SCons tools
+# In SCons, use Dir('.').abspath instead of __file__
+script_dir = Dir('.').srcnode().abspath
+sys.path.insert(0, os.path.join(script_dir, "tools"))
+
+env = SConscript("godot-cpp/SConstruct")
+
+# ============================================================================
+# Platform-specific fixes
+# ============================================================================
+# Remove static libstdc++ linking on Linux if static library not available
+# This allows building without libstdc++-static package
+if env["platform"] == "linux":
+    static_libstdcpp = "/usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.a"
+    if not os.path.exists(static_libstdcpp):
+        env["LINKFLAGS"] = [f for f in env["LINKFLAGS"] if f != "-static-libstdc++"]
+        print("[SConstruct] Note: Using dynamic libstdc++ (static not available)")
+
+# ============================================================================
+# llama.cpp Integration
+# ============================================================================
+# Parse llama.cpp options from command line
+llama_backend = ARGUMENTS.get("llama_backend", "cpu")
+llama_native = ARGUMENTS.get("llama_native", "yes") == "yes"
+llama_avx2 = ARGUMENTS.get("llama_avx2", "yes") == "yes"
+llama_rebuild = ARGUMENTS.get("llama_rebuild", "no") == "yes"
+
+# Store options in environment for the tool to use
+env["llama_backend"] = llama_backend
+env["llama_native"] = llama_native
+env["llama_avx2"] = llama_avx2
+env["llama_rebuild"] = llama_rebuild
+
+# Load and apply llama.cpp tool
+from llama import generate as llama_generate
+llama_generate(env)
+
+print(f"[SConstruct] llama.cpp backend: {llama_backend}")
+
+# Add source directory to include path
+env.Append(CPPPATH=["src/"])
+
+# Gather all source files
+sources = Glob("src/*.cpp")
+
+# Generate documentation data for editor builds
+if env["target"] in ["editor", "template_debug"]:
+    doc_data = env.GodotCPPDocData("src/gen/doc_data.gen.cpp", source=Glob("doc_classes/*.xml"))
+    sources.append(doc_data)
+
+# Output directory - binaries go to addon's gdextension folder
+output_dir = "../addons/ohmydialog/gdextension/"
+
+# Build library based on platform
+if env["platform"] == "macos":
+    library = env.SharedLibrary(
+        "{}libohmydialog.{}.{}.framework/libohmydialog.{}.{}".format(
+            output_dir, env["platform"], env["target"], env["platform"], env["target"]
+        ),
+        source=sources,
+    )
+elif env["platform"] == "ios":
+    if env["ios_simulator"]:
+        library = env.StaticLibrary(
+            "{}libohmydialog.{}.{}.simulator.a".format(output_dir, env["platform"], env["target"]),
+            source=sources,
+        )
+    else:
+        library = env.StaticLibrary(
+            "{}libohmydialog.{}.{}.a".format(output_dir, env["platform"], env["target"]),
+            source=sources,
+        )
+else:
+    library = env.SharedLibrary(
+        "{}libohmydialog{}{}".format(output_dir, env["suffix"], env["SHLIBSUFFIX"]),
+        source=sources,
+    )
+
+env.NoCache(library)
+Default(library)

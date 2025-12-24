@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - OhMyDialogSystem Wiki</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-bg"></canvas>
+
+  <div class="wiki-container">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">🧠</div>
+        <div class="sidebar-logo">OhMyDialogSystem</div>
+        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">General</div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="active"><span class="icon">🏠</span> Home</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Getting Started</div>
+        <ul class="nav-links">
+          <li><a href="Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
+          <li><a href="Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
+          <li><a href="Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">API Reference</div>
+        <ul class="nav-links">
+          <li><a href="API/index.html"><span class="icon">📚</span> Overview</a></li>
+          <li><a href="API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
+          <li><a href="API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
+          <li><a href="API/memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
+          <li><a href="API/tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
+          <li><a href="API/resources.html"><span class="icon">📄</span> Resources</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Technical</div>
+        <ul class="nav-links">
+          <li><a href="Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
+          <li><a href="Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
+          <li><a href="Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
+          <li><a href="Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li>
+          <li><a href="Technical/localization.html"><span class="icon">🌐</span> Localization</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Guides</div>
+        <ul class="nav-links">
+          <li><a href="Guides/index.html"><span class="icon">📖</span> Overview</a></li>
+          <li><a href="Guides/visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
+          <li><a href="Guides/character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
+          <li><a href="Guides/tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
+          <li><a href="Guides/csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Examples</div>
+        <ul class="nav-links">
+          <li><a href="Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
+          <li><a href="Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
+          <li><a href="Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">External Links</div>
+        <ul class="nav-links">
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
+          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Wiki</a> <span>/</span> <span>Home</span>
+      </div>
+
+      <h1>OhMyDialogSystem</h1>
+
+      <p>
+        <span class="badge badge-cyan">Godot 4.5+</span>
+        <span class="badge badge-purple">GDExtension</span>
+        <span class="badge badge-green">MIT License</span>
+      </p>
+
+      <div class="ai-box">
+        <p><strong>Sistema de diálogos con IA para Godot</strong> que permite crear NPCs inteligentes con personalidades únicas, memorias persistentes y voces sintetizadas. Potenciado por LLMs locales via llama.cpp.</p>
+      </div>
+
+      <hr>
+
+      <h2>Características Principales</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="icon">🦙</span>
+          <h3>LLM Local</h3>
+          <p>Inferencia de modelos GGUF directamente en Godot via llama.cpp. Sin dependencias de APIs externas.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🎨</span>
+          <h3>Editor Visual</h3>
+          <p>Editor de grafos de diálogo integrado con nodos de IA, condiciones, eventos y opciones.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🧠</span>
+          <h3>Memorias Persistentes</h3>
+          <p>Los NPCs recuerdan conversaciones previas con búsqueda semántica de memorias relevantes.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🔊</span>
+          <h3>Text-to-Speech</h3>
+          <p>Voces sintetizadas offline con Piper TTS. Cada personaje puede tener su propia voz.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🌐</span>
+          <h3>Localización</h3>
+          <p>Integración con TranslationServer de Godot. Prompts y plantillas en múltiples idiomas.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🔷</span>
+          <h3>Bindings C#</h3>
+          <p>API idiomática de C# con async/await, eventos y documentación XML completa.</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2>Quick Start</h2>
+
+      <pre data-lang="GDSCRIPT"><code># 1. Cargar el modelo
+var llama = LlamaInterface.new()
+llama.load_model("user://models/mistral-7b-q4.gguf")
+
+# 2. Configurar el DialogueManager
+var dm = DialogueManager.new()
+dm.set_llama_interface(llama)
+dm.set_character(preload("res://npcs/merchant.tres"))
+
+# 3. Iniciar conversación
+dm.npc_response_completed.connect(_on_npc_response)
+dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
+
+      <div class="callout-info">
+        <p>Para una guía completa de instalación y configuración, visita <a href="Guides/quickstart.html">Quick Start Guide</a>.</p>
+      </div>
+
+      <hr>
+
+      <h2>Arquitectura del Sistema</h2>
+
+      <pre data-lang="DIAGRAM"><code>┌─────────────────────────────────────────────────────────────────┐
+│                      OhMyDialogSystem                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │   LLM       │    │   Memory    │    │    TTS      │         │
+│  │ (llama.cpp) │    │   System    │    │  (Piper)    │         │
+│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘         │
+│         │                  │                  │                 │
+│         └──────────────────┼──────────────────┘                 │
+│                            │                                    │
+│                    ┌───────┴───────┐                           │
+│                    │   Dialogue    │                           │
+│                    │    Manager    │                           │
+│                    └───────┬───────┘                           │
+│                            │                                    │
+│              ┌─────────────┼─────────────┐                     │
+│              │             │             │                     │
+│        ┌─────┴─────┐ ┌─────┴─────┐ ┌─────┴─────┐             │
+│        │ Character │ │   World   │ │  Dialogue │             │
+│        │ Identity  │ │  Context  │ │   Graph   │             │
+│        └───────────┘ └───────────┘ └───────────┘             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+
+      <hr>
+
+      <h2>Roadmap</h2>
+
+      <div class="milestone-progress">
+        <div class="header">
+          <strong>M1: GDExtension Core</strong>
+          <span class="badge badge-cyan">0%</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
+      </div>
+
+      <div class="milestone-progress">
+        <div class="header">
+          <strong>M2: Core del Sistema</strong>
+          <span class="badge badge-purple">0%</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
+      </div>
+
+      <div class="milestone-progress">
+        <div class="header">
+          <strong>M3: Editor Visual</strong>
+          <span class="badge badge-purple">0%</span>
+        </div>
+        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Milestone</th>
+            <th>Descripción</th>
+            <th>Issues</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>M1</strong></td>
+            <td>GDExtension Core (llama.cpp, godot-cpp)</td>
+            <td>#1-#6</td>
+          </tr>
+          <tr>
+            <td><strong>M2</strong></td>
+            <td>Core del Sistema (Resources, Managers)</td>
+            <td>#7-#14</td>
+          </tr>
+          <tr>
+            <td><strong>M3</strong></td>
+            <td>Editor Visual de Diálogos</td>
+            <td>#15-#22</td>
+          </tr>
+          <tr>
+            <td><strong>M4</strong></td>
+            <td>Memorias Persistentes</td>
+            <td>#23-#28</td>
+          </tr>
+          <tr>
+            <td><strong>M5</strong></td>
+            <td>Localización</td>
+            <td>#29-#32</td>
+          </tr>
+          <tr>
+            <td><strong>M6</strong></td>
+            <td>Text-to-Speech (Piper)</td>
+            <td>#33-#38</td>
+          </tr>
+          <tr>
+            <td><strong>M7</strong></td>
+            <td>Bindings C#</td>
+            <td>#39-#43</td>
+          </tr>
+          <tr>
+            <td><strong>M8</strong></td>
+            <td>Ejemplos y Documentación</td>
+            <td>#44-#50</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Navegación Rápida</h2>
+
+      <h3>Para Empezar</h3>
+      <ul>
+        <li><a href="Guides/quickstart.html">🚀 Quick Start Guide</a> - Tu primer NPC en 10 minutos</li>
+        <li><a href="Guides/installation.html">📦 Installation</a> - Instalación del addon y modelos</li>
+      </ul>
+
+      <h3>Documentación Técnica</h3>
+      <ul>
+        <li><a href="API/index.html">📚 API Reference</a> - Referencia completa de todas las clases</li>
+        <li><a href="Technical/architecture.html">🏗️ Architecture</a> - Arquitectura del sistema</li>
+        <li><a href="Technical/gdextension.html">🔧 GDExtension Build</a> - Compilar el addon</li>
+      </ul>
+
+      <h3>Guías Prácticas</h3>
+      <ul>
+        <li><a href="Guides/visual-editor.html">🎨 Visual Editor</a> - Usar el editor de grafos</li>
+        <li><a href="Guides/character-identity.html">👤 Character Identity</a> - Definir personalidades</li>
+        <li><a href="Guides/tts-setup.html">🎤 TTS Setup</a> - Configurar voces</li>
+      </ul>
+
+      <hr>
+
+      <h2>Requisitos</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Componente</th>
+            <th>Versión</th>
+            <th>Notas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Godot Engine</td>
+            <td>4.5+</td>
+            <td>Requerido para GDExtension 4.3+</td>
+          </tr>
+          <tr>
+            <td>Modelo LLM</td>
+            <td>GGUF Q4/Q5/Q8</td>
+            <td>Recomendado: Mistral 7B o similar</td>
+          </tr>
+          <tr>
+            <td>RAM</td>
+            <td>8GB+</td>
+            <td>16GB recomendado para modelos grandes</td>
+          </tr>
+          <tr>
+            <td>GPU (opcional)</td>
+            <td>CUDA/Vulkan</td>
+            <td>Para aceleración de inferencia</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <em>Última actualización: Diciembre 2025</em>
+
+      <footer class="wiki-footer">
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+        <p>MIT License - Made with 🧠 by lobinuxsoft</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="ai-bg.js"></script>
+</body>
+</html>

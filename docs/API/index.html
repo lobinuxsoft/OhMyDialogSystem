@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Reference - OhMyDialogSystem Wiki</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-bg"></canvas>
+
+  <div class="wiki-container">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">🧠</div>
+        <div class="sidebar-logo">OhMyDialogSystem</div>
+        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">General</div>
+        <ul class="nav-links">
+          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Getting Started</div>
+        <ul class="nav-links">
+          <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
+          <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
+          <li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">API Reference</div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="active"><span class="icon">📚</span> Overview</a></li>
+          <li><a href="llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
+          <li><a href="dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
+          <li><a href="memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
+          <li><a href="tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
+          <li><a href="resources.html"><span class="icon">📄</span> Resources</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Technical</div>
+        <ul class="nav-links">
+          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
+          <li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
+          <li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">External Links</div>
+        <ul class="nav-links">
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
+          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Wiki</a> <span>/</span> <span>API Reference</span>
+      </div>
+
+      <h1>API Reference</h1>
+
+      <p>Documentación completa de todas las clases públicas del addon OhMyDialogSystem.</p>
+
+      <hr>
+
+      <h2>Clases Principales</h2>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <span class="icon">🦙</span>
+          <h3><a href="llama-interface.html">LlamaInterface</a></h3>
+          <p>Interfaz de bajo nivel para llama.cpp. Carga modelos GGUF y genera texto.</p>
+          <p><span class="badge badge-cyan">GDExtension</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">💬</span>
+          <h3><a href="dialogue-manager.html">DialogueManager</a></h3>
+          <p>Orquestador principal del sistema de diálogos. Conecta todos los componentes.</p>
+          <p><span class="badge badge-purple">Core</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🧠</span>
+          <h3><a href="memory-manager.html">MemoryManager</a></h3>
+          <p>Sistema de memorias persistentes con búsqueda semántica.</p>
+          <p><span class="badge badge-green">Memory</span></p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🔊</span>
+          <h3><a href="tts-manager.html">TTSManager</a></h3>
+          <p>Síntesis de voz con Piper TTS. Genera audio para diálogos.</p>
+          <p><span class="badge badge-orange">TTS</span></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2>Resources (Godot Resources)</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Resource</th>
+            <th>Descripción</th>
+            <th>Uso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>CharacterIdentity</code></td>
+            <td>Define la personalidad, background y estilo de un NPC</td>
+            <td>Un resource por personaje</td>
+          </tr>
+          <tr>
+            <td><code>WorldContext</code></td>
+            <td>Contexto del mundo, lore, eventos actuales</td>
+            <td>Uno o más por escenario</td>
+          </tr>
+          <tr>
+            <td><code>DialogueGraph</code></td>
+            <td>Grafo visual de nodos de diálogo</td>
+            <td>Uno por conversación/quest</td>
+          </tr>
+          <tr>
+            <td><code>AIPreset</code></td>
+            <td>Configuración de generación (temperature, top_p, etc.)</td>
+            <td>Presets reutilizables</td>
+          </tr>
+          <tr>
+            <td><code>VoiceProfile</code></td>
+            <td>Configuración de voz para TTS</td>
+            <td>Un profile por personaje</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><a href="resources.html">Ver documentación completa de Resources →</a></p>
+
+      <hr>
+
+      <h2>Signals Comunes</h2>
+
+      <h3>DialogueManager</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Signal</th>
+            <th>Parámetros</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>dialogue_started</code></td>
+            <td>-</td>
+            <td>Emitido al iniciar un diálogo</td>
+          </tr>
+          <tr>
+            <td><code>npc_response_started</code></td>
+            <td>-</td>
+            <td>El NPC comenzó a "pensar"</td>
+          </tr>
+          <tr>
+            <td><code>token_generated</code></td>
+            <td><code>token: String</code></td>
+            <td>Cada token generado (streaming)</td>
+          </tr>
+          <tr>
+            <td><code>npc_response_completed</code></td>
+            <td><code>response: String</code></td>
+            <td>Respuesta completa del NPC</td>
+          </tr>
+          <tr>
+            <td><code>choices_available</code></td>
+            <td><code>choices: Array[String]</code></td>
+            <td>Opciones disponibles para el jugador</td>
+          </tr>
+          <tr>
+            <td><code>event_triggered</code></td>
+            <td><code>name: String, data: Dictionary</code></td>
+            <td>Evento del grafo disparado</td>
+          </tr>
+          <tr>
+            <td><code>dialogue_ended</code></td>
+            <td>-</td>
+            <td>Conversación finalizada</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>LlamaInterface</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Signal</th>
+            <th>Parámetros</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>model_loaded</code></td>
+            <td><code>info: Dictionary</code></td>
+            <td>Modelo cargado exitosamente</td>
+          </tr>
+          <tr>
+            <td><code>generation_started</code></td>
+            <td>-</td>
+            <td>Inicio de generación</td>
+          </tr>
+          <tr>
+            <td><code>token_generated</code></td>
+            <td><code>token: String</code></td>
+            <td>Token generado</td>
+          </tr>
+          <tr>
+            <td><code>generation_completed</code></td>
+            <td><code>text: String</code></td>
+            <td>Generación completada</td>
+          </tr>
+          <tr>
+            <td><code>generation_error</code></td>
+            <td><code>error: String</code></td>
+            <td>Error durante generación</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Ejemplo de Uso Completo</h2>
+
+      <pre data-lang="GDSCRIPT"><code>extends Node
+
+var llama: LlamaInterface
+var dialogue_manager: DialogueManager
+var memory_manager: MemoryManager
+
+func _ready():
+    # Inicializar LLM
+    llama = LlamaInterface.new()
+    add_child(llama)
+
+    var err = llama.load_model("user://models/mistral-7b-q4.gguf", {
+        "n_ctx": 4096,
+        "n_gpu_layers": 0
+    })
+
+    if err != OK:
+        push_error("Failed to load model")
+        return
+
+    # Inicializar MemoryManager
+    memory_manager = MemoryManager.new()
+    add_child(memory_manager)
+
+    # Inicializar DialogueManager
+    dialogue_manager = DialogueManager.new()
+    dialogue_manager.set_llama_interface(llama)
+    dialogue_manager.set_memory_manager(memory_manager)
+    dialogue_manager.set_character(preload("res://npcs/merchant.tres"))
+    dialogue_manager.set_world_context(preload("res://world/fantasy_world.tres"))
+    add_child(dialogue_manager)
+
+    # Conectar signals
+    dialogue_manager.npc_response_completed.connect(_on_npc_response)
+    dialogue_manager.choices_available.connect(_on_choices)
+    dialogue_manager.event_triggered.connect(_on_event)
+
+func start_conversation():
+    dialogue_manager.start_dialogue(preload("res://dialogues/merchant_greeting.tres"))
+
+func send_message(text: String):
+    dialogue_manager.send_player_message(text)
+
+func _on_npc_response(response: String):
+    print("NPC: ", response)
+
+func _on_choices(choices: Array[String]):
+    for i in choices.size():
+        print("[%d] %s" % [i + 1, choices[i]])
+
+func _on_event(event_name: String, data: Dictionary):
+    match event_name:
+        "open_shop":
+            open_shop_ui()
+        "give_quest":
+            add_quest(data["quest_id"])</code></pre>
+
+      <hr>
+
+      <a href="../index.html">← Volver a Home</a>
+
+      <footer class="wiki-footer">
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../ai-bg.js"></script>
+</body>
+</html>

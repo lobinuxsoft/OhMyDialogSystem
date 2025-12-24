@@ -1,0 +1,6 @@
+[submodule "gdextension/godot-cpp"]
+	path = gdextension/godot-cpp
+	url = https://github.com/godotengine/godot-cpp.git
+[submodule "gdextension/thirdparty/llama.cpp"]
+	path = gdextension/thirdparty/llama.cpp
+	url = https://github.com/ggerganov/llama.cpp.git

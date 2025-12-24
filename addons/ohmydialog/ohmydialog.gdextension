@@ -1,0 +1,23 @@
+[configuration]
+
+entry_symbol = "ohmydialog_library_init"
+compatibility_minimum = "4.5"
+reloadable = true
+
+[libraries]
+
+; Windows
+windows.debug.x86_64 = "res://addons/ohmydialog/gdextension/libohmydialog.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "res://addons/ohmydialog/gdextension/libohmydialog.windows.template_release.x86_64.dll"
+windows.debug.arm64 = "res://addons/ohmydialog/gdextension/libohmydialog.windows.template_debug.arm64.dll"
+windows.release.arm64 = "res://addons/ohmydialog/gdextension/libohmydialog.windows.template_release.arm64.dll"
+
+; Linux
+linux.debug.x86_64 = "res://addons/ohmydialog/gdextension/libohmydialog.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "res://addons/ohmydialog/gdextension/libohmydialog.linux.template_release.x86_64.so"
+linux.debug.arm64 = "res://addons/ohmydialog/gdextension/libohmydialog.linux.template_debug.arm64.so"
+linux.release.arm64 = "res://addons/ohmydialog/gdextension/libohmydialog.linux.template_release.arm64.so"
+
+; macOS
+macos.debug = "res://addons/ohmydialog/gdextension/libohmydialog.macos.template_debug.framework"
+macos.release = "res://addons/ohmydialog/gdextension/libohmydialog.macos.template_release.framework"

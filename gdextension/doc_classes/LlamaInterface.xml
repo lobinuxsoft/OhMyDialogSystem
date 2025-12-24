@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="LlamaInterface" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Interface for loading GGUF language models and generating text via llama.cpp.
+	</brief_description>
+	<description>
+		LlamaInterface provides a high-level API for loading GGUF format language models and generating text using the llama.cpp library. This class handles model loading, memory management, sampling configuration, and synchronous text generation.
+		[b]Example usage:[/b]
+		[codeblock]
+		var llama = LlamaInterface.new()
+		var err = llama.load_model("user://models/mistral-7b-q4.gguf", {
+		    "n_ctx": 4096,
+		    "n_gpu_layers": 0
+		})
+		if err == OK:
+		    llama.temperature = 0.7
+		    llama.max_tokens = 100
+		    llama.set_stop_sequences(["\\n", "User:"])
+		    var response = llama.generate("Once upon a time")
+		    print(response)
+		[/codeblock]
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="load_model">
+			<return type="int" enum="Error" />
+			<param index="0" name="path" type="String" />
+			<param index="1" name="params" type="Dictionary" default="{}" />
+			<description>
+				Loads a GGUF model from the specified path.
+				[b]Parameters in params Dictionary:[/b]
+				- [code]n_ctx[/code] (int): Context size in tokens. Default: model's training context.
+				- [code]n_gpu_layers[/code] (int): Number of layers to offload to GPU. Default: 0 (CPU only).
+				- [code]n_batch[/code] (int): Batch size for prompt processing. Default: 512.
+				- [code]n_threads[/code] (int): Number of threads for generation. Default: auto.
+				- [code]n_threads_batch[/code] (int): Number of threads for batch processing. Default: auto.
+				- [code]use_mmap[/code] (bool): Use memory-mapped file. Default: true.
+				- [code]use_mlock[/code] (bool): Lock model in RAM. Default: false.
+				- [code]vocab_only[/code] (bool): Only load vocabulary. Default: false.
+				Returns [constant OK] on success, or an error code on failure.
+			</description>
+		</method>
+		<method name="unload_model">
+			<return type="void" />
+			<description>
+				Unloads the currently loaded model and frees all associated resources.
+			</description>
+		</method>
+		<method name="is_model_loaded" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if a model is currently loaded, [code]false[/code] otherwise.
+			</description>
+		</method>
+		<method name="get_model_info" qualifiers="const">
+			<return type="Dictionary" />
+			<description>
+				Returns a Dictionary containing information about the currently loaded model.
+				[b]Returned keys:[/b]
+				- [code]description[/code] (String): Model description.
+				- [code]path[/code] (String): Path to the loaded model.
+				- [code]size_bytes[/code] (int): Model size in bytes.
+				- [code]n_params[/code] (int): Number of parameters.
+				- [code]n_ctx_train[/code] (int): Training context size.
+				- [code]n_embd[/code] (int): Embedding dimension.
+				- [code]n_layer[/code] (int): Number of layers.
+				- [code]n_head[/code] (int): Number of attention heads.
+				- [code]n_ctx[/code] (int): Current context size.
+				- [code]n_batch[/code] (int): Current batch size.
+				- [code]vocab_size[/code] (int): Vocabulary size.
+				- [code]vocab_type[/code] (int): Vocabulary type.
+				- [code]bos_token[/code] (int): Beginning of sentence token ID.
+				- [code]eos_token[/code] (int): End of sentence token ID.
+				- [code]has_encoder[/code] (bool): Model has encoder.
+				- [code]has_decoder[/code] (bool): Model has decoder.
+				- [code]is_recurrent[/code] (bool): Model is recurrent (Mamba, RWKV).
+				- [code]rope_type[/code] (int): RoPE type.
+				Returns an empty Dictionary if no model is loaded.
+			</description>
+		</method>
+		<method name="get_model_path" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the path of the currently loaded model, or an empty string if no model is loaded.
+			</description>
+		</method>
+		<method name="generate">
+			<return type="String" />
+			<param index="0" name="prompt" type="String" />
+			<description>
+				Generates text synchronously from the given prompt.
+				Returns the generated text, or an empty string on error.
+				[b]Note:[/b] This is a blocking operation. For large outputs, consider running in a thread.
+				The generation stops when:
+				- [member max_tokens] is reached
+				- An end-of-generation token is encountered
+				- A stop sequence is matched
+			</description>
+		</method>
+		<method name="set_stop_sequences">
+			<return type="void" />
+			<param index="0" name="sequences" type="PackedStringArray" />
+			<description>
+				Sets the stop sequences that will halt text generation when encountered.
+				The stop sequence is removed from the final output.
+			</description>
+		</method>
+		<method name="get_stop_sequences" qualifiers="const">
+			<return type="PackedStringArray" />
+			<description>
+				Returns the currently configured stop sequences.
+			</description>
+		</method>
+		<method name="clear_stop_sequences">
+			<return type="void" />
+			<description>
+				Clears all configured stop sequences.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="temperature" type="float" setter="set_temperature" getter="get_temperature" default="0.8">
+			Controls randomness in generation. Higher values (e.g., 1.5) produce more creative/random output, lower values (e.g., 0.2) produce more focused/deterministic output. Set to 0 for greedy (deterministic) sampling.
+		</member>
+		<member name="top_p" type="float" setter="set_top_p" getter="get_top_p" default="0.95">
+			Nucleus sampling threshold. Only tokens with cumulative probability up to this value are considered. Range: 0.0 to 1.0.
+		</member>
+		<member name="top_k" type="int" setter="set_top_k" getter="get_top_k" default="40">
+			Limits sampling to the top K most likely tokens. Set to 0 to disable.
+		</member>
+		<member name="max_tokens" type="int" setter="set_max_tokens" getter="get_max_tokens" default="256">
+			Maximum number of tokens to generate.
+		</member>
+		<member name="repeat_penalty" type="float" setter="set_repeat_penalty" getter="get_repeat_penalty" default="1.1">
+			Penalty applied to repeated tokens. Values greater than 1.0 discourage repetition. Set to 1.0 to disable.
+		</member>
+		<member name="min_p" type="float" setter="set_min_p" getter="get_min_p" default="0.05">
+			Minimum probability threshold. Tokens with probability below this (relative to the top token) are filtered out. Range: 0.0 to 1.0.
+		</member>
+		<member name="seed" type="int" setter="set_seed" getter="get_seed" default="4294967295">
+			Random seed for reproducibility. Default value (0xFFFFFFFF) uses random seed.
+		</member>
+	</members>
+</class>
