@@ -153,16 +153,69 @@ gdextension\scripts\build_llama.bat --cpu</code></pre>
 
       <h3>3. Compilar GDExtension</h3>
 
+      <h4>Usando los scripts de build (recomendado)</h4>
+
+      <p>Los scripts <code>build.bat</code> (Windows) y <code>build.sh</code> (Linux/macOS) simplifican el proceso:</p>
+
+      <pre data-lang="BASH"><code>cd gdextension
+
+# Windows
+build.bat editor          # Para desarrollo en el editor
+build.bat debug           # Para exportar en modo debug
+build.bat release         # Para exportar en modo release
+
+# Linux/macOS
+./build.sh editor
+./build.sh debug
+./build.sh release</code></pre>
+
+      <div class="callout-warning">
+        <p><strong>Importante:</strong> Para abrir el proyecto en el editor de Godot, <strong>debes compilar con <code>editor</code></strong>. El target <code>template_debug</code> solo sirve para exportar el juego, no para desarrollo.</p>
+      </div>
+
+      <h4>Entendiendo los targets</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Target</th>
+            <th>Uso</th>
+            <th>Cuando compilar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>editor</code></td>
+            <td>Desarrollo en el editor de Godot</td>
+            <td><strong>Siempre</strong> - necesario para abrir el proyecto</td>
+          </tr>
+          <tr>
+            <td><code>template_debug</code></td>
+            <td>Exportar juego con debug habilitado</td>
+            <td>Cuando quieras probar exports con debugging</td>
+          </tr>
+          <tr>
+            <td><code>template_release</code></td>
+            <td>Exportar juego optimizado para produccion</td>
+            <td>Para distribuir el juego final</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Usando SCons directamente</h4>
+
+      <p>Si prefieres control manual:</p>
+
       <pre data-lang="BASH"><code>cd gdextension
 
 # Linux
-scons platform=linux target=template_debug
+scons platform=linux target=editor
 
 # Windows
-scons platform=windows target=template_debug
+scons platform=windows target=editor
 
 # macOS
-scons platform=macos target=template_debug</code></pre>
+scons platform=macos target=editor</code></pre>
 
       <hr>
 
@@ -296,12 +349,22 @@ sudo dnf install libstdc++-static</code></pre>
 
       <h2>Output</h2>
 
-      <p>Las librerias compiladas se colocan en:</p>
+      <p>Las librerias compiladas se colocan en <code>addons/ohmydialog/gdextension/</code>:</p>
 
       <pre data-lang="TREE"><code>addons/ohmydialog/gdextension/
-├── libohmydialog.linux.template_debug.x86_64.so
+├── libohmydialog.windows.editor.x86_64.dll
 ├── libohmydialog.windows.template_debug.x86_64.dll
-└── libohmydialog.macos.template_debug.framework/</code></pre>
+├── libohmydialog.windows.template_release.x86_64.dll
+├── libohmydialog.linux.editor.x86_64.so
+├── libohmydialog.linux.template_debug.x86_64.so
+├── libohmydialog.linux.template_release.x86_64.so
+├── libohmydialog.macos.editor.framework/
+├── libohmydialog.macos.template_debug.framework/
+└── libohmydialog.macos.template_release.framework/</code></pre>
+
+      <div class="callout-info">
+        <p>Solo se generan los binarios de la plataforma y target que compiles. Para un setup completo de desarrollo, compila al menos el target <code>editor</code> de tu plataforma.</p>
+      </div>
 
       <hr>
 
