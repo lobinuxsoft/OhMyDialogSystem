@@ -6,46 +6,14 @@ extends Resource
 ## Contains predefined models (recommended) and supports custom models.
 ## Use [method get_model_by_id] to retrieve a specific model configuration.
 
-## Predefined models with tested configurations
+## Predefined models optimized for dialogue systems and roleplay
 ## Organized by size: Tiny (<500MB), Small (500MB-1.5GB), Medium (1.5GB-3GB), Large (>3GB)
 const PREDEFINED_MODELS: Array[Dictionary] = [
-	# ===== TINY MODELS (<500MB) =====
+	# ===== TINY MODELS (<500MB) - For testing only =====
 	{
-		"id": "smollm-135m-instruct",
-		"display_name": "SmolLM 135M Instruct",
-		"description": "Ultra-light model. Very fast inference, suitable for testing and simple completions. Limited quality for complex tasks.",
-		"size_mb": 145.0,
-		"download_url": "https://huggingface.co/QuantFactory/SmolLM-135M-Instruct-GGUF/resolve/main/SmolLM-135M-Instruct.Q8_0.gguf",
-		"default_temperature": 0.7,
-		"default_top_p": 0.95,
-		"default_top_k": 40,
-		"default_max_tokens": 128,
-		"default_repeat_penalty": 1.1,
-		"default_min_p": 0.05,
-		"n_ctx": 2048,
-		"n_gpu_layers": 0,
-		"n_batch": 512
-	},
-	{
-		"id": "smollm2-360m-instruct-q4",
-		"display_name": "SmolLM2 360M Instruct (Q4)",
-		"description": "Compact model, newest SmolLM version. Good for simple tasks and testing. Runs on minimal hardware.",
-		"size_mb": 271.0,
-		"download_url": "https://huggingface.co/unsloth/SmolLM2-360M-Instruct-GGUF/resolve/main/SmolLM2-360M-Instruct-Q4_K_M.gguf",
-		"default_temperature": 0.7,
-		"default_top_p": 0.95,
-		"default_top_k": 40,
-		"default_max_tokens": 128,
-		"default_repeat_penalty": 1.1,
-		"default_min_p": 0.05,
-		"n_ctx": 2048,
-		"n_gpu_layers": 0,
-		"n_batch": 512
-	},
-	{
-		"id": "smollm2-360m-instruct-q8",
-		"display_name": "SmolLM2 360M Instruct (Q8)",
-		"description": "Compact model, highest quality quantization. Best quality for this size class.",
+		"id": "smollm2-360m-instruct",
+		"display_name": "SmolLM2 360M Instruct",
+		"description": "Ultra-light model for quick testing. Limited quality for complex dialogues.",
 		"size_mb": 386.0,
 		"download_url": "https://huggingface.co/unsloth/SmolLM2-360M-Instruct-GGUF/resolve/main/SmolLM2-360M-Instruct-Q8_0.gguf",
 		"default_temperature": 0.7,
@@ -58,11 +26,10 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_gpu_layers": 0,
 		"n_batch": 512
 	},
-	# ===== SMALL MODELS (500MB-1.5GB) =====
 	{
 		"id": "qwen2.5-0.5b-instruct",
-		"display_name": "Qwen2.5 0.5B Instruct (Recommended)",
-		"description": "Balanced model. Good quality with reasonable size. Excellent instruction following. Supports 29+ languages including Spanish.",
+		"display_name": "Qwen2.5 0.5B Instruct",
+		"description": "Smallest Qwen model. Good for testing with multilingual support (29+ languages). Fast inference.",
 		"size_mb": 531.0,
 		"download_url": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q8_0.gguf",
 		"default_temperature": 0.7,
@@ -75,74 +42,11 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_gpu_layers": 0,
 		"n_batch": 512
 	},
+	# ===== SMALL MODELS (500MB-1.5GB) - Limited hardware =====
 	{
-		"id": "tinyllama-1.1b-chat",
-		"display_name": "TinyLlama 1.1B Chat",
-		"description": "Higher quality model. Better coherence and creativity for dialogue generation. Good balance of quality vs size.",
-		"size_mb": 670.0,
-		"download_url": "https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q8_0.gguf",
-		"default_temperature": 0.7,
-		"default_top_p": 0.95,
-		"default_top_k": 40,
-		"default_max_tokens": 256,
-		"default_repeat_penalty": 1.1,
-		"default_min_p": 0.05,
-		"n_ctx": 2048,
-		"n_gpu_layers": 0,
-		"n_batch": 512
-	},
-	{
-		"id": "llama-3.2-1b-instruct-q4",
-		"display_name": "Llama 3.2 1B Instruct (Q4)",
-		"description": "Meta's latest small model. Optimized for multilingual dialogue, summarization, and tool calling. Efficient quantization.",
-		"size_mb": 808.0,
-		"download_url": "https://huggingface.co/unsloth/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q4_K_M.gguf",
-		"default_temperature": 0.7,
-		"default_top_p": 0.9,
-		"default_top_k": 40,
-		"default_max_tokens": 256,
-		"default_repeat_penalty": 1.1,
-		"default_min_p": 0.05,
-		"n_ctx": 8192,
-		"n_gpu_layers": 0,
-		"n_batch": 512
-	},
-	{
-		"id": "smollm2-1.7b-instruct-q4",
-		"display_name": "SmolLM2 1.7B Instruct (Q4)",
-		"description": "HuggingFace's flagship small model. Excellent for on-device inference. State-of-the-art for its size class.",
-		"size_mb": 1060.0,
-		"download_url": "https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF/resolve/main/smollm2-1.7b-instruct-q4_k_m.gguf",
-		"default_temperature": 0.7,
-		"default_top_p": 0.95,
-		"default_top_k": 40,
-		"default_max_tokens": 256,
-		"default_repeat_penalty": 1.1,
-		"default_min_p": 0.05,
-		"n_ctx": 8192,
-		"n_gpu_layers": 0,
-		"n_batch": 512
-	},
-	{
-		"id": "qwen2.5-1.5b-instruct-q4",
-		"display_name": "Qwen2.5 1.5B Instruct (Q4)",
-		"description": "Mid-size Qwen model. Great balance of quality and speed. Supports 29+ languages with 128K context capability.",
-		"size_mb": 1120.0,
-		"download_url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
-		"default_temperature": 0.7,
-		"default_top_p": 0.95,
-		"default_top_k": 40,
-		"default_max_tokens": 256,
-		"default_repeat_penalty": 1.1,
-		"default_min_p": 0.05,
-		"n_ctx": 8192,
-		"n_gpu_layers": 0,
-		"n_batch": 512
-	},
-	{
-		"id": "llama-3.2-1b-instruct-q8",
-		"display_name": "Llama 3.2 1B Instruct (Q8)",
-		"description": "Meta's latest small model. Highest quality quantization. Best for quality-critical applications.",
+		"id": "llama-3.2-1b-instruct",
+		"display_name": "Llama 3.2 1B Instruct",
+		"description": "Meta's smallest Llama 3. Optimized for dialogue with human-annotated training. Very fast.",
 		"size_mb": 1320.0,
 		"download_url": "https://huggingface.co/unsloth/Llama-3.2-1B-Instruct-GGUF/resolve/main/Llama-3.2-1B-Instruct-Q8_0.gguf",
 		"default_temperature": 0.7,
@@ -155,27 +59,10 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_gpu_layers": 0,
 		"n_batch": 512
 	},
-	# ===== MEDIUM MODELS (1.5GB-3GB) =====
 	{
-		"id": "gemma-2-2b-it-q4",
-		"display_name": "Gemma 2 2B IT (Q4)",
-		"description": "Google's instruction-tuned model. Excellent reasoning and instruction following. Efficient quantization.",
-		"size_mb": 1710.0,
-		"download_url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q4_K_M.gguf",
-		"default_temperature": 0.7,
-		"default_top_p": 0.95,
-		"default_top_k": 40,
-		"default_max_tokens": 256,
-		"default_repeat_penalty": 1.1,
-		"default_min_p": 0.05,
-		"n_ctx": 8192,
-		"n_gpu_layers": 0,
-		"n_batch": 512
-	},
-	{
-		"id": "qwen2.5-1.5b-instruct-q8",
-		"display_name": "Qwen2.5 1.5B Instruct (Q8)",
-		"description": "Mid-size Qwen model. Highest quality quantization. Excellent multilingual support.",
+		"id": "qwen2.5-1.5b-instruct",
+		"display_name": "Qwen2.5 1.5B Instruct",
+		"description": "Mid-size Qwen. Excellent multilingual support and instruction following. Good for character roleplay.",
 		"size_mb": 1890.0,
 		"download_url": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q8_0.gguf",
 		"default_temperature": 0.7,
@@ -189,13 +76,13 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_batch": 512
 	},
 	{
-		"id": "llama-3.2-3b-instruct-q4",
-		"display_name": "Llama 3.2 3B Instruct (Q4)",
-		"description": "Meta's capable 3B model. Outperforms Gemma 2 and Phi 3.5 on benchmarks. Good for complex tasks.",
-		"size_mb": 2020.0,
-		"download_url": "https://huggingface.co/unsloth/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+		"id": "smollm2-1.7b-instruct",
+		"display_name": "SmolLM2 1.7B Instruct",
+		"description": "HuggingFace's flagship small model. State-of-the-art for its size. Good balance of speed and quality.",
+		"size_mb": 1820.0,
+		"download_url": "https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF/resolve/main/smollm2-1.7b-instruct-q8_0.gguf",
 		"default_temperature": 0.7,
-		"default_top_p": 0.9,
+		"default_top_p": 0.95,
 		"default_top_k": 40,
 		"default_max_tokens": 256,
 		"default_repeat_penalty": 1.1,
@@ -204,10 +91,11 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_gpu_layers": 0,
 		"n_batch": 512
 	},
+	# ===== MEDIUM MODELS (1.5GB-3GB) - Recommended =====
 	{
 		"id": "qwen2.5-3b-instruct-q4",
-		"display_name": "Qwen2.5 3B Instruct (Q4)",
-		"description": "Larger Qwen model. Excellent for complex reasoning and coding. Supports 128K context.",
+		"display_name": "Qwen2.5 3B Instruct Q4 (Recommended)",
+		"description": "Best balance for dialogue systems. Excellent Spanish support, optimized for roleplay and system prompts. 128K context.",
 		"size_mb": 2100.0,
 		"download_url": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q4_k_m.gguf",
 		"default_temperature": 0.7,
@@ -221,25 +109,25 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_batch": 512
 	},
 	{
-		"id": "phi-3-mini-4k-instruct-q4",
-		"display_name": "Phi-3 Mini 4K Instruct (Q4)",
-		"description": "Microsoft's reasoning-focused model. State-of-the-art for <13B class. Strong on math, code, and logic.",
-		"size_mb": 2390.0,
-		"download_url": "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf/resolve/main/Phi-3-mini-4k-instruct-q4.gguf",
+		"id": "llama-3.2-3b-instruct-q4",
+		"display_name": "Llama 3.2 3B Instruct Q4",
+		"description": "Meta's best small model. Human-annotated dialogue training. Outperforms larger models on dialogue tasks.",
+		"size_mb": 2020.0,
+		"download_url": "https://huggingface.co/unsloth/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
 		"default_temperature": 0.7,
-		"default_top_p": 0.95,
+		"default_top_p": 0.9,
 		"default_top_k": 40,
 		"default_max_tokens": 256,
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
-		"n_ctx": 4096,
+		"n_ctx": 8192,
 		"n_gpu_layers": 0,
 		"n_batch": 512
 	},
 	{
-		"id": "gemma-2-2b-it-q8",
-		"display_name": "Gemma 2 2B IT (Q8)",
-		"description": "Google's instruction-tuned model. Highest quality quantization. Excellent for critical applications.",
+		"id": "gemma-2-2b-it",
+		"display_name": "Gemma 2 2B IT",
+		"description": "Google's instruction-tuned model. Strong reasoning and creative writing. Good for complex NPC personalities.",
 		"size_mb": 2780.0,
 		"download_url": "https://huggingface.co/bartowski/gemma-2-2b-it-GGUF/resolve/main/gemma-2-2b-it-Q8_0.gguf",
 		"default_temperature": 0.7,
@@ -252,11 +140,27 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_gpu_layers": 0,
 		"n_batch": 512
 	},
-	# ===== LARGE MODELS (>3GB) =====
+	# ===== LARGE MODELS (>3GB) - Best quality =====
+	{
+		"id": "qwen2.5-3b-instruct-q8",
+		"display_name": "Qwen2.5 3B Instruct Q8",
+		"description": "Highest quality Qwen 3B. Best multilingual dialogue and character embodiment. Premium choice.",
+		"size_mb": 3620.0,
+		"download_url": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q8_0.gguf",
+		"default_temperature": 0.7,
+		"default_top_p": 0.95,
+		"default_top_k": 40,
+		"default_max_tokens": 256,
+		"default_repeat_penalty": 1.1,
+		"default_min_p": 0.05,
+		"n_ctx": 8192,
+		"n_gpu_layers": 0,
+		"n_batch": 512
+	},
 	{
 		"id": "llama-3.2-3b-instruct-q8",
-		"display_name": "Llama 3.2 3B Instruct (Q8)",
-		"description": "Meta's capable 3B model. Highest quality. Best for complex dialogue and agentic tasks.",
+		"display_name": "Llama 3.2 3B Instruct Q8",
+		"description": "Highest quality Llama 3B. Best for complex dialogue, agentic tasks, and storytelling.",
 		"size_mb": 3420.0,
 		"download_url": "https://huggingface.co/unsloth/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q8_0.gguf",
 		"default_temperature": 0.7,
@@ -270,11 +174,11 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"n_batch": 512
 	},
 	{
-		"id": "qwen2.5-3b-instruct-q8",
-		"display_name": "Qwen2.5 3B Instruct (Q8)",
-		"description": "Larger Qwen model. Highest quality. Excellent multilingual and reasoning capabilities.",
-		"size_mb": 3620.0,
-		"download_url": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct-GGUF/resolve/main/qwen2.5-3b-instruct-q8_0.gguf",
+		"id": "mistral-nemo-12b-q4",
+		"display_name": "Mistral Nemo 12B Q4",
+		"description": "Mistral's dialogue specialist. Excellent for real-time dialogue systems and complex NLP. Requires 8GB+ RAM.",
+		"size_mb": 7200.0,
+		"download_url": "https://huggingface.co/bartowski/Mistral-Nemo-Instruct-2407-GGUF/resolve/main/Mistral-Nemo-Instruct-2407-Q4_K_M.gguf",
 		"default_temperature": 0.7,
 		"default_top_p": 0.95,
 		"default_top_k": 40,
@@ -288,7 +192,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 ]
 
 ## ID of the currently active model for runtime use
-@export var active_model_id: String = "qwen2.5-0.5b-instruct"
+@export var active_model_id: String = "qwen2.5-3b-instruct-q4"
 
 ## Custom model configurations added by the user
 @export var custom_models: Array[ModelConfig] = []
