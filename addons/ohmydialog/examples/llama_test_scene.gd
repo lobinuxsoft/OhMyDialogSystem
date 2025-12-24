@@ -780,7 +780,7 @@ func _on_hf_add_pressed() -> void:
 	var config = _hf_api.create_model_config(_hf_selected_model_id, _hf_selected_file)
 
 	# Add to registry
-	_model_manager.registry.add_custom_model(config)
+	_model_manager.add_custom_model(config)
 
 	# Refresh the models list
 	_populate_models_tree()
