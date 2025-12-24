@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+"""
+SConstruct for OhMyDialogSystem GDExtension
+Builds the native C++ extension for Godot 4.5+
+"""
+
+import os
+
+env = SConscript("godot-cpp/SConstruct")
+
+# Add source directory to include path
+env.Append(CPPPATH=["src/"])
+
+# Gather all source files
+sources = Glob("src/*.cpp")
+
+# Generate documentation data for editor builds
+if env["target"] in ["editor", "template_debug"]:
+    doc_data = env.GodotCPPDocData("src/gen/doc_data.gen.cpp", source=Glob("doc_classes/*.xml"))
+    sources.append(doc_data)
+
+# Output directory - binaries go to addon's gdextension folder
+output_dir = "../addons/ohmydialog/gdextension/"
+
+# Build library based on platform
+if env["platform"] == "macos":
+    library = env.SharedLibrary(
+        "{}libohmydialog.{}.{}.framework/libohmydialog.{}.{}".format(
+            output_dir, env["platform"], env["target"], env["platform"], env["target"]
+        ),
+        source=sources,
+    )
+elif env["platform"] == "ios":
+    if env["ios_simulator"]:
+        library = env.StaticLibrary(
+            "{}libohmydialog.{}.{}.simulator.a".format(output_dir, env["platform"], env["target"]),
+            source=sources,
+        )
+    else:
+        library = env.StaticLibrary(
+            "{}libohmydialog.{}.{}.a".format(output_dir, env["platform"], env["target"]),
+            source=sources,
+        )
+else:
+    library = env.SharedLibrary(
+        "{}libohmydialog{}{}".format(output_dir, env["suffix"], env["SHLIBSUFFIX"]),
+        source=sources,
+    )
+
+env.NoCache(library)
+Default(library)
