@@ -86,24 +86,21 @@ func is_downloaded() -> bool:
 	return FileAccess.file_exists(get_effective_path())
 
 
+## Returns the filename for this model (extracted from URL or ID-based)
+func get_filename() -> String:
+	if not download_url.is_empty():
+		# Extract filename from URL
+		var parts = download_url.split("/")
+		if parts.size() > 0:
+			return parts[-1]
+
+	return "%s.gguf" % id
+
+
 ## Returns the effective path where the model can be found
 ## Checks res://models/ (project directory, included in exports)
 func get_effective_path() -> String:
-	if model_path.is_empty():
-		# Default path based on id
-		return "res://models/%s.gguf" % id
+	if not model_path.is_empty():
+		return model_path
 
-	return model_path
-
-
-## Returns the filename for this model (for downloads)
-func get_filename() -> String:
-	if download_url.is_empty():
-		return "%s.gguf" % id
-
-	# Extract filename from URL
-	var parts = download_url.split("/")
-	if parts.size() > 0:
-		return parts[-1]
-
-	return "%s.gguf" % id
+	return "res://models/" + get_filename()

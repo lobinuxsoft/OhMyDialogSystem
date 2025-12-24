@@ -5,10 +5,12 @@ extends Control
 ## Run this scene directly to test the LLM integration.
 
 # UI References - Toolbar
-@onready var model_selector: OptionButton = %ModelSelector
+@onready var download_selector: OptionButton = %DownloadSelector
 @onready var download_btn: Button = %DownloadBtn
+@onready var load_selector: OptionButton = %LoadSelector
 @onready var load_btn: Button = %LoadBtn
 @onready var unload_btn: Button = %UnloadBtn
+@onready var manage_btn: Button = %ManageBtn
 @onready var status_label: Label = %StatusLabel
 
 # UI References - Download Progress
@@ -16,6 +18,12 @@ extends Control
 @onready var download_label: Label = %DownloadLabel
 @onready var download_progress: ProgressBar = %DownloadProgress
 @onready var cancel_download_btn: Button = %CancelDownloadBtn
+
+# UI References - Model Management Panel
+@onready var manage_panel: PanelContainer = %ManagePanel
+@onready var models_list: VBoxContainer = %ModelsList
+@onready var delete_selected_btn: Button = %DeleteSelectedBtn
+@onready var close_manage_btn: Button = %CloseManageBtn
 
 # UI References - Main Content
 @onready var prompt_input: TextEdit = %PromptInput
@@ -48,6 +56,7 @@ extends Control
 var _model_manager: ModelManager
 var _generation_thread: Thread
 var _is_generating: bool = false
+var _models_to_delete: Array[String] = []
 
 
 func _ready() -> void:
@@ -63,17 +72,21 @@ func _ready() -> void:
 	_model_manager.download_completed.connect(_on_download_completed)
 	_model_manager.download_failed.connect(_on_download_failed)
 
-	# Populate model selector
-	_populate_model_selector()
+	# Populate selectors
+	_populate_selectors()
 
 	# Connect UI signals
-	model_selector.item_selected.connect(_on_model_selected)
+	download_selector.item_selected.connect(_on_download_selector_changed)
 	download_btn.pressed.connect(_on_download_pressed)
+	load_selector.item_selected.connect(_on_load_selector_changed)
 	load_btn.pressed.connect(_on_load_pressed)
 	unload_btn.pressed.connect(_on_unload_pressed)
+	manage_btn.pressed.connect(_on_manage_pressed)
 	generate_btn.pressed.connect(_on_generate_pressed)
 	clear_btn.pressed.connect(_on_clear_pressed)
 	cancel_download_btn.pressed.connect(_on_cancel_download_pressed)
+	delete_selected_btn.pressed.connect(_on_delete_selected_pressed)
+	close_manage_btn.pressed.connect(_on_close_manage_pressed)
 
 	# Connect slider value changed
 	temperature_slider.value_changed.connect(_on_temperature_changed)
@@ -84,6 +97,7 @@ func _ready() -> void:
 	# Initial UI state
 	_update_ui_state()
 	download_panel.hide()
+	manage_panel.hide()
 	custom_warning.hide()
 
 
@@ -93,57 +107,116 @@ func _exit_tree() -> void:
 		_generation_thread.wait_to_finish()
 
 
-func _populate_model_selector() -> void:
-	model_selector.clear()
-
+func _populate_selectors() -> void:
+	# Populate download selector (all models not yet downloaded)
+	download_selector.clear()
 	var models = _model_manager.get_available_models()
-	for i in range(models.size()):
-		var model = models[i]
-		var suffix = ""
+	var download_idx = 0
+	for model in models:
+		if not model.is_downloaded():
+			var text = "%s (~%.0f MB)" % [model.display_name, model.size_mb]
+			download_selector.add_item(text, download_idx)
+			download_selector.set_item_metadata(download_idx, model.id)
+			download_idx += 1
+
+	if download_selector.item_count == 0:
+		download_selector.add_item("All models downloaded", 0)
+		download_selector.disabled = true
+		download_btn.disabled = true
+	else:
+		download_selector.disabled = false
+
+	# Populate load selector (only downloaded models)
+	load_selector.clear()
+	var load_idx = 0
+	for model in models:
 		if model.is_downloaded():
-			suffix = " [Downloaded]"
-		elif model.is_custom:
-			suffix = " [Custom]"
+			load_selector.add_item(model.display_name, load_idx)
+			load_selector.set_item_metadata(load_idx, model.id)
+			load_idx += 1
 
-		model_selector.add_item(model.display_name + suffix, i)
-		model_selector.set_item_metadata(i, model.id)
+	if load_selector.item_count == 0:
+		load_selector.add_item("No models downloaded", 0)
+		load_selector.disabled = true
+		load_btn.disabled = true
+	else:
+		load_selector.disabled = _model_manager.is_model_loaded()
+		load_btn.disabled = _model_manager.is_model_loaded()
 
-	# Select recommended model by default
-	for i in range(model_selector.item_count):
-		if model_selector.get_item_metadata(i) == "qwen2.5-0.5b-instruct":
-			model_selector.select(i)
-			break
+
+func _populate_manage_list() -> void:
+	# Clear existing
+	for child in models_list.get_children():
+		child.queue_free()
+
+	_models_to_delete.clear()
+
+	# Add downloaded models with checkboxes
+	var models = _model_manager.get_available_models()
+	for model in models:
+		if model.is_downloaded():
+			var hbox = HBoxContainer.new()
+
+			var checkbox = CheckBox.new()
+			checkbox.text = model.display_name
+			checkbox.set_meta("model_id", model.id)
+			checkbox.set_meta("model_path", model.get_effective_path())
+			checkbox.toggled.connect(_on_model_checkbox_toggled.bind(model.id))
+			hbox.add_child(checkbox)
+
+			var size_label = Label.new()
+			var file = FileAccess.open(model.get_effective_path(), FileAccess.READ)
+			if file:
+				var size_mb = file.get_length() / (1024.0 * 1024.0)
+				size_label.text = " (%.1f MB)" % size_mb
+				file.close()
+			size_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+			hbox.add_child(size_label)
+
+			models_list.add_child(hbox)
+
+	delete_selected_btn.disabled = true
 
 
-func _get_selected_model() -> ModelConfig:
-	var idx = model_selector.selected
-	if idx < 0:
+func _get_selected_download_model() -> ModelConfig:
+	var idx = download_selector.selected
+	if idx < 0 or download_selector.disabled:
 		return null
 
-	var model_id = model_selector.get_item_metadata(idx)
+	var model_id = download_selector.get_item_metadata(idx)
+	if model_id == null:
+		return null
+	return _model_manager.registry.get_model_by_id(model_id)
+
+
+func _get_selected_load_model() -> ModelConfig:
+	var idx = load_selector.selected
+	if idx < 0 or load_selector.disabled:
+		return null
+
+	var model_id = load_selector.get_item_metadata(idx)
+	if model_id == null:
+		return null
 	return _model_manager.registry.get_model_by_id(model_id)
 
 
 func _update_ui_state() -> void:
-	var model = _get_selected_model()
 	var is_loaded = _model_manager.is_model_loaded()
 	var is_downloading = _model_manager.is_downloading()
 
-	# Model selector
-	model_selector.disabled = is_loaded or is_downloading
+	# Selectors
+	download_selector.disabled = is_downloading or download_selector.item_count == 0
+	load_selector.disabled = is_loaded or is_downloading or load_selector.item_count == 0
 
 	# Buttons
-	if model != null:
-		download_btn.disabled = model.is_downloaded() or is_downloading or is_loaded
-		load_btn.disabled = not model.is_downloaded() or is_downloading or is_loaded
-	else:
-		download_btn.disabled = true
-		load_btn.disabled = true
-
+	download_btn.disabled = is_downloading or download_selector.item_count == 0 or _get_selected_download_model() == null
+	load_btn.disabled = is_loaded or is_downloading or load_selector.item_count == 0 or _get_selected_load_model() == null
 	unload_btn.disabled = not is_loaded
+	manage_btn.disabled = is_downloading
 	generate_btn.disabled = not is_loaded or _is_generating
 
 	# Custom warning
+	var model = _get_selected_load_model()
 	if model != null and model.is_custom:
 		custom_warning.show()
 	else:
@@ -217,13 +290,18 @@ func _apply_sampling_params() -> void:
 		llama.set_stop_sequences(packed)
 
 
-# Signal handlers
-func _on_model_selected(_index: int) -> void:
+# Signal handlers - Selectors
+func _on_download_selector_changed(_index: int) -> void:
 	_update_ui_state()
 
 
+func _on_load_selector_changed(_index: int) -> void:
+	_update_ui_state()
+
+
+# Signal handlers - Download
 func _on_download_pressed() -> void:
-	var model = _get_selected_model()
+	var model = _get_selected_download_model()
 	if model == null:
 		return
 
@@ -236,8 +314,37 @@ func _on_download_pressed() -> void:
 	_update_ui_state()
 
 
+func _on_cancel_download_pressed() -> void:
+	_model_manager.cancel_download()
+	download_panel.hide()
+	_update_ui_state()
+
+
+func _on_download_progress(model_id: String, progress: float) -> void:
+	download_progress.value = progress * 100.0
+	var downloaded_mb = _model_manager.downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
+	var total_mb = _model_manager.downloader.get_total_bytes() / (1024.0 * 1024.0)
+	download_label.text = "Downloading... %.1f / %.1f MB" % [downloaded_mb, total_mb]
+
+
+func _on_download_completed(_model_id: String) -> void:
+	download_panel.hide()
+	_populate_selectors()  # Refresh both selectors
+	_update_ui_state()
+	status_label.text = "Download complete!"
+	status_label.add_theme_color_override("font_color", Color.GREEN)
+
+
+func _on_download_failed(_model_id: String, error: String) -> void:
+	download_panel.hide()
+	status_label.text = "Download failed: %s" % error
+	status_label.add_theme_color_override("font_color", Color.RED)
+	_update_ui_state()
+
+
+# Signal handlers - Load/Unload
 func _on_load_pressed() -> void:
-	var model = _get_selected_model()
+	var model = _get_selected_load_model()
 	if model == null:
 		return
 
@@ -265,6 +372,23 @@ func _on_unload_pressed() -> void:
 	_update_model_info()
 
 
+func _on_model_loaded(_config: ModelConfig) -> void:
+	_update_ui_state()
+	_update_model_info()
+
+
+func _on_model_load_failed(_config: ModelConfig, error: Error) -> void:
+	status_label.text = "Load failed: %s" % error_string(error)
+	status_label.add_theme_color_override("font_color", Color.RED)
+	_update_ui_state()
+
+
+func _on_model_unloaded() -> void:
+	_update_ui_state()
+	_update_model_info()
+
+
+# Signal handlers - Generation
 func _on_generate_pressed() -> void:
 	if _is_generating or not _model_manager.is_model_loaded():
 		return
@@ -320,46 +444,58 @@ func _on_clear_pressed() -> void:
 	time_label.text = ""
 
 
-func _on_cancel_download_pressed() -> void:
-	_model_manager.cancel_download()
-	download_panel.hide()
+# Signal handlers - Model Management
+func _on_manage_pressed() -> void:
+	_populate_manage_list()
+	manage_panel.show()
+
+
+func _on_close_manage_pressed() -> void:
+	manage_panel.hide()
+	_models_to_delete.clear()
+
+
+func _on_model_checkbox_toggled(toggled: bool, model_id: String) -> void:
+	if toggled:
+		if not _models_to_delete.has(model_id):
+			_models_to_delete.append(model_id)
+	else:
+		_models_to_delete.erase(model_id)
+
+	delete_selected_btn.disabled = _models_to_delete.is_empty()
+	delete_selected_btn.text = "Delete Selected (%d)" % _models_to_delete.size() if not _models_to_delete.is_empty() else "Delete Selected"
+
+
+func _on_delete_selected_pressed() -> void:
+	if _models_to_delete.is_empty():
+		return
+
+	# Unload model if it's being deleted
+	if _model_manager.is_model_loaded() and _model_manager.current_config != null:
+		if _models_to_delete.has(_model_manager.current_config.id):
+			_model_manager.unload_model()
+
+	# Delete files
+	var deleted_count = 0
+	for model_id in _models_to_delete:
+		var model = _model_manager.registry.get_model_by_id(model_id)
+		if model != null:
+			var path = model.get_effective_path()
+			if FileAccess.file_exists(path):
+				var err = DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+				if err == OK:
+					deleted_count += 1
+					print("Deleted model: %s" % path)
+				else:
+					push_error("Failed to delete: %s - %s" % [path, error_string(err)])
+
+	_models_to_delete.clear()
+	manage_panel.hide()
+	_populate_selectors()
 	_update_ui_state()
 
-
-func _on_download_progress(model_id: String, progress: float) -> void:
-	download_progress.value = progress * 100.0
-	var downloaded_mb = _model_manager.downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
-	var total_mb = _model_manager.downloader.get_total_bytes() / (1024.0 * 1024.0)
-	download_label.text = "Downloading... %.1f / %.1f MB" % [downloaded_mb, total_mb]
-
-
-func _on_download_completed(_model_id: String) -> void:
-	download_panel.hide()
-	_populate_model_selector()  # Refresh to show [Downloaded]
-	_update_ui_state()
-
-
-func _on_download_failed(_model_id: String, error: String) -> void:
-	download_panel.hide()
-	status_label.text = "Download failed: %s" % error
-	status_label.add_theme_color_override("font_color", Color.RED)
-	_update_ui_state()
-
-
-func _on_model_loaded(_config: ModelConfig) -> void:
-	_update_ui_state()
-	_update_model_info()
-
-
-func _on_model_load_failed(_config: ModelConfig, error: Error) -> void:
-	status_label.text = "Load failed: %s" % error_string(error)
-	status_label.add_theme_color_override("font_color", Color.RED)
-	_update_ui_state()
-
-
-func _on_model_unloaded() -> void:
-	_update_ui_state()
-	_update_model_info()
+	status_label.text = "Deleted %d model(s)" % deleted_count
+	status_label.add_theme_color_override("font_color", Color.YELLOW)
 
 
 # Slider value display updates

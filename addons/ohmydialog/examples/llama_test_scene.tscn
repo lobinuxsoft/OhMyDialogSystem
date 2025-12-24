@@ -26,34 +26,65 @@ theme_override_constants/margin_bottom = 10
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="Toolbar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "LlamaInterface Test Scene"
+
+[node name="HSeparator0" type="HSeparator" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ModelSelector" type="OptionButton" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="DownloadRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DownloadLabel" type="Label" parent="MarginContainer/VBoxContainer/DownloadRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Download:"
+
+[node name="DownloadSelector" type="OptionButton" parent="MarginContainer/VBoxContainer/DownloadRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(250, 0)
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="DownloadBtn" type="Button" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="DownloadBtn" type="Button" parent="MarginContainer/VBoxContainer/DownloadRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Download"
 
-[node name="LoadBtn" type="Button" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="LoadRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LoadLabel" type="Label" parent="MarginContainer/VBoxContainer/LoadRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Load:"
+
+[node name="LoadSelector" type="OptionButton" parent="MarginContainer/VBoxContainer/LoadRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="LoadBtn" type="Button" parent="MarginContainer/VBoxContainer/LoadRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Load Model"
 
-[node name="UnloadBtn" type="Button" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="UnloadBtn" type="Button" parent="MarginContainer/VBoxContainer/LoadRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Unload"
 
-[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="ManageBtn" type="Button" parent="MarginContainer/VBoxContainer/LoadRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Manage Models..."
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/LoadRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/Toolbar"]
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/LoadRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "No model loaded"
@@ -86,11 +117,43 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Cancel"
 
+[node name="ManagePanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ManagePanel"]
+layout_mode = 2
+
+[node name="ManageTitle" type="Label" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Manage Downloaded Models"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ModelsList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="DeleteSelectedBtn" type="Button" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Delete Selected"
+
+[node name="CloseManageBtn" type="Button" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Close"
+
 [node name="CustomWarning" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_styles/panel = null
 
 [node name="WarningLabel" type="Label" parent="MarginContainer/VBoxContainer/CustomWarning"]
 layout_mode = 2
