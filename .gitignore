@@ -23,6 +23,13 @@ addons/ohmydialog/gdextension/bin/
 addons/ohmydialog/gdextension/thirdparty/llama.cpp/
 addons/ohmydialog/gdextension/thirdparty/piper/
 
+# llama.cpp build artifacts (in thirdparty submodule)
+gdextension/thirdparty/llama.cpp/build/
+gdextension/thirdparty/llama.cpp/*.a
+gdextension/thirdparty/llama.cpp/*.lib
+gdextension/thirdparty/llama.cpp/*.so
+gdextension/thirdparty/llama.cpp/*.dll
+
 # GDExtension generated files
 gdextension/src/gen/
 
