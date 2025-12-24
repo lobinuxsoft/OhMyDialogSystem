@@ -31,67 +31,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "LlamaInterface Test Scene"
 
-[node name="HSeparator0" type="HSeparator" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="DownloadRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="DownloadLabel" type="Label" parent="MarginContainer/VBoxContainer/DownloadRow"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "Download:"
-
-[node name="DownloadSelector" type="OptionButton" parent="MarginContainer/VBoxContainer/DownloadRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-
-[node name="DownloadBtn" type="Button" parent="MarginContainer/VBoxContainer/DownloadRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Download"
-
-[node name="LoadRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="LoadLabel" type="Label" parent="MarginContainer/VBoxContainer/LoadRow"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "Load:"
-
-[node name="LoadSelector" type="OptionButton" parent="MarginContainer/VBoxContainer/LoadRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-
-[node name="LoadBtn" type="Button" parent="MarginContainer/VBoxContainer/LoadRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Load Model"
-
-[node name="UnloadBtn" type="Button" parent="MarginContainer/VBoxContainer/LoadRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Unload"
-
-[node name="ManageBtn" type="Button" parent="MarginContainer/VBoxContainer/LoadRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Manage Models..."
-
-[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/LoadRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/LoadRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "No model loaded"
-
-[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-
 [node name="DownloadPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
@@ -107,7 +46,7 @@ text = "Downloading..."
 
 [node name="DownloadProgress" type="ProgressBar" parent="MarginContainer/VBoxContainer/DownloadPanel/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 100.0
@@ -117,131 +56,183 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Cancel"
 
-[node name="ManagePanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
-visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Models" type="HSplitContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
+layout_mode = 2
+split_offset = 400
+
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ToolbarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel"]
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ManagePanel"]
+[node name="SortLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
+layout_mode = 2
+text = "Sort by:"
+
+[node name="SortOption" type="OptionButton" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 
-[node name="ManageTitle" type="Label" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ModelsTree" type="Tree" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel"]
+layout_mode = 2
+
+[node name="DownloadModelBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Download"
+
+[node name="LoadModelBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Load"
+
+[node name="DeleteModelBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Delete"
+
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="DetailsLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Manage Downloaded Models"
+text = "Model Details"
 
-[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel"]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="ModelsList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
+[node name="ModelDetails" type="RichTextLabel" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Select a model to see details"
+fit_content = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer"]
-layout_mode = 2
-
-[node name="DeleteSelectedBtn" type="Button" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer/HBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Delete Selected"
-
-[node name="CloseManageBtn" type="Button" parent="MarginContainer/VBoxContainer/ManagePanel/VBoxContainer/HBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Close"
-
-[node name="CustomWarning" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
+[node name="Generation" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
 
-[node name="WarningLabel" type="Label" parent="MarginContainer/VBoxContainer/CustomWarning"]
+[node name="StatusRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.8, 0, 1)
-text = "Warning: Custom model selected. Use at your own responsibility."
-horizontal_alignment = 1
 
-[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer"]
+[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No model loaded"
+
+[node name="UnloadBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Generation/StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Unload Model"
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/Generation"]
+layout_mode = 2
+
+[node name="HSplitContainer" type="HSplitContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation"]
 layout_mode = 2
 size_flags_vertical = 3
 split_offset = 500
 
-[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PromptLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+[node name="PromptLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
 layout_mode = 2
 text = "Prompt:"
 
-[node name="PromptInput" type="TextEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+[node name="PromptInput" type="TextEdit" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_vertical = 3
 placeholder_text = "Enter your prompt here..."
 wrap_mode = 1
+scroll_smooth = true
 
-[node name="GenerateRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+[node name="GenerateRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
 layout_mode = 2
 
-[node name="GenerateBtn" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/GenerateRow"]
+[node name="GenerateBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Generate"
 
-[node name="ClearBtn" type="Button" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/GenerateRow"]
+[node name="ClearBtn" type="Button" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Clear Output"
 
-[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/GenerateRow"]
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TimeLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/GenerateRow"]
+[node name="TimeLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel/GenerateRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-text = ""
 
-[node name="OutputLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+[node name="OutputLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
 layout_mode = 2
 text = "Output:"
 
-[node name="OutputDisplay" type="TextEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+[node name="OutputDisplay" type="TextEdit" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 editable = false
 wrap_mode = 1
+scroll_smooth = true
 
-[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer"]
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer"]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 
-[node name="ParamsLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+[node name="ParamsLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Sampling Parameters"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ParamsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer"]
+[node name="ParamsContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TempRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="TempRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TempRow"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TempRow"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Temperature"
 
-[node name="TemperatureSlider" type="HSlider" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TempRow"]
+[node name="TemperatureSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TempRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -249,22 +240,22 @@ max_value = 2.0
 step = 0.01
 value = 0.7
 
-[node name="TemperatureValue" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TempRow"]
+[node name="TemperatureValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TempRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "0.70"
 horizontal_alignment = 2
 
-[node name="TopPRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="TopPRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopPRow"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopPRow"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Top P"
 
-[node name="TopPSlider" type="HSlider" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopPRow"]
+[node name="TopPSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopPRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -272,37 +263,37 @@ max_value = 1.0
 step = 0.01
 value = 0.95
 
-[node name="TopPValue" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopPRow"]
+[node name="TopPValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopPRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "0.95"
 horizontal_alignment = 2
 
-[node name="TopKRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="TopKRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopKRow"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopKRow"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Top K"
 
-[node name="TopKSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopKRow"]
+[node name="TopKSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/TopKRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 100.0
 value = 40.0
 
-[node name="MaxTokensRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="MaxTokensRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MaxTokensRow"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MaxTokensRow"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Max Tokens"
 
-[node name="MaxTokensSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MaxTokensRow"]
+[node name="MaxTokensSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MaxTokensRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -310,15 +301,15 @@ min_value = 1.0
 max_value = 4096.0
 value = 256.0
 
-[node name="RepeatPenaltyRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="RepeatPenaltyRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/RepeatPenaltyRow"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/RepeatPenaltyRow"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Repeat Penalty"
 
-[node name="RepeatPenaltySlider" type="HSlider" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/RepeatPenaltyRow"]
+[node name="RepeatPenaltySlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/RepeatPenaltyRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -327,22 +318,22 @@ max_value = 2.0
 step = 0.01
 value = 1.1
 
-[node name="RepeatPenaltyValue" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/RepeatPenaltyRow"]
+[node name="RepeatPenaltyValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/RepeatPenaltyRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "1.10"
 horizontal_alignment = 2
 
-[node name="MinPRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="MinPRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MinPRow"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MinPRow"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Min P"
 
-[node name="MinPSlider" type="HSlider" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MinPRow"]
+[node name="MinPSlider" type="HSlider" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MinPRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -350,22 +341,22 @@ max_value = 1.0
 step = 0.01
 value = 0.05
 
-[node name="MinPValue" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MinPRow"]
+[node name="MinPValue" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/MinPRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "0.05"
 horizontal_alignment = 2
 
-[node name="SeedRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="SeedRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/SeedRow"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/SeedRow"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 text = "Seed (-1=random)"
 
-[node name="SeedSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/SeedRow"]
+[node name="SeedSpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer/SeedRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -373,30 +364,31 @@ min_value = -1.0
 max_value = 999999.0
 value = -1.0
 
-[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="StopLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="StopLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 text = "Stop Sequences (one per line):"
 
-[node name="StopSequencesInput" type="TextEdit" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="StopSequencesInput" type="TextEdit" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 placeholder_text = "\\n
 User:"
+scroll_smooth = true
 
-[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
 
-[node name="ModelInfoLabel" type="Label" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="ModelInfoLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 layout_mode = 2
-text = "Model Info:"
+text = "Loaded Model:"
 
-[node name="ModelInfoDisplay" type="RichTextLabel" parent="MarginContainer/VBoxContainer/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
+[node name="LoadedModelInfo" type="RichTextLabel" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ScrollContainer/ParamsContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 bbcode_enabled = true
 text = "No model loaded"
