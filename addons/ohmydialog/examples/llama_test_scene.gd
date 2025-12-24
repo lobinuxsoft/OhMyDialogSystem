@@ -133,8 +133,16 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	# Wait for generation thread to finish
 	if _generation_thread != null and _generation_thread.is_started():
 		_generation_thread.wait_to_finish()
+
+	# Unload model from memory to free RAM
+	if _model_manager != null and _model_manager.is_model_loaded():
+		_model_manager.unload_model()
+		print("LlamaTestScene: Model unloaded on exit")
+
+	# Cleanup HuggingFace API
 	if _hf_api != null:
 		_hf_api.cleanup()
 
@@ -363,7 +371,8 @@ func _update_ui_state() -> void:
 
 		download_model_btn.disabled = model_downloaded or is_downloading
 		load_model_btn.disabled = not model_downloaded or model_is_loaded or is_downloading
-		delete_model_btn.disabled = not model_downloaded or model_is_loaded
+		# Custom models can always be deleted (from registry), predefined only if downloaded
+		delete_model_btn.disabled = not model_downloaded and not model.is_custom
 	else:
 		download_model_btn.disabled = true
 		load_model_btn.disabled = true
@@ -466,16 +475,32 @@ func _on_delete_model_pressed() -> void:
 	if model == null:
 		return
 
+	# If model is loaded, unload it first
+	if _model_manager.is_model_loaded() and _model_manager.current_config != null:
+		if _model_manager.current_config.id == model.id:
+			_model_manager.unload_model()
+			print("Unloaded model before deletion: %s" % model.display_name)
+
+	# Delete the physical file if it exists
 	var path = model.get_effective_path()
 	if FileAccess.file_exists(path):
 		var err = DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 		if err == OK:
-			print("Deleted model: %s" % path)
-			_populate_models_tree()
-			_update_model_details()
-			_update_ui_state()
+			print("Deleted model file: %s" % path)
 		else:
-			push_error("Failed to delete: %s" % error_string(err))
+			push_error("Failed to delete file: %s" % error_string(err))
+			return
+
+	# If it's a custom model, remove it from the registry
+	if model.is_custom:
+		if _model_manager.remove_custom_model(model.id):
+			print("Removed custom model from registry: %s" % model.id)
+		else:
+			push_error("Failed to remove custom model from registry: %s" % model.id)
+
+	_populate_models_tree()
+	_update_model_details()
+	_update_ui_state()
 
 
 func _on_cancel_download_pressed() -> void:
