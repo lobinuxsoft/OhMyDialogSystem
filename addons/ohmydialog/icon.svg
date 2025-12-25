@@ -29,10 +29,8 @@
   </defs>
 
   <!-- Rounded background -->
-  <rect x="0" y="0" width="128" height="128" rx="28" ry="28" fill="url(#bgGrad)"/>
 
   <!-- Glow overlay -->
-  <rect x="0" y="0" width="128" height="128" rx="28" ry="28" fill="url(#glowGrad)"/>
 
   <!-- Brain (centered, 20% smaller: 2.8 * 0.8 = 2.24) -->
   <g transform="translate(24, 38) scale(2.24)" filter="url(#brainGlow)">

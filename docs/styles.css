@@ -141,14 +141,14 @@ body {
 
 .sidebar-logo {
   font-family: var(--font-heading);
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--ai-cyan) 0%, var(--ai-purple) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .sidebar-subtitle {
@@ -167,13 +167,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-card) 100%);
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-  box-shadow:
-    0 0 20px var(--glow-cyan),
-    inset 0 0 20px rgba(0, 0, 0, 0.3);
-  font-size: 2rem;
+}
+
+.sidebar-logo-icon img {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 10px var(--glow-cyan));
 }
 
 .nav-section {
