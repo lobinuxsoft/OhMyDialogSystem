@@ -173,30 +173,188 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
 
       <h2>Arquitectura del Sistema</h2>
 
-      <pre data-lang="DIAGRAM"><code>┌─────────────────────────────────────────────────────────────────┐
-│                      OhMyDialogSystem                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
-│  │   LLM       │    │   Memory    │    │    TTS      │         │
-│  │ (llama.cpp) │    │   System    │    │  (Piper)    │         │
-│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘         │
-│         │                  │                  │                 │
-│         └──────────────────┼──────────────────┘                 │
-│                            │                                    │
-│                    ┌───────┴───────┐                           │
-│                    │   Dialogue    │                           │
-│                    │    Manager    │                           │
-│                    └───────┬───────┘                           │
-│                            │                                    │
-│              ┌─────────────┼─────────────┐                     │
-│              │             │             │                     │
-│        ┌─────┴─────┐ ┌─────┴─────┐ ┌─────┴─────┐             │
-│        │ Character │ │   World   │ │  Dialogue │             │
-│        │ Identity  │ │  Context  │ │   Graph   │             │
-│        └───────────┘ └───────────┘ └───────────┘             │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘</code></pre>
+      <style>
+        .arch-diagram {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 2rem;
+          margin: 1.5rem 0;
+        }
+        .arch-title {
+          text-align: center;
+          font-family: var(--font-mono);
+          font-size: 1.1rem;
+          color: var(--ai-cyan);
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border-color);
+        }
+        .arch-layer {
+          display: flex;
+          justify-content: center;
+          gap: 1.5rem;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+        }
+        .arch-node {
+          padding: 0.75rem 1.25rem;
+          border-radius: 8px;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          text-align: center;
+          border: 1px solid;
+          min-width: 120px;
+          transition: all 0.3s ease;
+        }
+        .arch-node:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .arch-node.llm {
+          background: rgba(59, 130, 246, 0.1);
+          border-color: #3b82f6;
+          color: #3b82f6;
+        }
+        .arch-node.memory {
+          background: rgba(168, 85, 247, 0.1);
+          border-color: #a855f7;
+          color: #a855f7;
+        }
+        .arch-node.tts {
+          background: rgba(16, 185, 129, 0.1);
+          border-color: #10b981;
+          color: #10b981;
+        }
+        .arch-node.manager {
+          background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
+          border-color: var(--ai-cyan);
+          color: var(--ai-cyan);
+          font-weight: 600;
+          padding: 1rem 2rem;
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        .arch-node.resource {
+          background: rgba(107, 114, 128, 0.1);
+          border-color: #6b7280;
+          color: #9ca3af;
+          font-size: 0.8rem;
+          min-width: 100px;
+        }
+        .arch-connector {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 0.5rem 0;
+          color: var(--text-muted);
+        }
+        .arch-connector.vertical::before {
+          content: '│';
+          font-size: 1.5rem;
+        }
+        .arch-connector.merge {
+          position: relative;
+          height: 30px;
+        }
+        .arch-connector.merge::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 60%;
+          height: 15px;
+          border-left: 1px solid var(--text-muted);
+          border-right: 1px solid var(--text-muted);
+          border-bottom: 1px solid var(--text-muted);
+          border-radius: 0 0 8px 8px;
+        }
+        .arch-connector.merge::after {
+          content: '│';
+          position: absolute;
+          bottom: -5px;
+          left: 50%;
+          transform: translateX(-50%);
+          color: var(--text-muted);
+        }
+        .arch-connector.split {
+          position: relative;
+          height: 30px;
+        }
+        .arch-connector.split::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 70%;
+          height: 15px;
+          border-left: 1px solid var(--text-muted);
+          border-right: 1px solid var(--text-muted);
+          border-top: 1px solid var(--text-muted);
+          border-radius: 8px 8px 0 0;
+        }
+        .arch-connector.split::after {
+          content: '│';
+          position: absolute;
+          top: -5px;
+          left: 50%;
+          transform: translateX(-50%);
+          color: var(--text-muted);
+        }
+        .arch-label {
+          font-size: 0.65rem;
+          color: var(--text-muted);
+          display: block;
+          margin-top: 0.25rem;
+        }
+      </style>
+
+      <div class="arch-diagram">
+        <div class="arch-title">OhMyDialogSystem</div>
+
+        <!-- Layer 1: Core Components -->
+        <div class="arch-layer">
+          <div class="arch-node llm">
+            🦙 LLM
+            <span class="arch-label">llama.cpp</span>
+          </div>
+          <div class="arch-node memory">
+            🧠 Memory
+            <span class="arch-label">System</span>
+          </div>
+          <div class="arch-node tts">
+            🔊 TTS
+            <span class="arch-label">Piper</span>
+          </div>
+        </div>
+
+        <!-- Connector: Merge -->
+        <div class="arch-connector merge"></div>
+
+        <!-- Layer 2: DialogueManager -->
+        <div class="arch-layer">
+          <div class="arch-node manager">
+            💬 DialogueManager
+          </div>
+        </div>
+
+        <!-- Connector: Split -->
+        <div class="arch-connector split"></div>
+
+        <!-- Layer 3: Resources -->
+        <div class="arch-layer">
+          <div class="arch-node resource">
+            👤 Character<br>Identity
+          </div>
+          <div class="arch-node resource">
+            🌍 World<br>Context
+          </div>
+          <div class="arch-node resource">
+            🔷 Dialogue<br>Graph
+          </div>
+        </div>
+      </div>
 
       <hr>
 

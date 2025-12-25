@@ -352,16 +352,178 @@ sudo dnf install libstdc++-static</code></pre>
 
       <p>Las librerias compiladas se colocan en <code>addons/ohmydialog/gdextension/</code>:</p>
 
-      <pre data-lang="TREE"><code>addons/ohmydialog/gdextension/
-├── libohmydialog.windows.editor.x86_64.dll
-├── libohmydialog.windows.template_debug.x86_64.dll
-├── libohmydialog.windows.template_release.x86_64.dll
-├── libohmydialog.linux.editor.x86_64.so
-├── libohmydialog.linux.template_debug.x86_64.so
-├── libohmydialog.linux.template_release.x86_64.so
-├── libohmydialog.macos.editor.framework/
-├── libohmydialog.macos.template_debug.framework/
-└── libohmydialog.macos.template_release.framework/</code></pre>
+      <style>
+        .binary-tree {
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(59, 130, 246, 0.05));
+          border: 1px solid rgba(16, 185, 129, 0.3);
+          border-radius: 12px;
+          padding: 1.5rem;
+          font-family: 'JetBrains Mono', monospace;
+          margin: 1.5rem 0;
+        }
+        .binary-tree .tree-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+          margin-bottom: 1rem;
+        }
+        .binary-tree .tree-header .icon { font-size: 1.5rem; }
+        .binary-tree .tree-header .title {
+          font-weight: 600;
+          color: #10b981;
+          font-size: 1.1rem;
+        }
+        .binary-tree .platform-group {
+          margin-bottom: 1rem;
+        }
+        .binary-tree .platform-group:last-child { margin-bottom: 0; }
+        .binary-tree .platform-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+          padding: 0.25rem 0;
+        }
+        .binary-tree .platform-header .icon { font-size: 1.2rem; }
+        .binary-tree .platform-header .name {
+          font-weight: 500;
+          color: var(--text-primary);
+        }
+        .binary-tree .binary-list {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 0 1.5rem;
+          border-left: 2px solid rgba(255,255,255,0.1);
+        }
+        .binary-tree .binary-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.35rem 0 0.35rem 1rem;
+          position: relative;
+          transition: background 0.2s ease;
+        }
+        .binary-tree .binary-item::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          width: 0.75rem;
+          height: 2px;
+          background: rgba(255,255,255,0.1);
+        }
+        .binary-tree .binary-item:hover {
+          background: rgba(255,255,255,0.05);
+          border-radius: 4px;
+        }
+        .binary-tree .binary-item .icon { font-size: 1rem; opacity: 0.8; }
+        .binary-tree .binary-item .name {
+          color: var(--text-secondary);
+          font-size: 0.85rem;
+        }
+        .binary-tree .binary-item .tag {
+          font-size: 0.7rem;
+          padding: 0.15rem 0.4rem;
+          border-radius: 4px;
+          font-weight: 500;
+        }
+        .binary-tree .tag-editor {
+          background: rgba(59, 130, 246, 0.2);
+          color: #60a5fa;
+        }
+        .binary-tree .tag-debug {
+          background: rgba(234, 179, 8, 0.2);
+          color: #facc15;
+        }
+        .binary-tree .tag-release {
+          background: rgba(16, 185, 129, 0.2);
+          color: #34d399;
+        }
+      </style>
+
+      <div class="binary-tree">
+        <div class="tree-header">
+          <span class="icon">📦</span>
+          <span class="title">addons/ohmydialog/gdextension/</span>
+        </div>
+
+        <!-- Windows -->
+        <div class="platform-group">
+          <div class="platform-header">
+            <span class="icon">🪟</span>
+            <span class="name">Windows</span>
+          </div>
+          <ul class="binary-list">
+            <li class="binary-item">
+              <span class="icon">⚙️</span>
+              <span class="name">libohmydialog.windows.editor.x86_64.dll</span>
+              <span class="tag tag-editor">editor</span>
+            </li>
+            <li class="binary-item">
+              <span class="icon">⚙️</span>
+              <span class="name">libohmydialog.windows.template_debug.x86_64.dll</span>
+              <span class="tag tag-debug">debug</span>
+            </li>
+            <li class="binary-item">
+              <span class="icon">⚙️</span>
+              <span class="name">libohmydialog.windows.template_release.x86_64.dll</span>
+              <span class="tag tag-release">release</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Linux -->
+        <div class="platform-group">
+          <div class="platform-header">
+            <span class="icon">🐧</span>
+            <span class="name">Linux</span>
+          </div>
+          <ul class="binary-list">
+            <li class="binary-item">
+              <span class="icon">⚙️</span>
+              <span class="name">libohmydialog.linux.editor.x86_64.so</span>
+              <span class="tag tag-editor">editor</span>
+            </li>
+            <li class="binary-item">
+              <span class="icon">⚙️</span>
+              <span class="name">libohmydialog.linux.template_debug.x86_64.so</span>
+              <span class="tag tag-debug">debug</span>
+            </li>
+            <li class="binary-item">
+              <span class="icon">⚙️</span>
+              <span class="name">libohmydialog.linux.template_release.x86_64.so</span>
+              <span class="tag tag-release">release</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- macOS -->
+        <div class="platform-group">
+          <div class="platform-header">
+            <span class="icon">🍎</span>
+            <span class="name">macOS</span>
+          </div>
+          <ul class="binary-list">
+            <li class="binary-item">
+              <span class="icon">📁</span>
+              <span class="name">libohmydialog.macos.editor.framework/</span>
+              <span class="tag tag-editor">editor</span>
+            </li>
+            <li class="binary-item">
+              <span class="icon">📁</span>
+              <span class="name">libohmydialog.macos.template_debug.framework/</span>
+              <span class="tag tag-debug">debug</span>
+            </li>
+            <li class="binary-item">
+              <span class="icon">📁</span>
+              <span class="name">libohmydialog.macos.template_release.framework/</span>
+              <span class="tag tag-release">release</span>
+            </li>
+          </ul>
+        </div>
+      </div>
 
       <div class="callout-info">
         <p>Solo se generan los binarios de la plataforma y target que compiles. Para un setup completo de desarrollo, compila al menos el target <code>editor</code> de tu plataforma.</p>
