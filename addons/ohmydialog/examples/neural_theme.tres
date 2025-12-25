@@ -1,38 +1,12 @@
-[gd_resource type="Theme" format=3]
+[gd_resource type="Theme" load_steps=17 format=3 uid="uid://c0i8d1mm5nrve"]
 
-[sub_resource type="StyleBoxFlat" id="panel_bg"]
-bg_color = Color(0.039, 0.051, 0.071, 1)
+[sub_resource type="StyleBoxFlat" id="button_disabled"]
+bg_color = Color(0.059, 0.078, 0.11, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.129, 0.149, 0.176, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="panel_accent"]
-bg_color = Color(0.071, 0.098, 0.145, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0, 0.831, 1, 0.3)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_color = Color(0, 0.831, 1, 0.15)
-shadow_size = 4
-
-[sub_resource type="StyleBoxFlat" id="button_normal"]
-bg_color = Color(0.086, 0.114, 0.149, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.129, 0.149, 0.176, 1)
+border_color = Color(0.098, 0.114, 0.137, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
@@ -52,6 +26,18 @@ corner_radius_bottom_left = 6
 shadow_color = Color(0, 0.831, 1, 0.2)
 shadow_size = 2
 
+[sub_resource type="StyleBoxFlat" id="button_normal"]
+bg_color = Color(0.086, 0.114, 0.149, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.129, 0.149, 0.176, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [sub_resource type="StyleBoxFlat" id="button_pressed"]
 bg_color = Color(0, 0.6, 0.8, 0.3)
 border_width_left = 1
@@ -64,63 +50,33 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="button_disabled"]
+[sub_resource type="StyleBoxFlat" id="slider_fill"]
+bg_color = Color(0.659, 0.333, 0.969, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="slider_bg"]
+content_margin_top = 4.0
+content_margin_bottom = 4.0
 bg_color = Color(0.059, 0.078, 0.11, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.098, 0.114, 0.137, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
 
-[sub_resource type="StyleBoxFlat" id="textedit_normal"]
-bg_color = Color(0.047, 0.063, 0.086, 1)
+[sub_resource type="StyleBoxFlat" id="panel_bg"]
+bg_color = Color(0.039, 0.051, 0.071, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.129, 0.149, 0.176, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="textedit_focus"]
-bg_color = Color(0.055, 0.075, 0.102, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0, 0.831, 1, 0.6)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-shadow_color = Color(0, 0.831, 1, 0.1)
-shadow_size = 3
-
-[sub_resource type="StyleBoxFlat" id="tree_bg"]
-bg_color = Color(0.047, 0.063, 0.086, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.129, 0.149, 0.176, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="tree_selected"]
-bg_color = Color(0, 0.831, 1, 0.15)
-border_width_left = 2
-border_width_top = 0
-border_width_right = 0
-border_width_bottom = 0
-border_color = Color(0, 0.831, 1, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="progress_bg"]
 bg_color = Color(0.059, 0.078, 0.11, 1)
@@ -138,12 +94,20 @@ corner_radius_bottom_left = 4
 shadow_color = Color(0, 0.831, 1, 0.4)
 shadow_size = 3
 
+[sub_resource type="StyleBoxFlat" id="tab_hover"]
+bg_color = Color(0.059, 0.082, 0.118, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_color = Color(0.659, 0.333, 0.969, 0.4)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+
 [sub_resource type="StyleBoxFlat" id="tab_selected"]
 bg_color = Color(0.071, 0.098, 0.145, 1)
 border_width_left = 1
 border_width_top = 2
 border_width_right = 1
-border_width_bottom = 0
 border_color = Color(0, 0.831, 1, 0.6)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
@@ -153,88 +117,93 @@ bg_color = Color(0.047, 0.063, 0.086, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
-border_width_bottom = 0
 border_color = Color(0.129, 0.149, 0.176, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 
-[sub_resource type="StyleBoxFlat" id="tab_hover"]
-bg_color = Color(0.059, 0.082, 0.118, 1)
+[sub_resource type="StyleBoxFlat" id="textedit_focus"]
+bg_color = Color(0.055, 0.075, 0.102, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0.831, 1, 0.6)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0, 0.831, 1, 0.1)
+shadow_size = 3
+
+[sub_resource type="StyleBoxFlat" id="textedit_normal"]
+bg_color = Color(0.047, 0.063, 0.086, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
-border_width_bottom = 0
-border_color = Color(0.659, 0.333, 0.969, 0.4)
+border_width_bottom = 1
+border_color = Color(0.129, 0.149, 0.176, 1)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="slider_bg"]
-bg_color = Color(0.059, 0.078, 0.11, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-content_margin_top = 4
-content_margin_bottom = 4
+[sub_resource type="StyleBoxFlat" id="tree_bg"]
+bg_color = Color(0.047, 0.063, 0.086, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.129, 0.149, 0.176, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
-[sub_resource type="StyleBoxFlat" id="slider_fill"]
-bg_color = Color(0.659, 0.333, 0.969, 0.6)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
+[sub_resource type="StyleBoxFlat" id="tree_selected"]
+bg_color = Color(0, 0.831, 1, 0.15)
+border_width_left = 2
+border_color = Color(0, 0.831, 1, 0.8)
 
 [resource]
 default_font_size = 14
-
 Button/colors/font_color = Color(0.902, 0.929, 0.953, 1)
+Button/colors/font_disabled_color = Color(0.545, 0.58, 0.624, 0.5)
 Button/colors/font_hover_color = Color(0, 0.831, 1, 1)
 Button/colors/font_pressed_color = Color(0, 0.831, 1, 1)
-Button/colors/font_disabled_color = Color(0.545, 0.58, 0.624, 0.5)
-Button/styles/normal = SubResource("button_normal")
-Button/styles/hover = SubResource("button_hover")
-Button/styles/pressed = SubResource("button_pressed")
 Button/styles/disabled = SubResource("button_disabled")
-
+Button/styles/hover = SubResource("button_hover")
+Button/styles/normal = SubResource("button_normal")
+Button/styles/pressed = SubResource("button_pressed")
+HSlider/styles/grabber_area = SubResource("slider_fill")
+HSlider/styles/grabber_area_highlight = SubResource("slider_fill")
+HSlider/styles/slider = SubResource("slider_bg")
 Label/colors/font_color = Color(0.902, 0.929, 0.953, 1)
-
+OptionButton/colors/font_color = Color(0.902, 0.929, 0.953, 1)
+OptionButton/colors/font_hover_color = Color(0, 0.831, 1, 1)
+OptionButton/styles/hover = SubResource("button_hover")
+OptionButton/styles/normal = SubResource("button_normal")
+OptionButton/styles/pressed = SubResource("button_pressed")
+PanelContainer/styles/panel = SubResource("panel_bg")
+ProgressBar/styles/background = SubResource("progress_bg")
+ProgressBar/styles/fill = SubResource("progress_fill")
+RichTextLabel/colors/default_color = Color(0.902, 0.929, 0.953, 1)
+SpinBox/colors/font_color = Color(0.902, 0.929, 0.953, 1)
+TabContainer/colors/font_hovered_color = Color(0.659, 0.333, 0.969, 1)
+TabContainer/colors/font_selected_color = Color(0, 0.831, 1, 1)
+TabContainer/colors/font_unselected_color = Color(0.545, 0.58, 0.624, 1)
+TabContainer/styles/panel = SubResource("panel_bg")
+TabContainer/styles/tab_hovered = SubResource("tab_hover")
+TabContainer/styles/tab_selected = SubResource("tab_selected")
+TabContainer/styles/tab_unselected = SubResource("tab_unselected")
+TextEdit/colors/caret_color = Color(0, 0.831, 1, 1)
 TextEdit/colors/font_color = Color(0.902, 0.929, 0.953, 1)
 TextEdit/colors/font_placeholder_color = Color(0.545, 0.58, 0.624, 0.6)
-TextEdit/colors/caret_color = Color(0, 0.831, 1, 1)
 TextEdit/colors/selection_color = Color(0, 0.831, 1, 0.3)
-TextEdit/styles/normal = SubResource("textedit_normal")
 TextEdit/styles/focus = SubResource("textedit_focus")
-
+TextEdit/styles/normal = SubResource("textedit_normal")
 Tree/colors/font_color = Color(0.902, 0.929, 0.953, 1)
 Tree/colors/font_selected_color = Color(0, 0.831, 1, 1)
 Tree/colors/title_button_color = Color(0, 0.831, 1, 1)
 Tree/styles/panel = SubResource("tree_bg")
 Tree/styles/selected = SubResource("tree_selected")
 Tree/styles/selected_focus = SubResource("tree_selected")
-
-ProgressBar/styles/background = SubResource("progress_bg")
-ProgressBar/styles/fill = SubResource("progress_fill")
-
-TabContainer/colors/font_selected_color = Color(0, 0.831, 1, 1)
-TabContainer/colors/font_unselected_color = Color(0.545, 0.58, 0.624, 1)
-TabContainer/colors/font_hovered_color = Color(0.659, 0.333, 0.969, 1)
-TabContainer/styles/tab_selected = SubResource("tab_selected")
-TabContainer/styles/tab_unselected = SubResource("tab_unselected")
-TabContainer/styles/tab_hovered = SubResource("tab_hover")
-TabContainer/styles/panel = SubResource("panel_bg")
-
-PanelContainer/styles/panel = SubResource("panel_bg")
-
-HSlider/styles/slider = SubResource("slider_bg")
-HSlider/styles/grabber_area = SubResource("slider_fill")
-HSlider/styles/grabber_area_highlight = SubResource("slider_fill")
-
-RichTextLabel/colors/default_color = Color(0.902, 0.929, 0.953, 1)
-
-OptionButton/colors/font_color = Color(0.902, 0.929, 0.953, 1)
-OptionButton/colors/font_hover_color = Color(0, 0.831, 1, 1)
-OptionButton/styles/normal = SubResource("button_normal")
-OptionButton/styles/hover = SubResource("button_hover")
-OptionButton/styles/pressed = SubResource("button_pressed")
-
-SpinBox/colors/font_color = Color(0.902, 0.929, 0.953, 1)

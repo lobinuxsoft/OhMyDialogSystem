@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://test_scene_llama"]
+[gd_scene load_steps=3 format=3 uid="uid://dvmbmbbjjhyk4"]
 
-[ext_resource type="Script" path="res://addons/ohmydialog/examples/llama_test_scene.gd" id="1_script"]
-[ext_resource type="Theme" path="res://addons/ohmydialog/examples/neural_theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://ckke5s511wgls" path="res://addons/ohmydialog/examples/llama_test_scene.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://c0i8d1mm5nrve" path="res://addons/ohmydialog/examples/neural_theme.tres" id="2_theme"]
 
 [node name="LlamaTestScene" type="Control"]
 layout_mode = 3
@@ -42,8 +42,8 @@ layout_mode = 2
 
 [node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderRow"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "LlamaInterface Test Scene"
 
 [node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/HeaderRow"]
@@ -81,7 +81,6 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-max_value = 100.0
 show_percentage = false
 
 [node name="CancelDownloadBtn" type="Button" parent="MarginContainer/VBoxContainer/DownloadPanel/MarginContainer/HBoxContainer"]
@@ -93,10 +92,12 @@ text = "Cancel"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+current_tab = 0
 
 [node name="Models" type="HSplitContainer" parent="MarginContainer/VBoxContainer/TabContainer"]
 layout_mode = 2
 split_offset = 450
+metadata/_tab_index = 0
 
 [node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models"]
 layout_mode = 2
@@ -167,8 +168,8 @@ text = "📋"
 
 [node name="DetailsLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel/DetailsHeader"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 16
 text = "Model Details"
 
 [node name="DetailsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Models/RightPanel"]
@@ -201,6 +202,7 @@ fit_content = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 12
+metadata/_tab_index = 1
 
 [node name="StatusRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation"]
 layout_mode = 2
@@ -314,8 +316,8 @@ text = "🦙"
 
 [node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection/ModelInfoHeader"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 16
 text = "Loaded Model"
 
 [node name="ModelInfoPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ModelInfoSection"]
@@ -351,8 +353,8 @@ text = "⚙️"
 
 [node name="ParamsLabel" type="Label" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsHeader"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+theme_override_font_sizes/font_size = 16
 text = "Sampling Parameters"
 
 [node name="ParamsPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection"]
@@ -436,7 +438,6 @@ text = "Top K"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-max_value = 100.0
 value = 40.0
 
 [node name="MaxTokensRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TabContainer/Generation/HSplitContainer/RightPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
@@ -572,8 +573,8 @@ text = "🤗"
 
 [node name="Title" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/TitleRow"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 18
 text = "HuggingFace Model Browser"
 
 [node name="SearchRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]

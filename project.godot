@@ -14,7 +14,7 @@ config/name="OhMyDialogSystem"
 config/description="AI-powered dialogue system for Godot with local LLM inference, persistent memories, and text-to-speech."
 config/version="0.1.0"
 config/features=PackedStringArray("4.5", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="uid://f0hyuiidpuyj"
 
 [dotnet]
 
