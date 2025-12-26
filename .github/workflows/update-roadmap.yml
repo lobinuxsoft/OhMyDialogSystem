@@ -163,6 +163,8 @@ jobs:
           cat docs/roadmap-data.json
 
       - name: Commit and Push
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -173,5 +175,7 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "docs(roadmap): actualizar datos del roadmap [skip ci]"
+            # Use PROJECT_TOKEN to bypass branch protection
+            git remote set-url origin https://x-access-token:${{ secrets.PROJECT_TOKEN }}@github.com/${{ github.repository }}.git
             git push
           fi
