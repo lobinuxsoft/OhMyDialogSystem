@@ -22,6 +22,7 @@ on:
 permissions:
   contents: write
   issues: read
+  pull-requests: write
   repository-projects: read
 
 jobs:
@@ -162,20 +163,61 @@ jobs:
           echo "Generated roadmap-data.json:"
           cat docs/roadmap-data.json
 
-      - name: Commit and Push
+      - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         run: |
+          # Check if there are changes
+          if git diff --quiet docs/roadmap-data.json; then
+            echo "No changes detected in roadmap-data.json"
+            exit 0
+          fi
+
+          # Setup git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add docs/roadmap-data.json
+          # Create unique branch name
+          BRANCH_NAME="auto/roadmap-update-$(date +%Y%m%d-%H%M%S)"
+          echo "Creating branch: $BRANCH_NAME"
 
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
+          # Create and checkout new branch
+          git checkout -b "$BRANCH_NAME"
+
+          # Commit changes
+          git add docs/roadmap-data.json
+          git commit -m "docs(roadmap): actualizar datos del roadmap"
+
+          # Push branch using token
+          git remote set-url origin https://x-access-token:${{ secrets.PROJECT_TOKEN }}@github.com/${{ github.repository }}.git
+          git push -u origin "$BRANCH_NAME"
+
+          # Check if PR already exists
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --json number --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR already exists: #$EXISTING_PR"
           else
-            git commit -m "docs(roadmap): actualizar datos del roadmap [skip ci]"
-            # Use PROJECT_TOKEN to bypass branch protection
-            git remote set-url origin https://x-access-token:${{ secrets.PROJECT_TOKEN }}@github.com/${{ github.repository }}.git
-            git push
+            # Create PR
+            gh pr create \
+              --base development \
+              --head "$BRANCH_NAME" \
+              --title "docs(roadmap): actualizar datos del roadmap" \
+              --body "$(cat <<'EOF'
+          ## Actualizacion automatica del Roadmap
+
+          Este PR fue generado automaticamente por el workflow de GitHub Actions.
+
+          ### Cambios
+          - Actualiza `docs/roadmap-data.json` con los datos mas recientes del Project Board
+
+          ### Fuente de datos
+          - GitHub Project: https://github.com/users/lobinuxsoft/projects/5
+          - Milestones del repositorio
+
+          ---
+          *Generado automaticamente por GitHub Actions*
+          EOF
+          )"
+            echo "PR created successfully"
           fi
