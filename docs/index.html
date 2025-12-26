@@ -361,86 +361,430 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
 
       <h2>Roadmap</h2>
 
-      <div class="milestone-progress">
-        <div class="header">
-          <strong>M1: GDExtension Core</strong>
-          <span class="badge badge-cyan">71%</span>
+      <style>
+        .sprint-container {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+        .sprint-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+        .sprint-card:hover {
+          border-color: var(--ai-cyan);
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        .sprint-header {
+          padding: 1rem 1.25rem;
+          background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(168, 85, 247, 0.1));
+          border-bottom: 1px solid var(--border-color);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .sprint-title {
+          font-weight: 600;
+          font-size: 1rem;
+          color: var(--ai-cyan);
+        }
+        .sprint-count {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          background: rgba(0,0,0,0.2);
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+        }
+        .sprint-tasks {
+          padding: 0.75rem;
+          max-height: 300px;
+          overflow-y: auto;
+        }
+        .sprint-task {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.5rem;
+          padding: 0.5rem;
+          border-radius: 6px;
+          font-size: 0.8rem;
+          transition: background 0.2s;
+        }
+        .sprint-task:hover {
+          background: rgba(255,255,255,0.03);
+        }
+        .task-order {
+          min-width: 20px;
+          height: 20px;
+          border-radius: 4px;
+          background: rgba(0, 212, 255, 0.2);
+          color: var(--ai-cyan);
+          font-size: 0.7rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .task-tag {
+          font-size: 0.65rem;
+          padding: 0.15rem 0.35rem;
+          border-radius: 3px;
+          font-weight: 500;
+        }
+        .task-tag.core { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .task-tag.editor { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .task-tag.ai { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .task-name {
+          flex: 1;
+          color: var(--text-body);
+          line-height: 1.3;
+        }
+        .task-issue {
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          font-family: var(--font-mono);
+        }
+        .milestone-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+          margin: 1.5rem 0;
+        }
+        .milestone-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 1rem;
+          transition: all 0.3s;
+        }
+        .milestone-card:hover {
+          border-color: var(--ai-purple);
+        }
+        .milestone-card .name {
+          font-weight: 600;
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .milestone-card .progress-bar {
+          height: 6px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 0.5rem;
+        }
+        .milestone-card .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, var(--ai-cyan), var(--ai-purple));
+          border-radius: 3px;
+          transition: width 0.5s ease;
+        }
+        .milestone-card .desc {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+        }
+      </style>
+
+      <h3>Plan de Implementacion por Sprints</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        28 tareas organizadas intercalando Core y Editor para desarrollo equilibrado.
+      </p>
+
+      <div class="sprint-container">
+        <!-- Sprint 1: Fundamentos -->
+        <div class="sprint-card">
+          <div class="sprint-header">
+            <span class="sprint-title">Sprint 1: Fundamentos</span>
+            <span class="sprint-count">9 tareas</span>
+          </div>
+          <div class="sprint-tasks">
+            <div class="sprint-task">
+              <span class="task-order">1</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">DialogueNodeData Resource</span>
+              <span class="task-issue">#69</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">2</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">CharacterIdentity Resource</span>
+              <span class="task-issue">#7</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">3</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">WorldContext Resource</span>
+              <span class="task-issue">#8</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">4</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">DialogueGraph Resource</span>
+              <span class="task-issue">#10</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">5</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">DialogueGraphEditor base</span>
+              <span class="task-issue">#15</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">6</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Clase base nodos visuales</span>
+              <span class="task-issue">#16</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">7</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo de inicio (StartNode)</span>
+              <span class="task-issue">#17</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">8</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo de fin (EndNode)</span>
+              <span class="task-issue">#73</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">9</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo respuesta estatica</span>
+              <span class="task-issue">#58</span>
+            </div>
+          </div>
         </div>
-        <div class="bar"><div class="bar-fill" style="width: 71%;"></div></div>
+
+        <!-- Sprint 2: IA + Decisiones -->
+        <div class="sprint-card">
+          <div class="sprint-header">
+            <span class="sprint-title">Sprint 2: IA + Decisiones</span>
+            <span class="sprint-count">6 tareas</span>
+          </div>
+          <div class="sprint-tasks">
+            <div class="sprint-task">
+              <span class="task-order">10</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">ConversationState</span>
+              <span class="task-issue">#70</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">11</span>
+              <span class="task-tag ai">AI</span>
+              <span class="task-name">Sistema de prompts</span>
+              <span class="task-issue">#11</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">12</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">Sistema NodeExecutors</span>
+              <span class="task-issue">#72</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">13</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo respuesta IA</span>
+              <span class="task-issue">#18</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">14</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo opciones jugador</span>
+              <span class="task-issue">#19</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">15</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">GraphRunner</span>
+              <span class="task-issue">#71</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sprint 3: Logica -->
+        <div class="sprint-card">
+          <div class="sprint-header">
+            <span class="sprint-title">Sprint 3: Logica</span>
+            <span class="sprint-count">7 tareas</span>
+          </div>
+          <div class="sprint-tasks">
+            <div class="sprint-task">
+              <span class="task-order">16</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">Historial conversacion</span>
+              <span class="task-issue">#12</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">17</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">ContextManager</span>
+              <span class="task-issue">#13</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">18</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo condicion</span>
+              <span class="task-issue">#20</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">19</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo evento</span>
+              <span class="task-issue">#21</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">20</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo SetVariable</span>
+              <span class="task-issue">#74</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">21</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo Jump</span>
+              <span class="task-issue">#75</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">22</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">DialogueManager principal</span>
+              <span class="task-issue">#14</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sprint 4: Polish -->
+        <div class="sprint-card">
+          <div class="sprint-header">
+            <span class="sprint-title">Sprint 4: Polish</span>
+            <span class="sprint-count">6 tareas</span>
+          </div>
+          <div class="sprint-tasks">
+            <div class="sprint-task">
+              <span class="task-order">23</span>
+              <span class="task-tag core">Core</span>
+              <span class="task-name">AIPreset Resource</span>
+              <span class="task-issue">#9</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">24</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Panel asistente IA</span>
+              <span class="task-issue">#59</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">25</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo JumpToFree</span>
+              <span class="task-issue">#76</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">26</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Nodo ReturnToGraph</span>
+              <span class="task-issue">#77</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">27</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Editor como dock/panel</span>
+              <span class="task-issue">#22</span>
+            </div>
+            <div class="sprint-task">
+              <span class="task-order">28</span>
+              <span class="task-tag editor">Editor</span>
+              <span class="task-name">Panel traduccion auto</span>
+              <span class="task-issue">#60</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="milestone-progress">
-        <div class="header">
-          <strong>M2: Core del Sistema</strong>
-          <span class="badge badge-purple">0%</span>
+      <h3>Progreso por Milestone</h3>
+
+      <div class="milestone-grid">
+        <div class="milestone-card">
+          <div class="name">
+            <span>M1: GDExtension Core</span>
+            <span class="badge badge-cyan">71%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 71%;"></div></div>
+          <div class="desc">llama.cpp, godot-cpp integration</div>
         </div>
-        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M2: Core Sistema</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">Resources, Managers, State</div>
+        </div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M3: Editor Visual</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">GraphEdit, DialogueNodes</div>
+        </div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M4: Memorias</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">NPC persistent memories</div>
+        </div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M5: Localizacion</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">TranslationServer i18n</div>
+        </div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M6: TTS</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">Piper Text-to-Speech</div>
+        </div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M7: C# Bindings</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">Idiomatic C# wrappers</div>
+        </div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M8: Docs</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">Examples, tutorials</div>
+        </div>
+        <div class="milestone-card">
+          <div class="name">
+            <span>M9: LoRA & AI</span>
+            <span class="badge badge-purple">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
+          <div class="desc">Fine-tuning, AI assistants</div>
+        </div>
       </div>
 
-      <div class="milestone-progress">
-        <div class="header">
-          <strong>M3: Editor Visual</strong>
-          <span class="badge badge-purple">0%</span>
-        </div>
-        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
+      <div class="callout-info">
+        <p>Para ver el estado detallado y en tiempo real, visita el <a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank">Project Board en GitHub</a>.</p>
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Milestone</th>
-            <th>Descripción</th>
-            <th>Issues</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>M1</strong></td>
-            <td>GDExtension Core (llama.cpp, godot-cpp)</td>
-            <td>#1-#6</td>
-          </tr>
-          <tr>
-            <td><strong>M2</strong></td>
-            <td>Core del Sistema (Resources, Managers)</td>
-            <td>#7-#14</td>
-          </tr>
-          <tr>
-            <td><strong>M3</strong></td>
-            <td>Editor Visual de Diálogos</td>
-            <td>#15-#22</td>
-          </tr>
-          <tr>
-            <td><strong>M4</strong></td>
-            <td>Memorias Persistentes</td>
-            <td>#23-#28</td>
-          </tr>
-          <tr>
-            <td><strong>M5</strong></td>
-            <td>Localización</td>
-            <td>#29-#32</td>
-          </tr>
-          <tr>
-            <td><strong>M6</strong></td>
-            <td>Text-to-Speech (Piper)</td>
-            <td>#33-#38</td>
-          </tr>
-          <tr>
-            <td><strong>M7</strong></td>
-            <td>Bindings C#</td>
-            <td>#39-#43</td>
-          </tr>
-          <tr>
-            <td><strong>M8</strong></td>
-            <td>Ejemplos y Documentación</td>
-            <td>#44-#50</td>
-          </tr>
-          <tr>
-            <td><strong>M9</strong></td>
-            <td>LoRA & Asistentes IA</td>
-            <td>#64-#68</td>
-          </tr>
-        </tbody>
-      </table>
 
       <hr>
 
