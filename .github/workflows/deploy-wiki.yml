@@ -2,13 +2,7 @@
 name: Deploy Wiki
 
 on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main", "development"]
-    paths:
-      - 'docs/**'
-
-  # Allows you to run this workflow manually from the Actions tab
+  # Manual trigger only
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
