@@ -1,0 +1,177 @@
+# Update Roadmap Data from GitHub Project
+name: Update Roadmap
+
+on:
+  # Run daily at 6:00 UTC
+  schedule:
+    - cron: '0 6 * * *'
+
+  # Run when issues or project items change
+  issues:
+    types: [opened, closed, edited, deleted, labeled, unlabeled, milestoned, demilestoned]
+
+  # Run on pushes to development that modify project-related files
+  push:
+    branches: ["development"]
+    paths:
+      - '.github/workflows/update-roadmap.yml'
+
+  # Manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+  repository-projects: read
+
+jobs:
+  update-roadmap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: development
+
+      - name: Generate Roadmap Data
+        env:
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          # Fetch project items with custom fields via GraphQL
+          PROJECT_DATA=$(gh api graphql -f query='
+            query {
+              node(id: "PVT_kwHOAVGx6s4BLOYT") {
+                ... on ProjectV2 {
+                  items(first: 100) {
+                    nodes {
+                      content {
+                        ... on Issue {
+                          number
+                          title
+                          state
+                          milestone {
+                            number
+                            title
+                          }
+                          labels(first: 10) {
+                            nodes {
+                              name
+                            }
+                          }
+                        }
+                      }
+                      fieldValues(first: 10) {
+                        nodes {
+                          ... on ProjectV2ItemFieldSingleSelectValue {
+                            name
+                            field {
+                              ... on ProjectV2SingleSelectField {
+                                name
+                              }
+                            }
+                          }
+                          ... on ProjectV2ItemFieldNumberValue {
+                            number
+                            field {
+                              ... on ProjectV2Field {
+                                name
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ')
+
+          # Fetch milestones via REST API
+          MILESTONES=$(gh api repos/${{ github.repository }}/milestones --jq '[.[] | {
+            number: .number,
+            title: .title,
+            description: .description,
+            open_issues: .open_issues,
+            closed_issues: .closed_issues,
+            state: .state
+          }]')
+
+          # Process with jq to create the final JSON structure
+          echo "$PROJECT_DATA" | jq --argjson milestones "$MILESTONES" '
+            # Extract items from project
+            .data.node.items.nodes as $items |
+
+            # Process each item into a cleaner format
+            [
+              $items[] |
+              select(.content != null) |
+              {
+                number: .content.number,
+                title: .content.title,
+                state: .content.state,
+                milestone: .content.milestone.title,
+                labels: [.content.labels.nodes[].name],
+                fields: (
+                  [.fieldValues.nodes[] | select(.field != null)] |
+                  map({(.field.name): (.name // .number)}) |
+                  add // {}
+                )
+              }
+            ] as $issues |
+
+            # Group by Sprint
+            ($issues | group_by(.fields.Sprint) |
+              map({
+                sprint: (.[0].fields.Sprint // "Backlog"),
+                issues: (. | sort_by(.fields.Order // 999))
+              }) |
+              sort_by(
+                if .sprint == "Sprint 1" then 1
+                elif .sprint == "Sprint 2" then 2
+                elif .sprint == "Sprint 3" then 3
+                elif .sprint == "Sprint 4" then 4
+                else 99 end
+              )
+            ) as $sprints |
+
+            # Calculate milestone progress
+            ($milestones | map({
+              number: .number,
+              title: .title,
+              description: .description,
+              open: .open_issues,
+              closed: .closed_issues,
+              progress: (if (.open_issues + .closed_issues) > 0
+                then ((.closed_issues / (.open_issues + .closed_issues)) * 100 | floor)
+                else 0 end),
+              state: .state
+            }) | sort_by(.number)) as $milestoneProgress |
+
+            # Final structure
+            {
+              updated_at: (now | strftime("%Y-%m-%dT%H:%M:%SZ")),
+              repository: "${{ github.repository }}",
+              milestones: $milestoneProgress,
+              sprints: $sprints,
+              issues: $issues
+            }
+          ' > docs/roadmap-data.json
+
+          echo "Generated roadmap-data.json:"
+          cat docs/roadmap-data.json
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add docs/roadmap-data.json
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "docs(roadmap): actualizar datos del roadmap [skip ci]"
+            git push
+          fi

@@ -1,0 +1,65 @@
+{
+  "updated_at": "2025-12-26T20:00:00Z",
+  "repository": "lobinuxsoft/OhMyDialogSystem",
+  "milestones": [
+    {"number": 1, "title": "GDExtension Core", "description": "llama.cpp, godot-cpp integration", "open": 2, "closed": 5, "progress": 71, "state": "open"},
+    {"number": 2, "title": "Core del Sistema", "description": "Resources, Managers, State", "open": 8, "closed": 0, "progress": 0, "state": "open"},
+    {"number": 3, "title": "Editor Visual", "description": "GraphEdit, DialogueNodes", "open": 8, "closed": 0, "progress": 0, "state": "open"},
+    {"number": 4, "title": "Memorias Persistentes", "description": "NPC persistent memories", "open": 6, "closed": 0, "progress": 0, "state": "open"},
+    {"number": 5, "title": "Localizacion", "description": "TranslationServer i18n", "open": 4, "closed": 0, "progress": 0, "state": "open"},
+    {"number": 6, "title": "Text-to-Speech", "description": "Piper TTS integration", "open": 6, "closed": 0, "progress": 0, "state": "open"},
+    {"number": 7, "title": "C# Bindings", "description": "Idiomatic C# wrappers", "open": 5, "closed": 0, "progress": 0, "state": "open"},
+    {"number": 8, "title": "Ejemplos y Documentacion", "description": "Tutorials, examples", "open": 7, "closed": 0, "progress": 0, "state": "open"},
+    {"number": 9, "title": "LoRA & Asistentes IA", "description": "Fine-tuning, AI assistants", "open": 5, "closed": 0, "progress": 0, "state": "open"}
+  ],
+  "sprints": [
+    {
+      "sprint": "Sprint 1: Fundamentos",
+      "issues": [
+        {"number": 69, "title": "[Core] Implementar DialogueNodeData Resource", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 1", "Order": 1, "Priority": "Critical"}},
+        {"number": 7, "title": "[Core] Implementar CharacterIdentity Resource", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 1", "Order": 2, "Priority": "Critical"}},
+        {"number": 8, "title": "[Core] Implementar WorldContext Resource", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 1", "Order": 3, "Priority": "High"}},
+        {"number": 10, "title": "[Core] Implementar DialogueGraph Resource", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 1", "Order": 4, "Priority": "Critical"}},
+        {"number": 15, "title": "[Editor] Crear DialogueGraphEditor base con GraphEdit", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 1", "Order": 5, "Priority": "Critical"}},
+        {"number": 16, "title": "[Editor] Crear clase base para nodos visuales", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 1", "Order": 6, "Priority": "Critical"}},
+        {"number": 17, "title": "[Editor] Implementar nodo de inicio (StartNode)", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 1", "Order": 7, "Priority": "Critical"}},
+        {"number": 73, "title": "[Editor] Implementar nodo de fin (EndNode)", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 1", "Order": 8, "Priority": "Critical"}},
+        {"number": 58, "title": "[Editor] Implementar nodo de respuesta estatica", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 1", "Order": 9, "Priority": "High"}}
+      ]
+    },
+    {
+      "sprint": "Sprint 2: IA + Decisiones",
+      "issues": [
+        {"number": 70, "title": "[Core] Implementar ConversationState", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 2", "Order": 10, "Priority": "High"}},
+        {"number": 11, "title": "[AI] Implementar sistema de construccion de prompts", "state": "OPEN", "labels": ["ai"], "fields": {"Sprint": "Sprint 2", "Order": 11, "Priority": "Critical"}},
+        {"number": 72, "title": "[Core] Implementar sistema de NodeExecutors", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 2", "Order": 12, "Priority": "High"}},
+        {"number": 18, "title": "[Editor] Implementar nodo de respuesta con IA", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 2", "Order": 13, "Priority": "Critical"}},
+        {"number": 19, "title": "[Editor] Implementar nodo de opciones del jugador", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 2", "Order": 14, "Priority": "High"}},
+        {"number": 71, "title": "[Core] Implementar GraphRunner", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 2", "Order": 15, "Priority": "Critical"}}
+      ]
+    },
+    {
+      "sprint": "Sprint 3: Logica",
+      "issues": [
+        {"number": 12, "title": "[Core] Implementar gestion de historial de conversacion", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 3", "Order": 16, "Priority": "High"}},
+        {"number": 13, "title": "[Core] Implementar ContextManager para estado dinamico", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 3", "Order": 17, "Priority": "High"}},
+        {"number": 20, "title": "[Editor] Implementar nodo de condicion", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 3", "Order": 18, "Priority": "High"}},
+        {"number": 21, "title": "[Editor] Implementar nodo de evento", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 3", "Order": 19, "Priority": "Medium"}},
+        {"number": 74, "title": "[Editor] Implementar nodo SetVariable", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 3", "Order": 20, "Priority": "Medium"}},
+        {"number": 75, "title": "[Editor] Implementar nodo Jump", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 3", "Order": 21, "Priority": "Medium"}},
+        {"number": 14, "title": "[Core] Implementar DialogueManager principal", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 3", "Order": 22, "Priority": "Critical"}}
+      ]
+    },
+    {
+      "sprint": "Sprint 4: Polish",
+      "issues": [
+        {"number": 9, "title": "[Core] Implementar AIPreset Resource", "state": "OPEN", "labels": ["core"], "fields": {"Sprint": "Sprint 4", "Order": 23, "Priority": "Medium"}},
+        {"number": 59, "title": "[Editor] Implementar panel asistente IA para generacion de texto", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 4", "Order": 24, "Priority": "Medium"}},
+        {"number": 76, "title": "[Editor] Implementar nodo JumpToFree", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 4", "Order": 25, "Priority": "Low"}},
+        {"number": 77, "title": "[Editor] Implementar nodo ReturnToGraph", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 4", "Order": 26, "Priority": "Low"}},
+        {"number": 22, "title": "[Editor] Integrar editor como dock/panel del editor", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 4", "Order": 27, "Priority": "High"}},
+        {"number": 60, "title": "[Editor] Implementar panel de traduccion automatica", "state": "OPEN", "labels": ["editor"], "fields": {"Sprint": "Sprint 4", "Order": 28, "Priority": "Low"}}
+      ]
+    }
+  ]
+}
