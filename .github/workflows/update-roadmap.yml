@@ -2,19 +2,14 @@
 name: Update Roadmap
 
 on:
-  # Run daily at 6:00 UTC
-  schedule:
-    - cron: '0 6 * * *'
-
-  # Run when issues or project items change
-  issues:
-    types: [opened, closed, edited, deleted, labeled, unlabeled, milestoned, demilestoned]
-
-  # Run on pushes to development that modify project-related files
+  # Run when pushing to development
   push:
     branches: ["development"]
-    paths:
-      - '.github/workflows/update-roadmap.yml'
+
+  # Run when PR is opened or synchronized to development
+  pull_request:
+    branches: ["development"]
+    types: [opened, synchronize, reopened]
 
   # Manual trigger
   workflow_dispatch:
