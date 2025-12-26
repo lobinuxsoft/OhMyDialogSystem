@@ -2,14 +2,11 @@
 name: Update Roadmap
 
 on:
-  # Run when pushing to development
+  # Run when pushing to development (except auto-generated commits)
   push:
     branches: ["development"]
-
-  # Run when PR is opened or synchronized to development
-  pull_request:
-    branches: ["development"]
-    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - 'docs/roadmap-data.json'
 
   # Manual trigger
   workflow_dispatch:
