@@ -36,7 +36,7 @@ jobs:
 
       - name: Generate Roadmap Data
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.PROJECT_TOKEN }}
         run: |
           # Fetch project items with custom fields via GraphQL
           PROJECT_DATA=$(gh api graphql -f query='
