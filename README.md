@@ -108,8 +108,6 @@ If you find this project useful, consider supporting its development:
 | **BTC** | `bc1qkxy898wa6mz04c9hrjekx6p0yht2ukz56e9xxq` |
 | **Binance Pay ID** | `78328894` |
 
-<!-- Ko-fi: Coming soon -->
-
 ## Contributing
 
 Contributions are welcome! Please check the [Issues](https://github.com/lobinuxsoft/OhMyDialogSystem/issues) for open tasks.
