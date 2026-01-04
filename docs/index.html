@@ -711,7 +711,155 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
 
       <hr>
 
-      <em>Última actualización: Diciembre 2025</em>
+      <h2>Support the Project</h2>
+
+      <p>If you find this project useful, consider supporting its development:</p>
+
+      <style>
+        .donate-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+        .donate-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 1.5rem;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+        .donate-card:hover {
+          border-color: var(--ai-cyan);
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        .donate-card img {
+          width: 150px;
+          height: 150px;
+          margin-bottom: 1rem;
+          border-radius: 8px;
+          background: white;
+          padding: 8px;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        .donate-card img:hover {
+          transform: scale(1.05);
+        }
+        .donate-card h4 {
+          margin: 0 0 0.5rem 0;
+          color: var(--ai-cyan);
+        }
+        .donate-card code {
+          font-size: 0.7rem;
+          word-break: break-all;
+          display: block;
+          padding: 0.5rem;
+          background: rgba(0,0,0,0.3);
+          border-radius: 4px;
+        }
+        /* Lightbox */
+        .lightbox {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.9);
+          z-index: 9999;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          cursor: pointer;
+        }
+        .lightbox.active {
+          display: flex;
+        }
+        .lightbox img {
+          max-width: 90%;
+          max-height: 70%;
+          background: white;
+          padding: 20px;
+          border-radius: 12px;
+          box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+        }
+        .lightbox-title {
+          color: var(--ai-cyan);
+          font-size: 1.5rem;
+          margin-top: 1.5rem;
+          font-weight: 600;
+        }
+        .lightbox-address {
+          color: white;
+          font-family: var(--font-mono);
+          font-size: 1rem;
+          margin-top: 0.75rem;
+          padding: 0.75rem 1.5rem;
+          background: rgba(255,255,255,0.1);
+          border-radius: 8px;
+          user-select: all;
+        }
+        .lightbox-hint {
+          color: var(--text-muted);
+          font-size: 0.8rem;
+          margin-top: 1rem;
+        }
+      </style>
+
+      <div class="donate-grid">
+        <div class="donate-card">
+          <img src="donate/usdt-trc20.png" alt="USDT TRC20 QR" onclick="openLightbox(this, 'USDT (TRC20)', 'TF6AXBP3LKBCcbJkLG6RqyMsrPNs2JCpdQ')">
+          <h4>USDT (TRC20)</h4>
+          <code>TF6AXBP3LKBCcbJkLG6RqyMsrPNs2JCpdQ</code>
+        </div>
+        <div class="donate-card">
+          <img src="donate/usdt-bep20.png" alt="USDT BEP20 QR" onclick="openLightbox(this, 'USDT (BEP20)', '0xd8d2Ed67C567CB3Af437f4638d3531e560575A20')">
+          <h4>USDT (BEP20)</h4>
+          <code>0xd8d2Ed67C567CB3Af437f4638d3531e560575A20</code>
+        </div>
+        <div class="donate-card">
+          <img src="donate/btc.png" alt="BTC QR" onclick="openLightbox(this, 'Bitcoin (BTC)', 'bc1qkxy898wa6mz04c9hrjekx6p0yht2ukz56e9xxq')">
+          <h4>BTC</h4>
+          <code>bc1qkxy898wa6mz04c9hrjekx6p0yht2ukz56e9xxq</code>
+        </div>
+        <div class="donate-card">
+          <img src="donate/binance-pay.jpeg" alt="Binance Pay QR" onclick="openLightbox(this, 'Binance Pay', '78328894')">
+          <h4>Binance Pay</h4>
+          <code>78328894</code>
+        </div>
+      </div>
+
+      <!-- Lightbox -->
+      <div class="lightbox" id="qrLightbox" onclick="closeLightbox()">
+        <img id="lightboxImg" src="" alt="QR Code">
+        <div class="lightbox-title" id="lightboxTitle"></div>
+        <div class="lightbox-address" id="lightboxAddress"></div>
+        <div class="lightbox-hint">Click anywhere to close</div>
+      </div>
+
+      <script>
+        function openLightbox(img, title, address) {
+          const lightbox = document.getElementById('qrLightbox');
+          document.getElementById('lightboxImg').src = img.src;
+          document.getElementById('lightboxTitle').textContent = title;
+          document.getElementById('lightboxAddress').textContent = address;
+          lightbox.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+          document.getElementById('qrLightbox').classList.remove('active');
+          document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeLightbox();
+        });
+      </script>
+
+      <hr>
+
+      <em>Última actualización: Enero 2026</em>
 
       <footer class="wiki-footer">
         <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>

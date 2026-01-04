@@ -97,6 +97,19 @@ addons/ohmydialog/
 
 See the [Project Board](https://github.com/users/lobinuxsoft/projects/5) for detailed progress.
 
+## Support the Project
+
+If you find this project useful, consider supporting its development:
+
+| Network | Address |
+|---------|---------|
+| **USDT (TRC20)** | `TF6AXBP3LKBCcbJkLG6RqyMsrPNs2JCpdQ` |
+| **USDT (BEP20)** | `0xd8d2Ed67C567CB3Af437f4638d3531e560575A20` |
+| **BTC** | `bc1qkxy898wa6mz04c9hrjekx6p0yht2ukz56e9xxq` |
+| **Binance Pay ID** | `78328894` |
+
+<!-- Ko-fi: Coming soon -->
+
 ## Contributing
 
 Contributions are welcome! Please check the [Issues](https://github.com/lobinuxsoft/OhMyDialogSystem/issues) for open tasks.
