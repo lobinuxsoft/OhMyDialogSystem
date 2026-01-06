@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-04T01:35:44Z",
+  "updated_at": "2026-01-06T17:47:46Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -15,9 +15,9 @@
       "number": 2,
       "title": "M2: Core del Sistema",
       "description": "Resources, PromptBuilder, DialogueManager",
-      "open": 11,
-      "closed": 0,
-      "progress": 0,
+      "open": 8,
+      "closed": 4,
+      "progress": 33,
       "state": "open"
     },
     {
@@ -88,6 +88,522 @@
     {
       "sprint": "Backlog",
       "issues": [
+        {
+          "number": 6,
+          "title": "[GDExtension] Implementar generación asíncrona con streaming",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:hard",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Critical",
+            "Order": 30.0
+          }
+        },
+        {
+          "number": 53,
+          "title": "[GDExtension] Soporte Vulkan para aceleracion GPU",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:medium",
+            "difficulty:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 31.0
+          }
+        },
+        {
+          "number": 54,
+          "title": "[GDExtension] Soporte NPU para inferencia acelerada",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:low",
+            "difficulty:hard",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 32.0
+          }
+        },
+        {
+          "number": 57,
+          "title": "[QA] Implementar integration tests para GDExtension",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "infrastructure"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 33.0
+          }
+        },
+        {
+          "number": 121,
+          "title": "[Memory] Diseñar arquitectura del sistema de memorias",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 40.0
+          }
+        },
+        {
+          "number": 122,
+          "title": "[Memory] Implementar almacenamiento persistente de memorias",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 41.0
+          }
+        },
+        {
+          "number": 123,
+          "title": "[Memory] Implementar MemoryManager",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 42.0
+          }
+        },
+        {
+          "number": 124,
+          "title": "[Memory] Implementar búsqueda de memorias por similitud",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 43.0
+          }
+        },
+        {
+          "number": 125,
+          "title": "[Memory] Integrar sistema de memorias con PromptBuilder",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 44.0
+          }
+        },
+        {
+          "number": 126,
+          "title": "[Memory] Implementar recordado automático de conversaciones",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 45.0
+          }
+        },
+        {
+          "number": 127,
+          "title": "[Localization] Disenar integracion con TranslationServer",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 50.0
+          }
+        },
+        {
+          "number": 128,
+          "title": "[Localization] Implementar LocaleManager",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 51.0
+          }
+        },
+        {
+          "number": 129,
+          "title": "[Localization] Crear plantillas de prompts por idioma",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 52.0
+          }
+        },
+        {
+          "number": 130,
+          "title": "[Localization] Implementar PromptTranslator",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 53.0
+          }
+        },
+        {
+          "number": 131,
+          "title": "[TTS] Integrar Piper TTS en GDExtension",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 60.0
+          }
+        },
+        {
+          "number": 132,
+          "title": "[TTS] Implementar VoiceProfile Resource",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 61.0
+          }
+        },
+        {
+          "number": 133,
+          "title": "[TTS] Implementar TTSManager",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 62.0
+          }
+        },
+        {
+          "number": 134,
+          "title": "[TTS] Implementar cache de audio",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 63.0
+          }
+        },
+        {
+          "number": 135,
+          "title": "[TTS] Integrar TTS con DialogueManager",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 64.0
+          }
+        },
+        {
+          "number": 136,
+          "title": "[TTS] Herramienta para descargar voces Piper",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 65.0
+          }
+        },
+        {
+          "number": 137,
+          "title": "[CSharp] Implementar wrapper para DialogueManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 70.0
+          }
+        },
+        {
+          "number": 138,
+          "title": "[CSharp] Implementar wrapper para ContextManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 71.0
+          }
+        },
+        {
+          "number": 139,
+          "title": "[CSharp] Implementar wrapper para MemoryManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 72.0
+          }
+        },
+        {
+          "number": 140,
+          "title": "[CSharp] Implementar wrapper para TTSManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 73.0
+          }
+        },
+        {
+          "number": 141,
+          "title": "[CSharp] Tests unitarios para wrappers",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 74.0
+          }
+        },
+        {
+          "number": 44,
+          "title": "[Examples] Ejemplo basico NPC con IA",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:high",
+            "difficulty:easy"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 80.0
+          }
+        },
+        {
+          "number": 48,
+          "title": "[Docs] Documentacion API completa",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:high",
+            "difficulty:medium"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 81.0
+          }
+        },
+        {
+          "number": 49,
+          "title": "[Docs] Guia de inicio rapido",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:high",
+            "difficulty:easy"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 82.0
+          }
+        },
+        {
+          "number": 50,
+          "title": "[Infra] GitHub Actions para builds y releases",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "infrastructure"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 83.0
+          }
+        },
+        {
+          "number": 63,
+          "title": "docs: documentar parametros de sampling en la wiki",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:medium",
+            "difficulty:easy"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 84.0
+          }
+        },
+        {
+          "number": 78,
+          "title": "[Wiki] Rediseño estilo Eldritch/Lovecraftiano",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:low"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 85.0
+          }
+        },
+        {
+          "number": 153,
+          "title": "[Examples] Ejemplo dialogo ramificado",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 86.0
+          }
+        },
+        {
+          "number": 154,
+          "title": "[Examples] Ejemplo NPC con memoria",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 87.0
+          }
+        },
+        {
+          "number": 155,
+          "title": "[Examples] Ejemplo mercader con regateo",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 88.0
+          }
+        },
+        {
+          "number": 144,
+          "title": "feat: sistema de modos Assistant/Immersive",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 90.0
+          }
+        },
+        {
+          "number": 149,
+          "title": "feat: soporte de adaptadores LoRA en LlamaInterface",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 91.0
+          }
+        },
+        {
+          "number": 150,
+          "title": "feat: crear asistente LoRA para guia de la herramienta",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 92.0
+          }
+        },
+        {
+          "number": 151,
+          "title": "docs: guia de fine-tuning y LoRA para desarrolladores",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 93.0
+          }
+        },
+        {
+          "number": 152,
+          "title": "feat: crear LoRA base para NPCs inmersivos",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 94.0
+          }
+        },
         {
           "number": 2,
           "title": "[GDExtension] Configurar proyecto con godot-cpp y sistema de build",
@@ -163,483 +679,6 @@
             "Status": "Done",
             "Priority": "Critical"
           }
-        },
-        {
-          "number": 6,
-          "title": "[GDExtension] Implementar generación asíncrona con streaming",
-          "state": "OPEN",
-          "milestone": "M1: Fundación - GDExtension Core",
-          "labels": [
-            "priority:critical",
-            "difficulty:hard",
-            "gdextension"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Critical"
-          }
-        },
-        {
-          "number": 121,
-          "title": "[Memory] Diseñar arquitectura del sistema de memorias",
-          "state": "OPEN",
-          "milestone": "M4: Memorias Persistentes",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 122,
-          "title": "[Memory] Implementar almacenamiento persistente de memorias",
-          "state": "OPEN",
-          "milestone": "M4: Memorias Persistentes",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 123,
-          "title": "[Memory] Implementar MemoryManager",
-          "state": "OPEN",
-          "milestone": "M4: Memorias Persistentes",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 124,
-          "title": "[Memory] Implementar búsqueda de memorias por similitud",
-          "state": "OPEN",
-          "milestone": "M4: Memorias Persistentes",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 125,
-          "title": "[Memory] Integrar sistema de memorias con PromptBuilder",
-          "state": "OPEN",
-          "milestone": "M4: Memorias Persistentes",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 126,
-          "title": "[Memory] Implementar recordado automático de conversaciones",
-          "state": "OPEN",
-          "milestone": "M4: Memorias Persistentes",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 137,
-          "title": "[CSharp] Implementar wrapper para DialogueManager",
-          "state": "OPEN",
-          "milestone": "M7: Bindings C#",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 138,
-          "title": "[CSharp] Implementar wrapper para ContextManager",
-          "state": "OPEN",
-          "milestone": "M7: Bindings C#",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 139,
-          "title": "[CSharp] Implementar wrapper para MemoryManager",
-          "state": "OPEN",
-          "milestone": "M7: Bindings C#",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 140,
-          "title": "[CSharp] Implementar wrapper para TTSManager",
-          "state": "OPEN",
-          "milestone": "M7: Bindings C#",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 127,
-          "title": "[Localization] Disenar integracion con TranslationServer",
-          "state": "OPEN",
-          "milestone": "M5: Localización",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 128,
-          "title": "[Localization] Implementar LocaleManager",
-          "state": "OPEN",
-          "milestone": "M5: Localización",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 129,
-          "title": "[Localization] Crear plantillas de prompts por idioma",
-          "state": "OPEN",
-          "milestone": "M5: Localización",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 130,
-          "title": "[Localization] Implementar PromptTranslator",
-          "state": "OPEN",
-          "milestone": "M5: Localización",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 131,
-          "title": "[TTS] Integrar Piper TTS en GDExtension",
-          "state": "OPEN",
-          "milestone": "M6: Text-to-Speech",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 132,
-          "title": "[TTS] Implementar VoiceProfile Resource",
-          "state": "OPEN",
-          "milestone": "M6: Text-to-Speech",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 133,
-          "title": "[TTS] Implementar TTSManager",
-          "state": "OPEN",
-          "milestone": "M6: Text-to-Speech",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 134,
-          "title": "[TTS] Implementar cache de audio",
-          "state": "OPEN",
-          "milestone": "M6: Text-to-Speech",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Low"
-          }
-        },
-        {
-          "number": 135,
-          "title": "[TTS] Integrar TTS con DialogueManager",
-          "state": "OPEN",
-          "milestone": "M6: Text-to-Speech",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 136,
-          "title": "[TTS] Herramienta para descargar voces Piper",
-          "state": "OPEN",
-          "milestone": "M6: Text-to-Speech",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Low"
-          }
-        },
-        {
-          "number": 141,
-          "title": "[CSharp] Tests unitarios para wrappers",
-          "state": "OPEN",
-          "milestone": "M7: Bindings C#",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 44,
-          "title": "[Examples] Ejemplo basico NPC con IA",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation",
-            "priority:high",
-            "difficulty:easy"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 153,
-          "title": "[Examples] Ejemplo dialogo ramificado",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 154,
-          "title": "[Examples] Ejemplo NPC con memoria",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 155,
-          "title": "[Examples] Ejemplo mercader con regateo",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 48,
-          "title": "[Docs] Documentacion API completa",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation",
-            "priority:high",
-            "difficulty:medium"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 49,
-          "title": "[Docs] Guia de inicio rapido",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation",
-            "priority:high",
-            "difficulty:easy"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 50,
-          "title": "[Infra] GitHub Actions para builds y releases",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "priority:high",
-            "difficulty:medium",
-            "infrastructure"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 53,
-          "title": "[GDExtension] Soporte Vulkan para aceleracion GPU",
-          "state": "OPEN",
-          "milestone": "M1: Fundación - GDExtension Core",
-          "labels": [
-            "priority:medium",
-            "difficulty:medium",
-            "gdextension"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 54,
-          "title": "[GDExtension] Soporte NPU para inferencia acelerada",
-          "state": "OPEN",
-          "milestone": "M1: Fundación - GDExtension Core",
-          "labels": [
-            "priority:low",
-            "difficulty:hard",
-            "gdextension"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Low"
-          }
-        },
-        {
-          "number": 57,
-          "title": "[QA] Implementar integration tests para GDExtension",
-          "state": "OPEN",
-          "milestone": "M1: Fundación - GDExtension Core",
-          "labels": [
-            "priority:high",
-            "infrastructure"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 63,
-          "title": "docs: documentar parametros de sampling en la wiki",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation",
-            "priority:medium",
-            "difficulty:easy"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 149,
-          "title": "feat: soporte de adaptadores LoRA en LlamaInterface",
-          "state": "OPEN",
-          "milestone": "M9: LoRA & Asistentes IA",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 150,
-          "title": "feat: crear asistente LoRA para guia de la herramienta",
-          "state": "OPEN",
-          "milestone": "M9: LoRA & Asistentes IA",
-          "labels": [
-            "documentation"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 144,
-          "title": "feat: sistema de modos Assistant/Immersive",
-          "state": "OPEN",
-          "milestone": "M9: LoRA & Asistentes IA",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "High"
-          }
-        },
-        {
-          "number": 151,
-          "title": "docs: guia de fine-tuning y LoRA para desarrolladores",
-          "state": "OPEN",
-          "milestone": "M9: LoRA & Asistentes IA",
-          "labels": [
-            "documentation"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 152,
-          "title": "feat: crear LoRA base para NPCs inmersivos",
-          "state": "OPEN",
-          "milestone": "M9: LoRA & Asistentes IA",
-          "labels": [],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Medium"
-          }
-        },
-        {
-          "number": 78,
-          "title": "[Wiki] Rediseño estilo Eldritch/Lovecraftiano",
-          "state": "OPEN",
-          "milestone": "M8: Ejemplos y Documentación",
-          "labels": [
-            "documentation",
-            "priority:low"
-          ],
-          "fields": {
-            "Status": "Todo",
-            "Priority": "Low"
-          }
         }
       ]
     },
@@ -649,11 +688,11 @@
         {
           "number": 145,
           "title": "[Core] Implementar DialogueNodeData Resource",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 1.0
@@ -662,7 +701,7 @@
         {
           "number": 7,
           "title": "[Core] Implementar CharacterIdentity Resource",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [
             "priority:critical",
@@ -671,7 +710,7 @@
             "core"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 2.0
@@ -680,7 +719,7 @@
         {
           "number": 8,
           "title": "[Core] Implementar WorldContext Resource",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [
             "priority:critical",
@@ -689,7 +728,7 @@
             "core"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 3.0
@@ -698,11 +737,11 @@
         {
           "number": 142,
           "title": "[Core] Implementar DialogueGraph Resource",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 4.0
@@ -1143,13 +1182,14 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Critical"
+        "Priority": "Critical",
+        "Order": 30.0
       }
     },
     {
       "number": 7,
       "title": "[Core] Implementar CharacterIdentity Resource",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [
         "priority:critical",
@@ -1158,7 +1198,7 @@
         "core"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 2.0
@@ -1167,7 +1207,7 @@
     {
       "number": 8,
       "title": "[Core] Implementar WorldContext Resource",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [
         "priority:critical",
@@ -1176,7 +1216,7 @@
         "core"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 3.0
@@ -1202,11 +1242,11 @@
     {
       "number": 142,
       "title": "[Core] Implementar DialogueGraph Resource",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 4.0
@@ -1388,7 +1428,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 40.0
       }
     },
     {
@@ -1399,7 +1440,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 41.0
       }
     },
     {
@@ -1410,7 +1452,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 42.0
       }
     },
     {
@@ -1421,7 +1464,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 43.0
       }
     },
     {
@@ -1432,7 +1476,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 44.0
       }
     },
     {
@@ -1443,7 +1488,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 45.0
       }
     },
     {
@@ -1454,7 +1500,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 70.0
       }
     },
     {
@@ -1465,7 +1512,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 71.0
       }
     },
     {
@@ -1476,7 +1524,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 72.0
       }
     },
     {
@@ -1487,7 +1536,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 73.0
       }
     },
     {
@@ -1498,7 +1548,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 50.0
       }
     },
     {
@@ -1509,7 +1560,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 51.0
       }
     },
     {
@@ -1520,7 +1572,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 52.0
       }
     },
     {
@@ -1531,7 +1584,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 53.0
       }
     },
     {
@@ -1542,7 +1596,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 60.0
       }
     },
     {
@@ -1553,7 +1608,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 61.0
       }
     },
     {
@@ -1564,7 +1620,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 62.0
       }
     },
     {
@@ -1575,7 +1632,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Low"
+        "Priority": "Low",
+        "Order": 63.0
       }
     },
     {
@@ -1586,7 +1644,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 64.0
       }
     },
     {
@@ -1597,7 +1656,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Low"
+        "Priority": "Low",
+        "Order": 65.0
       }
     },
     {
@@ -1608,7 +1668,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 74.0
       }
     },
     {
@@ -1623,7 +1684,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 80.0
       }
     },
     {
@@ -1636,7 +1698,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 86.0
       }
     },
     {
@@ -1649,7 +1712,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 87.0
       }
     },
     {
@@ -1662,7 +1726,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 88.0
       }
     },
     {
@@ -1677,7 +1742,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 81.0
       }
     },
     {
@@ -1692,7 +1758,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 82.0
       }
     },
     {
@@ -1707,7 +1774,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 83.0
       }
     },
     {
@@ -1722,7 +1790,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 31.0
       }
     },
     {
@@ -1737,7 +1806,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Low"
+        "Priority": "Low",
+        "Order": 32.0
       }
     },
     {
@@ -1751,7 +1821,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 33.0
       }
     },
     {
@@ -1805,7 +1876,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 84.0
       }
     },
     {
@@ -1816,7 +1888,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 91.0
       }
     },
     {
@@ -1829,7 +1902,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 92.0
       }
     },
     {
@@ -1840,7 +1914,8 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "High"
+        "Priority": "High",
+        "Order": 90.0
       }
     },
     {
@@ -1853,7 +1928,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 93.0
       }
     },
     {
@@ -1864,17 +1940,18 @@
       "labels": [],
       "fields": {
         "Status": "Todo",
-        "Priority": "Medium"
+        "Priority": "Medium",
+        "Order": 94.0
       }
     },
     {
       "number": 145,
       "title": "[Core] Implementar DialogueNodeData Resource",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 1.0
@@ -1995,7 +2072,8 @@
       ],
       "fields": {
         "Status": "Todo",
-        "Priority": "Low"
+        "Priority": "Low",
+        "Order": 85.0
       }
     }
   ]
