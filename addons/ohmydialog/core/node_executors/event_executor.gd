@@ -35,8 +35,8 @@ func _process_event_data(data: Dictionary, context: Object) -> Dictionary:
 		var value: Variant = data[key]
 
 		# Check for variable reference syntax: $variable_name
-		if value is String and value.begins_with("$"):
-			var var_name := value.substr(1)
+		if value is String and (value as String).begins_with("$"):
+			var var_name: String = (value as String).substr(1)
 			if context and context.has_method("get_variable"):
 				result[key] = context.get_variable(var_name)
 			else:

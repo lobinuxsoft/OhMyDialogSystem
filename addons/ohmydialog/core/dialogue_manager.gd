@@ -53,8 +53,8 @@ signal error_occurred(message: String)
 
 @export_group("Configuration")
 
-## The LlamaInterface for AI generation.
-@export var llama_interface: Object
+## The LlamaInterface for AI generation (set via code, not exported).
+var llama_interface: Object
 
 ## Default character for AI responses.
 @export var default_character: CharacterIdentity

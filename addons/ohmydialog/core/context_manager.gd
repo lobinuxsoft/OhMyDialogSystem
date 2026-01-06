@@ -157,12 +157,13 @@ func evaluate_condition(expression: String) -> bool:
 ## Evaluates a simple comparison expression.
 func _evaluate_comparison(expression: String) -> bool:
 	# Try each operator
-	for op in [">=", "<=", "!=", "==", ">", "<", " is ", " not "]:
+	var operators: Array[String] = [">=", "<=", "!=", "==", ">", "<", " is ", " not "]
+	for op: String in operators:
 		var idx := expression.find(op)
 		if idx > 0:
 			var left := expression.substr(0, idx).strip_edges()
 			var right := expression.substr(idx + op.length()).strip_edges()
-			var op_clean := op.strip_edges()
+			var op_clean: String = op.strip_edges()
 
 			var left_val := _resolve_value(left)
 			var right_val := _resolve_value(right)

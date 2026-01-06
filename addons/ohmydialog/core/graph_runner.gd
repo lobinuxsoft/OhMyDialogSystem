@@ -498,7 +498,7 @@ class GraphRunnerContext extends RefCounted:
 	func _init(runner: GraphRunner) -> void:
 		_runner = runner
 
-	func get(key: String) -> Variant:
+	func get_context(key: String) -> Variant:
 		match key:
 			"graph":
 				return _runner.current_graph
@@ -524,8 +524,8 @@ class GraphRunnerContext extends RefCounted:
 				return _runner._context.get("prompt_builder")
 		return null
 
-	func has_method(method_name: String) -> bool:
-		return method_name in ["get", "get_variable", "set_variable", "evaluate_condition"]
+	func context_has_method(method_name: String) -> bool:
+		return method_name in ["get_context", "get_variable", "set_variable", "evaluate_condition"]
 
 	func get_variable(name: String) -> Variant:
 		return _runner.get_variable(name)
