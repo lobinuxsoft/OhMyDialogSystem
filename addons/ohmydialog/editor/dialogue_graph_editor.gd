@@ -164,14 +164,31 @@ func _rebuild_visual_graph() -> void:
 		var node_data: DialogueNodeData = current_graph.nodes[node_id]
 		_create_visual_node(node_data)
 
+	# Wait for nodes to be ready before connecting
+	# GraphEdit needs a frame to process new children
+	await get_tree().process_frame
+
 	# Recreate connections
+	_rebuild_connections()
+
+
+## Rebuilds visual connections from graph data.
+func _rebuild_connections() -> void:
+	if not current_graph:
+		return
+
 	for conn in current_graph.connections:
-		graph_edit.connect_node(
-			conn.from_node,
-			conn.from_slot,
-			conn.to_node,
-			conn.to_slot
-		)
+		var from_node: String = conn.from_node
+		var to_node: String = conn.to_node
+
+		# Verify both nodes exist visually
+		if _visual_nodes.has(from_node) and _visual_nodes.has(to_node):
+			graph_edit.connect_node(
+				from_node,
+				conn.from_slot,
+				to_node,
+				conn.to_slot
+			)
 
 
 ## Clears all visual nodes from the graph edit.
