@@ -191,12 +191,15 @@ func _rebuild_visual_graph() -> void:
 		var node_data: DialogueNodeData = current_graph.nodes[node_id]
 		_create_visual_node(node_data)
 
-	# Wait for nodes to be ready before connecting
-	# GraphEdit needs a frame to process new children
-	await get_tree().process_frame
+	# GraphEdit needs multiple frames to fully process new children
+	# Using call_deferred twice to ensure nodes are ready
+	call_deferred("_deferred_rebuild_connections")
 
-	# Recreate connections
-	_rebuild_connections()
+
+## Deferred connection rebuild - gives GraphEdit time to process nodes.
+func _deferred_rebuild_connections() -> void:
+	# Extra defer to ensure GraphEdit has fully processed the nodes
+	call_deferred("_rebuild_connections")
 
 
 ## Rebuilds visual connections from graph data.
