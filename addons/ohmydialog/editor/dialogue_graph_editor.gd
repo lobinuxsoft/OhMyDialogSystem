@@ -148,6 +148,10 @@ func _create_color_icon(color: Color) -> ImageTexture:
 
 ## Loads a DialogueGraph for editing.
 func edit_graph(graph: DialogueGraph) -> void:
+	print("DialogueGraphEditor: edit_graph called, nodes: %d, connections: %d" % [
+		graph.nodes.size() if graph else 0,
+		graph.connections.size() if graph else 0
+	])
 	current_graph = graph
 	_rebuild_visual_graph()
 	_update_ui_state()
@@ -207,18 +211,29 @@ func _rebuild_connections() -> void:
 	if not current_graph:
 		return
 
+	print("DialogueGraphEditor: _rebuild_connections called, %d connections to create" % current_graph.connections.size())
+
+	var created := 0
 	for conn in current_graph.connections:
 		var from_node: String = conn.from_node
 		var to_node: String = conn.to_node
 
 		# Verify both nodes exist visually
 		if _visual_nodes.has(from_node) and _visual_nodes.has(to_node):
-			graph_edit.connect_node(
+			var err := graph_edit.connect_node(
 				from_node,
 				conn.from_slot,
 				to_node,
 				conn.to_slot
 			)
+			if err == OK:
+				created += 1
+			else:
+				print("DialogueGraphEditor: Failed to connect %s -> %s" % [from_node, to_node])
+		else:
+			print("DialogueGraphEditor: Nodes not found: %s or %s" % [from_node, to_node])
+
+	print("DialogueGraphEditor: Created %d/%d connections" % [created, current_graph.connections.size()])
 
 
 ## Clears all visual nodes from the graph edit.
