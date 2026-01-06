@@ -16,21 +16,40 @@ func _configure_slots() -> void:
 
 func _create_content_ui() -> void:
 	var variable: String = node_data.data.get("variable", "")
-	var op: int = node_data.data.get("operator", DialogueNodeData.ComparisonOperator.EQUAL)
+	var op_raw: Variant = node_data.data.get("operator", DialogueNodeData.ComparisonOperator.EQUAL)
 	var value: Variant = node_data.data.get("value", "")
 
-	# Build condition string
-	var op_str := _get_operator_string(op)
-	var condition_text := "if %s %s %s" % [variable, op_str, str(value)]
+	# Handle operator as either enum int or string
+	var op_str: String
+	if op_raw is String:
+		op_str = op_raw
+	else:
+		op_str = _get_operator_string(int(op_raw))
+
+	var condition_text := "%s %s %s" % [variable, op_str, str(value)]
 
 	if variable.is_empty():
-		condition_text = "if ??? == ???"
+		# Check for expression-based condition
+		var expression: String = node_data.data.get("condition", "")
+		if not expression.is_empty():
+			condition_text = expression
+		else:
+			condition_text = "??? == ???"
 
-	_add_label(condition_text)
+	_add_label(condition_text, Color(0.9, 0.9, 0.7))
 
-	# TRUE/FALSE labels
-	_add_label("✓ TRUE", Color.GREEN)
-	_add_label("✗ FALSE", Color.RED)
+	# TRUE/FALSE output labels
+	var true_label := Label.new()
+	true_label.text = "TRUE →"
+	true_label.add_theme_color_override("font_color", Color.GREEN)
+	true_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_content_container.add_child(true_label)
+
+	var false_label := Label.new()
+	false_label.text = "FALSE →"
+	false_label.add_theme_color_override("font_color", Color.RED)
+	false_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_content_container.add_child(false_label)
 
 
 func _get_operator_string(op: int) -> String:

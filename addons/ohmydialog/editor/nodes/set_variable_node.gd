@@ -14,15 +14,34 @@ func _configure_slots() -> void:
 
 func _create_content_ui() -> void:
 	var variable: String = node_data.data.get("variable", "")
-	var op: int = node_data.data.get("operation", DialogueNodeData.VariableOperation.SET)
+	var op_raw: Variant = node_data.data.get("operation", DialogueNodeData.VariableOperation.SET)
 	var value: Variant = node_data.data.get("value", "")
 
-	var op_str := _get_operation_string(op)
+	# Handle operation as either enum int or string
+	var op_str: String
+	if op_raw is String:
+		op_str = _string_to_op_symbol(op_raw)
+	else:
+		op_str = _get_operation_string(int(op_raw))
 
 	if variable.is_empty():
 		_add_hint_label("??? = ???")
 	else:
-		_add_label("%s %s %s" % [variable, op_str, str(value)])
+		var value_str := str(value)
+		if value is bool:
+			value_str = "true" if value else "false"
+		_add_label("%s %s %s" % [variable, op_str, value_str], Color(0.7, 0.9, 0.9))
+
+
+func _string_to_op_symbol(op: String) -> String:
+	match op.to_lower():
+		"set": return "="
+		"add", "+": return "+="
+		"subtract", "-": return "-="
+		"multiply", "*": return "*="
+		"divide", "/": return "/="
+		"toggle": return "= !"
+		_: return "="
 
 
 func _get_operation_string(op: int) -> String:
