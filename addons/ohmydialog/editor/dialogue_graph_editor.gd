@@ -236,7 +236,15 @@ func _rebuild_connections() -> void:
 	print("DialogueGraphEditor: Created %d/%d connections" % [created, current_graph.connections.size()])
 
 	# Force GraphEdit to redraw connections (workaround for Godot rendering bug)
-	graph_edit.queue_redraw()
+	# queue_redraw() doesn't work, so we force a zoom change
+	_force_graph_redraw()
+
+
+## Forces GraphEdit to redraw by toggling zoom (Godot workaround).
+func _force_graph_redraw() -> void:
+	var current_zoom := graph_edit.zoom
+	graph_edit.zoom = current_zoom + 0.001
+	graph_edit.zoom = current_zoom
 
 
 ## Clears all visual nodes from the graph edit.
