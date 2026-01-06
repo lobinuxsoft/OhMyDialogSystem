@@ -235,6 +235,9 @@ func _rebuild_connections() -> void:
 
 	print("DialogueGraphEditor: Created %d/%d connections" % [created, current_graph.connections.size()])
 
+	# Force GraphEdit to redraw connections (workaround for Godot rendering bug)
+	graph_edit.queue_redraw()
+
 
 ## Clears all visual nodes from the graph edit.
 func _clear_visual_nodes() -> void:
