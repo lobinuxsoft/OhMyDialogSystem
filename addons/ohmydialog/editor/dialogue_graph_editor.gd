@@ -40,9 +40,9 @@ var current_graph: DialogueGraph
 @onready var save_file_dialog: FileDialog = %SaveFileDialog
 
 ## Currently selected visual node.
-var _selected_node: DialogueGraphNode
+var _selected_node: BaseDialogueNode
 
-## Map of node_id -> DialogueGraphNode for quick lookup.
+## Map of node_id -> BaseDialogueNode for quick lookup.
 var _visual_nodes: Dictionary = {}
 
 ## Position where context menu was opened (for adding nodes).
@@ -244,7 +244,7 @@ func _clear_visual_nodes() -> void:
 	graph_edit.clear_connections()
 
 	for node_id in _visual_nodes:
-		var visual_node: DialogueGraphNode = _visual_nodes[node_id]
+		var visual_node: BaseDialogueNode = _visual_nodes[node_id]
 		visual_node.queue_free()
 
 	_visual_nodes.clear()
@@ -252,11 +252,11 @@ func _clear_visual_nodes() -> void:
 
 
 ## Creates a visual node for the given DialogueNodeData.
-func _create_visual_node(node_data: DialogueNodeData) -> DialogueGraphNode:
-	var visual_node := DialogueGraphNode.new()
-	visual_node.setup(node_data)
-	graph_edit.add_child(visual_node)
-	_visual_nodes[node_data.node_id] = visual_node
+func _create_visual_node(node_data: DialogueNodeData) -> BaseDialogueNode:
+	var visual_node := DialogueNodeFactory.create_node(node_data)
+	if visual_node:
+		graph_edit.add_child(visual_node)
+		_visual_nodes[node_data.node_id] = visual_node
 	return visual_node
 
 
@@ -285,7 +285,7 @@ func _remove_node(node_id: String) -> void:
 
 	# Remove visual node
 	if _visual_nodes.has(node_id):
-		var visual_node: DialogueGraphNode = _visual_nodes[node_id]
+		var visual_node: BaseDialogueNode = _visual_nodes[node_id]
 
 		# Remove connections involving this node
 		for conn in graph_edit.get_connection_list():
@@ -337,7 +337,7 @@ func _on_disconnection_request(from_node: StringName, from_port: int, to_node: S
 
 
 func _on_node_selected(node: Node) -> void:
-	if node is DialogueGraphNode:
+	if node is BaseDialogueNode:
 		_selected_node = node
 		node_selected.emit(node.node_data)
 
@@ -362,7 +362,7 @@ func _on_popup_request(position: Vector2) -> void:
 func _on_end_node_move() -> void:
 	# Sync all node positions back to data
 	for node_id in _visual_nodes:
-		var visual_node: DialogueGraphNode = _visual_nodes[node_id]
+		var visual_node: BaseDialogueNode = _visual_nodes[node_id]
 		visual_node.sync_position()
 	graph_modified.emit()
 
