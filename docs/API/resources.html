@@ -577,6 +577,201 @@ var context = world.to_context_prompt()</code></pre>
 
       <hr>
 
+      <!-- ==================== DialogueGraph ==================== -->
+      <h2 id="dialogue-graph">
+        <div class="resource-header">
+          <span class="icon">🔗</span>
+          <span>DialogueGraph</span>
+        </div>
+      </h2>
+
+      <p>Contiene un grafo completo de diálogo con todos los nodos, conexiones y contexto. Es el recurso principal que se carga para ejecutar una conversación.</p>
+
+      <p><strong>Archivo:</strong> <code>addons/ohmydialog/resources/dialogue_graph.gd</code></p>
+
+      <h3>Propiedades</h3>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Grupo</th>
+            <th>Propiedad</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="3"><strong>Graph Identity</strong></td>
+            <td><code>graph_id</code></td>
+            <td>String</td>
+            <td>ID único del grafo</td>
+          </tr>
+          <tr>
+            <td><code>display_name</code></td>
+            <td>String</td>
+            <td>Nombre mostrado en el editor</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td>String</td>
+            <td>Descripción del diálogo</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Context</strong></td>
+            <td><code>default_character</code></td>
+            <td>CharacterIdentity</td>
+            <td>Personaje por defecto para respuestas IA</td>
+          </tr>
+          <tr>
+            <td><code>world_context</code></td>
+            <td>WorldContext</td>
+            <td>Contexto del mundo</td>
+          </tr>
+          <tr>
+            <td rowspan="3"><strong>Graph Data</strong></td>
+            <td><code>nodes</code></td>
+            <td>Dictionary</td>
+            <td>node_id → DialogueNodeData</td>
+          </tr>
+          <tr>
+            <td><code>connections</code></td>
+            <td>Array[Dictionary]</td>
+            <td>Conexiones entre nodos</td>
+          </tr>
+          <tr>
+            <td><code>start_node_id</code></td>
+            <td>String</td>
+            <td>ID del nodo de inicio</td>
+          </tr>
+          <tr>
+            <td><strong>Variables</strong></td>
+            <td><code>local_variables</code></td>
+            <td>Dictionary</td>
+            <td>Variables locales del diálogo</td>
+          </tr>
+          <tr>
+            <td><strong>Editor</strong></td>
+            <td><code>editor_metadata</code></td>
+            <td>Dictionary</td>
+            <td>Metadatos del editor visual</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Signals</h3>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Signal</th>
+            <th>Parámetros</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>node_added</code></td>
+            <td><code>node: DialogueNodeData</code></td>
+            <td>Emitido al agregar un nodo</td>
+          </tr>
+          <tr>
+            <td><code>node_removed</code></td>
+            <td><code>node_id: String</code></td>
+            <td>Emitido al eliminar un nodo</td>
+          </tr>
+          <tr>
+            <td><code>connection_added</code></td>
+            <td><code>from_node, from_slot, to_node, to_slot</code></td>
+            <td>Emitido al crear conexión</td>
+          </tr>
+          <tr>
+            <td><code>connection_removed</code></td>
+            <td><code>from_node, from_slot, to_node, to_slot</code></td>
+            <td>Emitido al eliminar conexión</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Métodos Principales</h3>
+
+      <h4>Gestión de Nodos</h4>
+
+      <div class="method-signature">func add_node(node: DialogueNodeData) -> String</div>
+      <p class="method-desc">Agrega un nodo al grafo. Retorna el node_id.</p>
+
+      <div class="method-signature">func create_node(type: NodeType, position: Vector2 = Vector2.ZERO) -> DialogueNodeData</div>
+      <p class="method-desc">Crea y agrega un nuevo nodo del tipo especificado.</p>
+
+      <div class="method-signature">func remove_node(node_id: String) -> void</div>
+      <p class="method-desc">Elimina un nodo y todas sus conexiones.</p>
+
+      <div class="method-signature">func get_node(node_id: String) -> DialogueNodeData</div>
+      <p class="method-desc">Obtiene un nodo por su ID.</p>
+
+      <div class="method-signature">func get_start_node() -> DialogueNodeData</div>
+      <p class="method-desc">Obtiene el nodo de inicio del grafo.</p>
+
+      <h4>Gestión de Conexiones</h4>
+
+      <div class="method-signature">func connect_nodes(from_node: String, from_slot: int, to_node: String, to_slot: int = 0) -> bool</div>
+      <p class="method-desc">Crea una conexión entre dos nodos. Retorna true si tuvo éxito.</p>
+
+      <div class="method-signature">func disconnect_nodes(from_node: String, from_slot: int, to_node: String, to_slot: int = 0) -> void</div>
+      <p class="method-desc">Elimina una conexión específica.</p>
+
+      <div class="method-signature">func get_next_nodes(node_id: String, slot: int = 0) -> Array[DialogueNodeData]</div>
+      <p class="method-desc">Obtiene los nodos siguientes desde un slot de salida.</p>
+
+      <div class="method-signature">func get_next_node(node_id: String, slot: int = 0) -> DialogueNodeData</div>
+      <p class="method-desc">Obtiene el siguiente nodo (para flujo lineal).</p>
+
+      <h4>Validación</h4>
+
+      <div class="method-signature">func validate() -> Array[String]</div>
+      <p class="method-desc">Valida la estructura del grafo. Retorna array de errores.</p>
+
+      <h3>Ejemplo de Uso</h3>
+
+      <pre data-lang="GDSCRIPT"><code># Crear grafo programáticamente
+var graph = DialogueGraph.new()
+graph.graph_id = "merchant_greeting"
+graph.display_name = "Saludo del Mercader"
+graph.default_character = preload("res://npcs/merchant.tres")
+graph.world_context = preload("res://world/fantasy.tres")
+
+# Crear nodos
+var start = graph.create_node(DialogueNodeData.NodeType.START)
+var greeting = graph.create_node(DialogueNodeData.NodeType.AI_RESPONSE, Vector2(200, 0))
+greeting.data.character_id = "merchant_grok"
+greeting.data.prompt_template = "Saluda al cliente que acaba de entrar a tu tienda."
+
+var choice = graph.create_node(DialogueNodeData.NodeType.PLAYER_CHOICE, Vector2(400, 0))
+choice.data.choices = [
+    {"text": "¿Qué vendes?", "condition": ""},
+    {"text": "Adiós", "condition": ""}
+]
+
+var end_node = graph.create_node(DialogueNodeData.NodeType.END, Vector2(600, 100))
+
+# Conectar nodos
+graph.connect_nodes(start.node_id, 0, greeting.node_id)
+graph.connect_nodes(greeting.node_id, 0, choice.node_id)
+graph.connect_nodes(choice.node_id, 1, end_node.node_id)  # "Adiós" -> End
+
+# Validar
+var errors = graph.validate()
+if errors.is_empty():
+    print("Grafo válido!")
+else:
+    for err in errors:
+        push_error(err)
+
+# Guardar como resource
+ResourceSaver.save(graph, "res://dialogues/merchant_greeting.tres")</code></pre>
+
+      <hr>
+
       <h2>Próximamente</h2>
 
       <p>Estos Resources están planificados pero aún no implementados:</p>
@@ -590,11 +785,6 @@ var context = world.to_context_prompt()</code></pre>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><code>DialogueGraph</code></td>
-            <td>Grafo completo de nodos de diálogo</td>
-            <td><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/142">#142</a></td>
-          </tr>
           <tr>
             <td><code>AIPreset</code></td>
             <td>Configuración de parámetros de generación</td>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- Dialogue Graph icon - connected nodes -->
+  <!-- Node 1 (top-left) -->
+  <rect x="1" y="2" width="4" height="3" rx="0.8" fill="#10b981" stroke="#8da5f3" stroke-width="0.5"/>
+  <!-- Node 2 (top-right) -->
+  <rect x="11" y="2" width="4" height="3" rx="0.8" fill="#3b82f6" stroke="#8da5f3" stroke-width="0.5"/>
+  <!-- Node 3 (bottom-center) -->
+  <rect x="6" y="11" width="4" height="3" rx="0.8" fill="#eab308" stroke="#8da5f3" stroke-width="0.5"/>
+  <!-- Connection lines -->
+  <path d="M5 3.5 L11 3.5" stroke="#e0e0e0" stroke-width="0.8" fill="none"/>
+  <path d="M3 5 L8 11" stroke="#e0e0e0" stroke-width="0.8" fill="none"/>
+  <path d="M13 5 L8 11" stroke="#e0e0e0" stroke-width="0.8" fill="none"/>
+  <!-- Connection dots -->
+  <circle cx="5" cy="3.5" r="0.8" fill="#f6c358"/>
+  <circle cx="11" cy="3.5" r="0.8" fill="#f6c358"/>
+  <circle cx="8" cy="11" r="0.8" fill="#f6c358"/>
+</svg>
