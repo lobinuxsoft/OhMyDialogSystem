@@ -267,8 +267,18 @@ static func from_dict(dict: Dictionary) -> DialogueNodeData:
 	return node
 
 
+## Returns a human-readable name for this node's type.
+func get_type_name() -> String:
+	return DialogueNodeData.get_type_name_static(node_type)
+
+
+## Returns the suggested color for this node in the editor.
+func get_type_color() -> Color:
+	return DialogueNodeData.get_type_color_static(node_type)
+
+
 ## Returns a human-readable name for the node type.
-static func get_type_name(type: NodeType) -> String:
+static func get_type_name_static(type: NodeType) -> String:
 	match type:
 		NodeType.START: return "Start"
 		NodeType.END: return "End"
@@ -286,7 +296,7 @@ static func get_type_name(type: NodeType) -> String:
 
 ## Returns the suggested color for this node type in the editor.
 ## Colors match the documentation in docs/Technical/dialogue-nodes.html
-static func get_type_color(type: NodeType) -> Color:
+static func get_type_color_static(type: NodeType) -> Color:
 	match type:
 		NodeType.START: return Color("#10b981")           # Green
 		NodeType.END: return Color("#ef4444")             # Red
