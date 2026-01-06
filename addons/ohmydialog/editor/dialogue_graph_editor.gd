@@ -152,6 +152,12 @@ func edit_graph(graph: DialogueGraph) -> void:
 		graph.nodes.size() if graph else 0,
 		graph.connections.size() if graph else 0
 	])
+
+	# Skip if already editing the same graph (prevents race condition)
+	if current_graph == graph and graph != null:
+		print("DialogueGraphEditor: Same graph, skipping rebuild")
+		return
+
 	current_graph = graph
 	_rebuild_visual_graph()
 	_update_ui_state()
