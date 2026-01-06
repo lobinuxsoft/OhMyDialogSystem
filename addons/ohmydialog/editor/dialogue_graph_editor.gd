@@ -242,9 +242,18 @@ func _rebuild_connections() -> void:
 
 ## Forces GraphEdit to redraw by toggling zoom (Godot workaround).
 func _force_graph_redraw() -> void:
+	# Use a timer to delay the zoom toggle - GraphEdit needs time
+	var timer := get_tree().create_timer(0.05)
+	timer.timeout.connect(_do_zoom_toggle)
+
+
+## Actually toggles the zoom to force redraw.
+func _do_zoom_toggle() -> void:
 	var current_zoom := graph_edit.zoom
-	graph_edit.zoom = current_zoom + 0.001
+	graph_edit.zoom = current_zoom * 1.01
+	await get_tree().process_frame
 	graph_edit.zoom = current_zoom
+	print("DialogueGraphEditor: Forced zoom redraw")
 
 
 ## Clears all visual nodes from the graph edit.
