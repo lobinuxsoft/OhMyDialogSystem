@@ -249,6 +249,10 @@ func _force_graph_redraw() -> void:
 
 ## Actually toggles the zoom to force redraw.
 func _do_zoom_toggle() -> void:
+	# Verify connections exist in GraphEdit
+	var connection_list := graph_edit.get_connection_list()
+	print("DialogueGraphEditor: GraphEdit has %d connections internally" % connection_list.size())
+
 	var current_zoom := graph_edit.zoom
 	graph_edit.zoom = current_zoom * 1.01
 	await get_tree().process_frame
