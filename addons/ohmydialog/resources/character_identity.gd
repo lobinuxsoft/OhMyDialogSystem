@@ -1,4 +1,5 @@
 @tool
+@icon("res://addons/ohmydialog/icons/character_identity.svg")
 class_name CharacterIdentity
 extends Resource
 ## Defines the identity and personality of an NPC/character.

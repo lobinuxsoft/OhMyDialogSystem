@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- Character bust icon for CharacterIdentity Resource -->
+  <!-- Head -->
+  <circle cx="8" cy="5" r="3.5" fill="#e0e0e0" stroke="#8da5f3" stroke-width="0.8"/>
+  <!-- Body/shoulders -->
+  <path d="M2 15 Q2 11 8 10 Q14 11 14 15" fill="#e0e0e0" stroke="#8da5f3" stroke-width="0.8"/>
+  <!-- Personality indicator (small star/spark) -->
+  <circle cx="12" cy="3" r="1.2" fill="#f6c358"/>
+</svg>
