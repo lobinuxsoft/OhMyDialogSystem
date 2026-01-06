@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resources - OhMyDialogSystem Wiki</title>
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    .resource-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .resource-header .icon {
+      font-size: 2rem;
+    }
+    .property-table {
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .property-table th {
+      text-align: left;
+      background: rgba(139, 92, 246, 0.1);
+    }
+    .property-table td, .property-table th {
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+    }
+    .property-table code {
+      background: rgba(0,0,0,0.3);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+    }
+    .enum-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    .enum-item {
+      background: rgba(139, 92, 246, 0.1);
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border-left: 3px solid var(--accent-primary);
+    }
+    .enum-item code {
+      font-weight: 600;
+    }
+    .enum-item small {
+      display: block;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .method-signature {
+      background: rgba(0,0,0,0.3);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .method-desc {
+      margin: 0.5rem 0 1.5rem 0;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="neural-bg"></canvas>
+
+  <div class="wiki-container">
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
+        <div class="sidebar-logo">OhMyDialogSystem</div>
+        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">General</div>
+        <ul class="nav-links">
+          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">API Reference</div>
+        <ul class="nav-links">
+          <li><a href="index.html"><span class="icon">📚</span> Overview</a></li>
+          <li><a href="llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
+          <li><a href="dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
+          <li><a href="memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
+          <li><a href="tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
+          <li><a href="resources.html" class="active"><span class="icon">📄</span> Resources</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Technical</div>
+        <ul class="nav-links">
+          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
+          <li><a href="../Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
+          <li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">External Links</div>
+        <ul class="nav-links">
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">API Reference</a> <span>/</span> <span>Resources</span>
+      </div>
+
+      <h1>Resources</h1>
+
+      <p>Los Resources son objetos de datos serializables de Godot que almacenan configuración reutilizable. OhMyDialogSystem usa Resources para definir personajes, mundos, grafos de diálogo y más.</p>
+
+      <div class="callout callout-info">
+        <p><strong>Tip:</strong> Los Resources se guardan como archivos <code>.tres</code> y se pueden crear desde el menú <strong>New Resource</strong> en Godot, o desde el FileSystem haciendo click derecho.</p>
+      </div>
+
+      <hr>
+
+      <!-- ==================== DialogueNodeData ==================== -->
+      <h2 id="dialogue-node-data">
+        <div class="resource-header">
+          <span class="icon">🔷</span>
+          <span>DialogueNodeData</span>
+        </div>
+      </h2>
+
+      <p>Representa los datos de un nodo individual en un grafo de diálogo. Es la unidad básica del sistema de diálogos.</p>
+
+      <p><strong>Archivo:</strong> <code>addons/ohmydialog/resources/dialogue_node_data.gd</code></p>
+
+      <h3>Propiedades</h3>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Propiedad</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>node_id</code></td>
+            <td>String</td>
+            <td>Identificador único UUID del nodo. Se genera automáticamente.</td>
+          </tr>
+          <tr>
+            <td><code>node_type</code></td>
+            <td>NodeType</td>
+            <td>Tipo de nodo que determina su comportamiento. Ver enum abajo.</td>
+          </tr>
+          <tr>
+            <td><code>editor_position</code></td>
+            <td>Vector2</td>
+            <td>Posición del nodo en el editor visual GraphEdit.</td>
+          </tr>
+          <tr>
+            <td><code>data</code></td>
+            <td>Dictionary</td>
+            <td>Datos específicos del tipo de nodo. La estructura varía según <code>node_type</code>.</td>
+          </tr>
+          <tr>
+            <td><code>output_count</code></td>
+            <td>int</td>
+            <td>Número de slots de salida. Calculado automáticamente según el tipo.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Enum: NodeType</h3>
+
+      <p>Define los 11 tipos de nodos disponibles en el sistema de diálogos:</p>
+
+      <div class="enum-list">
+        <div class="enum-item" style="border-color: #10b981;">
+          <code>START</code>
+          <small>Punto de entrada del grafo</small>
+        </div>
+        <div class="enum-item" style="border-color: #ef4444;">
+          <code>END</code>
+          <small>Termina la ejecución del diálogo</small>
+        </div>
+        <div class="enum-item" style="border-color: #3b82f6;">
+          <code>AI_RESPONSE</code>
+          <small>Genera respuesta dinámica con LLM</small>
+        </div>
+        <div class="enum-item" style="border-color: #6b7280;">
+          <code>STATIC_RESPONSE</code>
+          <small>Muestra texto pre-escrito</small>
+        </div>
+        <div class="enum-item" style="border-color: #eab308;">
+          <code>PLAYER_CHOICE</code>
+          <small>Presenta opciones al jugador</small>
+        </div>
+        <div class="enum-item" style="border-color: #f97316;">
+          <code>CONDITION</code>
+          <small>Bifurcación basada en condición</small>
+        </div>
+        <div class="enum-item" style="border-color: #a855f7;">
+          <code>EVENT</code>
+          <small>Emite un signal/evento al juego</small>
+        </div>
+        <div class="enum-item" style="border-color: #06b6d4;">
+          <code>SET_VARIABLE</code>
+          <small>Modifica una variable de diálogo</small>
+        </div>
+        <div class="enum-item" style="border-color: #22c55e;">
+          <code>JUMP</code>
+          <small>Salta a otro grafo o nodo</small>
+        </div>
+        <div class="enum-item" style="border-color: #8b5cf6;">
+          <code>JUMP_TO_FREE</code>
+          <small>Escapa a modo conversación libre</small>
+        </div>
+        <div class="enum-item" style="border-color: #14b8a6;">
+          <code>RETURN_TO_GRAPH</code>
+          <small>Retorna del modo libre al grafo</small>
+        </div>
+      </div>
+
+      <h3>Métodos</h3>
+
+      <div class="method-signature">func validate() -> Array[String]</div>
+      <p class="method-desc">Valida los datos del nodo. Retorna array de errores (vacío si es válido).</p>
+
+      <div class="method-signature">func to_dict() -> Dictionary</div>
+      <p class="method-desc">Serializa el nodo a un Dictionary para almacenamiento JSON.</p>
+
+      <div class="method-signature">static func from_dict(dict: Dictionary) -> DialogueNodeData</div>
+      <p class="method-desc">Crea un DialogueNodeData desde un Dictionary.</p>
+
+      <div class="method-signature">static func get_type_name(type: NodeType) -> String</div>
+      <p class="method-desc">Retorna el nombre legible del tipo de nodo.</p>
+
+      <div class="method-signature">static func get_type_color(type: NodeType) -> Color</div>
+      <p class="method-desc">Retorna el color sugerido para el nodo en el editor.</p>
+
+      <hr>
+
+      <!-- ==================== CharacterIdentity ==================== -->
+      <h2 id="character-identity">
+        <div class="resource-header">
+          <span class="icon">👤</span>
+          <span>CharacterIdentity</span>
+        </div>
+      </h2>
+
+      <p>Define la identidad y personalidad de un NPC. Se usa para generar el system prompt que instruye al LLM cómo interpretar al personaje.</p>
+
+      <p><strong>Archivo:</strong> <code>addons/ohmydialog/resources/character_identity.gd</code></p>
+
+      <h3>Propiedades</h3>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Grupo</th>
+            <th>Propiedad</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="3"><strong>Identity</strong></td>
+            <td><code>character_id</code></td>
+            <td>String</td>
+            <td>ID único para referencias y guardados</td>
+          </tr>
+          <tr>
+            <td><code>character_name</code></td>
+            <td>String</td>
+            <td>Nombre mostrado en diálogos</td>
+          </tr>
+          <tr>
+            <td><code>portrait</code></td>
+            <td>Texture2D</td>
+            <td>Imagen de avatar para UI</td>
+          </tr>
+          <tr>
+            <td rowspan="4"><strong>Personality</strong></td>
+            <td><code>personality</code></td>
+            <td>String</td>
+            <td>Rasgos de personalidad y tendencias</td>
+          </tr>
+          <tr>
+            <td><code>background</code></td>
+            <td>String</td>
+            <td>Historia y experiencias del personaje</td>
+          </tr>
+          <tr>
+            <td><code>speech_style</code></td>
+            <td>SpeechStyle</td>
+            <td>Estilo de habla (casual, formal, medieval...)</td>
+          </tr>
+          <tr>
+            <td><code>speech_patterns</code></td>
+            <td>String</td>
+            <td>Muletillas o tics verbales</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Knowledge</strong></td>
+            <td><code>knowledge</code></td>
+            <td>Array[String]</td>
+            <td>Temas que el personaje conoce</td>
+          </tr>
+          <tr>
+            <td><code>secrets</code></td>
+            <td>Array[String]</td>
+            <td>Información que oculta</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Motivation</strong></td>
+            <td><code>goals</code></td>
+            <td>Array[String]</td>
+            <td>Objetivos del personaje</td>
+          </tr>
+          <tr>
+            <td><code>fears</code></td>
+            <td>Array[String]</td>
+            <td>Miedos y aversiones</td>
+          </tr>
+          <tr>
+            <td><strong>Relationships</strong></td>
+            <td><code>relationships</code></td>
+            <td>Dictionary</td>
+            <td>character_id → descripción de relación</td>
+          </tr>
+          <tr>
+            <td><strong>Examples</strong></td>
+            <td><code>example_dialogues</code></td>
+            <td>Array[String]</td>
+            <td>Líneas de ejemplo que demuestran la voz</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Enum: SpeechStyle</h3>
+
+      <div class="enum-list">
+        <div class="enum-item"><code>CASUAL</code><small>Relajado, informal</small></div>
+        <div class="enum-item"><code>FORMAL</code><small>Profesional, cortés</small></div>
+        <div class="enum-item"><code>MEDIEVAL</code><small>Arcaico, fantasía</small></div>
+        <div class="enum-item"><code>SCIENTIFIC</code><small>Técnico, preciso</small></div>
+        <div class="enum-item"><code>STREET</code><small>Jerga callejera</small></div>
+        <div class="enum-item"><code>POETIC</code><small>Florido, metafórico</small></div>
+        <div class="enum-item"><code>MILITARY</code><small>Directo, comandante</small></div>
+        <div class="enum-item"><code>CHILDISH</code><small>Simple, juguetón</small></div>
+        <div class="enum-item"><code>ELDERLY</code><small>Sabio, pausado</small></div>
+        <div class="enum-item"><code>ROBOTIC</code><small>Mecánico, literal</small></div>
+      </div>
+
+      <h3>Métodos</h3>
+
+      <div class="method-signature">func to_system_prompt() -> String</div>
+      <p class="method-desc">Genera el system prompt para el LLM. Este es el método principal que convierte los datos del personaje en instrucciones para la IA.</p>
+
+      <div class="method-signature">func to_dict() -> Dictionary</div>
+      <p class="method-desc">Serializa el personaje a Dictionary.</p>
+
+      <div class="method-signature">static func from_dict(dict: Dictionary) -> CharacterIdentity</div>
+      <p class="method-desc">Crea un CharacterIdentity desde un Dictionary.</p>
+
+      <div class="method-signature">func is_valid() -> bool</div>
+      <p class="method-desc">Retorna true si tiene character_id y character_name.</p>
+
+      <h3>Ejemplo de Uso</h3>
+
+      <pre data-lang="GDSCRIPT"><code># Crear personaje desde código
+var merchant = CharacterIdentity.new()
+merchant.character_id = "merchant_grok"
+merchant.character_name = "Grok el Mercader"
+merchant.personality = "Amable pero astuto. Siempre busca una buena oferta."
+merchant.background = "Ex-aventurero que se retiró tras perder una pierna."
+merchant.speech_style = CharacterIdentity.SpeechStyle.CASUAL
+merchant.knowledge = ["comercio", "armas", "rumores locales"]
+merchant.goals = ["Hacer dinero", "Encontrar objetos raros"]
+merchant.example_dialogues = [
+    "¡Bienvenido, amigo! Tengo justo lo que necesitas.",
+    "Hmm, ese precio no me convence... ¿qué tal si negociamos?"
+]
+
+# Generar system prompt para el LLM
+var prompt = merchant.to_system_prompt()
+print(prompt)</code></pre>
+
+      <hr>
+
+      <!-- ==================== WorldContext ==================== -->
+      <h2 id="world-context">
+        <div class="resource-header">
+          <span class="icon">🌍</span>
+          <span>WorldContext</span>
+        </div>
+      </h2>
+
+      <p>Define el contexto del mundo para la generación de diálogos. Incluye setting, lore, eventos actuales y estado dinámico que puede cambiar durante el juego.</p>
+
+      <p><strong>Archivo:</strong> <code>addons/ohmydialog/resources/world_context.gd</code></p>
+
+      <h3>Propiedades</h3>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Grupo</th>
+            <th>Propiedad</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="4"><strong>World Identity</strong></td>
+            <td><code>world_id</code></td>
+            <td>String</td>
+            <td>ID único del contexto</td>
+          </tr>
+          <tr>
+            <td><code>world_name</code></td>
+            <td>String</td>
+            <td>Nombre del mundo/setting</td>
+          </tr>
+          <tr>
+            <td><code>setting</code></td>
+            <td>String</td>
+            <td>Descripción breve del escenario</td>
+          </tr>
+          <tr>
+            <td><code>time_period</code></td>
+            <td>TimePeriod</td>
+            <td>Era tecnológica y cultural</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Lore & History</strong></td>
+            <td><code>lore</code></td>
+            <td>String</td>
+            <td>Historia profunda del mundo</td>
+          </tr>
+          <tr>
+            <td><code>factions</code></td>
+            <td>Dictionary</td>
+            <td>faction_id → descripción</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Geography</strong></td>
+            <td><code>locations</code></td>
+            <td>Dictionary</td>
+            <td>location_id → descripción</td>
+          </tr>
+          <tr>
+            <td><code>current_location</code></td>
+            <td>String</td>
+            <td>Ubicación actual (dinámico)</td>
+          </tr>
+          <tr>
+            <td><strong>Characters</strong></td>
+            <td><code>important_npcs</code></td>
+            <td>Dictionary</td>
+            <td>NPCs importantes del mundo</td>
+          </tr>
+          <tr>
+            <td rowspan="3"><strong>Current State</strong></td>
+            <td><code>current_events</code></td>
+            <td>Array[String]</td>
+            <td>Eventos actuales (dinámico)</td>
+          </tr>
+          <tr>
+            <td><code>rules</code></td>
+            <td>Array[String]</td>
+            <td>Reglas del mundo para la IA</td>
+          </tr>
+          <tr>
+            <td><code>dynamic_state</code></td>
+            <td>Dictionary</td>
+            <td>Variables de estado (dinámico)</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Tone & Style</strong></td>
+            <td><code>tone</code></td>
+            <td>String</td>
+            <td>Tono general del mundo</td>
+          </tr>
+          <tr>
+            <td><code>forbidden_topics</code></td>
+            <td>Array[String]</td>
+            <td>Temas a evitar</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Enum: TimePeriod</h3>
+
+      <div class="enum-list">
+        <div class="enum-item"><code>PREHISTORIC</code><small>Antes de la historia</small></div>
+        <div class="enum-item"><code>ANCIENT</code><small>Civilizaciones antiguas</small></div>
+        <div class="enum-item"><code>MEDIEVAL</code><small>Edad media</small></div>
+        <div class="enum-item"><code>RENAISSANCE</code><small>Renacimiento</small></div>
+        <div class="enum-item"><code>INDUSTRIAL</code><small>Era industrial</small></div>
+        <div class="enum-item"><code>MODERN</code><small>Mundo contemporáneo</small></div>
+        <div class="enum-item"><code>NEAR_FUTURE</code><small>Futuro cercano</small></div>
+        <div class="enum-item"><code>FAR_FUTURE</code><small>Futuro lejano</small></div>
+        <div class="enum-item"><code>POST_APOCALYPTIC</code><small>Post-apocalíptico</small></div>
+        <div class="enum-item"><code>FANTASY</code><small>Fantasía con magia</small></div>
+        <div class="enum-item"><code>STEAMPUNK</code><small>Victoriano + vapor</small></div>
+        <div class="enum-item"><code>CYBERPUNK</code><small>Alta tech, distopía</small></div>
+      </div>
+
+      <h3>Métodos</h3>
+
+      <div class="method-signature">func to_context_prompt() -> String</div>
+      <p class="method-desc">Genera el contexto del mundo para inyectar en prompts del LLM.</p>
+
+      <div class="method-signature">func set_state(key: String, value: Variant) -> void</div>
+      <p class="method-desc">Actualiza una variable de estado dinámico.</p>
+
+      <div class="method-signature">func get_state(key: String, default: Variant = null) -> Variant</div>
+      <p class="method-desc">Obtiene una variable de estado.</p>
+
+      <div class="method-signature">func add_event(event: String) -> void</div>
+      <p class="method-desc">Agrega un evento actual al mundo.</p>
+
+      <div class="method-signature">func remove_event(event: String) -> void</div>
+      <p class="method-desc">Elimina un evento del mundo.</p>
+
+      <div class="method-signature">func set_location(location_id: String) -> void</div>
+      <p class="method-desc">Cambia la ubicación actual.</p>
+
+      <h3>Ejemplo de Uso</h3>
+
+      <pre data-lang="GDSCRIPT"><code># Crear mundo desde código
+var world = WorldContext.new()
+world.world_id = "darklands"
+world.world_name = "Las Tierras Oscuras"
+world.setting = "Un reino devastado por una guerra de 100 años."
+world.time_period = WorldContext.TimePeriod.MEDIEVAL
+world.lore = "Los antiguos dioses abandonaron este mundo hace siglos..."
+
+world.factions = {
+    "iron_crown": "El imperio decadente del norte",
+    "free_cities": "Alianza de ciudades mercantiles del sur"
+}
+
+world.locations = {
+    "ravenshollow": "Ciudad amurallada, capital del comercio",
+    "blackwood": "Bosque maldito donde habitan los no-muertos"
+}
+
+world.rules = [
+    "La magia es ilegal y perseguida",
+    "Los nobles tienen poder absoluto",
+    "No existen armas de fuego"
+]
+
+# Actualizar estado dinámicamente durante el juego
+world.set_state("war_status", "tregua")
+world.set_state("season", "invierno")
+world.add_event("El rey ha enfermado gravemente")
+world.set_location("ravenshollow")
+
+# Generar contexto para el LLM
+var context = world.to_context_prompt()</code></pre>
+
+      <hr>
+
+      <h2>Próximamente</h2>
+
+      <p>Estos Resources están planificados pero aún no implementados:</p>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Resource</th>
+            <th>Descripción</th>
+            <th>Issue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>DialogueGraph</code></td>
+            <td>Grafo completo de nodos de diálogo</td>
+            <td><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/142">#142</a></td>
+          </tr>
+          <tr>
+            <td><code>AIPreset</code></td>
+            <td>Configuración de parámetros de generación</td>
+            <td><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/9">#9</a></td>
+          </tr>
+          <tr>
+            <td><code>VoiceProfile</code></td>
+            <td>Configuración de voz TTS por personaje</td>
+            <td><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/132">#132</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <a href="index.html">← Volver a API Reference</a>
+
+      <footer class="wiki-footer">
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="../ai-bg.js"></script>
+</body>
+</html>
