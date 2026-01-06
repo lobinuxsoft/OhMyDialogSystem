@@ -1,0 +1,105 @@
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=8 format=3 uid="uid://3r1ijfvrk1py"]
+
+[ext_resource type="Script" uid="uid://di7mrn0ixw647" path="res://addons/ohmydialog/resources/dialogue_node_data.gd" id="1_3qt05"]
+[ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="2_fb3bb"]
+
+[sub_resource type="Resource" id="Resource_a2yl5"]
+script = ExtResource("1_3qt05")
+node_id = "1a5ba112-2d03-4266-b548-7f52ea054d05"
+editor_position = Vector2(100, 200)
+data = {
+"trigger": ""
+}
+
+[sub_resource type="Resource" id="Resource_xfdoj"]
+script = ExtResource("1_3qt05")
+node_id = "28eebb12-2045-43a2-ac0a-981a9917d8e6"
+node_type = 5
+editor_position = Vector2(440, 500)
+data = {
+"expression": "",
+"operator": 0,
+"value": null,
+"variable": ""
+}
+output_count = 2
+
+[sub_resource type="Resource" id="Resource_fb3bb"]
+script = ExtResource("1_3qt05")
+node_id = "2d0962b7-8c7c-4557-97da-48b3fc7a6be4"
+node_type = 1
+editor_position = Vector2(820, 180)
+data = {
+"reason": ""
+}
+output_count = 0
+
+[sub_resource type="Resource" id="Resource_3qt05"]
+script = ExtResource("1_3qt05")
+node_id = "2dd29c33-7a14-4e22-8c99-794bdf5b9926"
+node_type = 5
+editor_position = Vector2(440, 180)
+data = {
+"expression": "",
+"operator": 0,
+"value": null,
+"variable": ""
+}
+output_count = 2
+
+[sub_resource type="Resource" id="Resource_si0u8"]
+script = ExtResource("1_3qt05")
+node_id = "7278ae8c-c4f8-4dbc-ba9c-37887ffc4557"
+node_type = 5
+editor_position = Vector2(440, 340)
+data = {
+"expression": "",
+"operator": 0,
+"value": null,
+"variable": ""
+}
+output_count = 2
+
+[resource]
+script = ExtResource("2_fb3bb")
+graph_id = "graph_1767724342"
+display_name = "New Dialogue"
+nodes = {
+"1a5ba112-2d03-4266-b548-7f52ea054d05": SubResource("Resource_a2yl5"),
+"28eebb12-2045-43a2-ac0a-981a9917d8e6": SubResource("Resource_xfdoj"),
+"2d0962b7-8c7c-4557-97da-48b3fc7a6be4": SubResource("Resource_fb3bb"),
+"2dd29c33-7a14-4e22-8c99-794bdf5b9926": SubResource("Resource_3qt05"),
+"7278ae8c-c4f8-4dbc-ba9c-37887ffc4557": SubResource("Resource_si0u8")
+}
+connections = Array[Dictionary]([{
+"from_node": "1a5ba112-2d03-4266-b548-7f52ea054d05",
+"from_slot": 0,
+"to_node": "2dd29c33-7a14-4e22-8c99-794bdf5b9926",
+"to_slot": 0
+}, {
+"from_node": "1a5ba112-2d03-4266-b548-7f52ea054d05",
+"from_slot": 0,
+"to_node": "7278ae8c-c4f8-4dbc-ba9c-37887ffc4557",
+"to_slot": 0
+}, {
+"from_node": "2dd29c33-7a14-4e22-8c99-794bdf5b9926",
+"from_slot": 0,
+"to_node": "2d0962b7-8c7c-4557-97da-48b3fc7a6be4",
+"to_slot": 0
+}, {
+"from_node": "1a5ba112-2d03-4266-b548-7f52ea054d05",
+"from_slot": 0,
+"to_node": "28eebb12-2045-43a2-ac0a-981a9917d8e6",
+"to_slot": 0
+}, {
+"from_node": "7278ae8c-c4f8-4dbc-ba9c-37887ffc4557",
+"from_slot": 0,
+"to_node": "2d0962b7-8c7c-4557-97da-48b3fc7a6be4",
+"to_slot": 0
+}, {
+"from_node": "28eebb12-2045-43a2-ac0a-981a9917d8e6",
+"from_slot": 0,
+"to_node": "2d0962b7-8c7c-4557-97da-48b3fc7a6be4",
+"to_slot": 0
+}])
+start_node_id = "1a5ba112-2d03-4266-b548-7f52ea054d05"

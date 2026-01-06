@@ -1,0 +1,140 @@
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+graph_id = "merchant_demo"
+display_name = "Merchant Demo Dialogue"
+description = "A demonstration dialogue with Marcus the Merchant. Shows branching choices, conditions, and events."
+nodes = {
+"start_001": {
+"node_id": "start_001",
+"node_type": 0,
+"editor_position": Vector2(50, 200),
+"data": {},
+"output_count": 1
+},
+"greeting_002": {
+"node_id": "greeting_002",
+"node_type": 3,
+"editor_position": Vector2(250, 200),
+"data": {
+"text": "Welcome, traveler! I am Marcus, purveyor of fine goods and rare treasures. What brings you to my humble stall today?",
+"speaker": "Marcus"
+},
+"output_count": 1
+},
+"choice_003": {
+"node_id": "choice_003",
+"node_type": 4,
+"editor_position": Vector2(500, 200),
+"data": {
+"choices": [
+{"text": "I'm looking to buy something.", "condition": ""},
+{"text": "Just browsing, thanks.", "condition": ""},
+{"text": "I heard you have... special items.", "condition": ""}
+]
+},
+"output_count": 3
+},
+"buy_response_004": {
+"node_id": "buy_response_004",
+"node_type": 3,
+"editor_position": Vector2(800, 100),
+"data": {
+"text": "Excellent! A customer with coin! I have potions, weapons, and magical trinkets. What catches your eye?",
+"speaker": "Marcus"
+},
+"output_count": 1
+},
+"browse_response_005": {
+"node_id": "browse_response_005",
+"node_type": 3,
+"editor_position": Vector2(800, 250),
+"data": {
+"text": "Of course, of course! Browse all you like. But I warn you - once you see my prices, you won't be able to resist!",
+"speaker": "Marcus"
+},
+"output_count": 1
+},
+"secret_check_006": {
+"node_id": "secret_check_006",
+"node_type": 5,
+"editor_position": Vector2(800, 400),
+"data": {
+"variable": "player_reputation",
+"operator": ">=",
+"value": 50
+},
+"output_count": 2
+},
+"secret_yes_007": {
+"node_id": "secret_yes_007",
+"node_type": 3,
+"editor_position": Vector2(1100, 350),
+"data": {
+"text": "*lowers voice* Ah, I see you're a person of... discerning tastes. Follow me to the back room.",
+"speaker": "Marcus"
+},
+"output_count": 1
+},
+"secret_no_008": {
+"node_id": "secret_no_008",
+"node_type": 3,
+"editor_position": Vector2(1100, 450),
+"data": {
+"text": "*narrows eyes* Special items? I don't know what you're talking about. I'm a legitimate merchant!",
+"speaker": "Marcus"
+},
+"output_count": 1
+},
+"event_reputation_009": {
+"node_id": "event_reputation_009",
+"node_type": 6,
+"editor_position": Vector2(1400, 350),
+"data": {
+"event_name": "secret_shop_unlocked",
+"event_data": {"merchant": "Marcus"}
+},
+"output_count": 1
+},
+"set_var_010": {
+"node_id": "set_var_010",
+"node_type": 7,
+"editor_position": Vector2(1100, 100),
+"data": {
+"variable": "talked_to_merchant",
+"operation": "set",
+"value": true
+},
+"output_count": 1
+},
+"end_011": {
+"node_id": "end_011",
+"node_type": 1,
+"editor_position": Vector2(1400, 200),
+"data": {},
+"output_count": 0
+}
+}
+connections = [
+{"from_node": "start_001", "from_slot": 0, "to_node": "greeting_002", "to_slot": 0},
+{"from_node": "greeting_002", "from_slot": 0, "to_node": "choice_003", "to_slot": 0},
+{"from_node": "choice_003", "from_slot": 0, "to_node": "buy_response_004", "to_slot": 0},
+{"from_node": "choice_003", "from_slot": 1, "to_node": "browse_response_005", "to_slot": 0},
+{"from_node": "choice_003", "from_slot": 2, "to_node": "secret_check_006", "to_slot": 0},
+{"from_node": "buy_response_004", "from_slot": 0, "to_node": "set_var_010", "to_slot": 0},
+{"from_node": "browse_response_005", "from_slot": 0, "to_node": "end_011", "to_slot": 0},
+{"from_node": "secret_check_006", "from_slot": 0, "to_node": "secret_yes_007", "to_slot": 0},
+{"from_node": "secret_check_006", "from_slot": 1, "to_node": "secret_no_008", "to_slot": 0},
+{"from_node": "secret_yes_007", "from_slot": 0, "to_node": "event_reputation_009", "to_slot": 0},
+{"from_node": "secret_no_008", "from_slot": 0, "to_node": "end_011", "to_slot": 0},
+{"from_node": "event_reputation_009", "from_slot": 0, "to_node": "end_011", "to_slot": 0},
+{"from_node": "set_var_010", "from_slot": 0, "to_node": "end_011", "to_slot": 0}
+]
+start_node_id = "start_001"
+local_variables = {
+"player_reputation": 60,
+"talked_to_merchant": false
+}

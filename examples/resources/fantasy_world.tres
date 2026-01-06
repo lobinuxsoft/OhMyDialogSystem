@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WorldContext" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/ohmydialog/resources/world_context.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+world_name = "Eldoria"
+setting_description = "A medieval fantasy realm of kingdoms, magic, and ancient mysteries. Technology is roughly equivalent to the 14th century, but magic fills the gaps."
+current_location = "Riverside Market"
+location_description = "A bustling marketplace by the river. Merchants hawk their wares from colorful stalls. The smell of spices and fresh bread fills the air."
+time_of_day = "afternoon"
+current_weather = "sunny"
+active_events = ["The annual Harvest Festival begins tomorrow", "Rumors of bandits on the northern road"]
+world_rules = ["Magic exists but is rare and feared by commoners", "The King's word is law", "Dragons are legends, thought to be extinct"]
+important_npcs = {"King Aldric": "The aging monarch of Eldoria", "High Priestess Vera": "Leader of the Temple of Light"}
+factions = {"Merchant Guild": "Controls trade, rival to nobility", "Royal Guard": "Enforcers of the King's law", "Thieves Guild": "Underground organization"}
+custom_context = "The player is a traveling adventurer who has just arrived in town."
