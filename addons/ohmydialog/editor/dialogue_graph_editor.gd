@@ -49,10 +49,17 @@ func _ready() -> void:
 	if not Engine.is_editor_hint():
 		return
 
+	# Ensure all nodes are available
+	if not is_instance_valid(graph_edit):
+		push_error("DialogueGraphEditor: GraphEdit not found!")
+		return
+
 	_setup_graph_edit()
 	_setup_toolbar()
 	_setup_context_menu()
 	_update_ui_state()
+
+	print("DialogueGraphEditor: Ready and initialized")
 
 
 func _setup_graph_edit() -> void:
@@ -73,9 +80,19 @@ func _setup_graph_edit() -> void:
 
 
 func _setup_toolbar() -> void:
-	new_button.pressed.connect(_on_new_pressed)
-	save_button.pressed.connect(_on_save_pressed)
-	validate_button.pressed.connect(_on_validate_pressed)
+	if not new_button or not save_button or not validate_button:
+		push_error("DialogueGraphEditor: Toolbar buttons not found!")
+		return
+
+	# Connect button signals (check if not already connected)
+	if not new_button.pressed.is_connected(_on_new_pressed):
+		new_button.pressed.connect(_on_new_pressed)
+	if not save_button.pressed.is_connected(_on_save_pressed):
+		save_button.pressed.connect(_on_save_pressed)
+	if not validate_button.pressed.is_connected(_on_validate_pressed):
+		validate_button.pressed.connect(_on_validate_pressed)
+
+	print("DialogueGraphEditor: Toolbar setup complete")
 
 	# Setup add node menu
 	var popup := add_node_button.get_popup()
@@ -320,6 +337,8 @@ func _on_end_node_move() -> void:
 
 
 func _on_new_pressed() -> void:
+	print("DialogueGraphEditor: New button pressed")
+
 	var new_graph := DialogueGraph.new()
 	new_graph.graph_id = "graph_%d" % Time.get_unix_time_from_system()
 	new_graph.display_name = "New Dialogue"
@@ -329,10 +348,14 @@ func _on_new_pressed() -> void:
 	new_graph.start_node_id = start_node.node_id
 
 	edit_graph(new_graph)
+	print("DialogueGraphEditor: New graph created with ID: %s" % new_graph.graph_id)
 
 
 func _on_save_pressed() -> void:
+	print("DialogueGraphEditor: Save button pressed")
+
 	if not current_graph:
+		push_warning("DialogueGraphEditor: No graph to save")
 		return
 
 	# If the resource has a path, save it
@@ -343,7 +366,8 @@ func _on_save_pressed() -> void:
 		else:
 			push_error("DialogueGraphEditor: Failed to save graph: %s" % error_string(err))
 	else:
-		push_warning("DialogueGraphEditor: Graph has no resource path. Use 'Save As' from FileSystem dock.")
+		# For new graphs, we need to use EditorInterface to save
+		push_warning("DialogueGraphEditor: Graph has no path. Right-click in FileSystem → 'New Resource' → 'DialogueGraph' to create one, then edit it.")
 
 
 func _on_validate_pressed() -> void:
