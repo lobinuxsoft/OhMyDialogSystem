@@ -27,6 +27,7 @@ var current_graph: DialogueGraph
 ## Reference to the toolbar buttons.
 @onready var new_button: Button = %NewButton
 @onready var save_button: Button = %SaveButton
+@onready var clear_button: Button = %ClearButton
 @onready var add_node_button: MenuButton = %AddNodeButton
 @onready var validate_button: Button = %ValidateButton
 @onready var graph_name_label: Label = %GraphNameLabel
@@ -34,6 +35,9 @@ var current_graph: DialogueGraph
 ## Reference to the context menu.
 @onready var context_menu: PopupMenu = %ContextMenu
 @onready var add_node_submenu: PopupMenu = %AddNodeSubmenu
+
+## Reference to save file dialog.
+@onready var save_file_dialog: FileDialog = %SaveFileDialog
 
 ## Currently selected visual node.
 var _selected_node: DialogueGraphNode
@@ -80,7 +84,7 @@ func _setup_graph_edit() -> void:
 
 
 func _setup_toolbar() -> void:
-	if not new_button or not save_button or not validate_button:
+	if not new_button or not save_button or not clear_button or not validate_button:
 		push_error("DialogueGraphEditor: Toolbar buttons not found!")
 		return
 
@@ -89,8 +93,14 @@ func _setup_toolbar() -> void:
 		new_button.pressed.connect(_on_new_pressed)
 	if not save_button.pressed.is_connected(_on_save_pressed):
 		save_button.pressed.connect(_on_save_pressed)
+	if not clear_button.pressed.is_connected(_on_clear_pressed):
+		clear_button.pressed.connect(_on_clear_pressed)
 	if not validate_button.pressed.is_connected(_on_validate_pressed):
 		validate_button.pressed.connect(_on_validate_pressed)
+
+	# Connect file dialog
+	if save_file_dialog and not save_file_dialog.file_selected.is_connected(_on_save_file_selected):
+		save_file_dialog.file_selected.connect(_on_save_file_selected)
 
 	print("DialogueGraphEditor: Toolbar setup complete")
 
@@ -350,6 +360,14 @@ func _on_new_pressed() -> void:
 	edit_graph(new_graph)
 	print("DialogueGraphEditor: New graph created with ID: %s" % new_graph.graph_id)
 
+	# Immediately prompt to save the new graph
+	_show_save_dialog()
+
+
+func _on_clear_pressed() -> void:
+	print("DialogueGraphEditor: Clear button pressed")
+	clear_graph()
+
 
 func _on_save_pressed() -> void:
 	print("DialogueGraphEditor: Save button pressed")
@@ -358,16 +376,55 @@ func _on_save_pressed() -> void:
 		push_warning("DialogueGraphEditor: No graph to save")
 		return
 
-	# If the resource has a path, save it
+	# If the resource has a path, save it directly
 	if not current_graph.resource_path.is_empty():
-		var err := ResourceSaver.save(current_graph)
-		if err == OK:
-			print("DialogueGraphEditor: Graph saved to %s" % current_graph.resource_path)
-		else:
-			push_error("DialogueGraphEditor: Failed to save graph: %s" % error_string(err))
+		_save_graph_to_path(current_graph.resource_path)
 	else:
-		# For new graphs, we need to use EditorInterface to save
-		push_warning("DialogueGraphEditor: Graph has no path. Right-click in FileSystem → 'New Resource' → 'DialogueGraph' to create one, then edit it.")
+		# No path - show Save As dialog
+		_show_save_dialog()
+
+
+## Shows the save file dialog.
+func _show_save_dialog() -> void:
+	if not save_file_dialog:
+		push_error("DialogueGraphEditor: Save file dialog not found!")
+		return
+
+	# Set suggested filename
+	var suggested_name := "new_dialogue.tres"
+	if current_graph and not current_graph.display_name.is_empty():
+		suggested_name = current_graph.display_name.to_snake_case() + ".tres"
+
+	save_file_dialog.current_file = suggested_name
+	save_file_dialog.popup_centered()
+
+
+## Called when user selects a file in the save dialog.
+func _on_save_file_selected(path: String) -> void:
+	print("DialogueGraphEditor: Saving to path: %s" % path)
+	_save_graph_to_path(path)
+
+
+## Saves the current graph to the specified path.
+func _save_graph_to_path(path: String) -> void:
+	if not current_graph:
+		return
+
+	# Ensure .tres extension
+	if not path.ends_with(".tres") and not path.ends_with(".res"):
+		path += ".tres"
+
+	var err := ResourceSaver.save(current_graph, path)
+	if err == OK:
+		current_graph.resource_path = path
+		print("DialogueGraphEditor: Graph saved to %s" % path)
+		_update_ui_state()
+
+		# Refresh the FileSystem dock to show the new file
+		if Engine.is_editor_hint():
+			EditorInterface.get_resource_filesystem().scan()
+	else:
+		push_error("DialogueGraphEditor: Failed to save graph: %s" % error_string(err))
 
 
 func _on_validate_pressed() -> void:

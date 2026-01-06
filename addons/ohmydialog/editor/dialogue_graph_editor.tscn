@@ -34,6 +34,12 @@ layout_mode = 2
 text = "Save"
 icon_alignment = 1
 
+[node name="ClearButton" type="Button" parent="VBoxContainer/Toolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear"
+icon_alignment = 1
+
 [node name="VSeparator" type="VSeparator" parent="VBoxContainer/Toolbar"]
 layout_mode = 2
 
@@ -71,3 +77,12 @@ unique_name_in_owner = true
 
 [node name="AddNodeSubmenu" type="PopupMenu" parent="ContextMenu"]
 unique_name_in_owner = true
+
+[node name="SaveFileDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+title = "Save Dialogue Graph"
+size = Vector2i(600, 400)
+ok_button_text = "Save"
+file_mode = 4
+access = 2
+filters = PackedStringArray("*.tres ; Godot Resource")
