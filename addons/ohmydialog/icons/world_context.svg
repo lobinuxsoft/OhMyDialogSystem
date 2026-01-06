@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- World/Globe icon for WorldContext Resource -->
+  <!-- Globe circle -->
+  <circle cx="8" cy="8" r="6.5" fill="#e0e0e0" stroke="#8da5f3" stroke-width="0.8"/>
+  <!-- Latitude lines -->
+  <ellipse cx="8" cy="8" rx="6.5" ry="2.5" fill="none" stroke="#8da5f3" stroke-width="0.5"/>
+  <ellipse cx="8" cy="8" rx="6.5" ry="5" fill="none" stroke="#8da5f3" stroke-width="0.4"/>
+  <!-- Longitude line -->
+  <ellipse cx="8" cy="8" rx="2.5" ry="6.5" fill="none" stroke="#8da5f3" stroke-width="0.5"/>
+  <!-- Location marker -->
+  <circle cx="11" cy="5" r="1.5" fill="#f6c358"/>
+</svg>
