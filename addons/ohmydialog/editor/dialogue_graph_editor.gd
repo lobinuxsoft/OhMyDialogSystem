@@ -63,8 +63,6 @@ func _ready() -> void:
 	_setup_context_menu()
 	_update_ui_state()
 
-	print("DialogueGraphEditor: Ready and initialized")
-
 
 func _setup_graph_edit() -> void:
 	graph_edit.right_disconnects = true
@@ -101,8 +99,6 @@ func _setup_toolbar() -> void:
 	# Connect file dialog
 	if save_file_dialog and not save_file_dialog.file_selected.is_connected(_on_save_file_selected):
 		save_file_dialog.file_selected.connect(_on_save_file_selected)
-
-	print("DialogueGraphEditor: Toolbar setup complete")
 
 	# Setup add node menu
 	var popup := add_node_button.get_popup()
@@ -148,14 +144,8 @@ func _create_color_icon(color: Color) -> ImageTexture:
 
 ## Loads a DialogueGraph for editing.
 func edit_graph(graph: DialogueGraph) -> void:
-	print("DialogueGraphEditor: edit_graph called, nodes: %d, connections: %d" % [
-		graph.nodes.size() if graph else 0,
-		graph.connections.size() if graph else 0
-	])
-
 	# Skip if already editing the same graph (prevents race condition)
 	if current_graph == graph and graph != null:
-		print("DialogueGraphEditor: Same graph, skipping rebuild")
 		return
 
 	current_graph = graph
@@ -217,32 +207,20 @@ func _rebuild_connections() -> void:
 	if not current_graph:
 		return
 
-	print("DialogueGraphEditor: _rebuild_connections called, %d connections to create" % current_graph.connections.size())
-
-	var created := 0
 	for conn in current_graph.connections:
 		var from_node: String = conn.from_node
 		var to_node: String = conn.to_node
 
 		# Verify both nodes exist visually
 		if _visual_nodes.has(from_node) and _visual_nodes.has(to_node):
-			var err := graph_edit.connect_node(
+			graph_edit.connect_node(
 				from_node,
 				conn.from_slot,
 				to_node,
 				conn.to_slot
 			)
-			if err == OK:
-				created += 1
-			else:
-				print("DialogueGraphEditor: Failed to connect %s -> %s" % [from_node, to_node])
-		else:
-			print("DialogueGraphEditor: Nodes not found: %s or %s" % [from_node, to_node])
-
-	print("DialogueGraphEditor: Created %d/%d connections" % [created, current_graph.connections.size()])
 
 	# Force GraphEdit to redraw connections (workaround for Godot rendering bug)
-	# queue_redraw() doesn't work, so we force a zoom change
 	_force_graph_redraw()
 
 
@@ -255,15 +233,10 @@ func _force_graph_redraw() -> void:
 
 ## Actually toggles the zoom to force redraw.
 func _do_zoom_toggle() -> void:
-	# Verify connections exist in GraphEdit
-	var connection_list := graph_edit.get_connection_list()
-	print("DialogueGraphEditor: GraphEdit has %d connections internally" % connection_list.size())
-
 	var current_zoom := graph_edit.zoom
 	graph_edit.zoom = current_zoom * 1.01
 	await get_tree().process_frame
 	graph_edit.zoom = current_zoom
-	print("DialogueGraphEditor: Forced zoom redraw")
 
 
 ## Clears all visual nodes from the graph edit.
@@ -395,8 +368,6 @@ func _on_end_node_move() -> void:
 
 
 func _on_new_pressed() -> void:
-	print("DialogueGraphEditor: New button pressed")
-
 	var new_graph := DialogueGraph.new()
 	new_graph.graph_id = "graph_%d" % Time.get_unix_time_from_system()
 	new_graph.display_name = "New Dialogue"
@@ -406,20 +377,16 @@ func _on_new_pressed() -> void:
 	new_graph.start_node_id = start_node.node_id
 
 	edit_graph(new_graph)
-	print("DialogueGraphEditor: New graph created with ID: %s" % new_graph.graph_id)
 
 	# Immediately prompt to save the new graph
 	_show_save_dialog()
 
 
 func _on_clear_pressed() -> void:
-	print("DialogueGraphEditor: Clear button pressed")
 	clear_graph()
 
 
 func _on_save_pressed() -> void:
-	print("DialogueGraphEditor: Save button pressed")
-
 	if not current_graph:
 		push_warning("DialogueGraphEditor: No graph to save")
 		return
@@ -449,7 +416,6 @@ func _show_save_dialog() -> void:
 
 ## Called when user selects a file in the save dialog.
 func _on_save_file_selected(path: String) -> void:
-	print("DialogueGraphEditor: Saving to path: %s" % path)
 	_save_graph_to_path(path)
 
 
@@ -465,7 +431,6 @@ func _save_graph_to_path(path: String) -> void:
 	var err := ResourceSaver.save(current_graph, path)
 	if err == OK:
 		current_graph.resource_path = path
-		print("DialogueGraphEditor: Graph saved to %s" % path)
 		_update_ui_state()
 
 		# Refresh the FileSystem dock to show the new file

@@ -39,7 +39,6 @@ func _handles(object: Object) -> bool:
 ## Called when the user selects an object this plugin handles.
 func _edit(object: Object) -> void:
 	if object is DialogueGraph and _editor_instance:
-		print("OhMyDialogSystem: _edit called for %s" % object.resource_path)
 		# Make panel visible FIRST, then load the graph
 		make_bottom_panel_item_visible(_editor_instance)
 		# Use call_deferred to ensure panel is visible before loading
