@@ -12,8 +12,15 @@ var _editor_instance: Control
 ## Reference to the custom inspector plugin.
 var _inspector_plugin: DialogueNodeInspectorPlugin
 
+## Reference to the AI service singleton.
+var _ai_service: AIService
+
 
 func _enter_tree() -> void:
+	# Initialize AI service singleton first
+	_ai_service = AIService.new()
+	_ai_service.name = "AIService"
+	add_child(_ai_service)
 	# Register inspector plugin for DialogueNodeData
 	_inspector_plugin = DialogueNodeInspectorPlugin.new()
 	add_inspector_plugin(_inspector_plugin)
@@ -43,6 +50,11 @@ func _exit_tree() -> void:
 		remove_control_from_bottom_panel(_editor_instance)
 		_editor_instance.queue_free()
 		_editor_instance = null
+
+	# Clean up AI service
+	if _ai_service:
+		_ai_service.queue_free()
+		_ai_service = null
 
 	print("OhMyDialogSystem: Plugin unloaded")
 
