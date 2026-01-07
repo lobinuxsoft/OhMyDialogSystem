@@ -16,6 +16,9 @@
 
 namespace godot {
 
+// Forward declaration for async task data
+struct AsyncGenerateData;
+
 /// LlamaInterface: Wrapper for llama.cpp model loading and inference.
 /// Exposes llama.cpp functionality to GDScript and C#.
 class LlamaInterface : public RefCounted {
@@ -57,6 +60,8 @@ private:
 	void _cleanup();
 	llama_sampler *_create_sampler() const;
 	bool _check_stop_sequence(const std::string &text) const;
+	void _async_generate_task(const String &prompt);
+	static void _async_generate_callback(void *userdata);
 
 protected:
 	static void _bind_methods();
@@ -94,6 +99,11 @@ public:
 	/// @param prompt The input text to continue from
 	/// @return Generated text, or empty string on error
 	String generate(const String &prompt);
+
+	/// Generate text asynchronously from a prompt.
+	/// Emits generation_started, generation_completed or generation_error.
+	/// @param prompt The input text to continue from
+	void generate_async(const String &prompt);
 
 	// ==================== Sampling Parameters ====================
 
