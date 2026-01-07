@@ -48,6 +48,14 @@ var _visual_nodes: Dictionary = {}
 ## Position where context menu was opened (for adding nodes).
 var _context_menu_position: Vector2
 
+## Reference to inspector plugin for context updates.
+var _inspector_plugin: DialogueNodeInspectorPlugin
+
+
+## Sets the inspector plugin reference for context updates.
+func set_inspector_plugin(plugin: DialogueNodeInspectorPlugin) -> void:
+	_inspector_plugin = plugin
+
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
@@ -149,6 +157,11 @@ func edit_graph(graph: DialogueGraph) -> void:
 		return
 
 	current_graph = graph
+
+	# Update inspector plugin with current graph for variable lookups
+	if _inspector_plugin:
+		_inspector_plugin.set_current_graph(graph)
+
 	_rebuild_visual_graph()
 	_update_ui_state()
 
@@ -340,12 +353,17 @@ func _on_node_selected(node: Node) -> void:
 	if node is BaseDialogueNode:
 		_selected_node = node
 		node_selected.emit(node.node_data)
+		# Show node data in the Inspector
+		EditorInterface.inspect_object(node.node_data)
 
 
 func _on_node_deselected(node: Node) -> void:
 	if node == _selected_node:
 		_selected_node = null
 		selection_cleared.emit()
+		# Clear inspector (show graph instead)
+		if current_graph:
+			EditorInterface.inspect_object(current_graph)
 
 
 func _on_delete_nodes_request(nodes: Array[StringName]) -> void:

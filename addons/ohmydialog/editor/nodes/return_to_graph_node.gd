@@ -14,8 +14,6 @@ func _configure_slots() -> void:
 
 func _create_content_ui() -> void:
 	var return_node: String = node_data.data.get("return_node_id", "")
-
-	if return_node.is_empty():
-		_add_label("← Return to graph")
-	else:
-		_add_label("← Return to: %s" % return_node)
+	_add_hint_label("<- Return to graph")
+	if not return_node.is_empty():
+		_add_info("Node", return_node)

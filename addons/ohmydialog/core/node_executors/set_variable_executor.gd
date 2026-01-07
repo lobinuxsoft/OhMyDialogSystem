@@ -6,10 +6,14 @@ extends BaseNodeExecutor
 ## Sets a variable in the dialogue context and continues.
 
 
+## Operation names matching DialogueNodeData.VariableOperation enum order.
+const OPERATION_NAMES := ["set", "add", "subtract", "multiply", "divide", "toggle"]
+
+
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	var variable_name: String = node_data.data.get("variable", "")
 	var value: Variant = node_data.data.get("value", null)
-	var operation: String = node_data.data.get("operation", "set")
+	var operation: String = _normalize_operation(node_data.data.get("operation", "set"))
 
 	if variable_name.is_empty():
 		return error("SetVariableExecutor: No variable name specified")
@@ -95,3 +99,14 @@ func _calculate_value(variable: String, value: Variant, operation: String, conte
 				return arr
 
 	return value
+
+
+## Normalizes operation from int (enum) or String to lowercase String.
+func _normalize_operation(op: Variant) -> String:
+	if op is int:
+		if op >= 0 and op < OPERATION_NAMES.size():
+			return OPERATION_NAMES[op]
+		return "set"
+	elif op is String:
+		return op.to_lower()
+	return "set"

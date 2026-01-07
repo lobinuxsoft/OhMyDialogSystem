@@ -61,6 +61,9 @@ enum ComparisonOperator {
 ## Position in the visual editor (GraphEdit coordinates).
 @export var editor_position: Vector2 = Vector2.ZERO
 
+## Size in the visual editor (for resizable nodes).
+@export var editor_size: Vector2 = Vector2.ZERO
+
 ## Type-specific data. Structure varies by node_type.
 ## See _get_default_data() for the expected structure of each type.
 @export var data: Dictionary = {}
@@ -75,6 +78,26 @@ func _init(p_node_type: NodeType = NodeType.START) -> void:
 		node_id = _generate_uuid()
 	data = _get_default_data(node_type)
 	output_count = _calculate_output_count()
+
+
+## Override _set to emit changed signal when properties are modified in Inspector.
+func _set(property: StringName, value: Variant) -> bool:
+	# Handle data sub-properties (e.g., "data/speaker")
+	var prop_str := String(property)
+	if prop_str.begins_with("data/"):
+		var key := prop_str.substr(5)  # Remove "data/" prefix
+		data[key] = value
+		emit_changed()
+		return true
+
+	# For normal properties, let Godot handle it but emit changed
+	match property:
+		&"node_id", &"node_type", &"editor_position", &"editor_size", &"data", &"output_count":
+			# Godot will set the property, we just need to know it changed
+			call_deferred("emit_changed")
+			return false  # Let Godot handle the actual set
+
+	return false
 
 
 ## Generates a UUID v4 string for node identification.
@@ -247,6 +270,7 @@ func to_dict() -> Dictionary:
 		"node_id": node_id,
 		"node_type": node_type,
 		"editor_position": {"x": editor_position.x, "y": editor_position.y},
+		"editor_size": {"x": editor_size.x, "y": editor_size.y},
 		"data": data.duplicate(true),
 		"output_count": output_count
 	}
@@ -260,6 +284,9 @@ static func from_dict(dict: Dictionary) -> DialogueNodeData:
 
 	var pos: Dictionary = dict.get("editor_position", {})
 	node.editor_position = Vector2(pos.get("x", 0), pos.get("y", 0))
+
+	var sz: Dictionary = dict.get("editor_size", {})
+	node.editor_size = Vector2(sz.get("x", 0), sz.get("y", 0))
 
 	node.data = dict.get("data", {}).duplicate(true)
 	node.output_count = dict.get("output_count", node._calculate_output_count())

@@ -109,7 +109,9 @@ func _show_choices(choices: Array[Dictionary]) -> void:
 		var choice: Dictionary = choices[i]
 		var button := Button.new()
 		button.text = "%d. %s" % [i + 1, choice.get("text", "Choice")]
-		button.pressed.connect(_on_choice_selected.bind(i))
+		# Use the original index from the choice data, not the filtered list index
+		var original_index: int = choice.get("index", i)
+		button.pressed.connect(_on_choice_selected.bind(original_index))
 		choices_container.add_child(button)
 
 

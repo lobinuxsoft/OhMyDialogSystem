@@ -50,6 +50,21 @@ signal variable_changed(name: String, old_value: Variant, new_value: Variant)
 ## Emitted when an error occurs.
 signal error_occurred(message: String)
 
+## Query System Signals (inspired by Questify)
+## These allow game code to respond to dialogue system queries.
+
+## Emitted when a condition needs to be checked by game logic.
+## Connect to this signal and call callback.call(result: bool) with the answer.
+signal condition_query_requested(key: String, expected_value: Variant, callback: Callable)
+
+## Emitted when an action needs to be executed by game logic.
+## Connect to this signal and call callback.call() when done.
+signal action_query_requested(key: String, value: Variant, callback: Callable)
+
+## Emitted when a value needs to be retrieved from game logic.
+## Connect to this signal and call callback.call(value: Variant) with the value.
+signal value_query_requested(key: String, callback: Callable)
+
 
 @export_group("Configuration")
 
@@ -104,6 +119,9 @@ var _is_active: bool = false
 
 ## Pending inference request.
 var _pending_inference: Dictionary = {}
+
+## Pending confirmation slot (for Continue after static response).
+var _pending_confirm_slot: int = 0
 
 
 func _ready() -> void:
@@ -283,7 +301,8 @@ func _start_graph_execution() -> void:
 		"character": active_character,
 		"world": world_context,
 		"history": conversation_history.get_history(),
-		"context_manager": context_manager
+		"context_manager": context_manager,
+		"dialogue_manager": self  # For Query System support
 	}
 
 	graph_runner.start(current_graph, exec_context)
@@ -419,6 +438,12 @@ func _on_waiting_for_input(input_type: String, data: Dictionary) -> void:
 				typed_choices.append(c)
 			player_choices_available.emit(typed_choices)
 
+		"confirm":
+			# Waiting for user to click Continue after static response
+			# The UI should show a Continue button; when pressed, call select_choice(0)
+			# Store the output_slot for when confirm is received
+			_pending_confirm_slot = data.get("output_slot", 0)
+
 		"inference":
 			if data.get("mode") == "free":
 				# Free mode inference request
@@ -499,3 +524,115 @@ func get_debug_info() -> Dictionary:
 		"history": conversation_history.get_summary(),
 		"context": context_manager.get_summary()
 	}
+
+
+# ==================== Query System ====================
+
+
+## Result holder for async queries.
+var _query_result: Variant = null
+var _query_completed: bool = false
+
+
+## Queries game logic to check a condition.
+## Returns true/false based on game response, or default_value if no handler.
+func query_condition(key: String, expected_value: Variant = true, default_value: bool = false) -> bool:
+	_query_completed = false
+	_query_result = default_value
+
+	var callback := func(result: bool) -> void:
+		_query_result = result
+		_query_completed = true
+
+	condition_query_requested.emit(key, expected_value, callback)
+
+	# If no handler connected, return default immediately
+	if not condition_query_requested.get_connections():
+		return default_value
+
+	# For sync usage, return current result
+	# (async usage would await _query_completed)
+	return _query_result as bool
+
+
+## Queries game logic to execute an action.
+## Returns true when action is completed, false if no handler.
+func query_action(key: String, value: Variant = null) -> bool:
+	_query_completed = false
+
+	var callback := func() -> void:
+		_query_completed = true
+
+	action_query_requested.emit(key, value, callback)
+
+	# If no handler connected, return false
+	if not action_query_requested.get_connections():
+		return false
+
+	return _query_completed
+
+
+## Queries game logic to get a value.
+## Returns the value from game, or default_value if no handler.
+func query_value(key: String, default_value: Variant = null) -> Variant:
+	_query_completed = false
+	_query_result = default_value
+
+	var callback := func(value: Variant) -> void:
+		_query_result = value
+		_query_completed = true
+
+	value_query_requested.emit(key, callback)
+
+	# If no handler connected, return default
+	if not value_query_requested.get_connections():
+		return default_value
+
+	return _query_result
+
+
+## Processes metadata from a node and executes any action queries.
+## Returns true if all actions completed successfully.
+func process_node_metadata(node_data: DialogueNodeData) -> bool:
+	if not node_data:
+		return true
+
+	var all_success := true
+
+	for key in node_data.get_meta_list():
+		# Skip internal metadata
+		if key.begins_with("_"):
+			continue
+
+		var value: Variant = node_data.get_meta(key)
+
+		# Check for action prefix
+		if key.begins_with("action:"):
+			var action_key := key.substr(7)  # Remove "action:" prefix
+			if not query_action(action_key, value):
+				push_warning("DialogueManager: Action '%s' had no handler" % action_key)
+				all_success = false
+
+	return all_success
+
+
+## Processes metadata conditions from a node.
+## Returns true only if all conditions pass.
+func check_node_metadata_conditions(node_data: DialogueNodeData) -> bool:
+	if not node_data:
+		return true
+
+	for key in node_data.get_meta_list():
+		# Skip internal metadata
+		if key.begins_with("_"):
+			continue
+
+		var value: Variant = node_data.get_meta(key)
+
+		# Check for condition prefix
+		if key.begins_with("condition:"):
+			var condition_key := key.substr(10)  # Remove "condition:" prefix
+			if not query_condition(condition_key, value, false):
+				return false
+
+	return true

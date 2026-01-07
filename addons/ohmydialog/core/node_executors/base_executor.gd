@@ -19,6 +19,7 @@ const RESULT_ERROR := "error"
 const RESULT_END_GRAPH := "end_graph"
 const RESULT_ENTER_FREE := "enter_free"
 const RESULT_EXIT_FREE := "exit_free"
+const RESULT_WAIT_CONFIRM := "wait_for_confirm"
 
 
 ## Executes the node and returns result dictionary.

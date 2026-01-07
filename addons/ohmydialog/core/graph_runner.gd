@@ -176,6 +176,14 @@ func _execute_current_node() -> void:
 
 	node_entered.emit(current_node)
 
+	# Process node metadata conditions (if DialogueManager available)
+	var dialogue_manager: Object = _context.get("dialogue_manager")
+	if dialogue_manager and dialogue_manager.has_method("check_node_metadata_conditions"):
+		if not dialogue_manager.check_node_metadata_conditions(current_node):
+			# Conditions not met - skip to next node via default slot
+			_advance_to_next_node(0)
+			return
+
 	# Get executor for this node type
 	var executor: BaseNodeExecutor = _executors.get(current_node.node_type)
 	if not executor:
@@ -189,6 +197,10 @@ func _execute_current_node() -> void:
 
 	# Execute the node
 	var result := executor.execute(current_node, _create_context_object())
+
+	# Process node metadata actions (if DialogueManager available)
+	if dialogue_manager and dialogue_manager.has_method("process_node_metadata"):
+		dialogue_manager.process_node_metadata(current_node)
 
 	# Handle the result
 	_handle_result(result)
@@ -239,6 +251,14 @@ func _handle_result(result: Dictionary) -> void:
 	if result.has(BaseNodeExecutor.RESULT_CHOICES):
 		state = State.WAITING_INPUT
 		waiting_for_input.emit("choice", {"choices": result[BaseNodeExecutor.RESULT_CHOICES]})
+		return
+
+	# Handle wait for confirmation (e.g., after static response)
+	if result.get(BaseNodeExecutor.RESULT_WAIT_CONFIRM, false):
+		state = State.WAITING_INPUT
+		waiting_for_input.emit("confirm", {
+			"output_slot": result.get(BaseNodeExecutor.RESULT_OUTPUT_SLOT, 0)
+		})
 		return
 
 	# Handle inference request (wait for LLM)

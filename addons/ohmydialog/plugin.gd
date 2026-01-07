@@ -9,11 +9,22 @@ extends EditorPlugin
 ## Reference to the dialogue graph editor instance.
 var _editor_instance: Control
 
+## Reference to the custom inspector plugin.
+var _inspector_plugin: DialogueNodeInspectorPlugin
+
 
 func _enter_tree() -> void:
+	# Register inspector plugin for DialogueNodeData
+	_inspector_plugin = DialogueNodeInspectorPlugin.new()
+	add_inspector_plugin(_inspector_plugin)
+
 	# Load and instantiate the dialogue graph editor
 	var editor_scene := preload("res://addons/ohmydialog/editor/dialogue_graph_editor.tscn")
 	_editor_instance = editor_scene.instantiate()
+
+	# Pass inspector plugin reference to editor for context updates
+	if _editor_instance.has_method("set_inspector_plugin"):
+		_editor_instance.set_inspector_plugin(_inspector_plugin)
 
 	# Add as bottom panel (more space for graph editing than dock)
 	add_control_to_bottom_panel(_editor_instance, "Dialogue Graph")
@@ -22,6 +33,11 @@ func _enter_tree() -> void:
 
 
 func _exit_tree() -> void:
+	# Remove inspector plugin
+	if _inspector_plugin:
+		remove_inspector_plugin(_inspector_plugin)
+		_inspector_plugin = null
+
 	# Remove and clean up the editor
 	if _editor_instance:
 		remove_control_from_bottom_panel(_editor_instance)
@@ -39,6 +55,10 @@ func _handles(object: Object) -> bool:
 ## Called when the user selects an object this plugin handles.
 func _edit(object: Object) -> void:
 	if object is DialogueGraph and _editor_instance:
+		# Update inspector plugin with current graph for variable lookups
+		if _inspector_plugin:
+			_inspector_plugin.set_current_graph(object)
+
 		# Make panel visible FIRST, then load the graph
 		make_bottom_panel_item_visible(_editor_instance)
 		# Use call_deferred to ensure panel is visible before loading

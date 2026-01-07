@@ -15,8 +15,8 @@ func _configure_slots() -> void:
 
 func _create_content_ui() -> void:
 	var prompt_hint: String = node_data.data.get("prompt_hint", "")
-	if prompt_hint.is_empty():
-		_add_hint_label("AI generates response...")
-	else:
-		var label := _add_label(prompt_hint)
-		label.custom_minimum_size.x = 180
+
+	_add_hint_label("AI generates response")
+	if not prompt_hint.is_empty():
+		_add_separator()
+		_add_text_preview(prompt_hint, 2)

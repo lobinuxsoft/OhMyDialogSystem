@@ -14,4 +14,8 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	_add_label("Enter free conversation", Color(0.6, 0.6, 0.8))
+	_add_hint_label("Enter free conversation")
+	var context_hint: String = node_data.data.get("context_hint", "")
+	if not context_hint.is_empty():
+		_add_separator()
+		_add_text_preview(context_hint, 2)

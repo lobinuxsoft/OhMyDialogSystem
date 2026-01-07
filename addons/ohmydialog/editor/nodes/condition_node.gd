@@ -4,64 +4,41 @@ extends BaseDialogueNode
 ## Visual node for branching based on conditions.
 ##
 ## Has one input and two outputs: TRUE and FALSE branches.
-## Evaluates a variable or expression to determine the path.
 
 
 func _configure_slots() -> void:
-	clear_all_slots()
-	# One input, two outputs (TRUE = slot 0, FALSE = slot 1)
-	set_slot(0, true, 0, Color.WHITE, true, 0, Color.GREEN)
-	set_slot(1, false, 0, Color.WHITE, true, 0, Color.RED)
+	# Will be configured in _create_content_ui after children are added
+	pass
 
 
 func _create_content_ui() -> void:
 	var variable: String = node_data.data.get("variable", "")
-	var op_raw: Variant = node_data.data.get("operator", DialogueNodeData.ComparisonOperator.EQUAL)
+	var operator_raw: Variant = node_data.data.get("operator", 0)
+	var operator_str: String = BaseDialogueNode.operator_to_string(operator_raw) if operator_raw is int else str(operator_raw)
 	var value: Variant = node_data.data.get("value", "")
 
-	# Handle operator as either enum int or string
-	var op_str: String
-	if op_raw is String:
-		op_str = op_raw
-	else:
-		op_str = _get_operator_string(int(op_raw))
-
-	var condition_text := "%s %s %s" % [variable, op_str, str(value)]
-
+	# Show condition summary
+	var condition_str := "%s %s %s" % [variable, operator_str, str(value)]
 	if variable.is_empty():
-		# Check for expression-based condition
-		var expression: String = node_data.data.get("condition", "")
-		if not expression.is_empty():
-			condition_text = expression
-		else:
-			condition_text = "??? == ???"
+		condition_str = "(no condition)"
+	_add_label(condition_str, Color("#f97316"))
 
-	_add_label(condition_text, Color(0.9, 0.9, 0.7))
+	# TRUE output label
+	_add_output_label("TRUE >", Color.GREEN)
 
-	# TRUE/FALSE output labels
-	var true_label := Label.new()
-	true_label.text = "TRUE →"
-	true_label.add_theme_color_override("font_color", Color.GREEN)
-	true_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_content_container.add_child(true_label)
-
+	# FALSE row as direct child for slot 1
+	var false_row := HBoxContainer.new()
+	false_row.custom_minimum_size = Vector2(180, 20)
 	var false_label := Label.new()
-	false_label.text = "FALSE →"
-	false_label.add_theme_color_override("font_color", Color.RED)
+	false_label.text = "FALSE >"
 	false_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_content_container.add_child(false_label)
+	false_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	false_label.add_theme_color_override("font_color", Color.RED)
+	false_row.add_child(false_label)
+	add_child(false_row)
 
-
-func _get_operator_string(op: int) -> String:
-	match op:
-		DialogueNodeData.ComparisonOperator.EQUAL: return "=="
-		DialogueNodeData.ComparisonOperator.NOT_EQUAL: return "!="
-		DialogueNodeData.ComparisonOperator.GREATER: return ">"
-		DialogueNodeData.ComparisonOperator.LESS: return "<"
-		DialogueNodeData.ComparisonOperator.GREATER_EQUAL: return ">="
-		DialogueNodeData.ComparisonOperator.LESS_EQUAL: return "<="
-		DialogueNodeData.ComparisonOperator.CONTAINS: return "contains"
-		DialogueNodeData.ComparisonOperator.IS_EMPTY: return "is_empty"
-		DialogueNodeData.ComparisonOperator.IS_TRUE: return "is_true"
-		DialogueNodeData.ComparisonOperator.IS_FALSE: return "is_false"
-		_: return "?"
+	# Configure slots AFTER adding all children
+	# Slot 0: _content_container - input left, TRUE output right
+	set_slot(0, true, 0, Color.WHITE, true, 0, Color.GREEN)
+	# Slot 1: false_row - no input, FALSE output right
+	set_slot(1, false, 0, Color.WHITE, true, 0, Color.RED)

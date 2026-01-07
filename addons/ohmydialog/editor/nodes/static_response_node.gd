@@ -14,13 +14,9 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
+	var speaker: String = node_data.data.get("speaker", "")
 	var text: String = node_data.data.get("text", "")
-	if text.is_empty():
-		_add_hint_label("(No text defined)")
-	else:
-		# Truncate long text for display
-		var display_text := text.substr(0, 50)
-		if text.length() > 50:
-			display_text += "..."
-		var label := _add_label(display_text)
-		label.custom_minimum_size.x = 180
+
+	_add_info("Speaker", speaker)
+	_add_separator()
+	_add_text_preview(text, 4)

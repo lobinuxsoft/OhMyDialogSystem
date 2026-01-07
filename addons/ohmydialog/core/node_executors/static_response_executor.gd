@@ -18,7 +18,8 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 		RESULT_NEXT_NODE: "",
 		RESULT_OUTPUT_SLOT: 0,
 		RESULT_TEXT: text,
-		"speaker": speaker
+		"speaker": speaker,
+		RESULT_WAIT_CONFIRM: true  # Wait for user to click Continue
 	}
 
 

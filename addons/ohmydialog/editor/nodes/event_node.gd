@@ -14,8 +14,4 @@ func _configure_slots() -> void:
 
 func _create_content_ui() -> void:
 	var event_name: String = node_data.data.get("event_name", "")
-
-	if event_name.is_empty():
-		_add_hint_label("Event: (undefined)")
-	else:
-		_add_label("Event: %s" % event_name)
+	_add_info("Event", event_name)
