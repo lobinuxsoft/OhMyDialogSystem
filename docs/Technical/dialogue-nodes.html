@@ -24,8 +24,8 @@
       --node-event: #a855f7;
       --node-variable: #06b6d4;
       --node-jump: #22c55e;
-      --node-free: #0ea5e9;
-      --node-return: #34d399;
+      --node-free: #8b5cf6;
+      --node-return: #14b8a6;
     }
 
     /* Node catalog grid */
@@ -43,6 +43,7 @@
       border-radius: 12px;
       overflow: hidden;
       transition: all 0.3s ease;
+      cursor: pointer;
     }
 
     .node-card:hover {
@@ -68,6 +69,26 @@
       border-radius: 0 10px 0 8px;
       letter-spacing: 1px;
       z-index: 10;
+    }
+
+    /* Click indicator */
+    .node-card::after {
+      content: 'Click para detalles';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 1.5rem 0 0.5rem 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .node-card:hover::after {
+      opacity: 1;
     }
 
     /* Node header with color stripe */
@@ -121,8 +142,8 @@
     .node-icon.event { background: rgba(168, 85, 247, 0.15); color: var(--node-event); }
     .node-icon.variable { background: rgba(6, 182, 212, 0.15); color: var(--node-variable); }
     .node-icon.jump { background: rgba(34, 197, 94, 0.15); color: var(--node-jump); }
-    .node-icon.free { background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(168, 85, 247, 0.2)); color: var(--node-free); }
-    .node-icon.return { background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(34, 197, 94, 0.2)); color: var(--node-return); }
+    .node-icon.free { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.2)); color: var(--node-free); }
+    .node-icon.return { background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(34, 197, 94, 0.2)); color: var(--node-return); }
 
     .node-title {
       font-family: var(--font-mono);
@@ -140,6 +161,7 @@
     /* Node body */
     .node-body {
       padding: 1.25rem;
+      position: relative;
     }
 
     .node-description {
@@ -157,7 +179,7 @@
       padding: 0.75rem;
       background: var(--bg-tertiary);
       border-radius: 6px;
-      margin-bottom: 1rem;
+      margin-bottom: 0;
     }
 
     .slot {
@@ -181,172 +203,301 @@
     .slot-dot.output-multi { border-color: var(--node-choice); background: rgba(234, 179, 8, 0.3); }
     .slot-dot.special { border-color: var(--ai-purple); background: rgba(168, 85, 247, 0.3); }
 
-    /* Node properties */
-    .node-props {
-      font-size: 0.8rem;
+    /* ============================================
+       LIGHTBOX SYSTEM
+       ============================================ */
+    .lightbox-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-y: auto;
     }
 
-    .node-props dt {
+    .lightbox-overlay.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 0 60px rgba(0, 212, 255, 0.2);
+      animation: lightbox-in 0.3s ease;
+    }
+
+    @keyframes lightbox-in {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .lightbox-close:hover {
+      background: var(--error);
+      color: white;
+      border-color: var(--error);
+    }
+
+    .lightbox-header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .lightbox-header .node-icon {
+      width: 64px;
+      height: 64px;
+      font-size: 2rem;
+    }
+
+    .lightbox-header .node-title {
+      font-size: 1.5rem;
+    }
+
+    .lightbox-header .node-subtitle {
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .lightbox-body {
+      padding: 2rem;
+    }
+
+    .lightbox-section {
+      margin-bottom: 2rem;
+    }
+
+    .lightbox-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .lightbox-section h3 {
+      font-size: 1rem;
+      color: var(--ai-cyan);
+      margin: 0 0 1rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .lightbox-section h3::before {
+      content: '';
+      width: 4px;
+      height: 1rem;
+      background: var(--ai-cyan);
+      border-radius: 2px;
+    }
+
+    .lightbox-description {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    /* Parameters table in lightbox */
+    .params-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .params-table th {
+      text-align: left;
+      padding: 0.75rem;
+      background: var(--bg-tertiary);
+      color: var(--ai-purple);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px solid var(--ai-purple);
+    }
+
+    .params-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    .params-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .params-table .param-name {
+      font-family: var(--font-mono);
+      color: var(--ai-cyan);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .params-table .param-type {
       font-family: var(--font-mono);
       color: var(--ai-purple);
-      margin-bottom: 0.25rem;
-    }
-
-    .node-props dd {
-      color: var(--text-secondary);
-      margin-bottom: 0.75rem;
-      margin-left: 0;
-      padding-left: 1rem;
-      border-left: 2px solid var(--border-color);
-    }
-
-    /* Flow diagram */
-    .flow-diagram {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 2rem;
-      margin: 2rem 0;
-      overflow-x: auto;
-    }
-
-    .flow-title {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .flow-title h3 {
-      margin: 0;
-      color: var(--ai-cyan);
-    }
-
-    .flow-title p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin: 0.5rem 0 0 0;
-    }
-
-    /* Flow nodes */
-    .flow-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      min-width: 800px;
-    }
-
-    .flow-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      justify-content: flex-start;
-    }
-
-    .flow-row.centered {
-      justify-content: center;
-    }
-
-    .flow-row.indented {
-      margin-left: 3rem;
-    }
-
-    .flow-row.indented-2 {
-      margin-left: 6rem;
-    }
-
-    .flow-node {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-family: var(--font-mono);
-      white-space: nowrap;
-      border: 1px solid;
-      position: relative;
-    }
-
-    .flow-node.start { background: rgba(16, 185, 129, 0.1); border-color: var(--node-start); color: var(--node-start); }
-    .flow-node.end { background: rgba(239, 68, 68, 0.1); border-color: var(--node-end); color: var(--node-end); }
-    .flow-node.ai { background: rgba(59, 130, 246, 0.1); border-color: var(--node-ai); color: var(--node-ai); }
-    .flow-node.static { background: rgba(107, 114, 128, 0.1); border-color: var(--node-static); color: var(--node-static); }
-    .flow-node.choice { background: rgba(234, 179, 8, 0.1); border-color: var(--node-choice); color: var(--node-choice); }
-    .flow-node.condition { background: rgba(249, 115, 22, 0.1); border-color: var(--node-condition); color: var(--node-condition); }
-    .flow-node.event { background: rgba(168, 85, 247, 0.1); border-color: var(--node-event); color: var(--node-event); }
-    .flow-node.variable { background: rgba(6, 182, 212, 0.1); border-color: var(--node-variable); color: var(--node-variable); }
-    .flow-node.jump { background: rgba(34, 197, 94, 0.1); border-color: var(--node-jump); color: var(--node-jump); }
-    .flow-node.free {
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(168, 85, 247, 0.15));
-      border-color: var(--node-free);
-      color: var(--node-free);
-      box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
-    }
-    .flow-node.return {
-      background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(34, 197, 94, 0.15));
-      border-color: var(--node-return);
-      color: var(--node-return);
-    }
-
-    .flow-arrow {
-      color: var(--text-muted);
-      font-size: 1.2rem;
-    }
-
-    .flow-branch {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: rgba(234, 179, 8, 0.05);
-      border: 1px dashed var(--node-choice);
-      border-radius: 8px;
-    }
-
-    .flow-branch-option {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
       font-size: 0.75rem;
+      background: rgba(168, 85, 247, 0.1);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .params-table .param-required {
+      color: var(--error);
+      font-size: 0.65rem;
+      font-weight: bold;
+      margin-left: 0.5rem;
+    }
+
+    .params-table .param-optional {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      margin-left: 0.5rem;
+    }
+
+    .params-table .param-desc {
       color: var(--text-secondary);
     }
 
-    .flow-branch-option::before {
-      content: '○';
-      color: var(--node-choice);
+    .params-table .param-default {
+      font-family: var(--font-mono);
+      color: var(--ai-green);
+      font-size: 0.75rem;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
     }
 
-    /* Free mode box */
-    .flow-free-mode {
-      padding: 1.5rem;
-      background: linear-gradient(135deg, rgba(14, 165, 233, 0.05), rgba(168, 85, 247, 0.05));
-      border: 2px dashed var(--ai-cyan);
-      border-radius: 12px;
-      text-align: center;
-      margin: 1rem 0;
-    }
-
-    .flow-free-mode h4 {
-      margin: 0 0 0.5rem 0;
-      color: var(--ai-cyan);
-      font-size: 0.9rem;
-    }
-
-    .flow-free-mode .chat-line {
+    /* Enum values list */
+    .enum-values {
       display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .enum-value {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-secondary);
+    }
+
+    /* Slots visualization in lightbox */
+    .lightbox-slots {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 1.5rem;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      gap: 2rem;
+    }
+
+    .lightbox-slot {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.8rem;
-      padding: 0.25rem 0;
     }
 
-    .flow-free-mode .chat-line.player { color: var(--ai-green); }
-    .flow-free-mode .chat-line.npc { color: var(--ai-purple); }
-    .flow-free-mode .chat-line.detect {
-      color: var(--ai-orange);
-      font-style: italic;
-      margin-top: 0.5rem;
-      padding-top: 0.5rem;
-      border-top: 1px dashed var(--border-color);
+    .lightbox-slot .slot-indicator {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 3px solid;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .lightbox-slot .slot-indicator.input {
+      border-color: var(--ai-green);
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--ai-green);
+    }
+
+    .lightbox-slot .slot-indicator.output {
+      border-color: var(--ai-cyan);
+      background: rgba(0, 212, 255, 0.2);
+      color: var(--ai-cyan);
+    }
+
+    .lightbox-slot .slot-indicator.output-true {
+      border-color: var(--ai-green);
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--ai-green);
+    }
+
+    .lightbox-slot .slot-indicator.output-false {
+      border-color: var(--error);
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--error);
+    }
+
+    .lightbox-slot .slot-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Validation callout */
+    .validation-note {
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-left: 4px solid var(--error);
+      padding: 0.75rem 1rem;
+      border-radius: 0 6px 6px 0;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .validation-note strong {
+      color: var(--error);
     }
 
     /* Legend */
@@ -382,8 +533,8 @@
     .legend-color.event { background: var(--node-event); }
     .legend-color.variable { background: var(--node-variable); }
     .legend-color.jump { background: var(--node-jump); }
-    .legend-color.free { background: linear-gradient(135deg, var(--node-free), var(--ai-purple)); }
-    .legend-color.return { background: linear-gradient(135deg, var(--node-return), var(--node-jump)); }
+    .legend-color.free { background: var(--node-free); }
+    .legend-color.return { background: var(--node-return); }
 
     /* Modes section */
     .modes-grid {
@@ -430,6 +581,136 @@
       color: var(--text-muted);
       font-style: italic;
     }
+
+    /* Flow diagram */
+    .flow-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+
+    .flow-title {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .flow-title h3 {
+      margin: 0;
+      color: var(--ai-cyan);
+    }
+
+    .flow-title p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0.5rem 0 0 0;
+    }
+
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 800px;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: flex-start;
+    }
+
+    .flow-row.centered {
+      justify-content: center;
+    }
+
+    .flow-node {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      white-space: nowrap;
+      border: 1px solid;
+    }
+
+    .flow-node.start { background: rgba(16, 185, 129, 0.1); border-color: var(--node-start); color: var(--node-start); }
+    .flow-node.end { background: rgba(239, 68, 68, 0.1); border-color: var(--node-end); color: var(--node-end); }
+    .flow-node.ai { background: rgba(59, 130, 246, 0.1); border-color: var(--node-ai); color: var(--node-ai); }
+    .flow-node.static { background: rgba(107, 114, 128, 0.1); border-color: var(--node-static); color: var(--node-static); }
+    .flow-node.choice { background: rgba(234, 179, 8, 0.1); border-color: var(--node-choice); color: var(--node-choice); }
+    .flow-node.condition { background: rgba(249, 115, 22, 0.1); border-color: var(--node-condition); color: var(--node-condition); }
+    .flow-node.event { background: rgba(168, 85, 247, 0.1); border-color: var(--node-event); color: var(--node-event); }
+    .flow-node.variable { background: rgba(6, 182, 212, 0.1); border-color: var(--node-variable); color: var(--node-variable); }
+    .flow-node.jump { background: rgba(34, 197, 94, 0.1); border-color: var(--node-jump); color: var(--node-jump); }
+    .flow-node.free { background: rgba(139, 92, 246, 0.1); border-color: var(--node-free); color: var(--node-free); }
+    .flow-node.return { background: rgba(20, 184, 166, 0.1); border-color: var(--node-return); color: var(--node-return); }
+
+    .flow-arrow {
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+
+    .flow-branch {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: rgba(234, 179, 8, 0.05);
+      border: 1px dashed var(--node-choice);
+      border-radius: 8px;
+    }
+
+    .flow-branch-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .flow-branch-option::before {
+      content: '\2192';
+      color: var(--node-choice);
+    }
+
+    .flow-free-mode {
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(168, 85, 247, 0.05));
+      border: 2px dashed var(--node-free);
+      border-radius: 12px;
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    .flow-free-mode h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--node-free);
+      font-size: 0.9rem;
+    }
+
+    .flow-free-mode .chat-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      padding: 0.25rem 0;
+      justify-content: center;
+    }
+
+    .flow-free-mode .chat-line.player { color: var(--ai-green); }
+    .flow-free-mode .chat-line.npc { color: var(--ai-purple); }
+    .flow-free-mode .chat-line.detect {
+      color: var(--ai-orange);
+      font-style: italic;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border-color);
+    }
   </style>
 </head>
 <body>
@@ -446,69 +727,69 @@
       <div class="nav-section">
         <div class="nav-section-title">General</div>
         <ul class="nav-links">
-          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
+          <li><a href="../index.html"><span class="icon">&#x1F3E0;</span> Home</a></li>
         </ul>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">Getting Started</div>
         <ul class="nav-links">
-          <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
-          <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
-          <li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
+          <li><a href="../Guides/quickstart.html"><span class="icon">&#x1F680;</span> Quick Start</a></li>
+          <li><a href="../Guides/installation.html"><span class="icon">&#x1F4E6;</span> Installation</a></li>
+          <li><a href="../Guides/first-npc.html"><span class="icon">&#x1F3AE;</span> Your First NPC</a></li>
         </ul>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">API Reference</div>
         <ul class="nav-links">
-          <li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li>
-          <li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
-          <li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
-          <li><a href="../API/memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
-          <li><a href="../API/tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
-          <li><a href="../API/resources.html"><span class="icon">📄</span> Resources</a></li>
+          <li><a href="../API/index.html"><span class="icon">&#x1F4DA;</span> Overview</a></li>
+          <li><a href="../API/llama-interface.html"><span class="icon">&#x1F999;</span> LlamaInterface</a></li>
+          <li><a href="../API/dialogue-manager.html"><span class="icon">&#x1F4AC;</span> DialogueManager</a></li>
+          <li><a href="../API/memory-manager.html"><span class="icon">&#x1F9E0;</span> MemoryManager</a></li>
+          <li><a href="../API/tts-manager.html"><span class="icon">&#x1F50A;</span> TTSManager</a></li>
+          <li><a href="../API/resources.html"><span class="icon">&#x1F4C4;</span> Resources</a></li>
         </ul>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">Technical</div>
         <ul class="nav-links">
-          <li><a href="index.html"><span class="icon">⚙️</span> Overview</a></li>
-          <li><a href="architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
-          <li><a href="dialogue-nodes.html" class="active"><span class="icon">🔷</span> Dialogue Nodes</a></li>
-          <li><a href="gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
-          <li><a href="memory-system.html"><span class="icon">💾</span> Memory System</a></li>
-          <li><a href="localization.html"><span class="icon">🌐</span> Localization</a></li>
+          <li><a href="index.html"><span class="icon">&#x2699;&#xFE0F;</span> Overview</a></li>
+          <li><a href="architecture.html"><span class="icon">&#x1F3D7;&#xFE0F;</span> Architecture</a></li>
+          <li><a href="dialogue-nodes.html" class="active"><span class="icon">&#x1F537;</span> Dialogue Nodes</a></li>
+          <li><a href="gdextension.html"><span class="icon">&#x1F527;</span> GDExtension Build</a></li>
+          <li><a href="memory-system.html"><span class="icon">&#x1F4BE;</span> Memory System</a></li>
+          <li><a href="localization.html"><span class="icon">&#x1F310;</span> Localization</a></li>
         </ul>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">Guides</div>
         <ul class="nav-links">
-          <li><a href="../Guides/index.html"><span class="icon">📖</span> Overview</a></li>
-          <li><a href="../Guides/visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
-          <li><a href="../Guides/character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
-          <li><a href="../Guides/tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
-          <li><a href="../Guides/csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
+          <li><a href="../Guides/index.html"><span class="icon">&#x1F4D6;</span> Overview</a></li>
+          <li><a href="../Guides/visual-editor.html"><span class="icon">&#x1F3A8;</span> Visual Editor</a></li>
+          <li><a href="../Guides/character-identity.html"><span class="icon">&#x1F464;</span> Character Identity</a></li>
+          <li><a href="../Guides/tts-setup.html"><span class="icon">&#x1F3A4;</span> TTS Setup</a></li>
+          <li><a href="../Guides/csharp-bindings.html"><span class="icon">&#x1F537;</span> C# Bindings</a></li>
         </ul>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">Examples</div>
         <ul class="nav-links">
-          <li><a href="../Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
-          <li><a href="../Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
-          <li><a href="../Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
+          <li><a href="../Guides/example-basic-npc.html"><span class="icon">&#x1F916;</span> Basic NPC</a></li>
+          <li><a href="../Guides/example-branching.html"><span class="icon">&#x1F333;</span> Branching Dialogue</a></li>
+          <li><a href="../Guides/example-merchant.html"><span class="icon">&#x1F6D2;</span> Dynamic Merchant</a></li>
         </ul>
       </div>
 
       <div class="nav-section">
         <div class="nav-section-title">External Links</div>
         <ul class="nav-links">
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
-          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li>
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">&#x1F517;</span> GitHub Repository</a></li>
+          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">&#x1F4CB;</span> Project Board</a></li>
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">&#x1F41B;</span> Issues</a></li>
         </ul>
       </div>
     </nav>
@@ -523,7 +804,7 @@
       <p>OhMyDialogSystem utiliza un sistema de nodos visuales para construir grafos de dialogo. A diferencia de otras herramientas, nuestro sistema es <strong>hibrido</strong>: combina estructura de grafos con generacion dinamica por IA.</p>
 
       <div class="callout-info">
-        <p><strong>Diferenciador clave:</strong> La IA genera el CONTENIDO, el grafo controla la ESTRUCTURA.</p>
+        <p><strong>Diferenciador clave:</strong> La IA genera el CONTENIDO, el grafo controla la ESTRUCTURA. Haz click en cualquier nodo para ver sus parametros detallados.</p>
       </div>
 
       <hr>
@@ -570,9 +851,9 @@
 
       <div class="node-catalog">
         <!-- StartNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('start')">
           <div class="node-header start">
-            <div class="node-icon start">▶</div>
+            <div class="node-icon start">&#x25B6;</div>
             <div>
               <div class="node-title">StartNode</div>
               <div class="node-subtitle">Punto de entrada</div>
@@ -583,38 +864,30 @@
             <div class="node-slots">
               <span class="slot"><span class="slot-dot output"></span> OUT</span>
             </div>
-            <dl class="node-props">
-              <dt>trigger</dt>
-              <dd>Evento que activa este dialogo (ej: "talk_to_herrero")</dd>
-            </dl>
           </div>
         </div>
 
         <!-- EndNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('end')">
           <div class="node-header end">
-            <div class="node-icon end">■</div>
+            <div class="node-icon end">&#x25A0;</div>
             <div>
               <div class="node-title">EndNode</div>
               <div class="node-subtitle">Termina dialogo</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description">Finaliza la ejecucion del grafo. Puede indicar el resultado del dialogo.</p>
+            <p class="node-description">Finaliza la ejecucion del grafo. Puede indicar una razon para analytics.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
             </div>
-            <dl class="node-props">
-              <dt>end_type</dt>
-              <dd>"normal" | "success" | "fail"</dd>
-            </dl>
           </div>
         </div>
 
         <!-- AIResponseNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('ai')">
           <div class="node-header ai">
-            <div class="node-icon ai">🧠</div>
+            <div class="node-icon ai">&#x1F9E0;</div>
             <div>
               <div class="node-title">AIResponseNode</div>
               <div class="node-subtitle">IA genera respuesta</div>
@@ -626,126 +899,84 @@
               <span class="slot"><span class="slot-dot input"></span> IN</span>
               <span class="slot"><span class="slot-dot output"></span> OUT</span>
             </div>
-            <dl class="node-props">
-              <dt>character</dt>
-              <dd>CharacterIdentity (opcional, usa default del grafo)</dd>
-              <dt>prompt_template</dt>
-              <dd>Instruccion para la IA (ej: "Saluda al jugador")</dd>
-              <dt>emotion_hint</dt>
-              <dd>Emocion sugerida: "happy", "angry", "sad"...</dd>
-              <dt>temperature</dt>
-              <dd>Control de creatividad (0.0 - 1.0)</dd>
-            </dl>
           </div>
         </div>
 
         <!-- StaticResponseNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('static')">
           <div class="node-header static">
-            <div class="node-icon static">💬</div>
+            <div class="node-icon static">&#x1F4AC;</div>
             <div>
               <div class="node-title">StaticResponseNode</div>
               <div class="node-subtitle">Texto pre-escrito</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description">Muestra texto fijo, sin generacion de IA. Util para lineas importantes o cutscenes.</p>
+            <p class="node-description">Muestra texto fijo, sin generacion de IA. Soporta sustitucion de variables.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
               <span class="slot"><span class="slot-dot output"></span> OUT</span>
             </div>
-            <dl class="node-props">
-              <dt>speaker</dt>
-              <dd>Nombre del hablante</dd>
-              <dt>text</dt>
-              <dd>Texto a mostrar</dd>
-              <dt>text_variants</dt>
-              <dd>Variantes aleatorias (opcional)</dd>
-            </dl>
           </div>
         </div>
 
         <!-- PlayerChoiceNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('choice')">
           <div class="node-header choice">
-            <div class="node-icon choice">☰</div>
+            <div class="node-icon choice">&#x2630;</div>
             <div>
               <div class="node-title">PlayerChoiceNode</div>
               <div class="node-subtitle">Opciones del jugador</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description">Presenta opciones al jugador. Cada opcion puede tener condiciones y lleva a diferentes caminos.</p>
+            <p class="node-description">Presenta opciones al jugador. Cada opcion puede tener condiciones de visibilidad.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
               <span class="slot"><span class="slot-dot output-multi"></span> OUT x N</span>
             </div>
-            <dl class="node-props">
-              <dt>choices</dt>
-              <dd>Array de opciones con texto y condiciones</dd>
-              <dt>generate_with_ai</dt>
-              <dd>Si true, la IA genera las opciones</dd>
-              <dt>choice_count</dt>
-              <dd>Cantidad de opciones a generar (si usa IA)</dd>
-            </dl>
           </div>
         </div>
 
         <!-- ConditionNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('condition')">
           <div class="node-header condition">
-            <div class="node-icon condition">◇</div>
+            <div class="node-icon condition">&#x25C7;</div>
             <div>
               <div class="node-title">ConditionNode</div>
               <div class="node-subtitle">Bifurcacion logica</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description">Evalua una condicion y bifurca el flujo. Soporta expresiones GDScript.</p>
+            <p class="node-description">Evalua una condicion y bifurca el flujo. Soporta 10 operadores de comparacion.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
-              <span class="slot" style="color: var(--ai-green)">TRUE →</span>
-              <span class="slot" style="color: var(--error)">FALSE →</span>
+              <span class="slot" style="color: var(--ai-green)">TRUE &#x2192;</span>
+              <span class="slot" style="color: var(--error)">FALSE &#x2192;</span>
             </div>
-            <dl class="node-props">
-              <dt>expression</dt>
-              <dd>Expresion a evaluar (ej: "gold >= 100")</dd>
-              <dt>variable_name</dt>
-              <dd>Variable a comparar</dd>
-              <dt>operator</dt>
-              <dd>"==" | "!=" | ">" | "<" | ">=" | "<="</dd>
-            </dl>
           </div>
         </div>
 
         <!-- EventNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('event')">
           <div class="node-header event">
-            <div class="node-icon event">⚡</div>
+            <div class="node-icon event">&#x26A1;</div>
             <div>
               <div class="node-title">EventNode</div>
               <div class="node-subtitle">Emite senales</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description">Dispara un evento/signal que el juego puede escuchar. Ideal para activar misiones, dar items, etc.</p>
+            <p class="node-description">Dispara un evento/signal que el juego puede escuchar para activar misiones, items, etc.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
               <span class="slot"><span class="slot-dot output"></span> OUT</span>
             </div>
-            <dl class="node-props">
-              <dt>event_name</dt>
-              <dd>Nombre del evento (ej: "quest_started")</dd>
-              <dt>event_data</dt>
-              <dd>Diccionario con datos adicionales</dd>
-              <dt>wait_for_completion</dt>
-              <dd>Si espera confirmacion antes de continuar</dd>
-            </dl>
           </div>
         </div>
 
         <!-- SetVariableNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('variable')">
           <div class="node-header variable">
             <div class="node-icon variable">X=</div>
             <div>
@@ -754,101 +985,64 @@
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description">Modifica variables del juego. Soporta diferentes scopes y operaciones.</p>
+            <p class="node-description">Modifica variables del contexto. Soporta 6 operaciones diferentes.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
               <span class="slot"><span class="slot-dot output"></span> OUT</span>
             </div>
-            <dl class="node-props">
-              <dt>variable_name</dt>
-              <dd>Nombre de la variable</dd>
-              <dt>operation</dt>
-              <dd>"set" | "add" | "subtract" | "toggle"</dd>
-              <dt>value</dt>
-              <dd>Valor a asignar/operar</dd>
-              <dt>scope</dt>
-              <dd>"local" | "global" | "character"</dd>
-            </dl>
           </div>
         </div>
 
         <!-- JumpNode -->
-        <div class="node-card">
+        <div class="node-card" onclick="openLightbox('jump')">
           <div class="node-header jump">
-            <div class="node-icon jump">↪</div>
+            <div class="node-icon jump">&#x21AA;</div>
             <div>
               <div class="node-title">JumpNode</div>
               <div class="node-subtitle">Salta a otro grafo</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description">Salta a otro DialogueGraph, permitiendo modularizar dialogos complejos.</p>
+            <p class="node-description">Salta a otro DialogueGraph o a un nodo especifico, permitiendo modularizar dialogos.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
               <span class="slot"><span class="slot-dot special"></span> JUMP</span>
             </div>
-            <dl class="node-props">
-              <dt>target_graph</dt>
-              <dd>DialogueGraph destino (.tres)</dd>
-              <dt>target_node_id</dt>
-              <dd>Nodo especifico (opcional, default: start)</dd>
-              <dt>pass_context</dt>
-              <dd>Mantener variables locales</dd>
-            </dl>
           </div>
         </div>
 
-        <!-- JumpToFreeNode - NUEVO -->
-        <div class="node-card new-concept">
+        <!-- JumpToFreeNode -->
+        <div class="node-card new-concept" onclick="openLightbox('free')">
           <div class="node-header free">
-            <div class="node-icon free">∞</div>
+            <div class="node-icon free">&#x221E;</div>
             <div>
               <div class="node-title">JumpToFreeNode</div>
               <div class="node-subtitle">Entra a modo libre</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description"><strong>Concepto unico de OhMyDialogSystem.</strong> Escapa del grafo a conversacion libre con IA, con condiciones configurables para volver.</p>
+            <p class="node-description"><strong>Concepto unico.</strong> Escapa del grafo a conversacion libre con IA, con condiciones para volver.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
-              <span class="slot"><span class="slot-dot special"></span> → FREE MODE</span>
+              <span class="slot"><span class="slot-dot special"></span> &#x2192; FREE</span>
             </div>
-            <dl class="node-props">
-              <dt>return_conditions</dt>
-              <dd>Condiciones que disparan el retorno al grafo</dd>
-              <dt>max_exchanges</dt>
-              <dd>Limite de intercambios (-1 = ilimitado)</dd>
-              <dt>timeout_seconds</dt>
-              <dd>Timeout para forzar retorno (0 = sin limite)</dd>
-              <dt>on_return_node_id</dt>
-              <dd>Nodo al que volver cuando se active el retorno</dd>
-            </dl>
           </div>
         </div>
 
-        <!-- ReturnToGraphNode - NUEVO -->
-        <div class="node-card new-concept">
+        <!-- ReturnToGraphNode -->
+        <div class="node-card new-concept" onclick="openLightbox('return')">
           <div class="node-header return">
-            <div class="node-icon return">↩</div>
+            <div class="node-icon return">&#x21A9;</div>
             <div>
               <div class="node-title">ReturnToGraphNode</div>
               <div class="node-subtitle">Vuelve al grafo</div>
             </div>
           </div>
           <div class="node-body">
-            <p class="node-description"><strong>Complemento de JumpToFree.</strong> Define como detectar cuando volver al grafo desde modo libre.</p>
+            <p class="node-description"><strong>Complemento de JumpToFree.</strong> Sale del modo conversacion libre y retorna al grafo.</p>
             <div class="node-slots">
               <span class="slot"><span class="slot-dot input"></span> IN</span>
-              <span class="slot"><span class="slot-dot output"></span> OUT</span>
             </div>
-            <dl class="node-props">
-              <dt>trigger_keywords</dt>
-              <dd>Palabras que activan retorno (ej: ["acepto", "si"])</dd>
-              <dt>trigger_intent</dt>
-              <dd>Intencion detectada por IA (ej: "accept_quest")</dd>
-              <dt>use_ai_detection</dt>
-              <dd>Usar IA para detectar intencion vs solo keywords</dd>
-            </dl>
           </div>
         </div>
       </div>
@@ -866,72 +1060,65 @@
         </div>
 
         <div class="flow-container">
-          <!-- Row 1: Start -> AI Saludo -> JumpToFree -->
           <div class="flow-row">
-            <div class="flow-node start">▶ START</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-node ai">🧠 AI: Saludo</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-node free">∞ JumpToFree</div>
+            <div class="flow-node start">&#x25B6; START</div>
+            <span class="flow-arrow">&#x2192;</span>
+            <div class="flow-node ai">&#x1F9E0; AI: Saludo</div>
+            <span class="flow-arrow">&#x2192;</span>
+            <div class="flow-node free">&#x221E; JumpToFree</div>
           </div>
 
-          <!-- Free mode box -->
           <div class="flow-row centered">
             <div class="flow-free-mode">
               <h4>MODO FREE - Conversacion Abierta</h4>
-              <div class="chat-line player">👤 Jugador: "Hola, buen dia"</div>
-              <div class="chat-line npc">🧙 NPC: "Bienvenido a mi herreria, viajero"</div>
-              <div class="chat-line player">👤 Jugador: "Tienes algun trabajo para mi?"</div>
-              <div class="chat-line detect">⚡ Detecta keyword: "trabajo" → Activa retorno</div>
+              <div class="chat-line player">&#x1F464; Jugador: "Hola, buen dia"</div>
+              <div class="chat-line npc">&#x1F9D9; NPC: "Bienvenido a mi herreria, viajero"</div>
+              <div class="chat-line player">&#x1F464; Jugador: "Tienes algun trabajo para mi?"</div>
+              <div class="chat-line detect">&#x26A1; Detecta keyword: "trabajo" &#x2192; Activa retorno</div>
             </div>
           </div>
 
-          <!-- Return node -->
           <div class="flow-row centered">
-            <div class="flow-node return">↩ ReturnToGraph</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-node ai">🧠 AI: Ofrecer mision</div>
+            <div class="flow-node return">&#x21A9; ReturnToGraph</div>
+            <span class="flow-arrow">&#x2192;</span>
+            <div class="flow-node ai">&#x1F9E0; AI: Ofrecer mision</div>
           </div>
 
-          <!-- Player choice -->
           <div class="flow-row centered">
-            <span class="flow-arrow">↓</span>
+            <span class="flow-arrow">&#x2193;</span>
           </div>
 
           <div class="flow-row centered">
             <div class="flow-branch">
-              <div style="text-align: center; margin-bottom: 0.5rem; color: var(--node-choice); font-weight: bold;">☰ PlayerChoice</div>
-              <div class="flow-branch-option">"Acepto la mision" → Ruta A</div>
-              <div class="flow-branch-option">"No me interesa" → Ruta B</div>
-              <div class="flow-branch-option">"Cuanto pagan?" → Ruta C</div>
+              <div style="text-align: center; margin-bottom: 0.5rem; color: var(--node-choice); font-weight: bold;">&#x2630; PlayerChoice</div>
+              <div class="flow-branch-option">"Acepto la mision" &#x2192; Ruta A</div>
+              <div class="flow-branch-option">"No me interesa" &#x2192; Ruta B</div>
+              <div class="flow-branch-option">"Cuanto pagan?" &#x2192; Ruta C</div>
             </div>
           </div>
 
-          <!-- Branch A: Accept -->
           <div class="flow-row">
             <div style="color: var(--text-muted); font-size: 0.8rem; width: 100px;">Ruta A:</div>
-            <div class="flow-node event">⚡ quest_started</div>
-            <span class="flow-arrow">→</span>
+            <div class="flow-node event">&#x26A1; quest_started</div>
+            <span class="flow-arrow">&#x2192;</span>
             <div class="flow-node variable">X= quest_status="active"</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-node ai">🧠 AI: Despedida</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-node end">■ END (success)</div>
+            <span class="flow-arrow">&#x2192;</span>
+            <div class="flow-node ai">&#x1F9E0; AI: Despedida</div>
+            <span class="flow-arrow">&#x2192;</span>
+            <div class="flow-node end">&#x25A0; END</div>
           </div>
 
-          <!-- Branch B: Reject -->
           <div class="flow-row">
             <div style="color: var(--text-muted); font-size: 0.8rem; width: 100px;">Ruta B:</div>
-            <div class="flow-node static">💬 "Hasta luego"</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-node end">■ END (normal)</div>
+            <div class="flow-node static">&#x1F4AC; "Hasta luego"</div>
+            <span class="flow-arrow">&#x2192;</span>
+            <div class="flow-node end">&#x25A0; END</div>
           </div>
 
-          <!-- Branch C: Ask price (loops back) -->
           <div class="flow-row">
             <div style="color: var(--text-muted); font-size: 0.8rem; width: 100px;">Ruta C:</div>
-            <div class="flow-node ai">🧠 AI: Explicar recompensa</div>
-            <span class="flow-arrow">→</span>
+            <div class="flow-node ai">&#x1F9E0; AI: Explicar recompensa</div>
+            <span class="flow-arrow">&#x2192;</span>
             <span style="color: var(--text-muted); font-size: 0.8rem;">(vuelve a PlayerChoice)</span>
           </div>
         </div>
@@ -940,8 +1127,6 @@
       <hr>
 
       <h2>Lo Que Nos Diferencia</h2>
-
-      <p>Comparacion con otras herramientas de dialogo para Godot:</p>
 
       <table>
         <thead>
@@ -955,40 +1140,40 @@
         <tbody>
           <tr>
             <td>Editor visual</td>
-            <td>✓</td>
-            <td>✗</td>
-            <td>✓</td>
+            <td>&#x2713;</td>
+            <td>&#x2717;</td>
+            <td>&#x2713;</td>
           </tr>
           <tr>
             <td>Generacion IA</td>
-            <td>✗</td>
-            <td>✗</td>
-            <td>✓</td>
+            <td>&#x2717;</td>
+            <td>&#x2717;</td>
+            <td>&#x2713;</td>
           </tr>
           <tr>
             <td>Modo libre + grafos</td>
-            <td>✗</td>
-            <td>✗</td>
-            <td>✓</td>
+            <td>&#x2717;</td>
+            <td>&#x2717;</td>
+            <td>&#x2713;</td>
           </tr>
           <tr>
             <td>Transiciones fluidas</td>
-            <td>✗</td>
-            <td>✗</td>
-            <td>✓</td>
+            <td>&#x2717;</td>
+            <td>&#x2717;</td>
+            <td>&#x2713;</td>
           </tr>
           <tr>
-            <td>Opciones generadas por IA</td>
-            <td>✗</td>
-            <td>✗</td>
-            <td>✓</td>
+            <td>Memorias persistentes</td>
+            <td>&#x2717;</td>
+            <td>&#x2717;</td>
+            <td>&#x2713;</td>
           </tr>
         </tbody>
       </table>
 
       <hr>
 
-      <a href="index.html">← Volver a Technical</a>
+      <a href="index.html">&#x2190; Volver a Technical</a>
 
       <footer class="wiki-footer">
         <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
@@ -996,6 +1181,913 @@
     </main>
   </div>
 
+  <!-- ============================================
+       LIGHTBOX OVERLAYS
+       ============================================ -->
+
+  <!-- START Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-start">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('start')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon start" style="width:64px;height:64px;font-size:2rem;">&#x25B6;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">StartNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Punto de entrada del grafo</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>StartNode</strong> marca el punto de entrada unico del grafo de dialogo. Cada DialogueGraph debe tener exactamente un StartNode. Cuando se inicia un dialogo, la ejecucion comienza desde este nodo y continua al nodo conectado a su salida.
+          </p>
+          <p class="lightbox-description">
+            Opcionalmente, puede configurarse un <code>trigger</code> que permite iniciar este dialogo automaticamente cuando ocurre un evento especifico en el juego.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator output">&#x2192;</div>
+              <div class="slot-label">1 Salida</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">trigger</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Nombre del evento que activa este dialogo automaticamente. Ejemplo: <code>"talk_to_merchant"</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- END Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-end">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('end')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon end" style="width:64px;height:64px;font-size:2rem;">&#x25A0;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">EndNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Termina la ejecucion del dialogo</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>EndNode</strong> finaliza completamente la ejecucion del grafo de dialogo. No tiene salidas, ya que es un nodo terminal. Puede haber multiples EndNodes en un grafo para representar diferentes finales o caminos de salida.
+          </p>
+          <p class="lightbox-description">
+            El parametro <code>reason</code> es opcional y se usa para analytics o para distinguir entre diferentes tipos de finalizacion del dialogo.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">reason</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Etiqueta para identificar el tipo de finalizacion. Ejemplos: <code>"good_ending"</code>, <code>"bad_ending"</code>, <code>"abort"</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Response Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-ai">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('ai')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon ai" style="width:64px;height:64px;font-size:2rem;">&#x1F9E0;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">AIResponseNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Genera respuestas dinamicas con IA</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>AIResponseNode</strong> genera texto dinamicamente usando el LLM local (llama.cpp). Utiliza el CharacterIdentity configurado para mantener la personalidad del NPC, el WorldContext para informacion del mundo, y las memorias persistentes para continuidad narrativa.
+          </p>
+          <p class="lightbox-description">
+            Este nodo marca <code>requires_inference: true</code> en su resultado, indicando al GraphRunner que debe esperar la generacion de la IA antes de continuar.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output">&#x2192;</div>
+              <div class="slot-label">1 Salida</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">character_id</span><span class="param-required">requerido</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Ruta al recurso CharacterIdentity. Ejemplo: <code>"res://characters/merchant.tres"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">prompt_template</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Template con instrucciones para la IA. Soporta variables con <code>{nombre}</code>. Ejemplo: <code>"Saluda al jugador y menciona {item}"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">emotion_hint</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Sugerencia de emocion para la respuesta. Se usa para animaciones y TTS.
+                  <div class="enum-values">
+                    <span class="enum-value">neutral</span>
+                    <span class="enum-value">happy</span>
+                    <span class="enum-value">sad</span>
+                    <span class="enum-value">angry</span>
+                    <span class="enum-value">surprised</span>
+                    <span class="enum-value">confused</span>
+                    <span class="enum-value">scared</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="param-name">max_tokens</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">int</span></td>
+                <td class="param-desc">Longitud maxima de la respuesta generada. <span class="param-default">Default: 256</span></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">temperature</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">float</span></td>
+                <td class="param-desc">Control de creatividad/aleatoriedad (0.0 = determinista, 1.0 = muy creativo). <span class="param-default">Default: 0.7</span></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">system_prompt_override</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Override completo del system prompt. Si se especifica, reemplaza el prompt construido automaticamente.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lightbox-section">
+          <div class="validation-note">
+            <strong>Validacion:</strong> Requiere <code>character_id</code> no vacio.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Static Response Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-static">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('static')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon static" style="width:64px;height:64px;font-size:2rem;">&#x1F4AC;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">StaticResponseNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Texto pre-escrito fijo</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>StaticResponseNode</strong> muestra texto pre-escrito sin generacion de IA. Es ideal para lineas de dialogo importantes que deben ser exactas, cutscenes, tutoriales, o cuando no se requiere variabilidad.
+          </p>
+          <p class="lightbox-description">
+            Soporta sustitucion simple de variables usando la sintaxis <code>{variable_name}</code>. Por ejemplo: <code>"Hola {player_name}, bienvenido a {town_name}."</code>
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output">&#x2192;</div>
+              <div class="slot-label">1 Salida</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">speaker</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Nombre del personaje que habla. Se muestra en la UI del dialogo.</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">text</span><span class="param-required">requerido</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">El texto del dialogo a mostrar. Soporta variables con <code>{nombre}</code>.</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">emotion</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Etiqueta de emocion para animaciones y TTS.
+                  <div class="enum-values">
+                    <span class="enum-value">neutral</span>
+                    <span class="enum-value">happy</span>
+                    <span class="enum-value">sad</span>
+                    <span class="enum-value">angry</span>
+                    <span class="enum-value">surprised</span>
+                    <span class="enum-value">confused</span>
+                    <span class="enum-value">scared</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lightbox-section">
+          <div class="validation-note">
+            <strong>Validacion:</strong> Requiere <code>text</code> no vacio.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Choice Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-choice">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('choice')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon choice" style="width:64px;height:64px;font-size:2rem;">&#x2630;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">PlayerChoiceNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Presenta opciones al jugador</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>PlayerChoiceNode</strong> presenta un conjunto de opciones al jugador y espera su seleccion. Cada opcion puede tener una condicion de visibilidad que determina si se muestra o no basandose en el estado del juego.
+          </p>
+          <p class="lightbox-description">
+            El nodo tiene una salida por cada opcion definida. Cuando el jugador selecciona una opcion, el flujo continua por la salida correspondiente (slot 0 para primera opcion, slot 1 para segunda, etc.).
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output" style="border-color: var(--node-choice); background: rgba(234, 179, 8, 0.2);">N</div>
+              <div class="slot-label">N Salidas (una por opcion)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">prompt</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Pregunta o contexto mostrado antes de las opciones. Ejemplo: <code>"Que deseas hacer?"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">choices</span><span class="param-required">requerido</span></td>
+                <td><span class="param-type">Array[Dictionary]</span></td>
+                <td class="param-desc">Array de opciones. Cada opcion tiene:
+                  <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <li><code>text</code>: Texto visible de la opcion</li>
+                    <li><code>condition</code>: Expresion que controla visibilidad (opcional)</li>
+                    <li><code>metadata</code>: Datos adicionales (opcional)</li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lightbox-section">
+          <div class="validation-note">
+            <strong>Validacion:</strong> Requiere al menos 1 opcion en <code>choices</code>.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Condition Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-condition">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('condition')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon condition" style="width:64px;height:64px;font-size:2rem;">&#x25C7;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">ConditionNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Bifurcacion logica condicional</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>ConditionNode</strong> evalua una condicion y bifurca el flujo del dialogo. Tiene dos salidas: TRUE (slot 0) y FALSE (slot 1). Soporta dos modos de operacion: comparacion simple (variable + operador + valor) o expresion GDScript completa.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output-true">&#x2713;</div>
+              <div class="slot-label">TRUE (slot 0)</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output-false">&#x2717;</div>
+              <div class="slot-label">FALSE (slot 1)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">variable</span><span class="param-optional">opcional*</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Nombre de la variable a comparar. Ejemplo: <code>"player_gold"</code>, <code>"quest_completed"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">operator</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">int (enum)</span></td>
+                <td class="param-desc">Operador de comparacion:
+                  <div class="enum-values">
+                    <span class="enum-value">== (EQUAL)</span>
+                    <span class="enum-value">!= (NOT_EQUAL)</span>
+                    <span class="enum-value">&gt; (GREATER)</span>
+                    <span class="enum-value">&gt;= (GREATER_EQUAL)</span>
+                    <span class="enum-value">&lt; (LESS)</span>
+                    <span class="enum-value">&lt;= (LESS_EQUAL)</span>
+                    <span class="enum-value">contains</span>
+                    <span class="enum-value">is_empty</span>
+                    <span class="enum-value">is_true</span>
+                    <span class="enum-value">is_false</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="param-name">value</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">Variant</span></td>
+                <td class="param-desc">Valor contra el cual comparar. Puede ser int, float, String, bool, etc.</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">expression</span><span class="param-optional">opcional*</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Expresion GDScript completa. Ejemplo: <code>"gold >= 100 and level > 5"</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">* Usa modo simple (variable + operator + value) O expresion, no ambos.</p>
+        </div>
+
+        <div class="lightbox-section">
+          <div class="validation-note">
+            <strong>Validacion:</strong> Requiere <code>variable</code> O <code>expression</code> no vacio.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-event">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('event')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon event" style="width:64px;height:64px;font-size:2rem;">&#x26A1;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">EventNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Emite eventos/signals al juego</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>EventNode</strong> emite un evento custom que el juego puede escuchar. Es ideal para activar misiones, dar items al jugador, cambiar estados del mundo, reproducir animaciones, o cualquier otra accion que deba ocurrir durante el dialogo.
+          </p>
+          <p class="lightbox-description">
+            Los datos del evento pueden incluir variables con la sintaxis <code>$variable_name</code> que seran sustituidas con valores del contexto.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output">&#x2192;</div>
+              <div class="slot-label">1 Salida</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">event_name</span><span class="param-required">requerido</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Nombre del evento/signal a emitir. Ejemplo: <code>"quest_started"</code>, <code>"item_received"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">event_data</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">Dictionary</span></td>
+                <td class="param-desc">Datos adicionales a enviar con el evento. Ejemplo: <code>{"item": "sword", "quantity": 1}</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">wait_for_completion</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">bool</span></td>
+                <td class="param-desc">Si es <code>true</code>, espera confirmacion antes de continuar. <span class="param-default">Default: false</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lightbox-section">
+          <div class="validation-note">
+            <strong>Validacion:</strong> Requiere <code>event_name</code> no vacio.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Set Variable Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-variable">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('variable')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon variable" style="width:64px;height:64px;font-size:2rem;">X=</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">SetVariableNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Modifica variables del contexto</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>SetVariableNode</strong> modifica variables en el contexto del dialogo. Soporta 6 operaciones diferentes y maneja automaticamente la conversion de tipos cuando es necesario (por ejemplo, operaciones con int y float producen float).
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output">&#x2192;</div>
+              <div class="slot-label">1 Salida</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">variable</span><span class="param-required">requerido</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Nombre de la variable a modificar. Ejemplo: <code>"player_gold"</code>, <code>"quest_active"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">operation</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">int (enum)</span></td>
+                <td class="param-desc">Tipo de operacion a realizar:
+                  <div class="enum-values">
+                    <span class="enum-value">Set (=)</span>
+                    <span class="enum-value">Add (+)</span>
+                    <span class="enum-value">Subtract (-)</span>
+                    <span class="enum-value">Multiply (*)</span>
+                    <span class="enum-value">Divide (/)</span>
+                    <span class="enum-value">Toggle (!)</span>
+                  </div>
+                  <span class="param-default">Default: Set</span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="param-name">value</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">Variant</span></td>
+                <td class="param-desc">Valor para la operacion. No se requiere para Toggle.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Comportamiento por Operacion</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Operacion</th>
+                <th>Comportamiento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">Set</span></td>
+                <td class="param-desc">Asigna el valor directamente</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">Add</span></td>
+                <td class="param-desc">Suma numeros, concatena strings, append a arrays</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">Subtract</span></td>
+                <td class="param-desc">Resta numeros</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">Multiply</span></td>
+                <td class="param-desc">Multiplica numeros (0 si variable es null)</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">Divide</span></td>
+                <td class="param-desc">Divide numeros (resultado siempre float, 0 si divisor es 0)</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">Toggle</span></td>
+                <td class="param-desc">Invierte el valor booleano</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lightbox-section">
+          <div class="validation-note">
+            <strong>Validacion:</strong> Requiere <code>variable</code> no vacio.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jump Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-jump">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('jump')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon jump" style="width:64px;height:64px;font-size:2rem;">&#x21AA;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">JumpNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Salta a otro grafo o nodo</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>JumpNode</strong> permite saltar a otro DialogueGraph completamente diferente, o a un nodo especifico dentro del mismo grafo. Es util para modularizar dialogos complejos, reutilizar fragmentos de conversacion, o crear estructuras de dialogo ramificadas.
+          </p>
+          <p class="lightbox-description">
+            No tiene salidas visuales ya que el flujo continua en el destino del salto.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator" style="border-color: var(--ai-purple); background: rgba(168, 85, 247, 0.2); color: var(--ai-purple);">&#x21B7;</div>
+              <div class="slot-label">JUMP (sin salida visual)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">target_graph_id</span><span class="param-required">requerido</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Ruta al DialogueGraph destino. Ejemplo: <code>"res://dialogues/shop_talk.tres"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">target_node_id</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">ID del nodo especifico al que saltar. Si esta vacio, salta al StartNode del grafo destino.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lightbox-section">
+          <div class="validation-note">
+            <strong>Validacion:</strong> Requiere <code>target_graph_id</code> no vacio.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jump to Free Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-free">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('free')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon free" style="width:64px;height:64px;font-size:2rem;">&#x221E;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">JumpToFreeNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Transicion a modo conversacion libre</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>JumpToFreeNode</strong> es un concepto unico de OhMyDialogSystem. Permite transicionar de un dialogo scripted (basado en grafo) a una conversacion completamente libre con la IA, manteniendo el contexto del personaje y las memorias.
+          </p>
+          <p class="lightbox-description">
+            Puedes configurar condiciones para que el sistema detecte cuando el jugador quiere volver al dialogo estructurado: palabras clave, expresiones evaluables, limite de intercambios, o timeout.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+            <div class="lightbox-slot">
+              <div class="slot-indicator output">&#x2192;</div>
+              <div class="slot-label">1 Salida (post-retorno)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">context_prompt</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Contexto adicional para la IA durante la conversacion libre. Ejemplo: <code>"El jugador esta preguntando sobre la mision del herrero"</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">return_keywords</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">Array[String]</span></td>
+                <td class="param-desc">Palabras clave que disparan el retorno al grafo. Ejemplo: <code>["acepto", "trabajo", "mision"]</code></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">return_condition</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">Expresion GDScript que dispara el retorno cuando es verdadera.</td>
+              </tr>
+              <tr>
+                <td><span class="param-name">max_exchanges</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">int</span></td>
+                <td class="param-desc">Numero maximo de intercambios antes de forzar retorno. <span class="param-default">0 = ilimitado</span></td>
+              </tr>
+              <tr>
+                <td><span class="param-name">timeout_seconds</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">float</span></td>
+                <td class="param-desc">Segundos antes de forzar retorno automatico. <span class="param-default">0 = sin timeout</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Return to Graph Node Lightbox -->
+  <div class="lightbox-overlay" id="lightbox-return">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox('return')">&times;</button>
+      <div class="lightbox-header">
+        <div class="node-icon return" style="width:64px;height:64px;font-size:2rem;">&#x21A9;</div>
+        <div>
+          <div class="node-title" style="font-size:1.5rem;">ReturnToGraphNode</div>
+          <div class="node-subtitle" style="font-size:0.9rem;">Sale del modo libre y retorna</div>
+        </div>
+      </div>
+      <div class="lightbox-body">
+        <div class="lightbox-section">
+          <h3>Descripcion</h3>
+          <p class="lightbox-description">
+            El <strong>ReturnToGraphNode</strong> es el complemento del JumpToFreeNode. Indica al sistema que debe salir del modo de conversacion libre y retornar a la ejecucion estructurada del grafo.
+          </p>
+          <p class="lightbox-description">
+            Si no se especifica un <code>return_node_id</code>, el flujo continua desde la salida del JumpToFreeNode que inicio el modo libre.
+          </p>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Conexiones</h3>
+          <div class="lightbox-slots">
+            <div class="lightbox-slot">
+              <div class="slot-indicator input">&#x2190;</div>
+              <div class="slot-label">1 Entrada</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lightbox-section">
+          <h3>Parametros</h3>
+          <table class="params-table">
+            <thead>
+              <tr>
+                <th>Parametro</th>
+                <th>Tipo</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="param-name">return_node_id</span><span class="param-optional">opcional</span></td>
+                <td><span class="param-type">String</span></td>
+                <td class="param-desc">ID del nodo al que retornar. Si esta vacio, continua desde la salida del JumpToFreeNode original.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="../ai-bg.js"></script>
+  <script>
+    // Lightbox functions
+    function openLightbox(nodeType) {
+      const lightbox = document.getElementById('lightbox-' + nodeType);
+      if (lightbox) {
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeLightbox(nodeType) {
+      const lightbox = document.getElementById('lightbox-' + nodeType);
+      if (lightbox) {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Close lightbox on overlay click
+    document.querySelectorAll('.lightbox-overlay').forEach(overlay => {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+
+    // Close lightbox on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.lightbox-overlay.active').forEach(overlay => {
+          overlay.classList.remove('active');
+        });
+        document.body.style.overflow = '';
+      }
+    });
+  </script>
 </body>
 </html>
