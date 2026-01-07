@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-06T17:47:46Z",
+  "updated_at": "2026-01-07T04:06:12Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -15,9 +15,9 @@
       "number": 2,
       "title": "M2: Core del Sistema",
       "description": "Resources, PromptBuilder, DialogueManager",
-      "open": 8,
-      "closed": 4,
-      "progress": 33,
+      "open": 0,
+      "closed": 12,
+      "progress": 100,
       "state": "open"
     },
     {
@@ -33,9 +33,9 @@
       "number": 10,
       "title": "M3: Editor Visual",
       "description": "DialogueGraphEditor completo con todos los nodos",
-      "open": 16,
-      "closed": 0,
-      "progress": 0,
+      "open": 13,
+      "closed": 3,
+      "progress": 18,
       "state": "open"
     },
     {
@@ -750,11 +750,11 @@
         {
           "number": 105,
           "title": "[Editor] Crear DialogueGraphEditor base con GraphEdit",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 5.0
@@ -763,11 +763,11 @@
         {
           "number": 106,
           "title": "[Editor] Crear clase base para nodos visuales",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 6.0
@@ -776,11 +776,11 @@
         {
           "number": 107,
           "title": "[Editor] Implementar nodo de inicio",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 7.0
@@ -820,11 +820,11 @@
         {
           "number": 146,
           "title": "[Core] Implementar ConversationState",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 2: IA + Decisiones",
             "Order": 10.0
@@ -833,7 +833,7 @@
         {
           "number": 11,
           "title": "[AI] Implementar sistema de construcción de prompts",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [
             "priority:high",
@@ -841,7 +841,7 @@
             "core"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 2: IA + Decisiones",
             "Order": 11.0
@@ -850,11 +850,11 @@
         {
           "number": 148,
           "title": "[Core] Implementar sistema de NodeExecutors",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 2: IA + Decisiones",
             "Order": 12.0
@@ -889,11 +889,11 @@
         {
           "number": 147,
           "title": "[Core] Implementar GraphRunner",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 2: IA + Decisiones",
             "Order": 15.0
@@ -907,7 +907,7 @@
         {
           "number": 12,
           "title": "[Core] Implementar gestión de historial de conversación",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [
             "priority:high",
@@ -915,7 +915,7 @@
             "core"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 3: Lógica",
             "Order": 16.0
@@ -924,11 +924,11 @@
         {
           "number": 143,
           "title": "[Core] Implementar ContextManager para estado dinámico",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 3: Lógica",
             "Order": 17.0
@@ -989,7 +989,7 @@
         {
           "number": 14,
           "title": "[Core] Implementar DialogueManager principal",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [
             "priority:critical",
@@ -997,7 +997,7 @@
             "core"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "Critical",
             "Sprint": "Sprint 3: Lógica",
             "Order": 22.0
@@ -1011,7 +1011,7 @@
         {
           "number": 9,
           "title": "[Core] Implementar AIPreset Resource",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M2: Core del Sistema",
           "labels": [
             "priority:medium",
@@ -1019,7 +1019,7 @@
             "core"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "Medium",
             "Sprint": "Sprint 4: Polish",
             "Order": 23.0
@@ -1225,7 +1225,7 @@
     {
       "number": 9,
       "title": "[Core] Implementar AIPreset Resource",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [
         "priority:medium",
@@ -1233,7 +1233,7 @@
         "core"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "Medium",
         "Sprint": "Sprint 4: Polish",
         "Order": 23.0
@@ -1255,7 +1255,7 @@
     {
       "number": 11,
       "title": "[AI] Implementar sistema de construcción de prompts",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [
         "priority:high",
@@ -1263,7 +1263,7 @@
         "core"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 2: IA + Decisiones",
         "Order": 11.0
@@ -1272,7 +1272,7 @@
     {
       "number": 12,
       "title": "[Core] Implementar gestión de historial de conversación",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [
         "priority:high",
@@ -1280,7 +1280,7 @@
         "core"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 3: Lógica",
         "Order": 16.0
@@ -1289,11 +1289,11 @@
     {
       "number": 143,
       "title": "[Core] Implementar ContextManager para estado dinámico",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 3: Lógica",
         "Order": 17.0
@@ -1302,7 +1302,7 @@
     {
       "number": 14,
       "title": "[Core] Implementar DialogueManager principal",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [
         "priority:critical",
@@ -1310,7 +1310,7 @@
         "core"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "Critical",
         "Sprint": "Sprint 3: Lógica",
         "Order": 22.0
@@ -1319,11 +1319,11 @@
     {
       "number": 105,
       "title": "[Editor] Crear DialogueGraphEditor base con GraphEdit",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 5.0
@@ -1332,11 +1332,11 @@
     {
       "number": 106,
       "title": "[Editor] Crear clase base para nodos visuales",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 6.0
@@ -1345,11 +1345,11 @@
     {
       "number": 107,
       "title": "[Editor] Implementar nodo de inicio",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 7.0
@@ -1960,11 +1960,11 @@
     {
       "number": 146,
       "title": "[Core] Implementar ConversationState",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 2: IA + Decisiones",
         "Order": 10.0
@@ -1973,11 +1973,11 @@
     {
       "number": 147,
       "title": "[Core] Implementar GraphRunner",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 2: IA + Decisiones",
         "Order": 15.0
@@ -1986,11 +1986,11 @@
     {
       "number": 148,
       "title": "[Core] Implementar sistema de NodeExecutors",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M2: Core del Sistema",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 2: IA + Decisiones",
         "Order": 12.0
