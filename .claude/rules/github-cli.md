@@ -1,8 +1,16 @@
 # GitHub CLI Guidelines
 
 ## Issue-First Development
-**ALWAYS create issue BEFORE coding.** Flow:
-1. Create Issue → 2. Create Branch → 3. Develop → 4. PR to development → 5. Close Issue
+**ALWAYS create issue BEFORE coding.**
+
+Flow: `Create Issue → Create Branch → Develop → PR to development → Pre-close Check → Close Issue`
+
+## Pre-Close Checklist
+Before closing ANY issue:
+1. **Check body for checkboxes/sub-issues** → Mark completed ones as `[x]`
+2. **Verify sub-issues are closed** → Close them first if done
+3. **Out-of-scope work?** → Add comment listing extra items implemented
+4. **Update project dates** → Set Start/End fields
 
 ## Labels
 | Category | Values |
@@ -13,13 +21,19 @@
 
 ## Commands
 ```bash
-# Create branch linked to issue
+# Branch from issue
 gh issue develop <number> --base development --checkout
 
-# Create PR (always to development!)
+# PR (always to development!)
 gh pr create --base development --title "Title" --body "Closes #XX"
 
-# Close issue with dates
+# Update issue body (checkboxes)
+gh issue edit <number> --body "updated markdown"
+
+# Add out-of-scope comment
+gh issue comment <number> --body "Additional work: ..."
+
+# Project dates
 gh project item-edit --project-id PVT_kwHOAVGx6s4BLOYT --id <ITEM_ID> \
   --field-id PVTF_lAHOAVGx6s4BLOYTzg63ghM --date YYYY-MM-DD  # Start
 gh project item-edit --project-id PVT_kwHOAVGx6s4BLOYT --id <ITEM_ID> \
@@ -28,5 +42,6 @@ gh project item-edit --project-id PVT_kwHOAVGx6s4BLOYT --id <ITEM_ID> \
 
 ## Critical Rules
 - NO coding without issue
-- NO working directly on `development` or `main`
-- NO closing issues without updating Start/End dates
+- NO working on `development` or `main` directly
+- NO closing without pre-close checklist
+- NO PRs to `main` (except MAJOR releases)
