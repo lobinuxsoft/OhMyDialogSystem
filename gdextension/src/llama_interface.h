@@ -62,6 +62,8 @@ private:
 	bool _check_stop_sequence(const std::string &text) const;
 	void _async_generate_task(const String &prompt);
 	static void _async_generate_callback(void *userdata);
+	void _streaming_generate_task(const String &prompt);
+	static void _streaming_generate_callback(void *userdata);
 
 protected:
 	static void _bind_methods();
@@ -104,6 +106,12 @@ public:
 	/// Emits generation_started, generation_completed or generation_error.
 	/// @param prompt The input text to continue from
 	void generate_async(const String &prompt);
+
+	/// Generate text with streaming (emits each token as generated).
+	/// Emits generation_started, token_generated for each token,
+	/// generation_progress, and generation_completed at the end.
+	/// @param prompt The input text to continue from
+	void generate_streaming(const String &prompt);
 
 	// ==================== Sampling Parameters ====================
 
