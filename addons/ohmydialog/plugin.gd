@@ -15,6 +15,9 @@ var _inspector_plugin: DialogueNodeInspectorPlugin
 ## Reference to the AI service singleton.
 var _ai_service: AIService
 
+## Reference to the AI dock panel.
+var _ai_dock: AIDock
+
 
 func _enter_tree() -> void:
 	# Initialize AI service singleton first
@@ -36,6 +39,13 @@ func _enter_tree() -> void:
 	# Add as bottom panel (more space for graph editing than dock)
 	add_control_to_bottom_panel(_editor_instance, "Dialogue Graph")
 
+	# Initialize AI dock panel
+	var dock_scene := preload("res://addons/ohmydialog/editor/ai_dock.tscn")
+	_ai_dock = dock_scene.instantiate()
+	_ai_dock.config_requested.connect(_on_ai_config_requested)
+	_ai_dock.load_requested.connect(_on_ai_load_requested)
+	add_control_to_dock(DOCK_SLOT_RIGHT_UL, _ai_dock)
+
 	print("OhMyDialogSystem: Plugin loaded")
 
 
@@ -50,6 +60,12 @@ func _exit_tree() -> void:
 		remove_control_from_bottom_panel(_editor_instance)
 		_editor_instance.queue_free()
 		_editor_instance = null
+
+	# Clean up AI dock
+	if _ai_dock:
+		remove_control_from_docks(_ai_dock)
+		_ai_dock.queue_free()
+		_ai_dock = null
 
 	# Clean up AI service
 	if _ai_service:
@@ -82,3 +98,15 @@ func _make_visible(visible: bool) -> void:
 	if _editor_instance:
 		if visible:
 			make_bottom_panel_item_visible(_editor_instance)
+
+
+## Called when user requests AI configuration from dock.
+func _on_ai_config_requested() -> void:
+	# TODO: Open AI Config Dialog (issue #167)
+	print("OhMyDialogSystem: Config requested - dialog not implemented yet")
+
+
+## Called when user requests to load a model from dock.
+func _on_ai_load_requested() -> void:
+	# TODO: Open Model Required Dialog (issue #166)
+	print("OhMyDialogSystem: Load requested - dialog not implemented yet")
