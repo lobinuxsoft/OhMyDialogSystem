@@ -182,6 +182,10 @@ public:
 	/// Get the progress of current generation (0.0 to 1.0)
 	/// @return tokens_generated / max_tokens
 	float get_generation_progress() const;
+
+	/// Cancel an in-progress generation.
+	/// Emits generation_cancelled when the generation stops.
+	void cancel_generation();
 };
 
 } // namespace godot

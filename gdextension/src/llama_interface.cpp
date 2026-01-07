@@ -137,6 +137,7 @@ void LlamaInterface::_bind_methods() {
 	// Async generation status
 	ClassDB::bind_method(D_METHOD("is_generating"), &LlamaInterface::is_generating);
 	ClassDB::bind_method(D_METHOD("get_generation_progress"), &LlamaInterface::get_generation_progress);
+	ClassDB::bind_method(D_METHOD("cancel_generation"), &LlamaInterface::cancel_generation);
 
 	// Signals
 	ADD_SIGNAL(MethodInfo("generation_timeout"));
@@ -946,6 +947,23 @@ void LlamaInterface::generate_streaming(const String &prompt) {
 		true,  // high priority
 		"LlamaInterface::generate_streaming"
 	);
+}
+
+// ==================== Generation Control ====================
+
+void LlamaInterface::cancel_generation() {
+	if (!m_is_generating.load()) {
+		return;
+	}
+
+	m_cancel_requested.store(true);
+	UtilityFunctions::print("LlamaInterface: Cancellation requested");
+
+	// Wait for the task to complete if we have a valid task ID
+	if (m_current_task_id != WorkerThreadPool::INVALID_TASK_ID) {
+		WorkerThreadPool::get_singleton()->wait_for_task_completion(m_current_task_id);
+		m_current_task_id = WorkerThreadPool::INVALID_TASK_ID;
+	}
 }
 
 } // namespace godot
