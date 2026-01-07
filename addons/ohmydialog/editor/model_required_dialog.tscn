@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://model_required_dlg"]
+
+[ext_resource type="Script" path="res://addons/ohmydialog/editor/model_required_dialog.gd" id="1_script"]
+
+[node name="ModelRequiredDialog" type="ConfirmationDialog"]
+title = "Modelo de IA Requerido"
+initial_position = 2
+size = Vector2i(400, 200)
+unresizable = true
+script = ExtResource("1_script")
