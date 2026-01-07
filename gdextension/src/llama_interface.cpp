@@ -120,8 +120,18 @@ void LlamaInterface::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_timeout"), &LlamaInterface::get_timeout);
 	ClassDB::bind_method(D_METHOD("has_generation_timed_out"), &LlamaInterface::has_generation_timed_out);
 
+	// Async generation status
+	ClassDB::bind_method(D_METHOD("is_generating"), &LlamaInterface::is_generating);
+	ClassDB::bind_method(D_METHOD("get_generation_progress"), &LlamaInterface::get_generation_progress);
+
 	// Signals
 	ADD_SIGNAL(MethodInfo("generation_timeout"));
+	ADD_SIGNAL(MethodInfo("generation_started"));
+	ADD_SIGNAL(MethodInfo("token_generated", PropertyInfo(Variant::STRING, "token")));
+	ADD_SIGNAL(MethodInfo("generation_completed", PropertyInfo(Variant::STRING, "response")));
+	ADD_SIGNAL(MethodInfo("generation_error", PropertyInfo(Variant::STRING, "error")));
+	ADD_SIGNAL(MethodInfo("generation_progress", PropertyInfo(Variant::FLOAT, "progress")));
+	ADD_SIGNAL(MethodInfo("generation_cancelled"));
 
 	// Properties
 	ADD_GROUP("Sampling", "");
@@ -535,6 +545,20 @@ int64_t LlamaInterface::get_timeout() const {
 
 bool LlamaInterface::has_generation_timed_out() const {
 	return m_generation_timed_out;
+}
+
+// ==================== Async Generation Status ====================
+
+bool LlamaInterface::is_generating() const {
+	return m_is_generating.load();
+}
+
+float LlamaInterface::get_generation_progress() const {
+	if (!m_is_generating.load() || m_max_tokens <= 0) {
+		return 0.0f;
+	}
+	int tokens = m_tokens_generated.load();
+	return static_cast<float>(tokens) / static_cast<float>(m_max_tokens);
 }
 
 } // namespace godot

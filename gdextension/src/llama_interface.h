@@ -2,12 +2,14 @@
 #define LLAMA_INTERFACE_H
 
 #include <godot_cpp/classes/ref_counted.hpp>
+#include <godot_cpp/classes/worker_thread_pool.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/variant/packed_string_array.hpp>
 #include <godot_cpp/variant/string.hpp>
 
 #include "llama.h"
 
+#include <atomic>
 #include <chrono>
 #include <string>
 #include <vector>
@@ -44,6 +46,12 @@ private:
 	// Timeout configuration
 	int64_t m_timeout_ms = 0; // 0 = no timeout
 	bool m_generation_timed_out = false;
+
+	// Async generation state
+	std::atomic<bool> m_is_generating{false};
+	std::atomic<bool> m_cancel_requested{false};
+	std::atomic<int> m_tokens_generated{0};
+	WorkerThreadPool::TaskID m_current_task_id = WorkerThreadPool::INVALID_TASK_ID;
 
 	// Internal methods
 	void _cleanup();
@@ -146,6 +154,16 @@ public:
 
 	/// Check if the last generation timed out
 	bool has_generation_timed_out() const;
+
+	// ==================== Async Generation Status ====================
+
+	/// Check if generation is currently in progress
+	/// @return true if generating, false otherwise
+	bool is_generating() const;
+
+	/// Get the progress of current generation (0.0 to 1.0)
+	/// @return tokens_generated / max_tokens
+	float get_generation_progress() const;
 };
 
 } // namespace godot
