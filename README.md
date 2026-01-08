@@ -44,18 +44,25 @@ Coming soon...
 ## Quick Start
 
 ```gdscript
-# Load the model
-var llama = LlamaInterface.new()
-llama.load_model("user://models/mistral-7b-q4.gguf")
+# Get reference to DialogueManager node
+@onready var dialogue_manager: DialogueManager = $DialogueManager
 
-# Configure DialogueManager
-var dm = DialogueManager.new()
-dm.set_llama_interface(llama)
-dm.set_character(preload("res://npcs/merchant.tres"))
+func _ready() -> void:
+    # Connect to dialogue signals
+    dialogue_manager.npc_response_completed.connect(_on_npc_response)
+    dialogue_manager.player_choices_available.connect(_on_choices)
+    dialogue_manager.dialogue_ended.connect(_on_dialogue_ended)
 
-# Start conversation
-dm.npc_response_completed.connect(_on_npc_response)
-dm.send_player_message("Hello, what do you have for sale?")
+func start_conversation() -> void:
+    # Load and start a dialogue graph (model loads automatically from StartNode)
+    var graph: DialogueGraph = preload("res://dialogues/merchant.tres")
+    dialogue_manager.start_dialogue(graph)
+
+func _on_npc_response(text: String) -> void:
+    dialogue_ui.show_npc_text(text)
+
+func _on_choices(choices: Array[Dictionary]) -> void:
+    dialogue_ui.show_choices(choices)
 ```
 
 ## Documentation
@@ -86,14 +93,15 @@ addons/ohmydialog/
 
 | Milestone | Description | Status |
 |-----------|-------------|--------|
-| M1 | GDExtension Core | 🔄 In Progress |
-| M2 | Core System | ⏳ Pending |
-| M3 | Visual Editor | ⏳ Pending |
+| M1 | GDExtension Core | 🔄 In Progress (11/18) |
+| M2 | Core System | ✅ Complete |
+| M3 | Visual Editor | 🔄 In Progress (5/17) |
 | M4 | Persistent Memories | ⏳ Pending |
 | M5 | Localization | ⏳ Pending |
 | M6 | Text-to-Speech | ⏳ Pending |
 | M7 | C# Bindings | ⏳ Pending |
-| M8 | Examples & Docs | ⏳ Pending |
+| M8 | Examples & Docs | 🔄 In Progress (6/16) |
+| M9 | LoRA & AI Assistants | ⏳ Pending |
 
 See the [Project Board](https://github.com/users/lobinuxsoft/projects/5) for detailed progress.
 

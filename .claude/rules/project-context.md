@@ -27,6 +27,7 @@ addons/ohmydialog/
 | M6 | Text-to-Speech | Piper TTS integration |
 | M7 | C# Bindings | Idiomatic C# wrappers |
 | M8 | Examples & Docs | Tutorials, documentation |
+| M9 | LoRA & AI Assistants | LoRA adapters, fine-tuning guides, AI helpers |
 
 ## Key Technologies
 - **GDExtension + godot-cpp:** Native C++ bindings
