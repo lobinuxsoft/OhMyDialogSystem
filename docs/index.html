@@ -605,10 +605,15 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
               return;
             }
 
-            container.innerHTML = milestones.map(m => `
+            container.innerHTML = milestones.map(m => {
+            // Extract milestone number from title (e.g., "M3: Editor Visual" -> "3")
+            const match = m.title.match(/^M(\d+)/i);
+            const milestoneNum = match ? match[1] : m.number;
+            const cleanTitle = m.title.replace(/^M\d+[:\s-]*/i, '');
+            return `
               <div class="milestone-card">
                 <div class="name">
-                  <span>M${m.number}: ${m.title.replace(/^M\d+[:\s-]*/i, '')}</span>
+                  <span>M${milestoneNum}: ${cleanTitle}</span>
                   <span class="badge ${m.progress > 50 ? 'badge-cyan' : 'badge-purple'}">${m.progress}%</span>
                 </div>
                 <div class="progress-bar">
@@ -616,7 +621,8 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
                 </div>
                 <div class="desc">${m.description || `${m.closed}/${m.open + m.closed} completadas`}</div>
               </div>
-            `).join('');
+            `;
+          }).join('');
           }
 
           // Format date
