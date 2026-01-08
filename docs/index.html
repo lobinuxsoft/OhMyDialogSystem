@@ -153,18 +153,19 @@
 
       <h2>Quick Start</h2>
 
-      <pre data-lang="GDSCRIPT"><code># 1. Cargar el modelo
-var llama = LlamaInterface.new()
-llama.load_model("user://models/mistral-7b-q4.gguf")
+      <pre data-lang="GDSCRIPT"><code># Obtener referencia al DialogueManager
+@onready var dialogue_manager: DialogueManager = $DialogueManager
 
-# 2. Configurar el DialogueManager
-var dm = DialogueManager.new()
-dm.set_llama_interface(llama)
-dm.set_character(preload("res://npcs/merchant.tres"))
+func _ready() -> void:
+    # Conectar señales de diálogo
+    dialogue_manager.npc_response_completed.connect(_on_npc_response)
+    dialogue_manager.player_choices_available.connect(_on_choices)
+    dialogue_manager.dialogue_ended.connect(_on_dialogue_ended)
 
-# 3. Iniciar conversación
-dm.npc_response_completed.connect(_on_npc_response)
-dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
+func start_conversation() -> void:
+    # Cargar e iniciar un grafo de diálogo (modelo se carga desde StartNode)
+    var graph: DialogueGraph = preload("res://dialogues/merchant.tres")
+    dialogue_manager.start_dialogue(graph)</code></pre>
 
       <div class="callout-info">
         <p>Para una guía completa de instalación y configuración, visita <a href="Guides/quickstart.html">Quick Start Guide</a>.</p>
@@ -362,109 +363,9 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
       <h2>Roadmap</h2>
 
       <style>
-        .sprint-container {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
-          margin: 2rem 0;
-        }
-        .sprint-card {
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
-          border-radius: 12px;
-          overflow: hidden;
-          transition: all 0.3s ease;
-        }
-        .sprint-card:hover {
-          border-color: var(--ai-cyan);
-          box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
-        }
-        .sprint-header {
-          padding: 1rem 1.25rem;
-          background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(168, 85, 247, 0.1));
-          border-bottom: 1px solid var(--border-color);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .sprint-title {
-          font-weight: 600;
-          font-size: 1rem;
-          color: var(--ai-cyan);
-        }
-        .sprint-count {
-          font-size: 0.75rem;
-          color: var(--text-muted);
-          background: rgba(0,0,0,0.2);
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
-        }
-        .sprint-tasks {
-          padding: 0.75rem;
-          max-height: 300px;
-          overflow-y: auto;
-        }
-        .sprint-task {
-          display: flex;
-          align-items: flex-start;
-          gap: 0.5rem;
-          padding: 0.5rem;
-          border-radius: 6px;
-          font-size: 0.8rem;
-          transition: background 0.2s;
-        }
-        .sprint-task:hover {
-          background: rgba(255,255,255,0.03);
-        }
-        .task-order {
-          min-width: 20px;
-          height: 20px;
-          border-radius: 4px;
-          background: rgba(0, 212, 255, 0.2);
-          color: var(--ai-cyan);
-          font-size: 0.7rem;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .task-tag {
-          font-size: 0.65rem;
-          padding: 0.15rem 0.35rem;
-          border-radius: 3px;
-          font-weight: 500;
-        }
-        .task-tag.core { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-        .task-tag.editor { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
-        .task-tag.ai { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .task-name {
-          flex: 1;
-          color: var(--text-body);
-          line-height: 1.3;
-        }
-        .task-issue {
-          font-size: 0.7rem;
-          color: var(--text-muted);
-          font-family: var(--font-mono);
-          text-decoration: none;
-          transition: color 0.2s;
-        }
-        .task-issue:hover {
-          color: var(--ai-cyan);
-        }
-        .sprint-task.done {
-          opacity: 0.6;
-        }
-        .sprint-task.done .task-name {
-          text-decoration: line-through;
-        }
-        .sprint-task.done .task-order {
-          background: rgba(16, 185, 129, 0.3);
-          color: #10b981;
-        }
         .milestone-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           gap: 1rem;
           margin: 1.5rem 0;
         }
@@ -474,9 +375,12 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
           border-radius: 8px;
           padding: 1rem;
           transition: all 0.3s;
+          cursor: pointer;
         }
         .milestone-card:hover {
-          border-color: var(--ai-purple);
+          border-color: var(--ai-cyan);
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+          transform: translateY(-2px);
         }
         .milestone-card .name {
           font-weight: 600;
@@ -503,29 +407,164 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
           font-size: 0.75rem;
           color: var(--text-muted);
         }
+        /* Milestone Lightbox */
+        .milestone-lightbox {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.9);
+          z-index: 9999;
+          justify-content: center;
+          align-items: center;
+          padding: 2rem;
+        }
+        .milestone-lightbox.active {
+          display: flex;
+        }
+        .milestone-lightbox-content {
+          background: var(--bg-card);
+          border: 1px solid var(--ai-cyan);
+          border-radius: 12px;
+          max-width: 600px;
+          width: 100%;
+          max-height: 80vh;
+          overflow: hidden;
+          box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+        }
+        .milestone-lightbox-header {
+          padding: 1.25rem 1.5rem;
+          background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
+          border-bottom: 1px solid var(--border-color);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .milestone-lightbox-title {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--ai-cyan);
+        }
+        .milestone-lightbox-close {
+          background: none;
+          border: none;
+          color: var(--text-muted);
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0;
+          line-height: 1;
+          transition: color 0.2s;
+        }
+        .milestone-lightbox-close:hover {
+          color: var(--ai-cyan);
+        }
+        .milestone-lightbox-body {
+          padding: 1rem 1.5rem;
+          max-height: 60vh;
+          overflow-y: auto;
+        }
+        .milestone-lightbox-desc {
+          color: var(--text-muted);
+          font-size: 0.9rem;
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border-color);
+        }
+        .milestone-lightbox-progress {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+        .milestone-lightbox-progress .progress-bar {
+          flex: 1;
+          height: 8px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .milestone-lightbox-progress .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, var(--ai-cyan), var(--ai-purple));
+          border-radius: 4px;
+        }
+        .milestone-lightbox-progress .progress-text {
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          color: var(--ai-cyan);
+          min-width: 45px;
+        }
+        .task-section-title {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          margin: 1rem 0 0.5rem 0;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .task-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          font-size: 0.85rem;
+        }
+        .task-item:last-child {
+          border-bottom: none;
+        }
+        .task-item.done {
+          opacity: 0.5;
+        }
+        .task-item.done .task-text {
+          text-decoration: line-through;
+        }
+        .task-status {
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.7rem;
+          flex-shrink: 0;
+        }
+        .task-status.pending {
+          background: rgba(234, 179, 8, 0.2);
+          color: #eab308;
+        }
+        .task-status.done {
+          background: rgba(16, 185, 129, 0.2);
+          color: #10b981;
+        }
+        .task-text {
+          flex: 1;
+          color: var(--text-body);
+        }
+        .task-link {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+        .task-link:hover {
+          color: var(--ai-cyan);
+        }
+        .no-tasks {
+          color: var(--text-muted);
+          font-style: italic;
+          padding: 0.5rem 0;
+        }
       </style>
 
-      <h3>Plan de Implementacion por Sprints</h3>
-      <p id="roadmap-summary" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+      <p id="roadmap-summary" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
         Cargando datos del roadmap...
       </p>
 
-      <div id="sprint-container" class="sprint-container">
-        <!-- Sprints are loaded dynamically from roadmap-data.json -->
-        <div class="sprint-card" style="opacity: 0.5;">
-          <div class="sprint-header">
-            <span class="sprint-title">Cargando...</span>
-          </div>
-          <div class="sprint-tasks" style="padding: 2rem; text-align: center; color: var(--text-muted);">
-            Los datos se cargan desde GitHub
-          </div>
-        </div>
-      </div>
-
-      <h3>Progreso por Milestone</h3>
-
       <div id="milestone-grid" class="milestone-grid">
-        <!-- Milestones are loaded dynamically from roadmap-data.json -->
         <div class="milestone-card" style="opacity: 0.5;">
           <div class="name"><span>Cargando...</span></div>
           <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
@@ -533,8 +572,28 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
       </div>
 
       <div class="callout-info">
-        <p>Datos actualizados automaticamente desde el <a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank">Project Board en GitHub</a>.
+        <p>Datos actualizados desde el <a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank">Project Board en GitHub</a>.
         <span id="roadmap-updated" style="font-size: 0.8rem; opacity: 0.7;"></span></p>
+      </div>
+
+      <!-- Milestone Lightbox -->
+      <div class="milestone-lightbox" id="milestoneLightbox">
+        <div class="milestone-lightbox-content">
+          <div class="milestone-lightbox-header">
+            <span class="milestone-lightbox-title" id="lightboxMilestoneTitle">Milestone</span>
+            <button class="milestone-lightbox-close" onclick="closeMilestoneLightbox()">&times;</button>
+          </div>
+          <div class="milestone-lightbox-body">
+            <div class="milestone-lightbox-desc" id="lightboxMilestoneDesc"></div>
+            <div class="milestone-lightbox-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="lightboxProgressFill" style="width: 0%;"></div>
+              </div>
+              <span class="progress-text" id="lightboxProgressText">0%</span>
+            </div>
+            <div id="lightboxTasksContainer"></div>
+          </div>
+        </div>
       </div>
 
       <script>
@@ -542,59 +601,22 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
         (function() {
           const REPO_URL = 'https://github.com/lobinuxsoft/OhMyDialogSystem';
           const DATA_URL = 'roadmap-data.json';
-
-          // Detect component from labels or title
-          function getComponent(issue) {
-            const labels = issue.labels || [];
-            const title = issue.title || '';
-
-            if (labels.includes('gdextension') || labels.includes('ai')) return 'ai';
-            if (labels.includes('editor') || title.includes('[Editor]')) return 'editor';
-            if (labels.includes('core') || title.includes('[Core]')) return 'core';
-            if (title.includes('[AI]')) return 'ai';
-            return 'core';
-          }
+          let roadmapData = null;
 
           // Clean title (remove [Component] prefix)
           function cleanTitle(title) {
-            return title.replace(/^\[(Core|Editor|AI)\]\s*/i, '');
+            return title.replace(/^\[(Core|Editor|AI|GDExtension|Memory|TTS|CSharp|Localization|Infra|QA|Docs|Examples|Wiki)\]\s*/i, '').replace(/^(feat|fix|docs|refactor):\s*/i, '');
           }
 
-          // Render sprints
-          function renderSprints(sprints, issues) {
-            const container = document.getElementById('sprint-container');
-            if (!sprints || sprints.length === 0) {
-              container.innerHTML = '<p style="color: var(--text-muted);">No hay sprints configurados.</p>';
-              return;
-            }
+          // Extract milestone number from title
+          function getMilestoneNum(title) {
+            const match = title.match(/^M(\d+)/i);
+            return match ? match[1] : '?';
+          }
 
-            const totalTasks = issues ? issues.length : sprints.reduce((acc, s) => acc + s.issues.length, 0);
-            document.getElementById('roadmap-summary').textContent =
-              `${totalTasks} tareas organizadas intercalando Core y Editor para desarrollo equilibrado.`;
-
-            container.innerHTML = sprints.map(sprint => `
-              <div class="sprint-card">
-                <div class="sprint-header">
-                  <span class="sprint-title">${sprint.sprint}</span>
-                  <span class="sprint-count">${sprint.issues.length} tareas</span>
-                </div>
-                <div class="sprint-tasks">
-                  ${sprint.issues.map(issue => {
-                    const component = getComponent(issue);
-                    const order = issue.fields?.Order || '?';
-                    const status = issue.state === 'CLOSED' ? 'done' : '';
-                    return `
-                      <div class="sprint-task ${status}">
-                        <span class="task-order">${order}</span>
-                        <span class="task-tag ${component}">${component.charAt(0).toUpperCase() + component.slice(1)}</span>
-                        <span class="task-name">${cleanTitle(issue.title)}</span>
-                        <a href="${REPO_URL}/issues/${issue.number}" target="_blank" class="task-issue">#${issue.number}</a>
-                      </div>
-                    `;
-                  }).join('')}
-                </div>
-              </div>
-            `).join('');
+          // Get clean milestone name
+          function getMilestoneName(title) {
+            return title.replace(/^M\d+[:\s-]*/i, '');
           }
 
           // Render milestones
@@ -605,25 +627,100 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
               return;
             }
 
-            container.innerHTML = milestones.map(m => {
-            // Extract milestone number from title (e.g., "M3: Editor Visual" -> "3")
-            const match = m.title.match(/^M(\d+)/i);
-            const milestoneNum = match ? match[1] : m.number;
-            const cleanTitle = m.title.replace(/^M\d+[:\s-]*/i, '');
-            return `
-              <div class="milestone-card">
-                <div class="name">
-                  <span>M${milestoneNum}: ${cleanTitle}</span>
-                  <span class="badge ${m.progress > 50 ? 'badge-cyan' : 'badge-purple'}">${m.progress}%</span>
+            const totalTasks = milestones.reduce((acc, m) => acc + m.open + m.closed, 0);
+            const completedTasks = milestones.reduce((acc, m) => acc + m.closed, 0);
+            document.getElementById('roadmap-summary').textContent =
+              `${completedTasks}/${totalTasks} tareas completadas en ${milestones.length} milestones.`;
+
+            container.innerHTML = milestones.map((m, index) => {
+              const milestoneNum = getMilestoneNum(m.title);
+              const cleanName = getMilestoneName(m.title);
+              return `
+                <div class="milestone-card" onclick="openMilestoneLightbox(${index})">
+                  <div class="name">
+                    <span>M${milestoneNum}: ${cleanName}</span>
+                    <span class="badge ${m.progress > 50 ? 'badge-cyan' : 'badge-purple'}">${m.progress}%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${m.progress}%;"></div>
+                  </div>
+                  <div class="desc">${m.description || `${m.closed}/${m.open + m.closed} completadas`}</div>
                 </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" style="width: ${m.progress}%;"></div>
-                </div>
-                <div class="desc">${m.description || `${m.closed}/${m.open + m.closed} completadas`}</div>
-              </div>
-            `;
-          }).join('');
+              `;
+            }).join('');
           }
+
+          // Open milestone lightbox
+          window.openMilestoneLightbox = function(index) {
+            if (!roadmapData) return;
+            const milestone = roadmapData.milestones[index];
+            if (!milestone) return;
+
+            const milestoneNum = getMilestoneNum(milestone.title);
+            const cleanName = getMilestoneName(milestone.title);
+
+            document.getElementById('lightboxMilestoneTitle').textContent = `M${milestoneNum}: ${cleanName}`;
+            document.getElementById('lightboxMilestoneDesc').textContent = milestone.description || '';
+            document.getElementById('lightboxProgressFill').style.width = `${milestone.progress}%`;
+            document.getElementById('lightboxProgressText').textContent = `${milestone.progress}%`;
+
+            // Get issues for this milestone
+            const milestoneIssues = (roadmapData.issues || []).filter(issue => {
+              const issueMilestone = issue.milestone || '';
+              return issueMilestone.includes(milestone.title) || issueMilestone.includes(`M${milestoneNum}`);
+            });
+
+            const pendingIssues = milestoneIssues.filter(i => i.state !== 'CLOSED');
+            const doneIssues = milestoneIssues.filter(i => i.state === 'CLOSED');
+
+            let tasksHtml = '';
+
+            if (pendingIssues.length > 0) {
+              tasksHtml += `<div class="task-section-title">Pendientes (${pendingIssues.length})</div>`;
+              tasksHtml += pendingIssues.map(issue => `
+                <div class="task-item">
+                  <span class="task-status pending">○</span>
+                  <span class="task-text">${cleanTitle(issue.title)}</span>
+                  <a href="${REPO_URL}/issues/${issue.number}" target="_blank" class="task-link">#${issue.number}</a>
+                </div>
+              `).join('');
+            }
+
+            if (doneIssues.length > 0) {
+              tasksHtml += `<div class="task-section-title">Completadas (${doneIssues.length})</div>`;
+              tasksHtml += doneIssues.map(issue => `
+                <div class="task-item done">
+                  <span class="task-status done">✓</span>
+                  <span class="task-text">${cleanTitle(issue.title)}</span>
+                  <a href="${REPO_URL}/issues/${issue.number}" target="_blank" class="task-link">#${issue.number}</a>
+                </div>
+              `).join('');
+            }
+
+            if (milestoneIssues.length === 0) {
+              tasksHtml = '<p class="no-tasks">No hay tareas registradas para este milestone.</p>';
+            }
+
+            document.getElementById('lightboxTasksContainer').innerHTML = tasksHtml;
+            document.getElementById('milestoneLightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+          };
+
+          // Close milestone lightbox
+          window.closeMilestoneLightbox = function() {
+            document.getElementById('milestoneLightbox').classList.remove('active');
+            document.body.style.overflow = '';
+          };
+
+          // Close on background click
+          document.getElementById('milestoneLightbox').addEventListener('click', function(e) {
+            if (e.target === this) closeMilestoneLightbox();
+          });
+
+          // Close on Escape
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeMilestoneLightbox();
+          });
 
           // Format date
           function formatDate(isoDate) {
@@ -641,7 +738,7 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
               return res.json();
             })
             .then(data => {
-              renderSprints(data.sprints, data.issues);
+              roadmapData = data;
               renderMilestones(data.milestones);
               document.getElementById('roadmap-updated').textContent = formatDate(data.updated_at);
             })
@@ -649,7 +746,6 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
               console.warn('Roadmap data not available:', err);
               document.getElementById('roadmap-summary').innerHTML =
                 'No se pudieron cargar los datos. <a href="' + REPO_URL + '/issues" target="_blank">Ver issues en GitHub</a>';
-              document.getElementById('sprint-container').innerHTML = '';
               document.getElementById('milestone-grid').innerHTML = '';
             });
         })();
