@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-08T17:58:21Z",
+  "updated_at": "2026-01-08T18:04:40Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -2417,6 +2417,90 @@
         "Order": 90.0,
         "Priority": "Critical"
       }
+    },
+    {
+      "number": 188,
+      "title": "[Docs] Limpiar sidebar - remover links a milestones no implementados",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:easy",
+        "next-session"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 187,
+      "title": "[Docs] Crear páginas de Examples",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:easy"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 186,
+      "title": "[Docs] Crear páginas Guides faltantes",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 185,
+      "title": "[Docs] Crear página Technical/architecture.html",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 184,
+      "title": "[Docs] Crear páginas API Reference faltantes",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 183,
+      "title": "[Docs] Crear páginas Getting Started",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 181,
+      "title": "[Docs] Actualizar README.md con estado real del proyecto",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high"
+      ],
+      "fields": {}
     }
   ]
 }
