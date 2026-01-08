@@ -98,12 +98,21 @@ jobs:
             state: .state
           }]')
 
+          # Fetch ALL issues with milestones (including closed ones not in Project Board)
+          MILESTONE_ISSUES=$(gh api repos/${{ github.repository }}/issues --paginate -X GET -f state=all -f per_page=100 --jq '[.[] | select(.milestone != null) | {
+            number: .number,
+            title: .title,
+            state: (if .state == "open" then "OPEN" else "CLOSED" end),
+            milestone: .milestone.title,
+            labels: [.labels[].name]
+          }]')
+
           # Process with jq to create the final JSON structure
-          echo "$PROJECT_DATA" | jq --argjson milestones "$MILESTONES" '
+          echo "$PROJECT_DATA" | jq --argjson milestones "$MILESTONES" --argjson milestoneIssues "$MILESTONE_ISSUES" '
             # Extract items from project
             .data.node.items.nodes as $items |
 
-            # Process each item into a cleaner format
+            # Process project items into a cleaner format
             [
               $items[] |
               select(.content != null) |
@@ -119,10 +128,19 @@ jobs:
                   add // {}
                 )
               }
-            ] as $issues |
+            ] as $projectIssues |
 
-            # Group by Sprint
-            ($issues | group_by(.fields.Sprint) |
+            # Get issue numbers from project board
+            ($projectIssues | map(.number)) as $projectNumbers |
+
+            # Add milestone issues that are NOT in project board (to include closed issues)
+            ($milestoneIssues | map(select(.number | IN($projectNumbers[]) | not) | . + {fields: {}})) as $extraIssues |
+
+            # Combine all issues
+            ($projectIssues + $extraIssues) as $allIssues |
+
+            # Group by Sprint (only project issues have Sprint field)
+            ($projectIssues | group_by(.fields.Sprint) |
               map({
                 sprint: (.[0].fields.Sprint // "Backlog"),
                 issues: (. | sort_by(.fields.Order // 999))
@@ -156,7 +174,7 @@ jobs:
               repository: "${{ github.repository }}",
               milestones: $milestoneProgress,
               sprints: $sprints,
-              issues: $issues
+              issues: $allIssues
             }
           ' > docs/roadmap-data.json
 
