@@ -50,6 +50,12 @@ signal variable_changed(name: String, old_value: Variant, new_value: Variant)
 ## Emitted when an error occurs.
 signal error_occurred(message: String)
 
+## Emitted when model loading starts (for UI loading indicators).
+signal model_loading_started(model_path: String)
+
+## Emitted when model loading completes.
+signal model_loading_completed()
+
 ## Query System Signals (inspired by Questify)
 ## These allow game code to respond to dialogue system queries.
 
@@ -123,6 +129,9 @@ var _pending_inference: Dictionary = {}
 ## Pending confirmation slot (for Continue after static response).
 var _pending_confirm_slot: int = 0
 
+## Whether the model was loaded by this dialogue (for auto-unload).
+var _model_loaded_for_dialogue: bool = false
+
 
 func _ready() -> void:
 	_initialize_components()
@@ -168,6 +177,14 @@ func start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = DialogueMo
 		if graph.default_character:
 			active_character = graph.default_character
 
+	# Load model from StartNode if specified
+	if graph:
+		var start_node := graph.get_start_node()
+		if start_node:
+			var model_path: String = start_node.data.get("model_path", "")
+			if not model_path.is_empty():
+				await _load_model_for_dialogue(model_path)
+
 	# Apply AI preset
 	if ai_preset and llama_interface:
 		ai_preset.apply_to(llama_interface)
@@ -194,6 +211,9 @@ func end_dialogue(reason: String = "ended") -> void:
 	context_manager.clear_local()
 	_is_active = false
 	_pending_inference.clear()
+
+	# Unload model if it was loaded by this dialogue
+	_unload_model_if_needed()
 
 	dialogue_ended.emit(reason)
 
@@ -280,6 +300,61 @@ func evaluate_condition(expression: String) -> bool:
 
 
 # ==================== Internal Methods ====================
+
+
+## Loads a model for the dialogue from the specified path.
+func _load_model_for_dialogue(model_path: String) -> void:
+	model_loading_started.emit(model_path)
+
+	var ai_service := AIService.get_singleton()
+	if not ai_service:
+		_emit_error("AIService not available for model loading")
+		return
+
+	var manager := ai_service.get_model_manager()
+	if not manager:
+		_emit_error("ModelManager not available")
+		return
+
+	# Check if model is already loaded
+	if ai_service.is_model_loaded():
+		var current_config := manager.get_current_config()
+		if current_config and current_config.get_effective_path() == model_path:
+			# Same model already loaded - reuse it
+			llama_interface = manager.get_llama()
+			model_loading_completed.emit()
+			return
+		# Different model - unload first
+		ai_service.unload_model()
+
+	# Find config by path and load
+	for config in manager.get_available_models():
+		if config.get_effective_path() == model_path:
+			var err := ai_service.load_model(config)
+			if err == OK:
+				_model_loaded_for_dialogue = true
+				llama_interface = manager.get_llama()
+				model_loading_completed.emit()
+				print("DialogueManager: Model loaded for dialogue: %s" % config.display_name)
+			else:
+				_emit_error("Failed to load model: %s" % error_string(err))
+			return
+
+	_emit_error("Model not found in registry: %s" % model_path)
+
+
+## Unloads the model if it was loaded by this dialogue.
+func _unload_model_if_needed() -> void:
+	if not _model_loaded_for_dialogue:
+		return
+
+	var ai_service := AIService.get_singleton()
+	if ai_service and ai_service.is_model_loaded():
+		ai_service.unload_model()
+		print("DialogueManager: Model unloaded after dialogue")
+
+	_model_loaded_for_dialogue = false
+	llama_interface = null
 
 
 ## Starts free conversation mode.
