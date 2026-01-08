@@ -619,6 +619,9 @@ func start_conversation() -> void:
             return title.replace(/^M\d+[:\s-]*/i, '');
           }
 
+          // Sort milestones by number
+          let sortedMilestones = [];
+
           // Render milestones
           function renderMilestones(milestones) {
             const container = document.getElementById('milestone-grid');
@@ -627,12 +630,19 @@ func start_conversation() -> void:
               return;
             }
 
-            const totalTasks = milestones.reduce((acc, m) => acc + m.open + m.closed, 0);
-            const completedTasks = milestones.reduce((acc, m) => acc + m.closed, 0);
-            document.getElementById('roadmap-summary').textContent =
-              `${completedTasks}/${totalTasks} tareas completadas en ${milestones.length} milestones.`;
+            // Sort milestones by number extracted from title (M1, M2, M3...)
+            sortedMilestones = [...milestones].sort((a, b) => {
+              const numA = parseInt(getMilestoneNum(a.title)) || 999;
+              const numB = parseInt(getMilestoneNum(b.title)) || 999;
+              return numA - numB;
+            });
 
-            container.innerHTML = milestones.map((m, index) => {
+            const totalTasks = sortedMilestones.reduce((acc, m) => acc + m.open + m.closed, 0);
+            const completedTasks = sortedMilestones.reduce((acc, m) => acc + m.closed, 0);
+            document.getElementById('roadmap-summary').textContent =
+              `${completedTasks}/${totalTasks} tareas completadas en ${sortedMilestones.length} milestones.`;
+
+            container.innerHTML = sortedMilestones.map((m, index) => {
               const milestoneNum = getMilestoneNum(m.title);
               const cleanName = getMilestoneName(m.title);
               return `
@@ -652,8 +662,8 @@ func start_conversation() -> void:
 
           // Open milestone lightbox
           window.openMilestoneLightbox = function(index) {
-            if (!roadmapData) return;
-            const milestone = roadmapData.milestones[index];
+            if (!roadmapData || sortedMilestones.length === 0) return;
+            const milestone = sortedMilestones[index];
             if (!milestone) return;
 
             const milestoneNum = getMilestoneNum(milestone.title);

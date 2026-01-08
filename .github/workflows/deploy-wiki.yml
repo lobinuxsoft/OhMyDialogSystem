@@ -136,7 +136,7 @@ jobs:
               )
             ) as $sprints |
 
-            # Calculate milestone progress
+            # Calculate milestone progress and sort by M-number from title
             ($milestones | map({
               number: .number,
               title: .title,
@@ -146,8 +146,9 @@ jobs:
               progress: (if (.open_issues + .closed_issues) > 0
                 then ((.closed_issues / (.open_issues + .closed_issues)) * 100 | floor)
                 else 0 end),
-              state: .state
-            }) | sort_by(.number)) as $milestoneProgress |
+              state: .state,
+              sort_key: (.title | capture("^M(?<n>[0-9]+)") | .n | tonumber // 999)
+            }) | sort_by(.sort_key) | map(del(.sort_key))) as $milestoneProgress |
 
             # Final structure
             {
