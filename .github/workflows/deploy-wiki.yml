@@ -99,7 +99,7 @@ jobs:
           }]')
 
           # Fetch ALL issues with milestones (including closed ones not in Project Board)
-          MILESTONE_ISSUES=$(gh api repos/${{ github.repository }}/issues --paginate -X GET -f state=all -f per_page=100 --jq '[.[] | select(.milestone != null) | {
+          MILESTONE_ISSUES=$(gh api repos/${{ github.repository }}/issues -X GET -f state=all -f per_page=100 | jq '[.[] | select(.milestone != null) | {
             number: .number,
             title: .title,
             state: (if .state == "open" then "OPEN" else "CLOSED" end),
