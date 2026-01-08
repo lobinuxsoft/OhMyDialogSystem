@@ -137,6 +137,28 @@ func _add_option_button(label_text: String, data_key: String, options: Array[Str
 	return option
 
 
+## Creates a labeled CheckBox.
+func _add_check_box(label_text: String, data_key: String, default_value: bool = false) -> CheckBox:
+	var hbox := HBoxContainer.new()
+
+	var label := Label.new()
+	label.text = label_text + ":"
+	label.custom_minimum_size.x = 100
+	hbox.add_child(label)
+
+	var check := CheckBox.new()
+	check.button_pressed = bool(_node_data.data.get(data_key, default_value))
+	check.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	check.toggled.connect(func(pressed: bool):
+		_node_data.data[data_key] = pressed
+		_emit_changed()
+	)
+	hbox.add_child(check)
+
+	add_child(hbox)
+	return check
+
+
 ## Adds a separator.
 func _add_separator() -> HSeparator:
 	var sep := HSeparator.new()
