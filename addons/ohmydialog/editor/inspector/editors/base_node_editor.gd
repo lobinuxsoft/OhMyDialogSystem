@@ -373,3 +373,38 @@ func _select_current_variable(data_key: String, current_value: String) -> void:
 	manual_check.button_pressed = true
 	_on_manual_mode_toggled(true, data_key)
 	manual_edit.text = current_value
+
+
+# ==================== Resource Picker ====================
+
+
+## Creates a resource picker for selecting Resource files.
+## base_type: The base class name (e.g., "DialogueGraph", "CharacterIdentity")
+func _add_resource_picker(label_text: String, data_key: String, base_type: String) -> EditorResourcePicker:
+	var hbox := HBoxContainer.new()
+
+	var label := Label.new()
+	label.text = label_text + ":"
+	label.custom_minimum_size.x = 100
+	hbox.add_child(label)
+
+	var picker := EditorResourcePicker.new()
+	picker.base_type = base_type
+	picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	# Load current resource if path exists
+	var current_path: String = str(_node_data.data.get(data_key, ""))
+	if not current_path.is_empty() and ResourceLoader.exists(current_path):
+		picker.edited_resource = load(current_path)
+
+	picker.resource_changed.connect(func(new_resource: Resource):
+		if new_resource:
+			_node_data.data[data_key] = new_resource.resource_path
+		else:
+			_node_data.data[data_key] = ""
+		_emit_changed()
+	)
+
+	hbox.add_child(picker)
+	add_child(hbox)
+	return picker
