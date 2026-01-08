@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-08T00:43:37Z",
+  "updated_at": "2026-01-08T17:19:06Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -25,17 +25,17 @@
       "title": "M8: Ejemplos y Documentación",
       "description": "Ejemplos, API docs, guía de inicio rápido, CI/CD",
       "open": 9,
-      "closed": 0,
-      "progress": 0,
+      "closed": 7,
+      "progress": 43,
       "state": "open"
     },
     {
       "number": 10,
       "title": "M3: Editor Visual",
       "description": "DialogueGraphEditor completo con todos los nodos",
-      "open": 13,
-      "closed": 4,
-      "progress": 23,
+      "open": 12,
+      "closed": 5,
+      "progress": 29,
       "state": "open"
     },
     {
@@ -967,16 +967,15 @@
         {
           "number": 116,
           "title": "[Editor] Implementar nodo de fin (EndNode)",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [
             "priority:high",
             "difficulty:medium",
-            "editor",
-            "next-session"
+            "editor"
           ],
           "fields": {
-            "Status": "In Progress",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 28.0
@@ -1165,7 +1164,9 @@
           "title": "[Editor] Implementar nodo Jump",
           "state": "OPEN",
           "milestone": "M3: Editor Visual",
-          "labels": [],
+          "labels": [
+            "next-session"
+          ],
           "fields": {
             "Status": "Todo",
             "Priority": "Medium",
@@ -1267,16 +1268,15 @@
     {
       "number": 116,
       "title": "[Editor] Implementar nodo de fin (EndNode)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [
         "priority:high",
         "difficulty:medium",
-        "editor",
-        "next-session"
+        "editor"
       ],
       "fields": {
-        "Status": "In Progress",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 28.0
@@ -2217,7 +2217,9 @@
       "title": "[Editor] Implementar nodo Jump",
       "state": "OPEN",
       "milestone": "M3: Editor Visual",
-      "labels": [],
+      "labels": [
+        "next-session"
+      ],
       "fields": {
         "Status": "Todo",
         "Priority": "Medium",
