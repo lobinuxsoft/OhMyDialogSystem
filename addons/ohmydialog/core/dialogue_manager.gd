@@ -203,6 +203,7 @@ func start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = DialogueMo
 
 
 ## Ends the current dialogue session.
+## Always unloads AI model if one was loaded to free memory resources.
 func end_dialogue(reason: String = "ended") -> void:
 	if not _is_active:
 		return
@@ -212,7 +213,7 @@ func end_dialogue(reason: String = "ended") -> void:
 	_is_active = false
 	_pending_inference.clear()
 
-	# Unload model if it was loaded by this dialogue
+	# Always unload model to free memory
 	_unload_model_if_needed()
 
 	dialogue_ended.emit(reason)
@@ -550,6 +551,8 @@ func _on_graph_completed() -> void:
 
 
 func _on_error_occurred(message: String) -> void:
+	# ALWAYS unload model on error to prevent memory leaks
+	_unload_model_if_needed()
 	_emit_error(message)
 
 

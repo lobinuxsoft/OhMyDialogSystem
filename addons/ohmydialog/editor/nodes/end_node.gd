@@ -5,6 +5,9 @@ extends BaseDialogueNode
 ##
 ## The END node has one input and no outputs. Multiple END nodes
 ## can exist in a graph for different endings.
+##
+## When reached, the dialogue ends and any loaded AI model is automatically
+## unloaded to free memory resources.
 
 
 func _configure_slots() -> void:
@@ -14,8 +17,5 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var reason: String = node_data.data.get("reason", "")
-	if reason.is_empty():
-		_add_hint_label("Dialogue ends here")
-	else:
-		_add_info("Reason", reason)
+	_add_hint_label("Dialogue ends here")
+	_add_hint_label("(AI model will be unloaded)")

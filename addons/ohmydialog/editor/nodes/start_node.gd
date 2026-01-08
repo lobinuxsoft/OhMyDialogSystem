@@ -15,4 +15,13 @@ func _configure_slots() -> void:
 
 func _create_content_ui() -> void:
 	_add_hint_label("Entry Point")
+
+	# Show AI model info
+	var model_path: String = node_data.data.get("model_path", "")
+	if model_path.is_empty():
+		_add_info("AI", "(ninguno)", Color(0.6, 0.6, 0.6))
+	else:
+		var model_name := model_path.get_file().get_basename()
+		_add_info("AI", model_name, Color(0.4, 0.8, 1.0))
+
 	_add_output_label(">")
