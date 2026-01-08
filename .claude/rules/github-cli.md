@@ -18,6 +18,23 @@ Before closing ANY issue:
 | Priority | `priority:critical`, `priority:high`, `priority:medium`, `priority:low` |
 | Difficulty | `difficulty:easy`, `difficulty:medium`, `difficulty:hard`, `difficulty:expert` |
 | Component | `gdextension`, `editor`, `core`, `memory`, `tts`, `localization`, `csharp` |
+| Session | `next-session` |
+
+## Session Management
+Use `next-session` label to mark issues for the next work session.
+
+**At session START:**
+```bash
+gh issue list --label next-session
+```
+
+**At session END:**
+- Remove `next-session` from completed issues
+- Add `next-session` to issues queued for next session
+```bash
+gh issue edit <number> --remove-label next-session
+gh issue edit <number> --add-label next-session
+```
 
 ## Commands
 ```bash
