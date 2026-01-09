@@ -32,6 +32,31 @@ signal model_unloaded()
 @onready var delete_model_btn: Button = %DeleteModelBtn
 @onready var browse_hf_btn: Button = %BrowseHFBtn
 
+# UI References - Generation Tab
+@onready var tab_container: TabContainer = %TabContainer
+@onready var gen_status_label: Label = %GenStatusLabel
+@onready var unload_btn: Button = %UnloadBtn
+@onready var prompt_input: TextEdit = %PromptInput
+@onready var generate_btn: Button = %GenerateBtn
+@onready var clear_btn: Button = %ClearBtn
+@onready var time_label: Label = %TimeLabel
+@onready var output_display: TextEdit = %OutputDisplay
+
+# UI References - Sampling Parameters
+@onready var temperature_slider: HSlider = %TemperatureSlider
+@onready var temperature_value: Label = %TemperatureValue
+@onready var top_p_slider: HSlider = %TopPSlider
+@onready var top_p_value: Label = %TopPValue
+@onready var top_k_spinbox: SpinBox = %TopKSpinBox
+@onready var max_tokens_spinbox: SpinBox = %MaxTokensSpinBox
+@onready var repeat_penalty_slider: HSlider = %RepeatPenaltySlider
+@onready var repeat_penalty_value: Label = %RepeatPenaltyValue
+@onready var min_p_slider: HSlider = %MinPSlider
+@onready var min_p_value: Label = %MinPValue
+@onready var seed_spinbox: SpinBox = %SeedSpinBox
+@onready var stop_sequences_input: TextEdit = %StopSequencesInput
+@onready var loaded_model_info: RichTextLabel = %LoadedModelInfo
+
 # UI References - HuggingFace Dialog
 @onready var hf_dialog: Window = %HFDialog
 @onready var hf_search_input: LineEdit = %HFSearchInput
@@ -57,6 +82,10 @@ var _hf_search_results: Array[Dictionary] = []
 var _hf_selected_model_id: String = ""
 var _hf_selected_file: Dictionary = {}
 
+# Generation state
+var _generation_thread: Thread
+var _is_generating: bool = false
+
 
 func _ready() -> void:
 	# Connect window signals
@@ -70,7 +99,7 @@ func _ready() -> void:
 	_setup_sort_options()
 	_setup_hf_dialog()
 
-	# Connect UI signals
+	# Connect UI signals - Models Tab
 	sort_option.item_selected.connect(_on_sort_changed)
 	refresh_btn.pressed.connect(_on_refresh_pressed)
 	models_tree.item_selected.connect(_on_model_tree_selected)
@@ -80,6 +109,20 @@ func _ready() -> void:
 	delete_model_btn.pressed.connect(_on_delete_model_pressed)
 	browse_hf_btn.pressed.connect(_on_browse_hf_pressed)
 	cancel_download_btn.pressed.connect(_on_cancel_download_pressed)
+
+	# Connect UI signals - Generation Tab
+	unload_btn.pressed.connect(_on_gen_unload_pressed)
+	generate_btn.pressed.connect(_on_generate_pressed)
+	clear_btn.pressed.connect(_on_clear_pressed)
+
+	# Connect slider value changed
+	temperature_slider.value_changed.connect(_on_temperature_changed)
+	top_p_slider.value_changed.connect(_on_top_p_changed)
+	repeat_penalty_slider.value_changed.connect(_on_repeat_penalty_changed)
+	min_p_slider.value_changed.connect(_on_min_p_changed)
+
+	# Setup tooltips for sampling parameters
+	_setup_sampling_tooltips()
 
 	# Initial state
 	download_panel.hide()
@@ -120,6 +163,11 @@ func _connect_ai_service() -> void:
 
 
 func _exit_tree() -> void:
+	# Wait for generation thread to finish
+	if _generation_thread != null and _generation_thread.is_started():
+		_generation_thread.wait_to_finish()
+
+	# Cleanup HuggingFace API
 	if _hf_api != null:
 		_hf_api.cleanup()
 
@@ -129,6 +177,8 @@ func show_window() -> void:
 	if _model_manager:
 		_populate_models_tree()
 		_update_ui_state()
+		_update_generation_ui_state()
+		_update_loaded_model_info()
 	popup_centered()
 
 
@@ -383,18 +433,27 @@ func _on_load_model_pressed() -> void:
 	status_label.add_theme_color_override("font_color", Color.YELLOW)
 
 	var err = _model_manager.load_model(model)
-	if err != OK:
+	if err == OK:
+		# Apply model's defaults to UI
+		_apply_model_defaults_to_ui(model)
+		# Switch to generation tab
+		tab_container.current_tab = 1
+	else:
 		status_label.text = "Failed to load model"
 		status_label.add_theme_color_override("font_color", Color.RED)
 
 	_populate_models_tree()
 	_update_ui_state()
+	_update_generation_ui_state()
+	_update_loaded_model_info()
 
 
 func _on_unload_model_pressed() -> void:
 	_model_manager.unload_model()
 	_populate_models_tree()
 	_update_ui_state()
+	_update_generation_ui_state()
+	_update_loaded_model_info()
 
 
 func _on_delete_model_pressed() -> void:
@@ -458,6 +517,8 @@ func _on_download_failed(_model_id: String, error: String) -> void:
 func _on_model_loaded_internal(config: ModelConfig) -> void:
 	_populate_models_tree()
 	_update_ui_state()
+	_update_generation_ui_state()
+	_update_loaded_model_info()
 	model_loaded.emit(config)
 
 
@@ -470,6 +531,8 @@ func _on_model_load_failed(_config: ModelConfig, error: Error) -> void:
 func _on_model_unloaded_internal() -> void:
 	_populate_models_tree()
 	_update_ui_state()
+	_update_generation_ui_state()
+	_update_loaded_model_info()
 	model_unloaded.emit()
 
 
@@ -683,3 +746,201 @@ func _format_number(n: int) -> String:
 	elif n >= 1000:
 		return "%.1fK" % (n / 1000.0)
 	return str(n)
+
+
+# ==================== Generation Tab ====================
+
+func _setup_sampling_tooltips() -> void:
+	temperature_slider.tooltip_text = "Controls randomness in generation.\n0.0 = Deterministic (always picks most likely token)\n0.7 = Balanced creativity\n1.0+ = More random and creative\n\nHigher values produce more varied but potentially less coherent text."
+
+	top_p_slider.tooltip_text = "Nucleus sampling: only considers tokens whose cumulative probability exceeds this threshold.\n0.9 = Conservative, more focused\n0.95 = Balanced (recommended)\n1.0 = Consider all tokens\n\nWorks together with Temperature to control output diversity."
+
+	top_k_spinbox.tooltip_text = "Limits token selection to the K most likely candidates.\n0 = Disabled (no limit)\n40 = Balanced (recommended)\n100 = More diverse\n\nLower values = more focused, higher = more varied responses."
+
+	max_tokens_spinbox.tooltip_text = "Maximum number of tokens to generate.\nThis is the PRIMARY control for response length.\n\n256 = Short responses\n512 = Medium responses\n1024+ = Long responses\n\nNote: Generation may stop earlier if the model produces an end-of-sequence token."
+
+	repeat_penalty_slider.tooltip_text = "Penalizes repeated tokens to avoid loops.\n1.0 = No penalty\n1.1 = Light penalty (recommended)\n1.5+ = Strong penalty\n\nToo high can make responses unnatural or cut them short."
+
+	min_p_slider.tooltip_text = "Filters out tokens with probability below this threshold relative to the top token.\n0.05 = Light filtering (recommended)\n0.1 = Moderate filtering\n0.2+ = Aggressive filtering\n\nHelps eliminate very unlikely tokens while preserving creativity."
+
+	seed_spinbox.tooltip_text = "Seed for random number generation.\n-1 = Random seed each time\nAny other value = Reproducible results\n\nUse a fixed seed to get the same output for the same prompt."
+
+	stop_sequences_input.tooltip_text = "Sequences that will stop generation when encountered.\nOne sequence per line.\n\nCommon examples:\n- User: (for chat format)\n- \\n\\n (double newline)\n- [END]\n\nLeave empty if you don't need early stopping."
+
+
+func _update_loaded_model_info() -> void:
+	if not _model_manager or not _model_manager.is_model_loaded():
+		loaded_model_info.text = "[color=#8b949e]No model loaded.[/color]\n[color=#484f58]Go to Models tab to load one.[/color]"
+		return
+
+	var config = _model_manager.current_config
+	var info = _model_manager.get_model_info()
+
+	# Title with gradient-like effect using colors
+	var text = "[color=#00d4ff][b]%s[/b][/color]\n" % config.display_name
+	text += "[color=#21262d]━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n"
+
+	# Model stats
+	if info.has("n_params"):
+		var params = info["n_params"]
+		var params_str = "%.2fB" % (params / 1_000_000_000.0) if params >= 1_000_000_000 else "%.0fM" % (params / 1_000_000.0)
+		text += "[color=#a855f7]Parameters:[/color] %s\n" % params_str
+
+	if info.has("n_ctx"):
+		text += "[color=#a855f7]Context:[/color] %d tokens\n" % info["n_ctx"]
+
+	if info.has("vocab_size"):
+		text += "[color=#a855f7]Vocabulary:[/color] %d tokens\n" % info["vocab_size"]
+
+	if info.has("n_layer"):
+		text += "[color=#a855f7]Layers:[/color] %d\n" % info["n_layer"]
+
+	# Config info
+	text += "\n[color=#10b981][b]Configuration[/b][/color]\n"
+	text += "[color=#8b949e]GPU Layers:[/color] %d\n" % config.n_gpu_layers
+	text += "[color=#8b949e]Batch Size:[/color] %d\n" % config.n_batch
+
+	# File size if available
+	var path = config.get_effective_path()
+	if FileAccess.file_exists(path):
+		var file = FileAccess.open(path, FileAccess.READ)
+		if file:
+			var size_mb = file.get_length() / (1024.0 * 1024.0)
+			file.close()
+			text += "[color=#8b949e]File Size:[/color] %.1f MB\n" % size_mb
+
+	# Estimated RAM
+	var est_ram = config.size_mb * 1.2
+	text += "[color=#8b949e]Est. RAM:[/color] ~%.0f MB\n" % est_ram
+
+	loaded_model_info.text = text
+
+
+func _update_generation_ui_state() -> void:
+	if not _model_manager:
+		return
+
+	var is_loaded = _model_manager.is_model_loaded()
+
+	# Generation tab controls
+	unload_btn.disabled = not is_loaded
+	generate_btn.disabled = not is_loaded or _is_generating
+
+	# Status
+	if is_loaded and _model_manager.current_config != null:
+		gen_status_label.text = "Model: %s" % _model_manager.current_config.display_name
+		gen_status_label.add_theme_color_override("font_color", Color.GREEN)
+	else:
+		gen_status_label.text = "No model loaded"
+		gen_status_label.remove_theme_color_override("font_color")
+
+
+func _apply_sampling_params() -> void:
+	var llama = _model_manager.get_llama()
+	if llama == null:
+		return
+
+	llama.temperature = temperature_slider.value
+	llama.top_p = top_p_slider.value
+	llama.top_k = int(top_k_spinbox.value)
+	llama.max_tokens = int(max_tokens_spinbox.value)
+	llama.repeat_penalty = repeat_penalty_slider.value
+	llama.min_p = min_p_slider.value
+
+	if seed_spinbox.value < 0:
+		llama.seed = 0xFFFFFFFF
+	else:
+		llama.seed = int(seed_spinbox.value)
+
+	var stop_text = stop_sequences_input.text.strip_edges()
+	if stop_text.is_empty():
+		llama.clear_stop_sequences()
+	else:
+		var sequences = stop_text.split("\n", false)
+		llama.set_stop_sequences(PackedStringArray(sequences))
+
+
+func _apply_model_defaults_to_ui(model: ModelConfig) -> void:
+	temperature_slider.value = model.default_temperature
+	top_p_slider.value = model.default_top_p
+	top_k_spinbox.value = model.default_top_k
+	max_tokens_spinbox.value = model.default_max_tokens
+	repeat_penalty_slider.value = model.default_repeat_penalty
+	min_p_slider.value = model.default_min_p
+
+
+# ==================== Signal Handlers - Generation Tab ====================
+
+func _on_gen_unload_pressed() -> void:
+	_model_manager.unload_model()
+	_populate_models_tree()
+	_update_ui_state()
+	_update_generation_ui_state()
+	_update_loaded_model_info()
+
+
+func _on_generate_pressed() -> void:
+	if _is_generating or not _model_manager.is_model_loaded():
+		return
+
+	var prompt = prompt_input.text.strip_edges()
+	if prompt.is_empty():
+		output_display.text = "[Error: Please enter a prompt]"
+		return
+
+	_is_generating = true
+	generate_btn.disabled = true
+	generate_btn.text = "Generating..."
+	time_label.text = ""
+	output_display.text = "Generating..."
+
+	_apply_sampling_params()
+
+	_generation_thread = Thread.new()
+	_generation_thread.start(_generate_threaded.bind(prompt))
+
+
+func _generate_threaded(prompt: String) -> void:
+	var start_time = Time.get_ticks_msec()
+	var llama = _model_manager.get_llama()
+	var result = llama.generate(prompt)
+	var elapsed = Time.get_ticks_msec() - start_time
+	call_deferred("_on_generation_complete", result, elapsed)
+
+
+func _on_generation_complete(result: String, elapsed_ms: int) -> void:
+	if _generation_thread != null:
+		_generation_thread.wait_to_finish()
+		_generation_thread = null
+
+	_is_generating = false
+	generate_btn.disabled = false
+	generate_btn.text = "Generate"
+
+	output_display.text = result
+	time_label.text = "Generated in %.2fs" % (elapsed_ms / 1000.0)
+
+	_update_generation_ui_state()
+
+
+func _on_clear_pressed() -> void:
+	output_display.text = ""
+	time_label.text = ""
+
+
+# ==================== Slider Handlers ====================
+
+func _on_temperature_changed(value: float) -> void:
+	temperature_value.text = "%.2f" % value
+
+
+func _on_top_p_changed(value: float) -> void:
+	top_p_value.text = "%.2f" % value
+
+
+func _on_repeat_penalty_changed(value: float) -> void:
+	repeat_penalty_value.text = "%.2f" % value
+
+
+func _on_min_p_changed(value: float) -> void:
+	min_p_value.text = "%.2f" % value
