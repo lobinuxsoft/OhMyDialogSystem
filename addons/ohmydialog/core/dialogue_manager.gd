@@ -476,8 +476,9 @@ func _complete_inference(response: String) -> void:
 		# Pure free mode - continue conversation
 		waiting_for_player_input.emit()
 	else:
-		# Graph mode - continue execution
-		graph_runner.provide_input(response)
+		# Graph mode - wait for user confirmation (Continue button)
+		# User will call select_choice(0) to advance
+		pass
 
 	_pending_inference.clear()
 

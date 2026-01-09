@@ -187,14 +187,18 @@ func _on_npc_speaking(speaker: String, text: String, is_streaming: bool) -> void
 	speaker_label.text = speaker
 	if not is_streaming:
 		dialogue_text.text = text
+		_show_continue()  # Static response - show continue button
 	else:
-		dialogue_text.text = ""  # Will be filled by tokens
-	_show_continue()
+		dialogue_text.text = "[i]Generating response...[/i]"
+		# For AI streaming, continue button will show after response completes
+		continue_button.visible = false
 	_update_debug()
 
 
 func _on_npc_response_completed(full_text: String) -> void:
 	dialogue_text.text = full_text
+	# Show continue button after AI response completes
+	_show_continue()
 	_update_debug()
 
 
