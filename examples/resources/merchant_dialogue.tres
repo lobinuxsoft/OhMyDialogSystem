@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=16 format=3 uid="uid://i1sbtg72xp43"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=15 format=3 uid="uid://i1sbtg72xp43"]
 
 [ext_resource type="Script" uid="uid://di7mrn0ixw647" path="res://addons/ohmydialog/resources/dialogue_node_data.gd" id="1_unnix"]
 [ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="2_euopo"]
@@ -68,17 +68,6 @@ data = {
 "variable": "talked_to_merchant"
 }
 
-[sub_resource type="Resource" id="Resource_euopo"]
-script = ExtResource("1_unnix")
-node_id = "5c905564-fd5a-401d-b006-aa3e47fd58c3"
-node_type = 3
-editor_position = Vector2(1620, 780)
-data = {
-"emotion": "confused",
-"speaker": "Marcus",
-"text": "Gracias vuelve pronto!!!"
-}
-
 [sub_resource type="Resource" id="Resource_4s3gr"]
 script = ExtResource("1_unnix")
 node_id = "627c0fa2-04dc-4905-bd0c-047b869a2cb1"
@@ -130,18 +119,8 @@ script = ExtResource("1_unnix")
 node_id = "cbac69cf-a41d-4f45-a0bc-79e55a396ead"
 editor_position = Vector2(-380, 220)
 data = {
+"model_path": "res://models/qwen2.5-3b-instruct-q4_k_m.gguf",
 "trigger": ""
-}
-
-[sub_resource type="Resource" id="Resource_unnix"]
-script = ExtResource("1_unnix")
-node_id = "cbf9f9a8-60a6-4e7e-98d5-863a107d65dd"
-node_type = 3
-editor_position = Vector2(840, 780)
-data = {
-"emotion": "surprised",
-"speaker": "Marcus",
-"text": "No has comprado nada..."
 }
 
 [sub_resource type="Resource" id="Resource_twdj5"]
@@ -157,6 +136,17 @@ data = {
 }
 output_count = 2
 
+[sub_resource type="Resource" id="Resource_unnix"]
+script = ExtResource("1_unnix")
+node_id = "879f11d8-36bd-4016-a356-e066c6e40480"
+node_type = 2
+editor_position = Vector2(740, 700)
+data = {
+"emotion_hint": "confused",
+"max_tokens": 256,
+"prompt_template": "contesta de manera profesional."
+}
+
 [resource]
 script = ExtResource("2_euopo")
 graph_id = "merchant_demo"
@@ -168,13 +158,12 @@ nodes = {
 "226d1a7d-6f94-4263-b2b1-f21ec77803b7": SubResource("Resource_1mjo3"),
 "32d728f2-736f-4949-b9ad-a21e61a0ee5a": SubResource("Resource_fif8s"),
 "3c5f4686-6079-40fe-9d7d-e9fc52af7307": SubResource("Resource_c48km"),
-"5c905564-fd5a-401d-b006-aa3e47fd58c3": SubResource("Resource_euopo"),
 "627c0fa2-04dc-4905-bd0c-047b869a2cb1": SubResource("Resource_4s3gr"),
 "69de9af7-f441-4bf0-9175-3872dfe127c7": SubResource("Resource_v4s23"),
 "74d33460-cf16-47fa-a7a9-f1c1562d61f9": SubResource("Resource_ii654"),
+"879f11d8-36bd-4016-a356-e066c6e40480": SubResource("Resource_unnix"),
 "ba8676f0-76e0-475f-8abf-6f40401d9ca9": SubResource("Resource_c51jo"),
 "cbac69cf-a41d-4f45-a0bc-79e55a396ead": SubResource("Resource_p5lqr"),
-"cbf9f9a8-60a6-4e7e-98d5-863a107d65dd": SubResource("Resource_unnix"),
 "ed9ee5fe-83b8-4342-b426-52fae2602675": SubResource("Resource_twdj5")
 }
 connections = Array[Dictionary]([{
@@ -223,21 +212,6 @@ connections = Array[Dictionary]([{
 "to_node": "69de9af7-f441-4bf0-9175-3872dfe127c7",
 "to_slot": 0
 }, {
-"from_node": "208fe2bb-0835-4ce9-b321-9433d97c721d",
-"from_slot": 3,
-"to_node": "cbf9f9a8-60a6-4e7e-98d5-863a107d65dd",
-"to_slot": 0
-}, {
-"from_node": "cbf9f9a8-60a6-4e7e-98d5-863a107d65dd",
-"from_slot": 0,
-"to_node": "5c905564-fd5a-401d-b006-aa3e47fd58c3",
-"to_slot": 0
-}, {
-"from_node": "5c905564-fd5a-401d-b006-aa3e47fd58c3",
-"from_slot": 0,
-"to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
-"to_slot": 0
-}, {
 "from_node": "3c5f4686-6079-40fe-9d7d-e9fc52af7307",
 "from_slot": 0,
 "to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
@@ -254,6 +228,16 @@ connections = Array[Dictionary]([{
 "to_slot": 0
 }, {
 "from_node": "32d728f2-736f-4949-b9ad-a21e61a0ee5a",
+"from_slot": 0,
+"to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
+"to_slot": 0
+}, {
+"from_node": "208fe2bb-0835-4ce9-b321-9433d97c721d",
+"from_slot": 3,
+"to_node": "879f11d8-36bd-4016-a356-e066c6e40480",
+"to_slot": 0
+}, {
+"from_node": "879f11d8-36bd-4016-a356-e066c6e40480",
 "from_slot": 0,
 "to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
 "to_slot": 0
