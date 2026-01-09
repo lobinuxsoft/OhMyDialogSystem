@@ -462,6 +462,9 @@ func _on_generation_completed(full_text: String) -> void:
 
 ## Completes inference and updates state.
 func _complete_inference(response: String) -> void:
+	# Clean up response (remove prompt artifacts)
+	response = _clean_response(response)
+
 	# Add to history
 	conversation_history.add_assistant(response)
 
@@ -481,6 +484,23 @@ func _complete_inference(response: String) -> void:
 		pass
 
 	_pending_inference.clear()
+
+
+## Cleans up LLM response by removing prompt template artifacts.
+func _clean_response(response: String) -> String:
+	var cleaned := response.strip_edges()
+
+	# Remove common prompt artifacts from start
+	var artifacts := ["### RESPONSE", "### Response", "###RESPONSE", "Response:"]
+	for artifact in artifacts:
+		if cleaned.begins_with(artifact):
+			cleaned = cleaned.substr(artifact.length()).strip_edges()
+
+	# Remove character name prefix if model repeated it
+	if active_character and cleaned.begins_with(active_character.character_name + ":"):
+		cleaned = cleaned.substr(active_character.character_name.length() + 1).strip_edges()
+
+	return cleaned
 
 
 # ==================== Graph Runner Signal Handlers ====================
