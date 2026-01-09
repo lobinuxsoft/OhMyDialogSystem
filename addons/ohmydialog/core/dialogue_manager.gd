@@ -491,14 +491,23 @@ func _clean_response(response: String) -> String:
 	var cleaned := response.strip_edges()
 
 	# Remove common prompt artifacts from start
-	var artifacts := ["### RESPONSE", "### Response", "###RESPONSE", "Response:"]
-	for artifact in artifacts:
+	var start_artifacts := ["### RESPONSE", "### Response", "###RESPONSE", "Response:"]
+	for artifact in start_artifacts:
 		if cleaned.begins_with(artifact):
 			cleaned = cleaned.substr(artifact.length()).strip_edges()
 
 	# Remove character name prefix if model repeated it
 	if active_character and cleaned.begins_with(active_character.character_name + ":"):
 		cleaned = cleaned.substr(active_character.character_name.length() + 1).strip_edges()
+
+	# Cut at first ### (model generating multiple responses or continuing prompt)
+	var cut_pos := cleaned.find("###")
+	if cut_pos > 0:
+		cleaned = cleaned.substr(0, cut_pos).strip_edges()
+
+	# Remove surrounding quotes if present
+	if cleaned.begins_with('"') and cleaned.ends_with('"'):
+		cleaned = cleaned.substr(1, cleaned.length() - 2)
 
 	return cleaned
 
