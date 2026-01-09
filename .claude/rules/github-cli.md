@@ -3,7 +3,17 @@
 ## Issue-First Development
 **ALWAYS create issue BEFORE coding.**
 
-Flow: `Create Issue → Create Branch → Develop → PR to development → Pre-close Check → Close Issue`
+Flow: `Create Issue → Add to Project → Create Branch → Develop → PR to development → Pre-close Check → Close Issue`
+
+## Project Management
+**ALWAYS add new issues to the project board.**
+
+```bash
+# Add issue to project (run immediately after creating issue)
+gh project item-add 5 --owner lobinuxsoft --url https://github.com/lobinuxsoft/OhMyDialogSystem/issues/<NUMBER>
+```
+
+Project ID: `5` (OhMyDialogSystem Development)
 
 ## Pre-Close Checklist
 Before closing ANY issue:
