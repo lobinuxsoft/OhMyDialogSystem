@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://test_dialogue_scene"]
+[gd_scene load_steps=2 format=3 uid="uid://bvirxw54wgi03"]
 
-[ext_resource type="Script" path="res://examples/dialogue_test_scene.gd" id="1"]
+[ext_resource type="Script" uid="uid://poksx1f252dk" path="res://examples/dialogue_test_scene.gd" id="1"]
 
 [node name="DialogueTestScene" type="Control"]
 layout_mode = 3
@@ -38,8 +38,8 @@ layout_mode = 2
 [node name="TitleLabel" type="Label" parent="VBoxContainer/Header/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "OhMyDialog - Test Scene"
 theme_override_font_sizes/font_size = 24
+text = "OhMyDialog - Test Scene"
 
 [node name="StatusLabel" type="Label" parent="VBoxContainer/Header/HBoxContainer"]
 unique_name_in_owner = true
@@ -82,9 +82,9 @@ theme_override_constants/separation = 15
 [node name="SpeakerLabel" type="Label" parent="VBoxContainer/MainContent/LeftPanel/DialoguePanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Speaker Name"
 theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 20
+text = "Speaker Name"
 
 [node name="DialogueText" type="RichTextLabel" parent="VBoxContainer/MainContent/LeftPanel/DialoguePanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
@@ -126,21 +126,25 @@ layout_mode = 2
 text = "Send"
 
 [node name="RightPanel" type="VBoxContainer" parent="VBoxContainer/MainContent"]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 
 [node name="DebugHeader" type="Label" parent="VBoxContainer/MainContent/RightPanel"]
 layout_mode = 2
-text = "Debug Info"
 theme_override_font_sizes/font_size = 16
+text = "Debug Info"
 
-[node name="DebugLabel" type="Label" parent="VBoxContainer/MainContent/RightPanel"]
-unique_name_in_owner = true
+[node name="DebugScroll" type="ScrollContainer" parent="VBoxContainer/MainContent/RightPanel"]
 layout_mode = 2
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="DebugLabel" type="Label" parent="VBoxContainer/MainContent/RightPanel/DebugScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Mode: IDLE
-History: 0 messages
-Context: 0 vars"
+History: 0 messages"
 autowrap_mode = 2
 
 [node name="Footer" type="PanelContainer" parent="VBoxContainer"]

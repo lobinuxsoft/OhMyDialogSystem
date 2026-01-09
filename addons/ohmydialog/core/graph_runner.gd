@@ -70,6 +70,9 @@ var _context: Dictionary = {}
 ## Return node for when exiting free mode.
 var _free_mode_return_node: String = ""
 
+## Pending choices when waiting for player selection.
+var _pending_choices: Array = []
+
 
 func _init() -> void:
 	_register_default_executors()
@@ -131,6 +134,7 @@ func stop() -> void:
 	state = State.IDLE
 	current_node = null
 	current_graph = null
+	_pending_choices.clear()
 
 
 ## Pauses execution (can be resumed).
@@ -153,7 +157,11 @@ func provide_input(input: Variant) -> void:
 		return
 
 	if input is int:
-		# Choice selection - use the slot index
+		# Choice selection - get text and store as player_input
+		if input >= 0 and input < _pending_choices.size():
+			var selected_choice: Dictionary = _pending_choices[input]
+			_context["player_input"] = selected_choice.get("text", "")
+		_pending_choices.clear()
 		_advance_to_next_node(input)
 	elif input is String:
 		# Text input - store in context
@@ -249,6 +257,7 @@ func _handle_result(result: Dictionary) -> void:
 
 	# Handle choices (wait for input)
 	if result.has(BaseNodeExecutor.RESULT_CHOICES):
+		_pending_choices = result[BaseNodeExecutor.RESULT_CHOICES]
 		state = State.WAITING_INPUT
 		waiting_for_input.emit("choice", {"choices": result[BaseNodeExecutor.RESULT_CHOICES]})
 		return
@@ -544,8 +553,11 @@ class GraphRunnerContext extends RefCounted:
 				return _runner._context.get("prompt_builder")
 		return null
 
+	func set_context(key: String, value: Variant) -> void:
+		_runner._context[key] = value
+
 	func context_has_method(method_name: String) -> bool:
-		return method_name in ["get_context", "get_variable", "set_variable", "evaluate_condition"]
+		return method_name in ["get_context", "set_context", "get_variable", "set_variable", "evaluate_condition"]
 
 	func get_variable(name: String) -> Variant:
 		return _runner.get_variable(name)

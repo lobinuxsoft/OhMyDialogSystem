@@ -13,17 +13,15 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	# Use duck typing - llama can be LlamaInterface or MockLlamaInterface
 	var llama: Object = context.get_context("llama_interface") if has_context else null
 	var pb: PromptBuilder = context.get_context("prompt_builder") if has_context else null
+	# Character and world come from DialogueGraph context (set when dialogue starts)
+	var character: CharacterIdentity = context.get_context("character") if has_context else null
 	var world: WorldContext = context.get_context("world") if has_context else null
 	var history: Array[Dictionary] = context.get_context("history") if has_context else []
 	var player_input: String = context.get_context("player_input") if has_context else ""
 
-	# Get character from node data or context
-	var character: CharacterIdentity = null
-	var character_id: String = node_data.data.get("character_id", "")
-	if not character_id.is_empty() and ResourceLoader.exists(character_id):
-		character = load(character_id) as CharacterIdentity
-	if not character:
-		character = context.get_context("character") if has_context else null
+	# Clear player_input after consuming so next AI_RESPONSE doesn't inherit it
+	if has_context and context.has_method("set_context"):
+		context.set_context("player_input", "")
 
 	# Validate required components (duck typing - check for generate method)
 	if not llama or not llama.has_method("generate"):
@@ -35,10 +33,10 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 
 	# Get node-specific overrides
 	var temperature: float = node_data.data.get("temperature", 0.7)
-	var max_tokens: int = node_data.data.get("max_tokens", 256)
-	var system_override: String = node_data.data.get("system_prompt_override", "")
+	var max_tokens: int = node_data.data.get("max_tokens", 64)  # Default to short responses
+	var prompt_template: String = node_data.data.get("prompt_template", "")
 
-	# Build the prompt
+	# Build the prompt with instruction from prompt_template
 	var memories: Array[String] = []
 	if has_context and context.get_context("memories"):
 		memories = context.get_context("memories")
@@ -48,12 +46,10 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 		world,
 		memories,
 		history,
-		player_input
+		player_input,
+		4096,  # max_context_tokens
+		prompt_template  # instruction - passed to user section of prompt
 	)
-
-	# Apply system override if specified
-	if not system_override.is_empty():
-		prompt = system_override + "\n\n" + prompt
 
 	# Generate response (this would be async in real usage)
 	# The GraphRunner should handle the async nature

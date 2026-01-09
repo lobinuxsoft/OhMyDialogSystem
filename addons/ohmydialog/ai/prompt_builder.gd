@@ -8,24 +8,26 @@ extends RefCounted
 ## that respects token limits.
 
 
-## Default prompt template with placeholders for each section.
-const DEFAULT_TEMPLATE := """### SYSTEM
-You are roleplaying as {character_name}. Stay in character at all times.
+## Default prompt template using ChatML format (compatible with Qwen, Mistral, etc.)
+const DEFAULT_TEMPLATE := """<|im_start|>system
+You are {character_name}. Stay in character. Give SHORT, DIRECT responses (1-2 sentences max).
+
+RULES:
+- Respond naturally to what the player said
+- Do NOT ask multiple questions
+- Do NOT list options or items unless specifically asked
+- Do NOT invent details not mentioned in your character description
+- Keep responses conversational and brief
+
 {character_prompt}
 
-### WORLD CONTEXT
-{world_context}
+World: {world_context}
 
-### RELEVANT MEMORIES
-{memories}
-
-### CONVERSATION HISTORY
+Memories: {memories}<|im_end|>
+<|im_start|>user
 {history}
-
-### CURRENT INPUT
-{player_input}
-
-### RESPONSE
+{player_input}{instruction}<|im_end|>
+<|im_start|>assistant
 {character_name}:"""
 
 
@@ -41,13 +43,15 @@ var custom_template: String = ""
 
 ## Builds a complete prompt from the provided components.
 ## Returns the assembled prompt string.
+## [param instruction]: Optional additional instruction for the AI (e.g., "respond sadly").
 func build_prompt(
 	character: CharacterIdentity,
 	world: WorldContext,
 	memories: Array[String],
 	history: Array[Dictionary],
 	player_input: String,
-	max_context_tokens: int = 4096
+	max_context_tokens: int = 4096,
+	instruction: String = ""
 ) -> String:
 	var template := custom_template if not custom_template.is_empty() else DEFAULT_TEMPLATE
 
@@ -71,6 +75,11 @@ func build_prompt(
 	else:
 		history_text = "(History truncated due to context limit)"
 
+	# Format instruction if provided
+	var instruction_text := ""
+	if not instruction.is_empty():
+		instruction_text = "\n\n[Instruction: %s]" % instruction
+
 	# Assemble the prompt
 	var prompt := template.format({
 		"character_name": character_name,
@@ -78,7 +87,8 @@ func build_prompt(
 		"world_context": world_context,
 		"memories": memories_text,
 		"history": history_text,
-		"player_input": player_input
+		"player_input": player_input,
+		"instruction": instruction_text
 	})
 
 	return prompt
@@ -92,13 +102,11 @@ func build_simple_prompt(
 	var character_name := character.character_name if character else "Assistant"
 	var character_prompt := character.to_system_prompt() if character else ""
 
-	return """### SYSTEM
-You are {name}. {prompt}
-
-### INPUT
-{input}
-
-### RESPONSE
+	return """<|im_start|>system
+You are {name}. Keep responses brief (1-3 sentences). {prompt}<|im_end|>
+<|im_start|>user
+{input}<|im_end|>
+<|im_start|>assistant
 {name}:""".format({
 		"name": character_name,
 		"prompt": character_prompt,

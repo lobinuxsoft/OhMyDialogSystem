@@ -16,6 +16,10 @@ config/version="0.1.0"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="uid://f0hyuiidpuyj"
 
+[autoload]
+
+AIServiceAutoload="*res://addons/ohmydialog/autoload/ai_service_autoload.gd"
+
 [dotnet]
 
 project/assembly_name="OhMyDialogSystem"

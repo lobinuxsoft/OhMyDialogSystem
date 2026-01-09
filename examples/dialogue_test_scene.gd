@@ -18,10 +18,15 @@ extends Control
 var dialogue_manager: DialogueManager
 var mock_llama: MockLlamaInterface
 
+# Debug tracking
+var last_player_input: String = ""
+var pending_choices: Array[Dictionary] = []
+
 # Resources
 var merchant_character: CharacterIdentity
 var fantasy_world: WorldContext
 var merchant_dialogue: DialogueGraph
+var dialogue_preset: AIPreset
 
 
 func _ready() -> void:
@@ -52,11 +57,14 @@ func _load_resources() -> void:
 	merchant_character = load("res://examples/resources/merchant_character.tres")
 	fantasy_world = load("res://examples/resources/fantasy_world.tres")
 	merchant_dialogue = load("res://examples/resources/merchant_dialogue.tres")
+	dialogue_preset = load("res://examples/resources/dialogue_preset.tres")
 
 	if merchant_character:
 		dialogue_manager.default_character = merchant_character
 	if fantasy_world:
 		dialogue_manager.world_context = fantasy_world
+	if dialogue_preset:
+		dialogue_manager.ai_preset = dialogue_preset
 
 
 func _connect_signals() -> void:
@@ -105,6 +113,9 @@ func _show_choices(choices: Array[Dictionary]) -> void:
 	input_field.visible = false
 	send_button.visible = false
 
+	# Store choices for debug tracking
+	pending_choices = choices
+
 	for i in choices.size():
 		var choice: Dictionary = choices[i]
 		var button := Button.new()
@@ -126,11 +137,24 @@ func _show_input() -> void:
 func _update_debug() -> void:
 	if dialogue_manager:
 		var info := dialogue_manager.get_debug_info()
-		debug_label.text = "Mode: %s | History: %s | Context: %s" % [
-			info.get("mode", "?"),
-			info.get("history", "?"),
-			info.get("context", "?")
-		]
+		var lines: Array[String] = []
+
+		lines.append("Mode: %s" % info.get("mode", "?"))
+		lines.append("Model: %s" % info.get("model", "none"))
+		lines.append("")
+		lines.append("Character: %s" % info.get("character", "none"))
+		if not info.get("character_personality", "").is_empty():
+			lines.append("  %s" % info.get("character_personality", "").substr(0, 40))
+		lines.append("")
+		lines.append("World: %s" % info.get("world", "none"))
+		if not info.get("world_location", "").is_empty():
+			lines.append("  @ %s" % info.get("world_location", ""))
+		lines.append("")
+		lines.append("Last Input: %s" % (last_player_input if not last_player_input.is_empty() else "(none)"))
+		lines.append("")
+		lines.append("History: %s" % info.get("history", "?"))
+
+		debug_label.text = "\n".join(lines)
 
 
 # ==================== UI Signal Handlers ====================
@@ -151,8 +175,10 @@ func _on_continue_pressed() -> void:
 func _on_send_pressed() -> void:
 	var text := input_field.text.strip_edges()
 	if not text.is_empty():
+		last_player_input = text  # Track for debug
 		dialogue_manager.send_player_message(text)
 		input_field.text = ""
+		_update_debug()
 
 
 func _on_input_submitted(text: String) -> void:
@@ -160,8 +186,16 @@ func _on_input_submitted(text: String) -> void:
 
 
 func _on_choice_selected(index: int) -> void:
+	# Store selected choice text for debug display
+	for choice in pending_choices:
+		if choice.get("index", -1) == index:
+			last_player_input = choice.get("text", "")
+			break
+	pending_choices.clear()
+
 	dialogue_manager.select_choice(index)
 	_clear_choices()
+	_update_debug()
 
 
 # ==================== DialogueManager Signal Handlers ====================
@@ -169,6 +203,8 @@ func _on_choice_selected(index: int) -> void:
 
 func _on_dialogue_started(_graph: DialogueGraph) -> void:
 	print("[DialogueTest] Dialogue started!")
+	last_player_input = ""
+	pending_choices.clear()
 	_update_ui_state()
 	_update_debug()
 
@@ -187,14 +223,18 @@ func _on_npc_speaking(speaker: String, text: String, is_streaming: bool) -> void
 	speaker_label.text = speaker
 	if not is_streaming:
 		dialogue_text.text = text
+		_show_continue()  # Static response - show continue button
 	else:
-		dialogue_text.text = ""  # Will be filled by tokens
-	_show_continue()
+		dialogue_text.text = "[i]Generating response...[/i]"
+		# For AI streaming, continue button will show after response completes
+		continue_button.visible = false
 	_update_debug()
 
 
 func _on_npc_response_completed(full_text: String) -> void:
 	dialogue_text.text = full_text
+	# Show continue button after AI response completes
+	_show_continue()
 	_update_debug()
 
 

@@ -1,265 +1,501 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=16 format=3 uid="uid://i1sbtg72xp43"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=30 format=3 uid="uid://i1sbtg72xp43"]
 
+[ext_resource type="Resource" path="res://examples/resources/merchant_character.tres" id="1_p5lqr"]
 [ext_resource type="Script" uid="uid://di7mrn0ixw647" path="res://addons/ohmydialog/resources/dialogue_node_data.gd" id="1_unnix"]
 [ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="2_euopo"]
+[ext_resource type="Resource" path="res://examples/resources/fantasy_world.tres" id="4_1mjo3"]
 
-[sub_resource type="Resource" id="Resource_y4fdt"]
+[sub_resource type="Resource" id="node_after_sample_ai"]
 script = ExtResource("1_unnix")
-node_id = "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f"
+node_id = "after_sample_ai_response"
+node_type = 2
+editor_position = Vector2(1660, 80)
+data = {
+"emotion_hint": "friendly",
+"max_tokens": 60,
+"prompt_template": "Ask the customer if they want to buy more potions now that they got a free sample. Be persuasive but friendly."
+}
+
+[sub_resource type="Resource" id="node_bow_ai"]
+script = ExtResource("1_unnix")
+node_id = "bow_ai_response"
+node_type = 2
+editor_position = Vector2(1380, -240)
+data = {
+"emotion_hint": "happy",
+"max_tokens": 60,
+"prompt_template": "The customer chose the elven bow! Thank them and mention it's crafted by elves. Be brief."
+}
+
+[sub_resource type="Resource" id="node_bow_event"]
+script = ExtResource("1_unnix")
+node_id = "bow_purchase_event"
+node_type = 6
+editor_position = Vector2(1680, -220)
+data = {
+"event_data": {
+"item": "elven_bow",
+"merchant": "Marcus",
+"price": 120
+},
+"event_name": "item_purchased"
+}
+
+[sub_resource type="Resource" id="node_bribe_ai"]
+script = ExtResource("1_unnix")
+node_id = "bribe_ai_response"
+node_type = 2
+editor_position = Vector2(1600, 340)
+data = {
+"emotion_hint": "greedy",
+"max_tokens": 70,
+"prompt_template": "The player offered to pay for secret information. Accept the bribe with greedy excitement and hint that you have access to a secret black market. Be brief and mysterious."
+}
+
+[sub_resource type="Resource" id="node_cancel_static"]
+script = ExtResource("1_unnix")
+node_id = "cancel_static"
+node_type = 3
+editor_position = Vector2(1380, 0)
+data = {
+"emotion": "neutral",
+"speaker": "Marcus",
+"text": "No problem, my friend! Come back anytime!"
+}
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("1_unnix")
+node_id = "end_node"
 node_type = 1
-editor_position = Vector2(2220, 60)
+editor_position = Vector2(2640, 380)
 data = {
 "reason": ""
 }
 output_count = 0
 
-[sub_resource type="Resource" id="Resource_kbowr"]
+[sub_resource type="Resource" id="node_forget_static"]
 script = ExtResource("1_unnix")
-node_id = "208fe2bb-0835-4ce9-b321-9433d97c721d"
+node_id = "forget_static"
+node_type = 3
+editor_position = Vector2(1600, 640)
+data = {
+"emotion": "relieved",
+"speaker": "Marcus",
+"text": "*looks relieved* Good, good. Some things are better left unknown, friend."
+}
+
+[sub_resource type="Resource" id="node_free_sample"]
+script = ExtResource("1_unnix")
+node_id = "free_sample_static"
+node_type = 3
+editor_position = Vector2(1020, 100)
+data = {
+"emotion": "generous",
+"speaker": "Marcus",
+"text": "*hands you a small vial* Here, take this minor healing potion as a free sample! Now then..."
+}
+
+[sub_resource type="Resource" id="node_goodbye_ai"]
+script = ExtResource("1_unnix")
+node_id = "goodbye_ai_response"
+node_type = 2
+editor_position = Vector2(740, 1080)
+data = {
+"emotion_hint": "sad",
+"max_tokens": 50,
+"prompt_template": "The player is leaving. Say a brief, slightly sad farewell hoping they'll return to shop another time."
+}
+
+[sub_resource type="Resource" id="node_increment_visits"]
+script = ExtResource("1_unnix")
+node_id = "increment_visits"
+node_type = 7
+editor_position = Vector2(1000, 1080)
+data = {
+"operation": 1,
+"value": 1,
+"variable": "merchant_visits"
+}
+
+[sub_resource type="Resource" id="node_main_choice"]
+script = ExtResource("1_unnix")
+node_id = "main_choice"
 node_type = 4
-editor_position = Vector2(280, 220)
+editor_position = Vector2(400, 200)
 data = {
 "choices": [{
-"text": "I'm looking to buy."
+"text": "I want to buy weapons."
 }, {
-"text": "Just browsing."
+"text": "Show me your potions."
 }, {
-"text": "Special items?"
+"text": "Tell me a secret..."
 }, {
-"text": "Bye!"
+"text": "Goodbye!"
 }]
 }
 output_count = 4
 
-[sub_resource type="Resource" id="Resource_1mjo3"]
+[sub_resource type="Resource" id="node_not_trusted_static"]
 script = ExtResource("1_unnix")
-node_id = "226d1a7d-6f94-4263-b2b1-f21ec77803b7"
+node_id = "not_trusted_static"
 node_type = 3
-editor_position = Vector2(-80, 220)
-editor_size = Vector2(295.00003, 374)
+editor_position = Vector2(1320, 800)
 data = {
-"emotion": "happy",
+"emotion": "suspicious",
 "speaker": "Marcus",
-"text": "Welcome, traveler! I am Marcus, purveyor of fine goods. What brings you here?"
-}
-metadata/test = false
-metadata/test1 = Vector3i(0, 0, 0)
-metadata/test3 = Vector3(0, 0, 0)
-
-[sub_resource type="Resource" id="Resource_fif8s"]
-script = ExtResource("1_unnix")
-node_id = "32d728f2-736f-4949-b9ad-a21e61a0ee5a"
-node_type = 3
-editor_position = Vector2(1620, 560)
-data = {
-"emotion": "angry",
-"speaker": "Marcus",
-"text": "Special items? I'm a legitimate merchant!"
+"text": "*narrows eyes* I don't know you well enough, stranger. Perhaps if you were more... established in these parts."
 }
 
-[sub_resource type="Resource" id="Resource_c48km"]
+[sub_resource type="Resource" id="node_potions_ai"]
 script = ExtResource("1_unnix")
-node_id = "3c5f4686-6079-40fe-9d7d-e9fc52af7307"
+node_id = "potions_ai_response"
+node_type = 2
+editor_position = Vector2(740, 120)
+data = {
+"emotion_hint": "happy",
+"max_tokens": 60,
+"prompt_template": "The customer wants potions! Respond enthusiastically about your healing potions. Be brief."
+}
+
+[sub_resource type="Resource" id="node_reputation_check"]
+script = ExtResource("1_unnix")
+node_id = "reputation_condition"
+node_type = 5
+editor_position = Vector2(1020, 460)
+data = {
+"operator": 3,
+"value": 50,
+"variable": "player_reputation"
+}
+output_count = 2
+
+[sub_resource type="Resource" id="node_sample_event"]
+script = ExtResource("1_unnix")
+node_id = "sample_event"
+node_type = 6
+editor_position = Vector2(1360, 180)
+data = {
+"event_data": {
+"item": "minor_healing_potion",
+"type": "free_sample"
+},
+"event_name": "item_received"
+}
+
+[sub_resource type="Resource" id="node_secret_ai"]
+script = ExtResource("1_unnix")
+node_id = "secret_ai_response"
+node_type = 2
+editor_position = Vector2(740, 460)
+data = {
+"emotion_hint": "mysterious",
+"max_tokens": 80,
+"prompt_template": "The player asked about secrets. Marcus should be suspicious and evasive, maybe hint at something illegal but not reveal too much. Be mysterious."
+}
+
+[sub_resource type="Resource" id="node_secret_choice_trusted"]
+script = ExtResource("1_unnix")
+node_id = "secret_choice_trusted"
+node_type = 4
+editor_position = Vector2(1320, 320)
+data = {
+"choices": [{
+"text": "I can pay well for information..."
+}, {
+"text": "Forget I asked."
+}]
+}
+output_count = 2
+
+[sub_resource type="Resource" id="node_secret_unlock_event"]
+script = ExtResource("1_unnix")
+node_id = "secret_unlock_event"
+node_type = 6
+editor_position = Vector2(1880, 400)
+data = {
+"event_data": {
+"merchant": "Marcus",
+"secret_type": "black_market"
+},
+"event_name": "secret_shop_unlocked"
+}
+
+[sub_resource type="Resource" id="node_set_talked"]
+script = ExtResource("1_unnix")
+node_id = "set_talked_variable"
 node_type = 7
-editor_position = Vector2(1160, 60)
+editor_position = Vector2(150, 200)
 data = {
 "operation": 0,
 "value": true,
 "variable": "talked_to_merchant"
 }
 
-[sub_resource type="Resource" id="Resource_euopo"]
+[sub_resource type="Resource" id="node_start"]
 script = ExtResource("1_unnix")
-node_id = "5c905564-fd5a-401d-b006-aa3e47fd58c3"
-node_type = 3
-editor_position = Vector2(1620, 780)
+node_id = "start_node"
+editor_position = Vector2(-400, 200)
 data = {
-"emotion": "confused",
-"speaker": "Marcus",
-"text": "Gracias vuelve pronto!!!"
-}
-
-[sub_resource type="Resource" id="Resource_4s3gr"]
-script = ExtResource("1_unnix")
-node_id = "627c0fa2-04dc-4905-bd0c-047b869a2cb1"
-node_type = 3
-editor_position = Vector2(1240, 400)
-editor_size = Vector2(236.60004, 191.70001)
-data = {
-"emotion": "neutral",
-"speaker": "Marcus",
-"text": "*whispers* Follow me to the back room..."
-}
-
-[sub_resource type="Resource" id="Resource_v4s23"]
-script = ExtResource("1_unnix")
-node_id = "69de9af7-f441-4bf0-9175-3872dfe127c7"
-node_type = 6
-editor_position = Vector2(1560, 380)
-data = {
-"event_data": {
-"merchant": "Marcus"
-},
-"event_name": "secret_shop_unlocked"
-}
-
-[sub_resource type="Resource" id="Resource_ii654"]
-script = ExtResource("1_unnix")
-node_id = "74d33460-cf16-47fa-a7a9-f1c1562d61f9"
-node_type = 3
-editor_position = Vector2(860, 240)
-data = {
-"emotion": "happy",
-"speaker": "Marcus",
-"text": "Browse all you like! My prices are irresistible!"
-}
-
-[sub_resource type="Resource" id="Resource_c51jo"]
-script = ExtResource("1_unnix")
-node_id = "ba8676f0-76e0-475f-8abf-6f40401d9ca9"
-node_type = 3
-editor_position = Vector2(850, 50)
-data = {
-"emotion": "neutral",
-"speaker": "Marcus",
-"text": "Excellent! I have potions, weapons, and magical trinkets!"
-}
-
-[sub_resource type="Resource" id="Resource_p5lqr"]
-script = ExtResource("1_unnix")
-node_id = "cbac69cf-a41d-4f45-a0bc-79e55a396ead"
-editor_position = Vector2(-380, 220)
-data = {
+"model_path": "res://models/qwen2.5-3b-instruct-q4_k_m.gguf",
 "trigger": ""
 }
 
-[sub_resource type="Resource" id="Resource_unnix"]
+[sub_resource type="Resource" id="node_sword_ai"]
 script = ExtResource("1_unnix")
-node_id = "cbf9f9a8-60a6-4e7e-98d5-863a107d65dd"
-node_type = 3
-editor_position = Vector2(840, 780)
+node_id = "sword_ai_response"
+node_type = 2
+editor_position = Vector2(1380, -520)
 data = {
-"emotion": "surprised",
-"speaker": "Marcus",
-"text": "No has comprado nada..."
+"emotion_hint": "happy",
+"max_tokens": 60,
+"prompt_template": "The customer chose the enchanted sword! Thank them for the purchase and say something about the sword being a fine choice."
 }
 
-[sub_resource type="Resource" id="Resource_twdj5"]
+[sub_resource type="Resource" id="node_sword_event"]
 script = ExtResource("1_unnix")
-node_id = "ed9ee5fe-83b8-4342-b426-52fae2602675"
-node_type = 5
-editor_position = Vector2(740, 480)
-editor_size = Vector2(236.57446, 220.4256)
+node_id = "sword_purchase_event"
+node_type = 6
+editor_position = Vector2(1680, -380)
 data = {
-"operator": 3,
-"value": 5,
-"variable": "player_reputation"
+"event_data": {
+"item": "enchanted_sword",
+"merchant": "Marcus",
+"price": 150
+},
+"event_name": "item_purchased"
 }
-output_count = 2
+
+[sub_resource type="Resource" id="node_weapons_ai"]
+script = ExtResource("1_unnix")
+node_id = "weapons_ai_response"
+node_type = 2
+editor_position = Vector2(740, -280)
+data = {
+"emotion_hint": "excited",
+"max_tokens": 60,
+"prompt_template": "Acknowledge the customer wants weapons. Mention you have an enchanted sword and an elven bow. Be enthusiastic but brief."
+}
+
+[sub_resource type="Resource" id="node_weapons_choice"]
+script = ExtResource("1_unnix")
+node_id = "weapons_choice"
+node_type = 4
+editor_position = Vector2(1020, -280)
+data = {
+"choices": [{
+"text": "I'll take the enchanted sword!"
+}, {
+"text": "The elven bow looks nice."
+}, {
+"text": "Actually, never mind."
+}]
+}
+output_count = 3
+
+[sub_resource type="Resource" id="node_welcome"]
+script = ExtResource("1_unnix")
+node_id = "welcome_static"
+node_type = 3
+editor_position = Vector2(-100, 200)
+data = {
+"emotion": "happy",
+"speaker": "Marcus",
+"text": "Welcome, traveler! I am Marcus, the finest merchant in Eldoria. What can I do for you today?"
+}
 
 [resource]
 script = ExtResource("2_euopo")
-graph_id = "merchant_demo"
-display_name = "Merchant Demo Dialogue"
-description = "A demonstration dialogue with Marcus the Merchant."
+graph_id = "merchant_demo_complex"
+display_name = "Merchant Demo - Complex Test"
+description = "Complex dialogue testing all node types: CHOICE, AI_RESPONSE, STATIC, CONDITION, VARIABLE, EVENT."
+default_character = ExtResource("1_p5lqr")
+world_context = ExtResource("4_1mjo3")
 nodes = {
-"0fbf73fe-c910-4c86-8d7d-fe989dd52a1f": SubResource("Resource_y4fdt"),
-"208fe2bb-0835-4ce9-b321-9433d97c721d": SubResource("Resource_kbowr"),
-"226d1a7d-6f94-4263-b2b1-f21ec77803b7": SubResource("Resource_1mjo3"),
-"32d728f2-736f-4949-b9ad-a21e61a0ee5a": SubResource("Resource_fif8s"),
-"3c5f4686-6079-40fe-9d7d-e9fc52af7307": SubResource("Resource_c48km"),
-"5c905564-fd5a-401d-b006-aa3e47fd58c3": SubResource("Resource_euopo"),
-"627c0fa2-04dc-4905-bd0c-047b869a2cb1": SubResource("Resource_4s3gr"),
-"69de9af7-f441-4bf0-9175-3872dfe127c7": SubResource("Resource_v4s23"),
-"74d33460-cf16-47fa-a7a9-f1c1562d61f9": SubResource("Resource_ii654"),
-"ba8676f0-76e0-475f-8abf-6f40401d9ca9": SubResource("Resource_c51jo"),
-"cbac69cf-a41d-4f45-a0bc-79e55a396ead": SubResource("Resource_p5lqr"),
-"cbf9f9a8-60a6-4e7e-98d5-863a107d65dd": SubResource("Resource_unnix"),
-"ed9ee5fe-83b8-4342-b426-52fae2602675": SubResource("Resource_twdj5")
+"after_sample_ai_response": SubResource("node_after_sample_ai"),
+"bow_ai_response": SubResource("node_bow_ai"),
+"bow_purchase_event": SubResource("node_bow_event"),
+"bribe_ai_response": SubResource("node_bribe_ai"),
+"cancel_static": SubResource("node_cancel_static"),
+"end_node": SubResource("node_end"),
+"forget_static": SubResource("node_forget_static"),
+"free_sample_static": SubResource("node_free_sample"),
+"goodbye_ai_response": SubResource("node_goodbye_ai"),
+"increment_visits": SubResource("node_increment_visits"),
+"main_choice": SubResource("node_main_choice"),
+"not_trusted_static": SubResource("node_not_trusted_static"),
+"potions_ai_response": SubResource("node_potions_ai"),
+"reputation_condition": SubResource("node_reputation_check"),
+"sample_event": SubResource("node_sample_event"),
+"secret_ai_response": SubResource("node_secret_ai"),
+"secret_choice_trusted": SubResource("node_secret_choice_trusted"),
+"secret_unlock_event": SubResource("node_secret_unlock_event"),
+"set_talked_variable": SubResource("node_set_talked"),
+"start_node": SubResource("node_start"),
+"sword_ai_response": SubResource("node_sword_ai"),
+"sword_purchase_event": SubResource("node_sword_event"),
+"weapons_ai_response": SubResource("node_weapons_ai"),
+"weapons_choice": SubResource("node_weapons_choice"),
+"welcome_static": SubResource("node_welcome")
 }
 connections = Array[Dictionary]([{
-"from_node": "cbac69cf-a41d-4f45-a0bc-79e55a396ead",
+"from_node": "start_node",
 "from_slot": 0,
-"to_node": "226d1a7d-6f94-4263-b2b1-f21ec77803b7",
+"to_node": "welcome_static",
 "to_slot": 0
 }, {
-"from_node": "226d1a7d-6f94-4263-b2b1-f21ec77803b7",
+"from_node": "welcome_static",
 "from_slot": 0,
-"to_node": "208fe2bb-0835-4ce9-b321-9433d97c721d",
+"to_node": "set_talked_variable",
 "to_slot": 0
 }, {
-"from_node": "208fe2bb-0835-4ce9-b321-9433d97c721d",
+"from_node": "set_talked_variable",
 "from_slot": 0,
-"to_node": "ba8676f0-76e0-475f-8abf-6f40401d9ca9",
+"to_node": "main_choice",
 "to_slot": 0
 }, {
-"from_node": "208fe2bb-0835-4ce9-b321-9433d97c721d",
+"from_node": "main_choice",
+"from_slot": 0,
+"to_node": "weapons_ai_response",
+"to_slot": 0
+}, {
+"from_node": "main_choice",
 "from_slot": 1,
-"to_node": "74d33460-cf16-47fa-a7a9-f1c1562d61f9",
+"to_node": "potions_ai_response",
 "to_slot": 0
 }, {
-"from_node": "208fe2bb-0835-4ce9-b321-9433d97c721d",
+"from_node": "main_choice",
 "from_slot": 2,
-"to_node": "ed9ee5fe-83b8-4342-b426-52fae2602675",
+"to_node": "secret_ai_response",
 "to_slot": 0
 }, {
-"from_node": "ba8676f0-76e0-475f-8abf-6f40401d9ca9",
-"from_slot": 0,
-"to_node": "3c5f4686-6079-40fe-9d7d-e9fc52af7307",
-"to_slot": 0
-}, {
-"from_node": "ed9ee5fe-83b8-4342-b426-52fae2602675",
-"from_slot": 0,
-"to_node": "627c0fa2-04dc-4905-bd0c-047b869a2cb1",
-"to_slot": 0
-}, {
-"from_node": "ed9ee5fe-83b8-4342-b426-52fae2602675",
-"from_slot": 1,
-"to_node": "32d728f2-736f-4949-b9ad-a21e61a0ee5a",
-"to_slot": 0
-}, {
-"from_node": "627c0fa2-04dc-4905-bd0c-047b869a2cb1",
-"from_slot": 0,
-"to_node": "69de9af7-f441-4bf0-9175-3872dfe127c7",
-"to_slot": 0
-}, {
-"from_node": "208fe2bb-0835-4ce9-b321-9433d97c721d",
+"from_node": "main_choice",
 "from_slot": 3,
-"to_node": "cbf9f9a8-60a6-4e7e-98d5-863a107d65dd",
+"to_node": "goodbye_ai_response",
 "to_slot": 0
 }, {
-"from_node": "cbf9f9a8-60a6-4e7e-98d5-863a107d65dd",
+"from_node": "weapons_ai_response",
 "from_slot": 0,
-"to_node": "5c905564-fd5a-401d-b006-aa3e47fd58c3",
+"to_node": "weapons_choice",
 "to_slot": 0
 }, {
-"from_node": "5c905564-fd5a-401d-b006-aa3e47fd58c3",
+"from_node": "weapons_choice",
 "from_slot": 0,
-"to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
+"to_node": "sword_ai_response",
 "to_slot": 0
 }, {
-"from_node": "3c5f4686-6079-40fe-9d7d-e9fc52af7307",
-"from_slot": 0,
-"to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
+"from_node": "weapons_choice",
+"from_slot": 1,
+"to_node": "bow_ai_response",
 "to_slot": 0
 }, {
-"from_node": "74d33460-cf16-47fa-a7a9-f1c1562d61f9",
-"from_slot": 0,
-"to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
+"from_node": "weapons_choice",
+"from_slot": 2,
+"to_node": "cancel_static",
 "to_slot": 0
 }, {
-"from_node": "69de9af7-f441-4bf0-9175-3872dfe127c7",
+"from_node": "sword_ai_response",
 "from_slot": 0,
-"to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
+"to_node": "sword_purchase_event",
 "to_slot": 0
 }, {
-"from_node": "32d728f2-736f-4949-b9ad-a21e61a0ee5a",
+"from_node": "sword_purchase_event",
 "from_slot": 0,
-"to_node": "0fbf73fe-c910-4c86-8d7d-fe989dd52a1f",
+"to_node": "end_node",
+"to_slot": 0
+}, {
+"from_node": "bow_ai_response",
+"from_slot": 0,
+"to_node": "bow_purchase_event",
+"to_slot": 0
+}, {
+"from_node": "bow_purchase_event",
+"from_slot": 0,
+"to_node": "end_node",
+"to_slot": 0
+}, {
+"from_node": "cancel_static",
+"from_slot": 0,
+"to_node": "end_node",
+"to_slot": 0
+}, {
+"from_node": "potions_ai_response",
+"from_slot": 0,
+"to_node": "free_sample_static",
+"to_slot": 0
+}, {
+"from_node": "free_sample_static",
+"from_slot": 0,
+"to_node": "sample_event",
+"to_slot": 0
+}, {
+"from_node": "sample_event",
+"from_slot": 0,
+"to_node": "after_sample_ai_response",
+"to_slot": 0
+}, {
+"from_node": "after_sample_ai_response",
+"from_slot": 0,
+"to_node": "end_node",
+"to_slot": 0
+}, {
+"from_node": "secret_ai_response",
+"from_slot": 0,
+"to_node": "reputation_condition",
+"to_slot": 0
+}, {
+"from_node": "reputation_condition",
+"from_slot": 0,
+"to_node": "secret_choice_trusted",
+"to_slot": 0
+}, {
+"from_node": "reputation_condition",
+"from_slot": 1,
+"to_node": "not_trusted_static",
+"to_slot": 0
+}, {
+"from_node": "secret_choice_trusted",
+"from_slot": 0,
+"to_node": "bribe_ai_response",
+"to_slot": 0
+}, {
+"from_node": "secret_choice_trusted",
+"from_slot": 1,
+"to_node": "forget_static",
+"to_slot": 0
+}, {
+"from_node": "bribe_ai_response",
+"from_slot": 0,
+"to_node": "secret_unlock_event",
+"to_slot": 0
+}, {
+"from_node": "secret_unlock_event",
+"from_slot": 0,
+"to_node": "end_node",
+"to_slot": 0
+}, {
+"from_node": "not_trusted_static",
+"from_slot": 0,
+"to_node": "end_node",
+"to_slot": 0
+}, {
+"from_node": "forget_static",
+"from_slot": 0,
+"to_node": "end_node",
+"to_slot": 0
+}, {
+"from_node": "goodbye_ai_response",
+"from_slot": 0,
+"to_node": "increment_visits",
+"to_slot": 0
+}, {
+"from_node": "increment_visits",
+"from_slot": 0,
+"to_node": "end_node",
 "to_slot": 0
 }])
-start_node_id = "cbac69cf-a41d-4f45-a0bc-79e55a396ead"
+start_node_id = "start_node"
 local_variables = {
+"merchant_visits": 0,
 "player_reputation": 60,
 "talked_to_merchant": false
 }

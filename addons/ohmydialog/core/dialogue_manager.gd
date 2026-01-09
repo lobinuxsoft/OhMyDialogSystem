@@ -462,6 +462,9 @@ func _on_generation_completed(full_text: String) -> void:
 
 ## Completes inference and updates state.
 func _complete_inference(response: String) -> void:
+	# Clean up response (remove prompt artifacts)
+	response = _clean_response(response)
+
 	# Add to history
 	conversation_history.add_assistant(response)
 
@@ -476,10 +479,35 @@ func _complete_inference(response: String) -> void:
 		# Pure free mode - continue conversation
 		waiting_for_player_input.emit()
 	else:
-		# Graph mode - continue execution
-		graph_runner.provide_input(response)
+		# Graph mode - wait for user confirmation (Continue button)
+		# User will call select_choice(0) to advance
+		pass
 
 	_pending_inference.clear()
+
+
+## Cleans up LLM response by removing prompt template artifacts.
+func _clean_response(response: String) -> String:
+	var cleaned := response.strip_edges()
+
+	# Remove ChatML end tokens
+	cleaned = cleaned.replace("<|im_end|>", "").replace("<|im_start|>", "").strip_edges()
+
+	# Cut at common continuation patterns
+	for pattern in ["\nPlayer:", "\nUser:", "\n\n"]:
+		var cut_pos := cleaned.find(pattern)
+		if cut_pos > 0:
+			cleaned = cleaned.substr(0, cut_pos).strip_edges()
+
+	# Remove character name prefix if model repeated it
+	if active_character and cleaned.begins_with(active_character.character_name + ":"):
+		cleaned = cleaned.substr(active_character.character_name.length() + 1).strip_edges()
+
+	# Remove surrounding quotes if present
+	if cleaned.begins_with('"') and cleaned.ends_with('"') and cleaned.length() > 2:
+		cleaned = cleaned.substr(1, cleaned.length() - 2)
+
+	return cleaned
 
 
 # ==================== Graph Runner Signal Handlers ====================
@@ -594,11 +622,30 @@ func clear_history() -> void:
 
 ## Returns debug info.
 func get_debug_info() -> Dictionary:
+	# Get model info
+	var model_name := "none"
+	var ai_service := AIService.get_singleton()
+	if ai_service:
+		var config := ai_service.get_current_config()
+		if config:
+			model_name = config.display_name
+
+	# Get player_input from graph_runner
+	var player_input := ""
+	if graph_runner:
+		var runner_context = graph_runner._context if "_context" in graph_runner else {}
+		player_input = runner_context.get("player_input", "")
+
 	return {
 		"is_active": _is_active,
 		"mode": DialogueMode.keys()[current_mode],
 		"graph": current_graph.graph_id if current_graph else "none",
+		"model": model_name,
 		"character": active_character.character_name if active_character else "none",
+		"character_personality": active_character.personality if active_character else "",
+		"world": world_context.world_name if world_context else "none",
+		"world_location": world_context.current_location if world_context else "",
+		"player_input": player_input,
 		"history": conversation_history.get_summary(),
 		"context": context_manager.get_summary()
 	}
