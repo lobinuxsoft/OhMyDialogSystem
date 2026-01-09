@@ -490,22 +490,14 @@ func _complete_inference(response: String) -> void:
 func _clean_response(response: String) -> String:
 	var cleaned := response.strip_edges()
 
-	# Cut at newline followed by ### (model continuing with prompt structure)
-	var cut_pos := cleaned.find("\n###")
-	if cut_pos > 0:
-		cleaned = cleaned.substr(0, cut_pos).strip_edges()
+	# Remove ChatML end tokens
+	cleaned = cleaned.replace("<|im_end|>", "").replace("<|im_start|>", "").strip_edges()
 
-	# Also cut at newline followed by common patterns
-	for pattern in ["\nMarcus:", "\nPlayer:", "\nUser:", "\n\n\n"]:
-		cut_pos = cleaned.find(pattern)
+	# Cut at common continuation patterns
+	for pattern in ["\nPlayer:", "\nUser:", "\n\n"]:
+		var cut_pos := cleaned.find(pattern)
 		if cut_pos > 0:
 			cleaned = cleaned.substr(0, cut_pos).strip_edges()
-
-	# Remove common prompt artifacts from start
-	var start_artifacts := ["### RESPONSE", "### Response", "###RESPONSE", "###", "Response:"]
-	for artifact in start_artifacts:
-		if cleaned.begins_with(artifact):
-			cleaned = cleaned.substr(artifact.length()).strip_edges()
 
 	# Remove character name prefix if model repeated it
 	if active_character and cleaned.begins_with(active_character.character_name + ":"):
