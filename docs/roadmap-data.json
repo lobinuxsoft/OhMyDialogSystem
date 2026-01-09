@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-08T18:19:24Z",
+  "updated_at": "2026-01-09T05:40:38Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -16,7 +16,7 @@
       "title": "M2: Core del Sistema",
       "description": "Resources, PromptBuilder, DialogueManager",
       "open": 0,
-      "closed": 13,
+      "closed": 14,
       "progress": 100,
       "state": "open"
     },
@@ -202,7 +202,8 @@
           "labels": [
             "priority:high",
             "difficulty:easy",
-            "editor"
+            "editor",
+            "next-session"
           ],
           "fields": {
             "Status": "Todo",
@@ -844,6 +845,18 @@
             "Status": "Done",
             "Priority": "Critical"
           }
+        },
+        {
+          "number": 190,
+          "title": "[Core] AI_RESPONSE debe usar contexto del DialogueGraph, no character_id propio",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "core"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
         }
       ]
     },
@@ -1164,9 +1177,7 @@
           "title": "[Editor] Implementar nodo Jump",
           "state": "OPEN",
           "milestone": "M3: Editor Visual",
-          "labels": [
-            "next-session"
-          ],
+          "labels": [],
           "fields": {
             "Status": "Todo",
             "Priority": "Medium",
@@ -1290,7 +1301,8 @@
       "labels": [
         "priority:high",
         "difficulty:easy",
-        "editor"
+        "editor",
+        "next-session"
       ],
       "fields": {
         "Status": "Todo",
@@ -2217,9 +2229,7 @@
       "title": "[Editor] Implementar nodo Jump",
       "state": "OPEN",
       "milestone": "M3: Editor Visual",
-      "labels": [
-        "next-session"
-      ],
+      "labels": [],
       "fields": {
         "Status": "Todo",
         "Priority": "Medium",
@@ -2416,6 +2426,18 @@
         "Status": "Done",
         "Order": 90.0,
         "Priority": "Critical"
+      }
+    },
+    {
+      "number": 190,
+      "title": "[Core] AI_RESPONSE debe usar contexto del DialogueGraph, no character_id propio",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "core"
+      ],
+      "fields": {
+        "Status": "Done"
       }
     },
     {
