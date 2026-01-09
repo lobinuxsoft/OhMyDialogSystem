@@ -25,8 +25,7 @@ var _downloaded_models: Array[ModelConfig] = []
 
 func _init() -> void:
 	title = "Modelo de IA Requerido"
-	size = Vector2i(400, 200)
-	unresizable = true
+	unresizable = false
 
 
 func _ready() -> void:
@@ -38,6 +37,7 @@ func _ready() -> void:
 func _setup_ui() -> void:
 	_content_container = VBoxContainer.new()
 	_content_container.add_theme_constant_override("separation", 12)
+	_content_container.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	add_child(_content_container)
 
 	# Message label (shown in both modes)
@@ -90,6 +90,19 @@ func _connect_ai_service() -> void:
 func show_dialog() -> void:
 	_refresh_models()
 	_update_ui()
+
+	# Calculate size as 25% of screen
+	var screen_size := DisplayServer.screen_get_size()
+	var dialog_size := Vector2i(int(screen_size.x * 0.25), int(screen_size.y * 0.25))
+
+	# Clip content to prevent overflow
+	_content_container.clip_contents = true
+
+	# Force dialog size
+	reset_size()
+	min_size = dialog_size
+	max_size = dialog_size
+	size = dialog_size
 	popup_centered()
 
 
