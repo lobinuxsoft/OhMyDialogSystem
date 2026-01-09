@@ -130,11 +130,25 @@ func _show_input() -> void:
 func _update_debug() -> void:
 	if dialogue_manager:
 		var info := dialogue_manager.get_debug_info()
-		debug_label.text = "Mode: %s | History: %s | Context: %s" % [
-			info.get("mode", "?"),
-			info.get("history", "?"),
-			info.get("context", "?")
-		]
+		var lines: Array[String] = []
+
+		lines.append("Mode: %s" % info.get("mode", "?"))
+		lines.append("Model: %s" % info.get("model", "none"))
+		lines.append("")
+		lines.append("Character: %s" % info.get("character", "none"))
+		if not info.get("character_personality", "").is_empty():
+			lines.append("  %s" % info.get("character_personality", "").substr(0, 40))
+		lines.append("")
+		lines.append("World: %s" % info.get("world", "none"))
+		if not info.get("world_location", "").is_empty():
+			lines.append("  @ %s" % info.get("world_location", ""))
+		lines.append("")
+		lines.append("Player Input: %s" % (info.get("player_input", "") if not info.get("player_input", "").is_empty() else "(empty)"))
+		lines.append("")
+		lines.append("History: %s" % info.get("history", "?"))
+		lines.append("Context: %s" % info.get("context", "?"))
+
+		debug_label.text = "\n".join(lines)
 
 
 # ==================== UI Signal Handlers ====================

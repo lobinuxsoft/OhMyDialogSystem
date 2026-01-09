@@ -10,7 +10,15 @@ extends RefCounted
 
 ## Default prompt template using ChatML format (compatible with Qwen, Mistral, etc.)
 const DEFAULT_TEMPLATE := """<|im_start|>system
-You are roleplaying as {character_name}. Stay in character at all times. Keep responses brief (1-3 sentences).
+You are {character_name}. Stay in character. Give SHORT, DIRECT responses (1-2 sentences max).
+
+RULES:
+- Respond naturally to what the player said
+- Do NOT ask multiple questions
+- Do NOT list options or items unless specifically asked
+- Do NOT invent details not mentioned in your character description
+- Keep responses conversational and brief
+
 {character_prompt}
 
 World: {world_context}

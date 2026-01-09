@@ -622,11 +622,30 @@ func clear_history() -> void:
 
 ## Returns debug info.
 func get_debug_info() -> Dictionary:
+	# Get model info
+	var model_name := "none"
+	var ai_service := AIService.get_singleton()
+	if ai_service:
+		var config := ai_service.get_current_config()
+		if config:
+			model_name = config.display_name
+
+	# Get player_input from graph_runner
+	var player_input := ""
+	if graph_runner:
+		var runner_context = graph_runner._context if "_context" in graph_runner else {}
+		player_input = runner_context.get("player_input", "")
+
 	return {
 		"is_active": _is_active,
 		"mode": DialogueMode.keys()[current_mode],
 		"graph": current_graph.graph_id if current_graph else "none",
+		"model": model_name,
 		"character": active_character.character_name if active_character else "none",
+		"character_personality": active_character.personality if active_character else "",
+		"world": world_context.world_name if world_context else "none",
+		"world_location": world_context.current_location if world_context else "",
+		"player_input": player_input,
 		"history": conversation_history.get_summary(),
 		"context": context_manager.get_summary()
 	}

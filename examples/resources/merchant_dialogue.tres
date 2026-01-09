@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=32 format=3 uid="uid://i1sbtg72xp43"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=30 format=3 uid="uid://i1sbtg72xp43"]
 
 [ext_resource type="Resource" path="res://examples/resources/merchant_character.tres" id="1_p5lqr"]
 [ext_resource type="Script" uid="uid://di7mrn0ixw647" path="res://addons/ohmydialog/resources/dialogue_node_data.gd" id="1_unnix"]
@@ -8,7 +8,6 @@
 [sub_resource type="Resource" id="node_start"]
 script = ExtResource("1_unnix")
 node_id = "start_node"
-node_type = 0
 editor_position = Vector2(-400, 200)
 data = {
 "model_path": "res://models/qwen2.5-3b-instruct-q4_k_m.gguf",
@@ -19,7 +18,7 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "end_node"
 node_type = 1
-editor_position = Vector2(2200, 400)
+editor_position = Vector2(2640, 380)
 data = {
 "reason": ""
 }
@@ -73,14 +72,14 @@ editor_position = Vector2(750, -50)
 data = {
 "emotion_hint": "excited",
 "max_tokens": 60,
-"prompt_template": ""
+"prompt_template": "Acknowledge the customer wants weapons. Mention you have an enchanted sword and an elven bow. Be enthusiastic but brief."
 }
 
 [sub_resource type="Resource" id="node_weapons_choice"]
 script = ExtResource("1_unnix")
 node_id = "weapons_choice"
 node_type = 4
-editor_position = Vector2(1100, -50)
+editor_position = Vector2(1020, -280)
 data = {
 "choices": [{
 "text": "I'll take the enchanted sword!"
@@ -96,23 +95,23 @@ output_count = 3
 script = ExtResource("1_unnix")
 node_id = "sword_ai_response"
 node_type = 2
-editor_position = Vector2(1450, -150)
+editor_position = Vector2(1380, -380)
 data = {
 "emotion_hint": "happy",
 "max_tokens": 60,
-"prompt_template": ""
+"prompt_template": "The customer chose the enchanted sword! Thank them for the purchase and say something about the sword being a fine choice."
 }
 
 [sub_resource type="Resource" id="node_sword_event"]
 script = ExtResource("1_unnix")
 node_id = "sword_purchase_event"
 node_type = 6
-editor_position = Vector2(1800, -150)
+editor_position = Vector2(1680, -380)
 data = {
 "event_data": {
 "item": "enchanted_sword",
-"price": 150,
-"merchant": "Marcus"
+"merchant": "Marcus",
+"price": 150
 },
 "event_name": "item_purchased"
 }
@@ -121,23 +120,23 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "bow_ai_response"
 node_type = 2
-editor_position = Vector2(1450, 0)
+editor_position = Vector2(1380, -220)
 data = {
 "emotion_hint": "happy",
 "max_tokens": 60,
-"prompt_template": ""
+"prompt_template": "The customer chose the elven bow! Thank them and mention it's crafted by elves. Be brief."
 }
 
 [sub_resource type="Resource" id="node_bow_event"]
 script = ExtResource("1_unnix")
 node_id = "bow_purchase_event"
 node_type = 6
-editor_position = Vector2(1800, 0)
+editor_position = Vector2(1680, -220)
 data = {
 "event_data": {
 "item": "elven_bow",
-"price": 120,
-"merchant": "Marcus"
+"merchant": "Marcus",
+"price": 120
 },
 "event_name": "item_purchased"
 }
@@ -146,7 +145,7 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "cancel_static"
 node_type = 3
-editor_position = Vector2(1450, 150)
+editor_position = Vector2(1380, -80)
 data = {
 "emotion": "neutral",
 "speaker": "Marcus",
@@ -157,18 +156,18 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "potions_ai_response"
 node_type = 2
-editor_position = Vector2(750, 250)
+editor_position = Vector2(740, 120)
 data = {
 "emotion_hint": "happy",
 "max_tokens": 60,
-"prompt_template": ""
+"prompt_template": "The customer wants potions! Respond enthusiastically about your healing potions. Be brief."
 }
 
 [sub_resource type="Resource" id="node_free_sample"]
 script = ExtResource("1_unnix")
 node_id = "free_sample_static"
 node_type = 3
-editor_position = Vector2(1100, 250)
+editor_position = Vector2(1020, 100)
 data = {
 "emotion": "generous",
 "speaker": "Marcus",
@@ -179,7 +178,7 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "sample_event"
 node_type = 6
-editor_position = Vector2(1450, 250)
+editor_position = Vector2(1360, 100)
 data = {
 "event_data": {
 "item": "minor_healing_potion",
@@ -192,7 +191,7 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "after_sample_ai_response"
 node_type = 2
-editor_position = Vector2(1800, 250)
+editor_position = Vector2(1660, 80)
 data = {
 "emotion_hint": "friendly",
 "max_tokens": 60,
@@ -203,7 +202,7 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "secret_ai_response"
 node_type = 2
-editor_position = Vector2(750, 450)
+editor_position = Vector2(740, 460)
 data = {
 "emotion_hint": "mysterious",
 "max_tokens": 80,
@@ -214,7 +213,7 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "reputation_condition"
 node_type = 5
-editor_position = Vector2(1100, 450)
+editor_position = Vector2(1020, 460)
 data = {
 "operator": 3,
 "value": 50,
@@ -226,7 +225,7 @@ output_count = 2
 script = ExtResource("1_unnix")
 node_id = "secret_choice_trusted"
 node_type = 4
-editor_position = Vector2(1450, 400)
+editor_position = Vector2(1320, 320)
 data = {
 "choices": [{
 "text": "I can pay well for information..."
@@ -240,7 +239,7 @@ output_count = 2
 script = ExtResource("1_unnix")
 node_id = "not_trusted_static"
 node_type = 3
-editor_position = Vector2(1450, 550)
+editor_position = Vector2(1320, 700)
 data = {
 "emotion": "suspicious",
 "speaker": "Marcus",
@@ -251,18 +250,18 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "bribe_ai_response"
 node_type = 2
-editor_position = Vector2(1800, 350)
+editor_position = Vector2(1600, 400)
 data = {
 "emotion_hint": "greedy",
 "max_tokens": 70,
-"prompt_template": ""
+"prompt_template": "The player offered to pay for secret information. Accept the bribe with greedy excitement and hint that you have access to a secret black market. Be brief and mysterious."
 }
 
 [sub_resource type="Resource" id="node_secret_unlock_event"]
 script = ExtResource("1_unnix")
 node_id = "secret_unlock_event"
 node_type = 6
-editor_position = Vector2(2000, 350)
+editor_position = Vector2(1880, 400)
 data = {
 "event_data": {
 "merchant": "Marcus",
@@ -275,7 +274,7 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "forget_static"
 node_type = 3
-editor_position = Vector2(1800, 500)
+editor_position = Vector2(1600, 540)
 data = {
 "emotion": "relieved",
 "speaker": "Marcus",
@@ -286,18 +285,18 @@ data = {
 script = ExtResource("1_unnix")
 node_id = "goodbye_ai_response"
 node_type = 2
-editor_position = Vector2(750, 650)
+editor_position = Vector2(740, 1080)
 data = {
 "emotion_hint": "sad",
 "max_tokens": 50,
-"prompt_template": ""
+"prompt_template": "The player is leaving. Say a brief, slightly sad farewell hoping they'll return to shop another time."
 }
 
 [sub_resource type="Resource" id="node_increment_visits"]
 script = ExtResource("1_unnix")
 node_id = "increment_visits"
 node_type = 7
-editor_position = Vector2(1100, 650)
+editor_position = Vector2(1000, 1080)
 data = {
 "operation": 1,
 "value": 1,
@@ -312,31 +311,31 @@ description = "Complex dialogue testing all node types: CHOICE, AI_RESPONSE, STA
 default_character = ExtResource("1_p5lqr")
 world_context = ExtResource("4_1mjo3")
 nodes = {
-"start_node": SubResource("node_start"),
-"end_node": SubResource("node_end"),
-"welcome_static": SubResource("node_welcome"),
-"set_talked_variable": SubResource("node_set_talked"),
-"main_choice": SubResource("node_main_choice"),
-"weapons_ai_response": SubResource("node_weapons_ai"),
-"weapons_choice": SubResource("node_weapons_choice"),
-"sword_ai_response": SubResource("node_sword_ai"),
-"sword_purchase_event": SubResource("node_sword_event"),
+"after_sample_ai_response": SubResource("node_after_sample_ai"),
 "bow_ai_response": SubResource("node_bow_ai"),
 "bow_purchase_event": SubResource("node_bow_event"),
-"cancel_static": SubResource("node_cancel_static"),
-"potions_ai_response": SubResource("node_potions_ai"),
-"free_sample_static": SubResource("node_free_sample"),
-"sample_event": SubResource("node_sample_event"),
-"after_sample_ai_response": SubResource("node_after_sample_ai"),
-"secret_ai_response": SubResource("node_secret_ai"),
-"reputation_condition": SubResource("node_reputation_check"),
-"secret_choice_trusted": SubResource("node_secret_choice_trusted"),
-"not_trusted_static": SubResource("node_not_trusted_static"),
 "bribe_ai_response": SubResource("node_bribe_ai"),
-"secret_unlock_event": SubResource("node_secret_unlock_event"),
+"cancel_static": SubResource("node_cancel_static"),
+"end_node": SubResource("node_end"),
 "forget_static": SubResource("node_forget_static"),
+"free_sample_static": SubResource("node_free_sample"),
 "goodbye_ai_response": SubResource("node_goodbye_ai"),
-"increment_visits": SubResource("node_increment_visits")
+"increment_visits": SubResource("node_increment_visits"),
+"main_choice": SubResource("node_main_choice"),
+"not_trusted_static": SubResource("node_not_trusted_static"),
+"potions_ai_response": SubResource("node_potions_ai"),
+"reputation_condition": SubResource("node_reputation_check"),
+"sample_event": SubResource("node_sample_event"),
+"secret_ai_response": SubResource("node_secret_ai"),
+"secret_choice_trusted": SubResource("node_secret_choice_trusted"),
+"secret_unlock_event": SubResource("node_secret_unlock_event"),
+"set_talked_variable": SubResource("node_set_talked"),
+"start_node": SubResource("node_start"),
+"sword_ai_response": SubResource("node_sword_ai"),
+"sword_purchase_event": SubResource("node_sword_event"),
+"weapons_ai_response": SubResource("node_weapons_ai"),
+"weapons_choice": SubResource("node_weapons_choice"),
+"welcome_static": SubResource("node_welcome")
 }
 connections = Array[Dictionary]([{
 "from_node": "start_node",
@@ -496,7 +495,7 @@ connections = Array[Dictionary]([{
 }])
 start_node_id = "start_node"
 local_variables = {
+"merchant_visits": 0,
 "player_reputation": 60,
-"talked_to_merchant": false,
-"merchant_visits": 0
+"talked_to_merchant": false
 }
