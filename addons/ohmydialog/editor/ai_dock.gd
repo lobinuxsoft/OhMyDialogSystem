@@ -26,6 +26,12 @@ func _ready() -> void:
 	_action_button.pressed.connect(_on_action_pressed)
 	_config_button.pressed.connect(_on_config_pressed)
 
+	# Set config button icon
+	_config_button.icon = get_theme_icon("Tools", "EditorIcons")
+
+	# Set status icon
+	_status_icon.texture = get_theme_icon("StatusSuccess", "EditorIcons")
+
 	# Defer connection to AIService to ensure it's initialized
 	call_deferred("_connect_ai_service")
 
