@@ -5,6 +5,8 @@ extends EditorPlugin
 ## Main plugin entry point. Handles initialization and cleanup of
 ## editor components, custom types, and dock panels.
 
+const AUTOLOAD_NAME := "AIServiceAutoload"
+const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
 
 ## Reference to the dialogue graph editor instance.
 var _editor_instance: Control
@@ -12,7 +14,7 @@ var _editor_instance: Control
 ## Reference to the custom inspector plugin.
 var _inspector_plugin: DialogueNodeInspectorPlugin
 
-## Reference to the AI service singleton.
+## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
 ## Reference to the AI dock panel.
@@ -20,10 +22,14 @@ var _ai_dock: AIDock
 
 
 func _enter_tree() -> void:
-	# Initialize AI service singleton first
+	# Register AutoLoad for runtime (automatic, user doesn't need to configure)
+	_register_autoload()
+
+	# Initialize AI service singleton for editor context
 	_ai_service = AIService.new()
 	_ai_service.name = "AIService"
 	add_child(_ai_service)
+
 	# Register inspector plugin for DialogueNodeData
 	_inspector_plugin = DialogueNodeInspectorPlugin.new()
 	add_inspector_plugin(_inspector_plugin)
@@ -72,7 +78,22 @@ func _exit_tree() -> void:
 		_ai_service.queue_free()
 		_ai_service = null
 
+	# Note: We don't unregister the autoload here because:
+	# 1. It would break running games if user disables plugin while testing
+	# 2. User can manually remove it from Project Settings if needed
+
 	print("OhMyDialogSystem: Plugin unloaded")
+
+
+## Registers the AIService AutoLoad if not already registered.
+func _register_autoload() -> void:
+	# Check if already registered
+	if ProjectSettings.has_setting("autoload/" + AUTOLOAD_NAME):
+		return
+
+	# Register the autoload
+	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
+	print("OhMyDialogSystem: Registered AIService AutoLoad")
 
 
 ## Returns true if this plugin handles the given object type.
