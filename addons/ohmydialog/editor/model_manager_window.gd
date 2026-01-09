@@ -21,7 +21,6 @@ signal model_unloaded()
 
 # UI References - Models List
 @onready var models_tree: Tree = %ModelsTree
-@onready var sort_option: OptionButton = %SortOption
 @onready var refresh_btn: Button = %RefreshBtn
 @onready var model_details: RichTextLabel = %ModelDetails
 
@@ -73,6 +72,7 @@ enum SortBy { NAME, SIZE, CONTEXT, STATUS }
 var _ai_service: AIService
 var _model_manager: ModelManager
 var _current_sort: SortBy = SortBy.NAME
+var _sort_ascending: bool = true
 var _selected_model_id: String = ""
 
 # HuggingFace Browser
@@ -95,11 +95,10 @@ func _ready() -> void:
 
 	# Setup UI
 	_setup_models_tree()
-	_setup_sort_options()
 	_setup_hf_dialog()
 
 	# Connect UI signals - Models Tab
-	sort_option.item_selected.connect(_on_sort_changed)
+	models_tree.column_title_clicked.connect(_on_column_title_clicked)
 	refresh_btn.pressed.connect(_on_refresh_pressed)
 	models_tree.item_selected.connect(_on_model_tree_selected)
 	download_model_btn.pressed.connect(_on_download_model_pressed)
@@ -196,18 +195,23 @@ func _setup_models_tree() -> void:
 	models_tree.set_column_custom_minimum_width(3, 100)
 
 
-func _setup_sort_options() -> void:
-	sort_option.add_item("Name", SortBy.NAME)
-	sort_option.add_item("Size", SortBy.SIZE)
-	sort_option.add_item("Context", SortBy.CONTEXT)
-	sort_option.add_item("Status", SortBy.STATUS)
-	sort_option.selected = 0
+func _update_column_titles() -> void:
+	var titles = ["Model", "Size", "Context", "Status"]
+	var arrows = ["", "", "", ""]
+
+	# Add arrow to current sort column
+	var arrow = " ↑" if _sort_ascending else " ↓"
+	arrows[_current_sort] = arrow
+
+	for i in range(4):
+		models_tree.set_column_title(i, titles[i] + arrows[i])
 
 
 func _populate_models_tree() -> void:
 	models_tree.clear()
 	var root = models_tree.create_item()
 	models_tree.hide_root = true
+	_update_column_titles()
 
 	if not _model_manager:
 		return
@@ -251,22 +255,34 @@ func _populate_models_tree() -> void:
 
 func _sort_models(models: Array[ModelConfig]) -> Array[ModelConfig]:
 	var sorted = models.duplicate()
+	var asc = _sort_ascending
 
 	match _current_sort:
 		SortBy.NAME:
-			sorted.sort_custom(func(a, b): return a.display_name.naturalcasecmp_to(b.display_name) < 0)
+			sorted.sort_custom(func(a, b):
+				var cmp = a.display_name.naturalcasecmp_to(b.display_name) < 0
+				return cmp if asc else not cmp
+			)
 		SortBy.SIZE:
-			sorted.sort_custom(func(a, b): return a.size_mb < b.size_mb)
+			sorted.sort_custom(func(a, b):
+				return a.size_mb < b.size_mb if asc else a.size_mb > b.size_mb
+			)
 		SortBy.CONTEXT:
-			sorted.sort_custom(func(a, b): return a.n_ctx > b.n_ctx)
+			sorted.sort_custom(func(a, b):
+				return a.n_ctx < b.n_ctx if asc else a.n_ctx > b.n_ctx
+			)
 		SortBy.STATUS:
 			sorted.sort_custom(func(a, b):
-				var a_downloaded = 1 if a.is_downloaded() else 0
-				var b_downloaded = 1 if b.is_downloaded() else 0
-				return a_downloaded > b_downloaded
+				var a_val = 2 if _is_model_loaded(a) else (1 if a.is_downloaded() else 0)
+				var b_val = 2 if _is_model_loaded(b) else (1 if b.is_downloaded() else 0)
+				return a_val < b_val if asc else a_val > b_val
 			)
 
 	return sorted
+
+
+func _is_model_loaded(model: ModelConfig) -> bool:
+	return _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id
 
 
 func _get_selected_model() -> ModelConfig:
@@ -389,8 +405,15 @@ func _on_close_requested() -> void:
 	hide()
 
 
-func _on_sort_changed(index: int) -> void:
-	_current_sort = sort_option.get_item_id(index) as SortBy
+func _on_column_title_clicked(column: int, _mouse_button_index: int) -> void:
+	var new_sort = column as SortBy
+	if new_sort == _current_sort:
+		# Same column - toggle direction
+		_sort_ascending = not _sort_ascending
+	else:
+		# Different column - reset to ascending
+		_current_sort = new_sort
+		_sort_ascending = true
 	_populate_models_tree()
 
 

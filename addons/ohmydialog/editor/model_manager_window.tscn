@@ -113,20 +113,7 @@ theme_override_constants/separation = 8
 
 [node name="ToolbarRow" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel"]
 layout_mode = 2
-
-[node name="SortLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
-text = "Sort by:"
-
-[node name="SortOption" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-
-[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
-layout_mode = 2
-size_flags_horizontal = 3
+alignment = 2
 
 [node name="RefreshBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/TabContainer/Models/LeftPanel/ToolbarRow"]
 unique_name_in_owner = true
