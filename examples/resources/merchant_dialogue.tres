@@ -236,7 +236,7 @@ script = ExtResource("1_unnix")
 node_id = "start_node"
 editor_position = Vector2(-400, 200)
 data = {
-"model_path": "res://models/qwen2.5-3b-instruct-q4_k_m.gguf",
+"model_path": "res://models/SmolLM2-360M-Instruct-Q8_0.gguf",
 "trigger": ""
 }
 
