@@ -490,8 +490,19 @@ func _complete_inference(response: String) -> void:
 func _clean_response(response: String) -> String:
 	var cleaned := response.strip_edges()
 
+	# Cut at newline followed by ### (model continuing with prompt structure)
+	var cut_pos := cleaned.find("\n###")
+	if cut_pos > 0:
+		cleaned = cleaned.substr(0, cut_pos).strip_edges()
+
+	# Also cut at newline followed by common patterns
+	for pattern in ["\nMarcus:", "\nPlayer:", "\nUser:", "\n\n\n"]:
+		cut_pos = cleaned.find(pattern)
+		if cut_pos > 0:
+			cleaned = cleaned.substr(0, cut_pos).strip_edges()
+
 	# Remove common prompt artifacts from start
-	var start_artifacts := ["### RESPONSE", "### Response", "###RESPONSE", "Response:"]
+	var start_artifacts := ["### RESPONSE", "### Response", "###RESPONSE", "###", "Response:"]
 	for artifact in start_artifacts:
 		if cleaned.begins_with(artifact):
 			cleaned = cleaned.substr(artifact.length()).strip_edges()
@@ -500,13 +511,8 @@ func _clean_response(response: String) -> String:
 	if active_character and cleaned.begins_with(active_character.character_name + ":"):
 		cleaned = cleaned.substr(active_character.character_name.length() + 1).strip_edges()
 
-	# Cut at first ### (model generating multiple responses or continuing prompt)
-	var cut_pos := cleaned.find("###")
-	if cut_pos > 0:
-		cleaned = cleaned.substr(0, cut_pos).strip_edges()
-
 	# Remove surrounding quotes if present
-	if cleaned.begins_with('"') and cleaned.ends_with('"'):
+	if cleaned.begins_with('"') and cleaned.ends_with('"') and cleaned.length() > 2:
 		cleaned = cleaned.substr(1, cleaned.length() - 2)
 
 	return cleaned
