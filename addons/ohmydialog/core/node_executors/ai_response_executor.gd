@@ -32,7 +32,7 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	var max_tokens: int = node_data.data.get("max_tokens", 64)  # Default to short responses
 	var prompt_template: String = node_data.data.get("prompt_template", "")
 
-	# Build the prompt
+	# Build the prompt with instruction from prompt_template
 	var memories: Array[String] = []
 	if has_context and context.get_context("memories"):
 		memories = context.get_context("memories")
@@ -42,12 +42,10 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 		world,
 		memories,
 		history,
-		player_input
+		player_input,
+		4096,  # max_context_tokens
+		prompt_template  # instruction - passed to user section of prompt
 	)
-
-	# Apply prompt template as additional instruction if specified
-	if not prompt_template.is_empty():
-		prompt = prompt + "\n\n### ADDITIONAL INSTRUCTION\n" + prompt_template
 
 	# Generate response (this would be async in real usage)
 	# The GraphRunner should handle the async nature

@@ -18,7 +18,7 @@ World: {world_context}
 Memories: {memories}<|im_end|>
 <|im_start|>user
 {history}
-{player_input}<|im_end|>
+{player_input}{instruction}<|im_end|>
 <|im_start|>assistant
 {character_name}:"""
 
@@ -35,13 +35,15 @@ var custom_template: String = ""
 
 ## Builds a complete prompt from the provided components.
 ## Returns the assembled prompt string.
+## [param instruction]: Optional additional instruction for the AI (e.g., "respond sadly").
 func build_prompt(
 	character: CharacterIdentity,
 	world: WorldContext,
 	memories: Array[String],
 	history: Array[Dictionary],
 	player_input: String,
-	max_context_tokens: int = 4096
+	max_context_tokens: int = 4096,
+	instruction: String = ""
 ) -> String:
 	var template := custom_template if not custom_template.is_empty() else DEFAULT_TEMPLATE
 
@@ -65,6 +67,11 @@ func build_prompt(
 	else:
 		history_text = "(History truncated due to context limit)"
 
+	# Format instruction if provided
+	var instruction_text := ""
+	if not instruction.is_empty():
+		instruction_text = "\n\n[Instruction: %s]" % instruction
+
 	# Assemble the prompt
 	var prompt := template.format({
 		"character_name": character_name,
@@ -72,7 +79,8 @@ func build_prompt(
 		"world_context": world_context,
 		"memories": memories_text,
 		"history": history_text,
-		"player_input": player_input
+		"player_input": player_input,
+		"instruction": instruction_text
 	})
 
 	return prompt
