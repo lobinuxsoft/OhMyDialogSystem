@@ -25,10 +25,9 @@ signal model_unloaded()
 @onready var refresh_btn: Button = %RefreshBtn
 @onready var model_details: RichTextLabel = %ModelDetails
 
-# UI References - Action Buttons
+# UI References - Action Buttons (Models Tab)
 @onready var download_model_btn: Button = %DownloadModelBtn
 @onready var load_model_btn: Button = %LoadModelBtn
-@onready var unload_model_btn: Button = %UnloadModelBtn
 @onready var delete_model_btn: Button = %DeleteModelBtn
 @onready var browse_hf_btn: Button = %BrowseHFBtn
 
@@ -105,7 +104,6 @@ func _ready() -> void:
 	models_tree.item_selected.connect(_on_model_tree_selected)
 	download_model_btn.pressed.connect(_on_download_model_pressed)
 	load_model_btn.pressed.connect(_on_load_model_pressed)
-	unload_model_btn.pressed.connect(_on_unload_model_pressed)
 	delete_model_btn.pressed.connect(_on_delete_model_pressed)
 	browse_hf_btn.pressed.connect(_on_browse_hf_pressed)
 	cancel_download_btn.pressed.connect(_on_cancel_download_pressed)
@@ -353,16 +351,12 @@ func _update_ui_state() -> void:
 	if not _model_manager:
 		download_model_btn.disabled = true
 		load_model_btn.disabled = true
-		unload_model_btn.disabled = true
 		delete_model_btn.disabled = true
 		return
 
 	var model = _get_selected_model()
 	var is_loaded = _model_manager.is_model_loaded()
 	var is_downloading = _model_manager.is_downloading()
-
-	# Unload button
-	unload_model_btn.disabled = not is_loaded
 
 	# Model-specific buttons
 	if model != null:
@@ -442,14 +436,6 @@ func _on_load_model_pressed() -> void:
 		status_label.text = "Failed to load model"
 		status_label.add_theme_color_override("font_color", Color.RED)
 
-	_populate_models_tree()
-	_update_ui_state()
-	_update_generation_ui_state()
-	_update_loaded_model_info()
-
-
-func _on_unload_model_pressed() -> void:
-	_model_manager.unload_model()
 	_populate_models_tree()
 	_update_ui_state()
 	_update_generation_ui_state()
