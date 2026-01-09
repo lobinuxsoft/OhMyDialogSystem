@@ -22,6 +22,7 @@ var mock_llama: MockLlamaInterface
 var merchant_character: CharacterIdentity
 var fantasy_world: WorldContext
 var merchant_dialogue: DialogueGraph
+var dialogue_preset: AIPreset
 
 
 func _ready() -> void:
@@ -52,11 +53,14 @@ func _load_resources() -> void:
 	merchant_character = load("res://examples/resources/merchant_character.tres")
 	fantasy_world = load("res://examples/resources/fantasy_world.tres")
 	merchant_dialogue = load("res://examples/resources/merchant_dialogue.tres")
+	dialogue_preset = load("res://examples/resources/dialogue_preset.tres")
 
 	if merchant_character:
 		dialogue_manager.default_character = merchant_character
 	if fantasy_world:
 		dialogue_manager.world_context = fantasy_world
+	if dialogue_preset:
+		dialogue_manager.ai_preset = dialogue_preset
 
 
 func _connect_signals() -> void:

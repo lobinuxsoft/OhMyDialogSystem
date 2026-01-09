@@ -29,8 +29,8 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 
 	# Get node-specific overrides
 	var temperature: float = node_data.data.get("temperature", 0.7)
-	var max_tokens: int = node_data.data.get("max_tokens", 256)
-	var system_override: String = node_data.data.get("system_prompt_override", "")
+	var max_tokens: int = node_data.data.get("max_tokens", 64)  # Default to short responses
+	var prompt_template: String = node_data.data.get("prompt_template", "")
 
 	# Build the prompt
 	var memories: Array[String] = []
@@ -45,9 +45,9 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 		player_input
 	)
 
-	# Apply system override if specified
-	if not system_override.is_empty():
-		prompt = system_override + "\n\n" + prompt
+	# Apply prompt template as additional instruction if specified
+	if not prompt_template.is_empty():
+		prompt = prompt + "\n\n### ADDITIONAL INSTRUCTION\n" + prompt_template
 
 	# Generate response (this would be async in real usage)
 	# The GraphRunner should handle the async nature

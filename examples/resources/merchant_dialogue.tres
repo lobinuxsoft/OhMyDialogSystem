@@ -103,6 +103,17 @@ data = {
 "text": "Browse all you like! My prices are irresistible!"
 }
 
+[sub_resource type="Resource" id="Resource_unnix"]
+script = ExtResource("1_unnix")
+node_id = "879f11d8-36bd-4016-a356-e066c6e40480"
+node_type = 2
+editor_position = Vector2(740, 700)
+data = {
+"emotion_hint": "sad",
+"max_tokens": 50,
+"prompt_template": "Respond briefly as Marcus saying goodbye to a customer who is leaving without buying. Keep it short (1-2 sentences max)."
+}
+
 [sub_resource type="Resource" id="Resource_c51jo"]
 script = ExtResource("1_unnix")
 node_id = "ba8676f0-76e0-475f-8abf-6f40401d9ca9"
@@ -135,17 +146,6 @@ data = {
 "variable": "player_reputation"
 }
 output_count = 2
-
-[sub_resource type="Resource" id="Resource_unnix"]
-script = ExtResource("1_unnix")
-node_id = "879f11d8-36bd-4016-a356-e066c6e40480"
-node_type = 2
-editor_position = Vector2(740, 700)
-data = {
-"emotion_hint": "confused",
-"max_tokens": 256,
-"prompt_template": "contesta de manera profesional."
-}
 
 [resource]
 script = ExtResource("2_euopo")
