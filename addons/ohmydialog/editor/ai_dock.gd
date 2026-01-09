@@ -29,9 +29,6 @@ func _ready() -> void:
 	# Set config button icon
 	_config_button.icon = get_theme_icon("Tools", "EditorIcons")
 
-	# Set status icon with plugin icon
-	_status_icon.texture = preload("res://addons/ohmydialog/icon.png")
-
 	# Defer connection to AIService to ensure it's initialized
 	call_deferred("_connect_ai_service")
 
