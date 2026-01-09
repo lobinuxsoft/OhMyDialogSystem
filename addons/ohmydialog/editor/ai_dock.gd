@@ -6,6 +6,8 @@ extends Control
 ## Shows current model status and provides quick access to load/unload
 ## and configuration options.
 
+const PLUGIN_ICON = preload("res://addons/ohmydialog/icons/plugin_icon.svg")
+
 ## Emitted when user requests to open config dialog
 signal config_requested()
 
@@ -29,8 +31,8 @@ func _ready() -> void:
 	# Set config button icon
 	_config_button.icon = get_theme_icon("Tools", "EditorIcons")
 
-	# Set status icon
-	_status_icon.texture = get_theme_icon("StatusSuccess", "EditorIcons")
+	# Set status icon with plugin icon
+	_status_icon.texture = PLUGIN_ICON
 
 	# Defer connection to AIService to ensure it's initialized
 	call_deferred("_connect_ai_service")

@@ -249,7 +249,7 @@ func _update_model_details() -> void:
 			file.close()
 
 	# Title
-	var text = "[b]%s[/b]\n" % model.display_name
+	var text = "[color=#00d4ff][b]%s[/b][/color]\n" % model.display_name
 	text += "[color=#21262d]━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n"
 
 	# Description
@@ -257,43 +257,43 @@ func _update_model_details() -> void:
 		text += "[color=#8b949e]%s[/color]\n\n" % model.description
 
 	# Status badge
-	text += "[b]Status:[/b] "
+	text += "[color=#a855f7]Status:[/color] "
 	if _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id:
-		text += "[color=#10b981][b]LOADED[/b][/color]\n"
+		text += "[color=#10b981][b]● LOADED[/b][/color]\n"
 	elif is_downloaded:
-		text += "[color=#00d4ff]Ready[/color]\n"
+		text += "[color=#00d4ff]● Ready[/color]\n"
 	else:
-		text += "[color=#484f58]Not Downloaded[/color]\n"
+		text += "[color=#484f58]○ Not Downloaded[/color]\n"
 
 	# Specifications section
-	text += "\n[b]Specifications[/b]\n"
+	text += "\n[color=#10b981][b]Specifications[/b][/color]\n"
 
 	# Size
 	if is_downloaded and file_size_actual > 0:
-		text += "File Size: %.1f MB\n" % file_size_actual
+		text += "[color=#8b949e]File Size:[/color] [color=#00d4ff]%.1f MB[/color]\n" % file_size_actual
 	else:
-		text += "Est. Size: ~%.0f MB\n" % model.size_mb
+		text += "[color=#8b949e]Est. Size:[/color] ~%.0f MB\n" % model.size_mb
 
 	# Context
-	text += "Context Window: %d tokens\n" % model.n_ctx
+	text += "[color=#8b949e]Context Window:[/color] [color=#00d4ff]%d[/color] tokens\n" % model.n_ctx
 
 	# Estimate memory
 	var est_memory = model.size_mb * 1.2
-	text += "Est. RAM Usage: ~%.0f MB\n" % est_memory
+	text += "[color=#8b949e]Est. RAM Usage:[/color] ~%.0f MB\n" % est_memory
 
 	# GPU layers
-	text += "GPU Layers: %d\n" % model.n_gpu_layers
+	text += "[color=#8b949e]GPU Layers:[/color] %d\n" % model.n_gpu_layers
 
 	# Default sampling section
-	text += "\n[b]Default Sampling[/b]\n"
-	text += "Temperature: %.2f\n" % model.default_temperature
-	text += "Top P: %.2f\n" % model.default_top_p
-	text += "Top K: %d\n" % model.default_top_k
-	text += "Max Tokens: %d\n" % model.default_max_tokens
+	text += "\n[color=#a855f7][b]Default Sampling[/b][/color]\n"
+	text += "[color=#8b949e]Temperature:[/color] %.2f\n" % model.default_temperature
+	text += "[color=#8b949e]Top P:[/color] %.2f\n" % model.default_top_p
+	text += "[color=#8b949e]Top K:[/color] %d\n" % model.default_top_k
+	text += "[color=#8b949e]Max Tokens:[/color] %d\n" % model.default_max_tokens
 
 	# Custom model warning
 	if model.is_custom:
-		text += "\n[color=#f97316][b]CUSTOM MODEL[/b][/color]\n"
+		text += "\n[color=#f97316][b]⚠ CUSTOM MODEL[/b][/color]\n"
 
 	model_details.text = text
 	_selected_model_id = model.id
