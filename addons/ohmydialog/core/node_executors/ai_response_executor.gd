@@ -19,6 +19,10 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	var history: Array[Dictionary] = context.get_context("history") if has_context else []
 	var player_input: String = context.get_context("player_input") if has_context else ""
 
+	# Clear player_input after consuming so next AI_RESPONSE doesn't inherit it
+	if has_context and context.has_method("set_context"):
+		context.set_context("player_input", "")
+
 	# Validate required components (duck typing - check for generate method)
 	if not llama or not llama.has_method("generate"):
 		return error("AIResponseExecutor: No valid LlamaInterface in context")
