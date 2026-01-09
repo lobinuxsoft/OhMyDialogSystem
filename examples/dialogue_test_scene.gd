@@ -18,6 +18,10 @@ extends Control
 var dialogue_manager: DialogueManager
 var mock_llama: MockLlamaInterface
 
+# Debug tracking
+var last_player_input: String = ""
+var pending_choices: Array[Dictionary] = []
+
 # Resources
 var merchant_character: CharacterIdentity
 var fantasy_world: WorldContext
@@ -109,6 +113,9 @@ func _show_choices(choices: Array[Dictionary]) -> void:
 	input_field.visible = false
 	send_button.visible = false
 
+	# Store choices for debug tracking
+	pending_choices = choices
+
 	for i in choices.size():
 		var choice: Dictionary = choices[i]
 		var button := Button.new()
@@ -143,10 +150,9 @@ func _update_debug() -> void:
 		if not info.get("world_location", "").is_empty():
 			lines.append("  @ %s" % info.get("world_location", ""))
 		lines.append("")
-		lines.append("Player Input: %s" % (info.get("player_input", "") if not info.get("player_input", "").is_empty() else "(empty)"))
+		lines.append("Last Input: %s" % (last_player_input if not last_player_input.is_empty() else "(none)"))
 		lines.append("")
 		lines.append("History: %s" % info.get("history", "?"))
-		lines.append("Context: %s" % info.get("context", "?"))
 
 		debug_label.text = "\n".join(lines)
 
@@ -169,8 +175,10 @@ func _on_continue_pressed() -> void:
 func _on_send_pressed() -> void:
 	var text := input_field.text.strip_edges()
 	if not text.is_empty():
+		last_player_input = text  # Track for debug
 		dialogue_manager.send_player_message(text)
 		input_field.text = ""
+		_update_debug()
 
 
 func _on_input_submitted(text: String) -> void:
@@ -178,8 +186,16 @@ func _on_input_submitted(text: String) -> void:
 
 
 func _on_choice_selected(index: int) -> void:
+	# Store selected choice text for debug display
+	for choice in pending_choices:
+		if choice.get("index", -1) == index:
+			last_player_input = choice.get("text", "")
+			break
+	pending_choices.clear()
+
 	dialogue_manager.select_choice(index)
 	_clear_choices()
+	_update_debug()
 
 
 # ==================== DialogueManager Signal Handlers ====================
@@ -187,6 +203,8 @@ func _on_choice_selected(index: int) -> void:
 
 func _on_dialogue_started(_graph: DialogueGraph) -> void:
 	print("[DialogueTest] Dialogue started!")
+	last_player_input = ""
+	pending_choices.clear()
 	_update_ui_state()
 	_update_debug()
 
