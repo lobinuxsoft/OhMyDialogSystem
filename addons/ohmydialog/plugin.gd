@@ -20,6 +20,9 @@ var _ai_service: AIService
 ## Reference to the AI dock panel.
 var _ai_dock: AIDock
 
+## Reference to the model required dialog.
+var _model_required_dialog: ModelRequiredDialog
+
 
 func _enter_tree() -> void:
 	# Register AutoLoad for runtime (automatic, user doesn't need to configure)
@@ -52,6 +55,13 @@ func _enter_tree() -> void:
 	_ai_dock.load_requested.connect(_on_ai_load_requested)
 	add_control_to_dock(DOCK_SLOT_RIGHT_UL, _ai_dock)
 
+	# Initialize model required dialog
+	var dialog_scene := preload("res://addons/ohmydialog/editor/model_required_dialog.tscn")
+	_model_required_dialog = dialog_scene.instantiate()
+	_model_required_dialog.open_model_manager_requested.connect(_on_open_model_manager_requested)
+	_model_required_dialog.model_activated.connect(_on_model_activated)
+	EditorInterface.get_base_control().add_child(_model_required_dialog)
+
 	print("OhMyDialogSystem: Plugin loaded")
 
 
@@ -77,6 +87,11 @@ func _exit_tree() -> void:
 	if _ai_service:
 		_ai_service.queue_free()
 		_ai_service = null
+
+	# Clean up model required dialog
+	if _model_required_dialog:
+		_model_required_dialog.queue_free()
+		_model_required_dialog = null
 
 	# Note: We don't unregister the autoload here because:
 	# 1. It would break running games if user disables plugin while testing
@@ -129,5 +144,16 @@ func _on_ai_config_requested() -> void:
 
 ## Called when user requests to load a model from dock.
 func _on_ai_load_requested() -> void:
-	# TODO: Open Model Required Dialog (issue #166)
-	print("OhMyDialogSystem: Load requested - dialog not implemented yet")
+	if _model_required_dialog:
+		_model_required_dialog.show_dialog()
+
+
+## Called when user requests to open the Model Manager from the dialog.
+func _on_open_model_manager_requested() -> void:
+	# TODO: Open Model Manager window (future implementation)
+	print("OhMyDialogSystem: Model Manager not implemented yet")
+
+
+## Called when a model is activated from the dialog.
+func _on_model_activated(config: ModelConfig) -> void:
+	print("OhMyDialogSystem: Model activated - %s" % config.display_name)
