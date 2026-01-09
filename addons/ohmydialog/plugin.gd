@@ -23,6 +23,9 @@ var _ai_dock: AIDock
 ## Reference to the model required dialog.
 var _model_required_dialog: ModelRequiredDialog
 
+## Reference to the model manager window.
+var _model_manager_window: ModelManagerWindow
+
 
 func _enter_tree() -> void:
 	# Register AutoLoad for runtime (automatic, user doesn't need to configure)
@@ -62,6 +65,11 @@ func _enter_tree() -> void:
 	_model_required_dialog.model_activated.connect(_on_model_activated)
 	EditorInterface.get_base_control().add_child(_model_required_dialog)
 
+	# Initialize model manager window
+	var manager_scene := preload("res://addons/ohmydialog/editor/model_manager_window.tscn")
+	_model_manager_window = manager_scene.instantiate()
+	EditorInterface.get_base_control().add_child(_model_manager_window)
+
 	print("OhMyDialogSystem: Plugin loaded")
 
 
@@ -92,6 +100,11 @@ func _exit_tree() -> void:
 	if _model_required_dialog:
 		_model_required_dialog.queue_free()
 		_model_required_dialog = null
+
+	# Clean up model manager window
+	if _model_manager_window:
+		_model_manager_window.queue_free()
+		_model_manager_window = null
 
 	# Note: We don't unregister the autoload here because:
 	# 1. It would break running games if user disables plugin while testing
@@ -137,9 +150,10 @@ func _make_visible(visible: bool) -> void:
 
 
 ## Called when user requests AI configuration from dock.
+## Opens the Model Manager window.
 func _on_ai_config_requested() -> void:
-	# TODO: Open AI Config Dialog (issue #167)
-	print("OhMyDialogSystem: Config requested - dialog not implemented yet")
+	if _model_manager_window:
+		_model_manager_window.show_window()
 
 
 ## Called when user requests to load a model from dock.
@@ -150,8 +164,8 @@ func _on_ai_load_requested() -> void:
 
 ## Called when user requests to open the Model Manager from the dialog.
 func _on_open_model_manager_requested() -> void:
-	# TODO: Open Model Manager window (future implementation)
-	print("OhMyDialogSystem: Model Manager not implemented yet")
+	if _model_manager_window:
+		_model_manager_window.show_window()
 
 
 ## Called when a model is activated from the dialog.

@@ -1,0 +1,289 @@
+[gd_scene load_steps=2 format=3 uid="uid://model_manager_win"]
+
+[ext_resource type="Script" path="res://addons/ohmydialog/editor/model_manager_window.gd" id="1_script"]
+
+[node name="ModelManagerWindow" type="Window"]
+title = "Model Manager - OhMyDialogSystem"
+initial_position = 2
+size = Vector2i(900, 600)
+visible = false
+wrap_controls = true
+exclusive = true
+script = ExtResource("1_script")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HeaderRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Model Manager"
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/VBoxContainer/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatusLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HeaderRow"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DownloadPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/DownloadPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/DownloadPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DownloadLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/DownloadPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Downloading..."
+
+[node name="DownloadProgress" type="ProgressBar" parent="PanelContainer/MarginContainer/VBoxContainer/DownloadPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+
+[node name="CancelDownloadBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/DownloadPanel/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Cancel"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 450
+
+[node name="LeftPanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ToolbarRow" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+layout_mode = 2
+
+[node name="SortLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ToolbarRow"]
+layout_mode = 2
+text = "Sort by:"
+
+[node name="SortOption" type="OptionButton" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ToolbarRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ToolbarRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RefreshBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ToolbarRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Refresh"
+
+[node name="ModelsTree" type="Tree" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonsRow" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DownloadModelBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Download"
+
+[node name="LoadModelBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Load"
+
+[node name="UnloadModelBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Unload"
+
+[node name="DeleteModelBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Delete"
+
+[node name="Spacer" type="Control" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ButtonsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BrowseHFBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel/ButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Browse HuggingFace"
+
+[node name="RightPanel" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DetailsHeader" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+layout_mode = 2
+
+[node name="DetailsLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel/DetailsHeader"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Model Details"
+
+[node name="DetailsPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel/DetailsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel/DetailsPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ModelDetails" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel/DetailsPanel/ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Select a model to see details"
+fit_content = true
+
+[node name="HFDialog" type="Window" parent="."]
+unique_name_in_owner = true
+title = "Browse HuggingFace Models"
+initial_position = 2
+size = Vector2i(900, 600)
+visible = false
+exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="HFDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HFDialog/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/TitleRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "HuggingFace Model Browser"
+
+[node name="SearchRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HFSearchInput" type="LineEdit" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Search GGUF models (e.g., llama, qwen, phi, instruct)..."
+
+[node name="HFSearchBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/SearchRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Search"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 400
+
+[node name="LeftPanel" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ModelsLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+layout_mode = 2
+text = "Models (sorted by downloads)"
+
+[node name="HFResultsTree" type="Tree" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/LeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightPanel" type="VBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FilesLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+layout_mode = 2
+text = "GGUF Files (select one to add)"
+
+[node name="HFFilesTree" type="Tree" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/HSplitContainer/RightPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BottomRow" type="HBoxContainer" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HFStatusLabel" type="Label" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Search for models to browse available GGUF files"
+
+[node name="HFAddBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Add to List"
+
+[node name="HFCloseBtn" type="Button" parent="HFDialog/PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Close"

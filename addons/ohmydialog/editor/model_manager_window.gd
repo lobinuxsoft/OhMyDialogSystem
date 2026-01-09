@@ -1,0 +1,685 @@
+@tool
+class_name ModelManagerWindow
+extends Window
+## Window for managing AI models in the editor.
+##
+## Provides a complete interface for downloading, loading, and managing
+## LLM models. Based on llama_test_scene UI but integrated with AIService.
+
+## Emitted when a model is loaded
+signal model_loaded(config: ModelConfig)
+
+## Emitted when a model is unloaded
+signal model_unloaded()
+
+# UI References - Main
+@onready var status_label: Label = %StatusLabel
+@onready var download_panel: PanelContainer = %DownloadPanel
+@onready var download_label: Label = %DownloadLabel
+@onready var download_progress: ProgressBar = %DownloadProgress
+@onready var cancel_download_btn: Button = %CancelDownloadBtn
+
+# UI References - Models List
+@onready var models_tree: Tree = %ModelsTree
+@onready var sort_option: OptionButton = %SortOption
+@onready var refresh_btn: Button = %RefreshBtn
+@onready var model_details: RichTextLabel = %ModelDetails
+
+# UI References - Action Buttons
+@onready var download_model_btn: Button = %DownloadModelBtn
+@onready var load_model_btn: Button = %LoadModelBtn
+@onready var unload_model_btn: Button = %UnloadModelBtn
+@onready var delete_model_btn: Button = %DeleteModelBtn
+@onready var browse_hf_btn: Button = %BrowseHFBtn
+
+# UI References - HuggingFace Dialog
+@onready var hf_dialog: Window = %HFDialog
+@onready var hf_search_input: LineEdit = %HFSearchInput
+@onready var hf_search_btn: Button = %HFSearchBtn
+@onready var hf_results_tree: Tree = %HFResultsTree
+@onready var hf_files_tree: Tree = %HFFilesTree
+@onready var hf_status_label: Label = %HFStatusLabel
+@onready var hf_add_btn: Button = %HFAddBtn
+@onready var hf_close_btn: Button = %HFCloseBtn
+
+# Sort options
+enum SortBy { NAME, SIZE, CONTEXT, STATUS }
+
+# Internal
+var _ai_service: AIService
+var _model_manager: ModelManager
+var _current_sort: SortBy = SortBy.NAME
+var _selected_model_id: String = ""
+
+# HuggingFace Browser
+var _hf_api: HuggingFaceAPI
+var _hf_search_results: Array[Dictionary] = []
+var _hf_selected_model_id: String = ""
+var _hf_selected_file: Dictionary = {}
+
+
+func _ready() -> void:
+	# Connect window signals
+	close_requested.connect(_on_close_requested)
+
+	# Connect to AIService
+	call_deferred("_connect_ai_service")
+
+	# Setup UI
+	_setup_models_tree()
+	_setup_sort_options()
+	_setup_hf_dialog()
+
+	# Connect UI signals
+	sort_option.item_selected.connect(_on_sort_changed)
+	refresh_btn.pressed.connect(_on_refresh_pressed)
+	models_tree.item_selected.connect(_on_model_tree_selected)
+	download_model_btn.pressed.connect(_on_download_model_pressed)
+	load_model_btn.pressed.connect(_on_load_model_pressed)
+	unload_model_btn.pressed.connect(_on_unload_model_pressed)
+	delete_model_btn.pressed.connect(_on_delete_model_pressed)
+	browse_hf_btn.pressed.connect(_on_browse_hf_pressed)
+	cancel_download_btn.pressed.connect(_on_cancel_download_pressed)
+
+	# Initial state
+	download_panel.hide()
+	_update_ui_state()
+
+
+func _connect_ai_service() -> void:
+	_ai_service = AIService.get_singleton()
+	if not _ai_service:
+		push_warning("ModelManagerWindow: AIService not available")
+		status_label.text = "AIService not available"
+		return
+
+	_model_manager = _ai_service.get_model_manager()
+	if not _model_manager:
+		push_warning("ModelManagerWindow: ModelManager not available")
+		status_label.text = "ModelManager not available"
+		return
+
+	# Connect ModelManager signals
+	_model_manager.model_loaded.connect(_on_model_loaded_internal)
+	_model_manager.model_load_failed.connect(_on_model_load_failed)
+	_model_manager.model_unloaded.connect(_on_model_unloaded_internal)
+	_model_manager.download_progress.connect(_on_download_progress)
+	_model_manager.download_completed.connect(_on_download_completed)
+	_model_manager.download_failed.connect(_on_download_failed)
+
+	# Initialize HuggingFace API
+	_hf_api = HuggingFaceAPI.new()
+	_hf_api.search_completed.connect(_on_hf_search_completed)
+	_hf_api.search_failed.connect(_on_hf_search_failed)
+	_hf_api.model_details_completed.connect(_on_hf_model_details_completed)
+	_hf_api.model_details_failed.connect(_on_hf_model_details_failed)
+
+	# Populate models
+	_populate_models_tree()
+	_update_ui_state()
+
+
+func _exit_tree() -> void:
+	if _hf_api != null:
+		_hf_api.cleanup()
+
+
+## Shows the window
+func show_window() -> void:
+	if _model_manager:
+		_populate_models_tree()
+		_update_ui_state()
+	popup_centered()
+
+
+func _setup_models_tree() -> void:
+	models_tree.columns = 4
+	models_tree.set_column_title(0, "Model")
+	models_tree.set_column_title(1, "Size")
+	models_tree.set_column_title(2, "Context")
+	models_tree.set_column_title(3, "Status")
+	models_tree.column_titles_visible = true
+	models_tree.set_column_expand(0, true)
+	models_tree.set_column_expand(1, false)
+	models_tree.set_column_expand(2, false)
+	models_tree.set_column_expand(3, false)
+	models_tree.set_column_custom_minimum_width(1, 80)
+	models_tree.set_column_custom_minimum_width(2, 80)
+	models_tree.set_column_custom_minimum_width(3, 100)
+
+
+func _setup_sort_options() -> void:
+	sort_option.add_item("Name", SortBy.NAME)
+	sort_option.add_item("Size", SortBy.SIZE)
+	sort_option.add_item("Context", SortBy.CONTEXT)
+	sort_option.add_item("Status", SortBy.STATUS)
+	sort_option.selected = 0
+
+
+func _populate_models_tree() -> void:
+	models_tree.clear()
+	var root = models_tree.create_item()
+	models_tree.hide_root = true
+
+	if not _model_manager:
+		return
+
+	var models = _model_manager.get_available_models()
+	models = _sort_models(models)
+
+	for model in models:
+		var item = models_tree.create_item(root)
+
+		# Column 0: Name
+		item.set_text(0, model.display_name)
+		item.set_metadata(0, model.id)
+
+		# Column 1: Size
+		item.set_text(1, "%.0f MB" % model.size_mb)
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		# Column 2: Context
+		item.set_text(2, "%d" % model.n_ctx)
+		item.set_text_alignment(2, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		# Column 3: Status
+		var is_downloaded = model.is_downloaded()
+		var is_loaded = _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id
+
+		if is_loaded:
+			item.set_text(3, "Loaded")
+			item.set_custom_color(3, Color.GREEN)
+		elif is_downloaded:
+			item.set_text(3, "Ready")
+			item.set_custom_color(3, Color.CYAN)
+		else:
+			item.set_text(3, "Not Downloaded")
+			item.set_custom_color(3, Color.GRAY)
+
+		# Highlight if custom
+		if model.is_custom:
+			item.set_custom_color(0, Color.YELLOW)
+
+
+func _sort_models(models: Array[ModelConfig]) -> Array[ModelConfig]:
+	var sorted = models.duplicate()
+
+	match _current_sort:
+		SortBy.NAME:
+			sorted.sort_custom(func(a, b): return a.display_name.naturalcasecmp_to(b.display_name) < 0)
+		SortBy.SIZE:
+			sorted.sort_custom(func(a, b): return a.size_mb < b.size_mb)
+		SortBy.CONTEXT:
+			sorted.sort_custom(func(a, b): return a.n_ctx > b.n_ctx)
+		SortBy.STATUS:
+			sorted.sort_custom(func(a, b):
+				var a_downloaded = 1 if a.is_downloaded() else 0
+				var b_downloaded = 1 if b.is_downloaded() else 0
+				return a_downloaded > b_downloaded
+			)
+
+	return sorted
+
+
+func _get_selected_model() -> ModelConfig:
+	var selected = models_tree.get_selected()
+	if selected == null:
+		return null
+
+	var model_id = selected.get_metadata(0)
+	if model_id == null or model_id.is_empty():
+		return null
+
+	return _model_manager.registry.get_model_by_id(model_id)
+
+
+func _update_model_details() -> void:
+	var model = _get_selected_model()
+	if model == null:
+		model_details.text = "[color=#8b949e]Select a model to see details[/color]"
+		return
+
+	var is_downloaded = model.is_downloaded()
+	var file_size_actual = 0.0
+
+	if is_downloaded:
+		var file = FileAccess.open(model.get_effective_path(), FileAccess.READ)
+		if file:
+			file_size_actual = file.get_length() / (1024.0 * 1024.0)
+			file.close()
+
+	# Title
+	var text = "[b]%s[/b]\n" % model.display_name
+	text += "[color=#21262d]━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n"
+
+	# Description
+	if not model.description.is_empty():
+		text += "[color=#8b949e]%s[/color]\n\n" % model.description
+
+	# Status badge
+	text += "[b]Status:[/b] "
+	if _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id:
+		text += "[color=#10b981][b]LOADED[/b][/color]\n"
+	elif is_downloaded:
+		text += "[color=#00d4ff]Ready[/color]\n"
+	else:
+		text += "[color=#484f58]Not Downloaded[/color]\n"
+
+	# Specifications section
+	text += "\n[b]Specifications[/b]\n"
+
+	# Size
+	if is_downloaded and file_size_actual > 0:
+		text += "File Size: %.1f MB\n" % file_size_actual
+	else:
+		text += "Est. Size: ~%.0f MB\n" % model.size_mb
+
+	# Context
+	text += "Context Window: %d tokens\n" % model.n_ctx
+
+	# Estimate memory
+	var est_memory = model.size_mb * 1.2
+	text += "Est. RAM Usage: ~%.0f MB\n" % est_memory
+
+	# GPU layers
+	text += "GPU Layers: %d\n" % model.n_gpu_layers
+
+	# Default sampling section
+	text += "\n[b]Default Sampling[/b]\n"
+	text += "Temperature: %.2f\n" % model.default_temperature
+	text += "Top P: %.2f\n" % model.default_top_p
+	text += "Top K: %d\n" % model.default_top_k
+	text += "Max Tokens: %d\n" % model.default_max_tokens
+
+	# Custom model warning
+	if model.is_custom:
+		text += "\n[color=#f97316][b]CUSTOM MODEL[/b][/color]\n"
+
+	model_details.text = text
+	_selected_model_id = model.id
+
+
+func _update_ui_state() -> void:
+	if not _model_manager:
+		download_model_btn.disabled = true
+		load_model_btn.disabled = true
+		unload_model_btn.disabled = true
+		delete_model_btn.disabled = true
+		return
+
+	var model = _get_selected_model()
+	var is_loaded = _model_manager.is_model_loaded()
+	var is_downloading = _model_manager.is_downloading()
+
+	# Unload button
+	unload_model_btn.disabled = not is_loaded
+
+	# Model-specific buttons
+	if model != null:
+		var model_downloaded = model.is_downloaded()
+		var model_is_loaded = is_loaded and _model_manager.current_config != null and _model_manager.current_config.id == model.id
+
+		download_model_btn.disabled = model_downloaded or is_downloading
+		load_model_btn.disabled = not model_downloaded or model_is_loaded or is_downloading
+		delete_model_btn.disabled = not model_downloaded and not model.is_custom
+	else:
+		download_model_btn.disabled = true
+		load_model_btn.disabled = true
+		delete_model_btn.disabled = true
+
+	# Status label
+	if is_loaded and _model_manager.current_config != null:
+		status_label.text = "Loaded: %s" % _model_manager.current_config.display_name
+		status_label.add_theme_color_override("font_color", Color.GREEN)
+	elif is_downloading:
+		status_label.text = "Downloading..."
+		status_label.add_theme_color_override("font_color", Color.YELLOW)
+	else:
+		status_label.text = "No model loaded"
+		status_label.remove_theme_color_override("font_color")
+
+
+# ==================== Signal Handlers - Main ====================
+
+func _on_close_requested() -> void:
+	hide()
+
+
+func _on_sort_changed(index: int) -> void:
+	_current_sort = sort_option.get_item_id(index) as SortBy
+	_populate_models_tree()
+
+
+func _on_refresh_pressed() -> void:
+	_populate_models_tree()
+	_update_ui_state()
+
+
+func _on_model_tree_selected() -> void:
+	_update_model_details()
+	_update_ui_state()
+
+
+func _on_download_model_pressed() -> void:
+	var model = _get_selected_model()
+	if model == null:
+		return
+
+	var err = _model_manager.download_model(model)
+	if err == OK:
+		download_panel.show()
+		download_label.text = "Downloading %s..." % model.display_name
+		download_progress.value = 0
+
+	_update_ui_state()
+
+
+func _on_load_model_pressed() -> void:
+	var model = _get_selected_model()
+	if model == null:
+		return
+
+	status_label.text = "Loading %s..." % model.display_name
+	status_label.add_theme_color_override("font_color", Color.YELLOW)
+
+	var err = _model_manager.load_model(model)
+	if err != OK:
+		status_label.text = "Failed to load model"
+		status_label.add_theme_color_override("font_color", Color.RED)
+
+	_populate_models_tree()
+	_update_ui_state()
+
+
+func _on_unload_model_pressed() -> void:
+	_model_manager.unload_model()
+	_populate_models_tree()
+	_update_ui_state()
+
+
+func _on_delete_model_pressed() -> void:
+	var model = _get_selected_model()
+	if model == null:
+		return
+
+	# If model is loaded, unload it first
+	if _model_manager.is_model_loaded() and _model_manager.current_config != null:
+		if _model_manager.current_config.id == model.id:
+			_model_manager.unload_model()
+
+	# Delete the physical file if it exists
+	var path = model.get_effective_path()
+	if FileAccess.file_exists(path):
+		var err = DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+		if err != OK:
+			push_error("Failed to delete file: %s" % error_string(err))
+			return
+
+	# If it's a custom model, remove it from the registry
+	if model.is_custom:
+		_model_manager.remove_custom_model(model.id)
+
+	_populate_models_tree()
+	_update_model_details()
+	_update_ui_state()
+
+
+func _on_cancel_download_pressed() -> void:
+	_model_manager.cancel_download()
+	download_panel.hide()
+	_update_ui_state()
+
+
+# ==================== Signal Handlers - ModelManager ====================
+
+func _on_download_progress(_model_id: String, progress: float) -> void:
+	download_progress.value = progress * 100.0
+	var downloaded_mb = _model_manager.downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
+	var total_mb = _model_manager.downloader.get_total_bytes() / (1024.0 * 1024.0)
+	download_label.text = "Downloading... %.1f / %.1f MB" % [downloaded_mb, total_mb]
+
+
+func _on_download_completed(_model_id: String) -> void:
+	download_panel.hide()
+	_populate_models_tree()
+	_update_model_details()
+	_update_ui_state()
+	status_label.text = "Download complete!"
+	status_label.add_theme_color_override("font_color", Color.GREEN)
+
+
+func _on_download_failed(_model_id: String, error: String) -> void:
+	download_panel.hide()
+	status_label.text = "Download failed: %s" % error
+	status_label.add_theme_color_override("font_color", Color.RED)
+	_update_ui_state()
+
+
+func _on_model_loaded_internal(config: ModelConfig) -> void:
+	_populate_models_tree()
+	_update_ui_state()
+	model_loaded.emit(config)
+
+
+func _on_model_load_failed(_config: ModelConfig, error: Error) -> void:
+	status_label.text = "Load failed: %s" % error_string(error)
+	status_label.add_theme_color_override("font_color", Color.RED)
+	_update_ui_state()
+
+
+func _on_model_unloaded_internal() -> void:
+	_populate_models_tree()
+	_update_ui_state()
+	model_unloaded.emit()
+
+
+# ==================== HuggingFace Browser ====================
+
+func _setup_hf_dialog() -> void:
+	# Setup results tree
+	hf_results_tree.columns = 3
+	hf_results_tree.set_column_title(0, "Model")
+	hf_results_tree.set_column_title(1, "Downloads")
+	hf_results_tree.set_column_title(2, "Likes")
+	hf_results_tree.column_titles_visible = true
+	hf_results_tree.set_column_expand(0, true)
+	hf_results_tree.set_column_expand(1, false)
+	hf_results_tree.set_column_expand(2, false)
+	hf_results_tree.set_column_custom_minimum_width(1, 80)
+	hf_results_tree.set_column_custom_minimum_width(2, 60)
+
+	# Setup files tree
+	hf_files_tree.columns = 3
+	hf_files_tree.set_column_title(0, "File")
+	hf_files_tree.set_column_title(1, "Size")
+	hf_files_tree.set_column_title(2, "Quant")
+	hf_files_tree.column_titles_visible = true
+	hf_files_tree.set_column_expand(0, true)
+	hf_files_tree.set_column_expand(1, false)
+	hf_files_tree.set_column_expand(2, false)
+	hf_files_tree.set_column_custom_minimum_width(1, 80)
+	hf_files_tree.set_column_custom_minimum_width(2, 70)
+
+	# Connect dialog signals
+	hf_search_btn.pressed.connect(_on_hf_search_pressed)
+	hf_search_input.text_submitted.connect(_on_hf_search_submitted)
+	hf_results_tree.item_selected.connect(_on_hf_result_selected)
+	hf_files_tree.item_selected.connect(_on_hf_file_selected)
+	hf_add_btn.pressed.connect(_on_hf_add_pressed)
+	hf_close_btn.pressed.connect(_on_hf_close_pressed)
+	hf_dialog.close_requested.connect(_on_hf_close_pressed)
+
+	# Initial state
+	hf_add_btn.disabled = true
+
+
+func _on_browse_hf_pressed() -> void:
+	hf_dialog.popup_centered(Vector2i(900, 600))
+	hf_search_input.grab_focus()
+
+
+func _on_hf_search_pressed() -> void:
+	_do_hf_search()
+
+
+func _on_hf_search_submitted(_text: String) -> void:
+	_do_hf_search()
+
+
+func _do_hf_search() -> void:
+	if not _hf_api:
+		hf_status_label.text = "HuggingFace API not initialized"
+		return
+
+	var query = hf_search_input.text.strip_edges()
+	if query.is_empty():
+		query = "instruct gguf"
+
+	hf_status_label.text = "Searching..."
+	hf_search_btn.disabled = true
+	hf_results_tree.clear()
+	hf_files_tree.clear()
+	_hf_selected_model_id = ""
+	_hf_selected_file = {}
+	hf_add_btn.disabled = true
+
+	_hf_api.search_models(query, 100)
+
+
+func _on_hf_search_completed(results: Array[Dictionary]) -> void:
+	hf_search_btn.disabled = false
+	_hf_search_results = results
+
+	hf_results_tree.clear()
+	var root = hf_results_tree.create_item()
+	hf_results_tree.hide_root = true
+
+	if results.is_empty():
+		hf_status_label.text = "No GGUF models found"
+		return
+
+	hf_status_label.text = "Found %d models" % results.size()
+
+	for result in results:
+		var item = hf_results_tree.create_item(root)
+		item.set_text(0, result.get("name", ""))
+		item.set_metadata(0, result.get("id", ""))
+
+		var downloads = result.get("downloads", 0)
+		var downloads_str = _format_number(downloads)
+		item.set_text(1, downloads_str)
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		item.set_text(2, str(result.get("likes", 0)))
+		item.set_text_alignment(2, HORIZONTAL_ALIGNMENT_RIGHT)
+
+
+func _on_hf_search_failed(error: String) -> void:
+	hf_search_btn.disabled = false
+	hf_status_label.text = "Search failed: %s" % error
+
+
+func _on_hf_result_selected() -> void:
+	var selected = hf_results_tree.get_selected()
+	if selected == null:
+		return
+
+	var model_id = selected.get_metadata(0) as String
+	if model_id.is_empty():
+		return
+
+	_hf_selected_model_id = model_id
+	_hf_selected_file = {}
+	hf_add_btn.disabled = true
+
+	hf_files_tree.clear()
+	hf_status_label.text = "Loading files for %s..." % model_id
+
+	_hf_api.get_model_files(model_id)
+
+
+func _on_hf_model_details_completed(model_id: String, files: Array[Dictionary]) -> void:
+	if model_id != _hf_selected_model_id:
+		return
+
+	hf_files_tree.clear()
+	var root = hf_files_tree.create_item()
+	hf_files_tree.hide_root = true
+
+	if files.is_empty():
+		hf_status_label.text = "No GGUF files found (or all files > 4GB)"
+		return
+
+	hf_status_label.text = "Found %d GGUF files" % files.size()
+
+	for file_info in files:
+		var item = hf_files_tree.create_item(root)
+
+		var filename = file_info.get("filename", "")
+		item.set_text(0, filename)
+		item.set_metadata(0, file_info)
+
+		var size_mb = file_info.get("size_mb", 0.0)
+		if size_mb >= 1024:
+			item.set_text(1, "%.1f GB" % (size_mb / 1024.0))
+		else:
+			item.set_text(1, "%.0f MB" % size_mb)
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		var quant = file_info.get("quantization", "")
+		item.set_text(2, quant)
+
+		# Highlight preferred quantizations
+		if file_info.get("is_preferred", false):
+			item.set_custom_color(2, Color(0, 0.831, 1))
+
+
+func _on_hf_model_details_failed(model_id: String, error: String) -> void:
+	if model_id != _hf_selected_model_id:
+		return
+
+	hf_status_label.text = "Failed to load files: %s" % error
+
+
+func _on_hf_file_selected() -> void:
+	var selected = hf_files_tree.get_selected()
+	if selected == null:
+		hf_add_btn.disabled = true
+		_hf_selected_file = {}
+		return
+
+	_hf_selected_file = selected.get_metadata(0) as Dictionary
+	hf_add_btn.disabled = _hf_selected_file.is_empty()
+
+
+func _on_hf_add_pressed() -> void:
+	if _hf_selected_model_id.is_empty() or _hf_selected_file.is_empty():
+		return
+
+	# Create ModelConfig from HuggingFace info
+	var config = _hf_api.create_model_config(_hf_selected_model_id, _hf_selected_file)
+
+	# Add to registry
+	_model_manager.add_custom_model(config)
+
+	# Refresh the models list
+	_populate_models_tree()
+
+	# Close dialog
+	hf_dialog.hide()
+
+	# Show feedback
+	status_label.text = "Added: %s" % config.display_name
+	status_label.add_theme_color_override("font_color", Color(0, 0.831, 1))
+
+
+func _on_hf_close_pressed() -> void:
+	hf_dialog.hide()
+
+
+func _format_number(n: int) -> String:
+	if n >= 1000000:
+		return "%.1fM" % (n / 1000000.0)
+	elif n >= 1000:
+		return "%.1fK" % (n / 1000.0)
+	return str(n)
