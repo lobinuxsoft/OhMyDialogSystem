@@ -165,8 +165,9 @@ func _get_default_data(type: NodeType) -> Dictionary:
 			}
 		NodeType.JUMP:
 			return {
-				"target_graph_id": "",  # DialogueGraph resource path or ID
-				"target_node_id": ""    # Specific node ID (empty = start node)
+				"target_graph_id": "",   # DialogueGraph resource path or ID
+				"target_node_id": "",    # Specific node ID (empty = start node)
+				"preserve_context": false # Keep local variables when jumping
 			}
 		NodeType.JUMP_TO_FREE:
 			return {
