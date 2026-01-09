@@ -70,8 +70,6 @@ func _set_loaded_state() -> void:
 	_action_button.text = "Unload"
 	_action_button.icon = get_theme_icon("Stop", "EditorIcons")
 
-	_status_icon.modulate = Color.GREEN
-
 
 func _set_unloaded_state() -> void:
 	_status_label.text = "No Model"
@@ -83,8 +81,6 @@ func _set_unloaded_state() -> void:
 	_action_button.text = "Load"
 	_action_button.icon = get_theme_icon("Play", "EditorIcons")
 
-	_status_icon.modulate = Color.GRAY
-
 
 func _set_disconnected_state() -> void:
 	_status_label.text = "Disconnected"
@@ -95,8 +91,6 @@ func _set_disconnected_state() -> void:
 
 	_action_button.text = "Retry"
 	_action_button.icon = get_theme_icon("Reload", "EditorIcons")
-
-	_status_icon.modulate = Color.RED
 
 
 func _on_action_pressed() -> void:
