@@ -129,7 +129,6 @@ func _get_default_data(type: NodeType) -> Dictionary:
 			}
 		NodeType.AI_RESPONSE:
 			return {
-				"character_id": "",     # Reference to CharacterIdentity resource
 				"prompt_template": "",  # Template with {variables} for prompt
 				"emotion_hint": "",     # Suggested emotion (happy, sad, angry, etc.)
 				"max_tokens": 256       # Maximum response length
@@ -228,8 +227,7 @@ func validate() -> Array[String]:
 
 	match node_type:
 		NodeType.AI_RESPONSE:
-			if data.get("character_id", "").is_empty():
-				errors.append("AI_RESPONSE requires a character_id")
+			pass  # No mandatory fields - uses context from DialogueGraph
 		NodeType.STATIC_RESPONSE:
 			if data.get("text", "").is_empty():
 				errors.append("STATIC_RESPONSE requires text content")

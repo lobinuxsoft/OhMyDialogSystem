@@ -14,9 +14,9 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var prompt_hint: String = node_data.data.get("prompt_hint", "")
+	var prompt_template: String = node_data.data.get("prompt_template", "")
 
 	_add_hint_label("AI generates response")
-	if not prompt_hint.is_empty():
+	if not prompt_template.is_empty():
 		_add_separator()
-		_add_text_preview(prompt_hint, 2)
+		_add_text_preview(prompt_template, 2)

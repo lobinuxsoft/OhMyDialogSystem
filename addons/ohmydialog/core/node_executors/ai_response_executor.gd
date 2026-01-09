@@ -10,16 +10,18 @@ extends BaseNodeExecutor
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	# Get required components from context
 	var has_context := context.has_method("get_context")
-	var llama: LlamaInterface = context.get_context("llama_interface") if has_context else null
+	# Use duck typing - llama can be LlamaInterface or MockLlamaInterface
+	var llama: Object = context.get_context("llama_interface") if has_context else null
 	var pb: PromptBuilder = context.get_context("prompt_builder") if has_context else null
+	# Character and world come from DialogueGraph context (set when dialogue starts)
 	var character: CharacterIdentity = context.get_context("character") if has_context else null
 	var world: WorldContext = context.get_context("world") if has_context else null
 	var history: Array[Dictionary] = context.get_context("history") if has_context else []
 	var player_input: String = context.get_context("player_input") if has_context else ""
 
-	# Validate required components
-	if not llama:
-		return error("AIResponseExecutor: No LlamaInterface in context")
+	# Validate required components (duck typing - check for generate method)
+	if not llama or not llama.has_method("generate"):
+		return error("AIResponseExecutor: No valid LlamaInterface in context")
 
 	if not pb:
 		# Create default prompt builder if not provided
