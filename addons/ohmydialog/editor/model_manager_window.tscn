@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://model_manager_win"]
 
 [ext_resource type="Script" path="res://addons/ohmydialog/editor/model_manager_window.gd" id="1_script"]
-[ext_resource type="Theme" uid="uid://c0i8d1mm5nrve" path="res://addons/ohmydialog/examples/neural_theme.tres" id="2_theme"]
+[ext_resource type="Theme" uid="uid://editor_theme_omds" path="res://addons/ohmydialog/editor/editor_theme.tres" id="2_theme"]
 
 [node name="ModelManagerWindow" type="Window"]
 title = "Model Manager - OhMyDialogSystem"
