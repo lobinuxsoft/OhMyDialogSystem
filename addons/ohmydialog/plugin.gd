@@ -8,14 +8,17 @@ extends EditorPlugin
 const AUTOLOAD_NAME := "AIServiceAutoload"
 const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
 
-## Reference to the toolbar container (HBoxContainer with indicator + menu).
+## Reference to the toolbar container (HBoxContainer with icon + AI label + menu).
 var _toolbar_container: HBoxContainer
 
 ## Reference to the toolbar menu button.
 var _toolbar_menu: MenuButton
 
-## Reference to the AI status indicator.
-var _status_indicator: Label
+## Reference to the plugin icon in toolbar.
+var _toolbar_icon: TextureRect
+
+## Reference to the AI status label.
+var _ai_label: Label
 
 ## Reference to the dialogue graph editor window.
 var _dialogue_graph_window: DialogueGraphWindow
@@ -84,21 +87,26 @@ func _enter_tree() -> void:
 	_model_manager_window = manager_scene.instantiate()
 	EditorInterface.get_base_control().add_child(_model_manager_window)
 
-	# Create toolbar container with status indicator and menu
+	# Create toolbar container: [Icon] [AI] [▼]
 	_toolbar_container = HBoxContainer.new()
-	_toolbar_container.add_theme_constant_override("separation", 4)
+	_toolbar_container.add_theme_constant_override("separation", 2)
 
-	# Status indicator (circle that shows AI model status)
-	_status_indicator = Label.new()
-	_status_indicator.text = "●"
-	_status_indicator.add_theme_font_size_override("font_size", 12)
-	_status_indicator.tooltip_text = "No AI model loaded"
+	# Plugin icon
+	_toolbar_icon = TextureRect.new()
+	_toolbar_icon.texture = preload("res://addons/ohmydialog/icon.png")
+	_toolbar_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_toolbar_icon.custom_minimum_size = Vector2(16, 16)
+	_toolbar_container.add_child(_toolbar_icon)
+
+	# AI status label
+	_ai_label = Label.new()
+	_ai_label.text = "AI"
+	_ai_label.add_theme_font_size_override("font_size", 13)
 	_update_status_indicator(false, null)
-	_toolbar_container.add_child(_status_indicator)
+	_toolbar_container.add_child(_ai_label)
 
-	# Menu button
+	# Menu button (dropdown arrow only)
 	_toolbar_menu = MenuButton.new()
-	_toolbar_menu.text = "OhMyDialog"
 	_toolbar_menu.flat = true
 	_toolbar_menu.focus_mode = Control.FOCUS_NONE
 
@@ -109,9 +117,6 @@ func _enter_tree() -> void:
 	_toolbar_container.add_child(_toolbar_menu)
 
 	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_container)
-
-	# Move to left side of toolbar (after adding, move to first position)
-	call_deferred("_reposition_toolbar_control")
 
 	# Connect to ModelManager signals after a frame (needs AIService to be ready)
 	call_deferred("_connect_model_manager_signals")
@@ -129,7 +134,8 @@ func _exit_tree() -> void:
 		_toolbar_container.queue_free()
 		_toolbar_container = null
 		_toolbar_menu = null
-		_status_indicator = null
+		_toolbar_icon = null
+		_ai_label = null
 
 	# Remove inspector plugins
 	if _node_inspector_plugin:
@@ -216,16 +222,6 @@ func _on_toolbar_menu_id_pressed(id: int) -> void:
 				_dialogue_graph_window.show_window()
 
 
-## Repositions the toolbar control to the left side.
-func _reposition_toolbar_control() -> void:
-	if not _toolbar_container or not is_instance_valid(_toolbar_container):
-		return
-
-	var parent := _toolbar_container.get_parent()
-	if parent:
-		parent.move_child(_toolbar_container, 0)
-
-
 ## Connects to ModelManager signals for status updates.
 func _connect_model_manager_signals() -> void:
 	if not _ai_service:
@@ -239,10 +235,14 @@ func _connect_model_manager_signals() -> void:
 		model_manager.model_loaded.connect(_on_model_loaded)
 	if not model_manager.model_unloaded.is_connected(_on_model_unloaded):
 		model_manager.model_unloaded.connect(_on_model_unloaded)
+	if not model_manager.models_changed.is_connected(_on_models_changed):
+		model_manager.models_changed.connect(_on_models_changed)
 
-	# Check current state
+	# Check current state and update tooltip
 	if model_manager.is_model_loaded() and model_manager.current_config:
 		_update_status_indicator(true, model_manager.current_config)
+	else:
+		_update_status_indicator(false, null)
 
 
 ## Disconnects ModelManager signals.
@@ -258,19 +258,39 @@ func _disconnect_model_manager_signals() -> void:
 		model_manager.model_loaded.disconnect(_on_model_loaded)
 	if model_manager.model_unloaded.is_connected(_on_model_unloaded):
 		model_manager.model_unloaded.disconnect(_on_model_unloaded)
+	if model_manager.models_changed.is_connected(_on_models_changed):
+		model_manager.models_changed.disconnect(_on_models_changed)
 
 
-## Updates the status indicator appearance.
+## Updates the AI label appearance and tooltip.
 func _update_status_indicator(is_loaded: bool, config: ModelConfig) -> void:
-	if not _status_indicator:
+	if not _ai_label:
 		return
 
+	# Build tooltip with model info
+	var tooltip := ""
+	var downloaded_count := 0
+
+	if _ai_service:
+		var model_manager := _ai_service.get_model_manager()
+		if model_manager:
+			for model in model_manager.get_available_models():
+				if model.is_downloaded():
+					downloaded_count += 1
+
 	if is_loaded and config:
-		_status_indicator.add_theme_color_override("font_color", Color.GREEN)
-		_status_indicator.tooltip_text = "Model loaded: %s" % config.display_name
+		_ai_label.add_theme_color_override("font_color", Color.GREEN)
+		tooltip = "Active: %s\nAvailable models: %d" % [config.display_name, downloaded_count]
 	else:
-		_status_indicator.add_theme_color_override("font_color", Color.GRAY)
-		_status_indicator.tooltip_text = "No AI model loaded"
+		_ai_label.remove_theme_color_override("font_color")
+		if downloaded_count > 0:
+			tooltip = "No model loaded\nAvailable models: %d" % downloaded_count
+		else:
+			tooltip = "No model loaded\nDownload a model from AI Models"
+
+	_ai_label.tooltip_text = tooltip
+	if _toolbar_container:
+		_toolbar_container.tooltip_text = tooltip
 
 
 ## Called when a model is loaded.
@@ -281,3 +301,14 @@ func _on_model_loaded(config: ModelConfig) -> void:
 ## Called when a model is unloaded.
 func _on_model_unloaded() -> void:
 	_update_status_indicator(false, null)
+
+
+## Called when available models change (download/delete).
+func _on_models_changed() -> void:
+	# Refresh tooltip with updated model count
+	if _ai_service:
+		var model_manager := _ai_service.get_model_manager()
+		if model_manager and model_manager.is_model_loaded() and model_manager.current_config:
+			_update_status_indicator(true, model_manager.current_config)
+		else:
+			_update_status_indicator(false, null)
