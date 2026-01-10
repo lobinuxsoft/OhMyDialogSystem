@@ -397,9 +397,11 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 				var current_key: String = key
 				item_hbox.add_child(key_edit)
 
-				# Type selector
+				# Type selector - compact size
 				var type_btn := OptionButton.new()
-				type_btn.custom_minimum_size.x = 55
+				type_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+				type_btn.fit_to_longest_item = false
+				type_btn.add_theme_font_size_override("font_size", 11)
 				for t in TYPE_OPTIONS:
 					type_btn.add_item(t)
 				var current_type := _get_type_name(value)
@@ -407,13 +409,169 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 				type_btn.add_theme_color_override("font_color", TYPE_COLORS.get(current_type, WikiInspectorTheme.TEXT_PRIMARY))
 				item_hbox.add_child(type_btn)
 
-				# Value edit
-				var value_edit := LineEdit.new()
-				value_edit.text = str(value)
-				value_edit.placeholder_text = "value"
-				value_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				# Value editor container - will hold type-specific editor
+				var value_container := HBoxContainer.new()
+				value_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				item_hbox.add_child(value_container)
+
 				var k: String = key
-				item_hbox.add_child(value_edit)
+
+				# Function to create appropriate value editor based on type
+				var create_value_editor: Callable
+				var get_editor_value: Callable
+				var current_editor: Array = [null]  # Wrapper for closure
+
+				create_value_editor = func(type_name: String, val: Variant) -> Control:
+					match type_name:
+						"bool":
+							var check := CheckButton.new()
+							check.button_pressed = val if val is bool else false
+							check.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							return check
+						"int":
+							var spin := SpinBox.new()
+							spin.step = 1
+							spin.min_value = -999999999
+							spin.max_value = 999999999
+							spin.value = val if val is int else 0
+							spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							spin.allow_greater = true
+							spin.allow_lesser = true
+							return spin
+						"float":
+							var spin := SpinBox.new()
+							spin.step = 0.001
+							spin.min_value = -999999999.0
+							spin.max_value = 999999999.0
+							spin.value = val if val is float else 0.0
+							spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							spin.allow_greater = true
+							spin.allow_lesser = true
+							return spin
+						"Color":
+							var picker := ColorPickerButton.new()
+							picker.color = val if val is Color else Color.WHITE
+							picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							picker.custom_minimum_size.y = 24
+							picker.edit_alpha = true
+							return picker
+						"Vector2", "Vector2i":
+							var hbox := HBoxContainer.new()
+							hbox.add_theme_constant_override("separation", 2)
+							hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							var is_int := type_name == "Vector2i"
+							var vec: Variant = val if (val is Vector2 or val is Vector2i) else (Vector2i.ZERO if is_int else Vector2.ZERO)
+							for i in 2:
+								var spin := SpinBox.new()
+								spin.step = 1 if is_int else 0.001
+								spin.min_value = -999999
+								spin.max_value = 999999
+								spin.value = vec[i]
+								spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+								spin.allow_greater = true
+								spin.allow_lesser = true
+								hbox.add_child(spin)
+							return hbox
+						"Vector3", "Vector3i":
+							var hbox := HBoxContainer.new()
+							hbox.add_theme_constant_override("separation", 2)
+							hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							var is_int := type_name == "Vector3i"
+							var vec: Variant = val if (val is Vector3 or val is Vector3i) else (Vector3i.ZERO if is_int else Vector3.ZERO)
+							for i in 3:
+								var spin := SpinBox.new()
+								spin.step = 1 if is_int else 0.001
+								spin.min_value = -999999
+								spin.max_value = 999999
+								spin.value = vec[i]
+								spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+								spin.allow_greater = true
+								spin.allow_lesser = true
+								hbox.add_child(spin)
+							return hbox
+						"Vector4", "Vector4i":
+							var hbox := HBoxContainer.new()
+							hbox.add_theme_constant_override("separation", 2)
+							hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							var is_int := type_name == "Vector4i"
+							var vec: Variant = val if (val is Vector4 or val is Vector4i) else (Vector4i.ZERO if is_int else Vector4.ZERO)
+							for i in 4:
+								var spin := SpinBox.new()
+								spin.step = 1 if is_int else 0.001
+								spin.min_value = -999999
+								spin.max_value = 999999
+								spin.value = vec[i]
+								spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+								spin.allow_greater = true
+								spin.allow_lesser = true
+								hbox.add_child(spin)
+							return hbox
+						_:
+							# Default: LineEdit for String and complex types
+							var edit := LineEdit.new()
+							edit.text = str(val)
+							edit.placeholder_text = "value"
+							edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+							return edit
+
+				# Function to get value from current editor
+				get_editor_value = func(type_name: String) -> Variant:
+					var editor: Control = current_editor[0]
+					if not editor:
+						return null
+					match type_name:
+						"bool":
+							return (editor as CheckButton).button_pressed
+						"int":
+							return int((editor as SpinBox).value)
+						"float":
+							return (editor as SpinBox).value
+						"Color":
+							return (editor as ColorPickerButton).color
+						"Vector2":
+							var hbox := editor as HBoxContainer
+							return Vector2(
+								(hbox.get_child(0) as SpinBox).value,
+								(hbox.get_child(1) as SpinBox).value
+							)
+						"Vector2i":
+							var hbox := editor as HBoxContainer
+							return Vector2i(
+								int((hbox.get_child(0) as SpinBox).value),
+								int((hbox.get_child(1) as SpinBox).value)
+							)
+						"Vector3":
+							var hbox := editor as HBoxContainer
+							return Vector3(
+								(hbox.get_child(0) as SpinBox).value,
+								(hbox.get_child(1) as SpinBox).value,
+								(hbox.get_child(2) as SpinBox).value
+							)
+						"Vector3i":
+							var hbox := editor as HBoxContainer
+							return Vector3i(
+								int((hbox.get_child(0) as SpinBox).value),
+								int((hbox.get_child(1) as SpinBox).value),
+								int((hbox.get_child(2) as SpinBox).value)
+							)
+						"Vector4":
+							var hbox := editor as HBoxContainer
+							return Vector4(
+								(hbox.get_child(0) as SpinBox).value,
+								(hbox.get_child(1) as SpinBox).value,
+								(hbox.get_child(2) as SpinBox).value,
+								(hbox.get_child(3) as SpinBox).value
+							)
+						"Vector4i":
+							var hbox := editor as HBoxContainer
+							return Vector4i(
+								int((hbox.get_child(0) as SpinBox).value),
+								int((hbox.get_child(1) as SpinBox).value),
+								int((hbox.get_child(2) as SpinBox).value),
+								int((hbox.get_child(3) as SpinBox).value)
+							)
+						_:
+							return (editor as LineEdit).text
 
 				# Auto-save function for this row
 				var save_changes := func() -> void:
@@ -422,7 +580,8 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 					var old_dict: Dictionary = _graph.get(property).duplicate()
 					var new_key: String = key_edit.text
 					var type_idx: int = type_btn.selected
-					var new_value: Variant = _convert_value(value_edit.text, TYPE_OPTIONS[type_idx])
+					var type_name: String = TYPE_OPTIONS[type_idx]
+					var new_value: Variant = get_editor_value.call(type_name)
 
 					# Check if anything changed
 					if current_key == new_key and str(old_dict.get(current_key, "")) == str(new_value):
@@ -440,17 +599,50 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 					_undo_redo.add_undo_method(_graph, "emit_changed")
 					_undo_redo.commit_action()
 
-				# Connect auto-save to focus lost and Enter
+				# Function to connect save signals to an editor
+				var connect_editor_signals: Callable
+				connect_editor_signals = func(editor: Control, type_name: String) -> void:
+					match type_name:
+						"bool":
+							(editor as CheckButton).toggled.connect(func(_v: bool): save_changes.call())
+						"int", "float":
+							(editor as SpinBox).value_changed.connect(func(_v: float): save_changes.call())
+						"Color":
+							(editor as ColorPickerButton).color_changed.connect(func(_c: Color): save_changes.call())
+						"Vector2", "Vector2i", "Vector3", "Vector3i", "Vector4", "Vector4i":
+							var hbox := editor as HBoxContainer
+							for child in hbox.get_children():
+								(child as SpinBox).value_changed.connect(func(_v: float): save_changes.call())
+						_:
+							(editor as LineEdit).focus_exited.connect(save_changes)
+							(editor as LineEdit).text_submitted.connect(func(_t: String): save_changes.call())
+
+				# Create initial editor
+				current_editor[0] = create_value_editor.call(current_type, value)
+				value_container.add_child(current_editor[0])
+				connect_editor_signals.call(current_editor[0], current_type)
+
+				# Connect auto-save to key name
 				key_edit.focus_exited.connect(save_changes)
 				key_edit.text_submitted.connect(func(_t: String): save_changes.call())
-				value_edit.focus_exited.connect(save_changes)
-				value_edit.text_submitted.connect(func(_t: String): save_changes.call())
-				type_btn.item_selected.connect(func(_idx: int): save_changes.call())
 
-				# Update type color when changed
+				# Type change - recreate value editor
 				type_btn.item_selected.connect(func(idx: int) -> void:
-					var t: String = TYPE_OPTIONS[idx]
-					type_btn.add_theme_color_override("font_color", TYPE_COLORS.get(t, WikiInspectorTheme.TEXT_PRIMARY))
+					var new_type: String = TYPE_OPTIONS[idx]
+					type_btn.add_theme_color_override("font_color", TYPE_COLORS.get(new_type, WikiInspectorTheme.TEXT_PRIMARY))
+
+					# Remove old editor
+					for child in value_container.get_children():
+						child.queue_free()
+
+					# Create new editor with default value for type
+					var default_val: Variant = _get_default_value_for_type(new_type)
+					current_editor[0] = create_value_editor.call(new_type, default_val)
+					value_container.add_child(current_editor[0])
+					connect_editor_signals.call(current_editor[0], new_type)
+
+					# Save immediately with new type
+					save_changes.call()
 				)
 
 				# Delete button
@@ -494,6 +686,35 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 		(rebuild_ref[0] as Callable).call()
 		_property_controls[property] = rebuild_ref
 		parent.add_child(container)
+
+
+	func _get_default_value_for_type(type_name: String) -> Variant:
+		match type_name:
+			"bool": return false
+			"int": return 0
+			"float": return 0.0
+			"String": return ""
+			"StringName": return StringName("")
+			"NodePath": return NodePath("")
+			"Color": return Color.WHITE
+			"Vector2": return Vector2.ZERO
+			"Vector2i": return Vector2i.ZERO
+			"Vector3": return Vector3.ZERO
+			"Vector3i": return Vector3i.ZERO
+			"Vector4": return Vector4.ZERO
+			"Vector4i": return Vector4i.ZERO
+			"Rect2": return Rect2()
+			"Rect2i": return Rect2i()
+			"AABB": return AABB()
+			"Plane": return Plane()
+			"Quaternion": return Quaternion()
+			"Basis": return Basis()
+			"Transform2D": return Transform2D()
+			"Transform3D": return Transform3D()
+			"Projection": return Projection()
+			"Array": return []
+			"Dictionary": return {}
+			_: return null
 
 
 	func _get_type_name(value: Variant) -> String:
