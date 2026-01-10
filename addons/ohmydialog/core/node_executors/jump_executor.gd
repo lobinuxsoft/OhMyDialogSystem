@@ -8,9 +8,10 @@ extends BaseNodeExecutor
 
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
-	var target_node_id: String = node_data.data.get("target_node_id", "")
-	var target_graph_path: String = node_data.data.get("target_graph_id", "")
-	var preserve_context: bool = node_data.data.get("preserve_context", false)
+	var jump_node := node_data as JumpNodeData
+	var target_node_id: String = jump_node.target_node_id if jump_node else ""
+	var target_graph_path: String = jump_node.target_graph_id if jump_node else ""
+	var preserve_context: bool = jump_node.preserve_context if jump_node else false
 
 	# Jump to another graph
 	if not target_graph_path.is_empty():

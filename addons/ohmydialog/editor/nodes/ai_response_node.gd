@@ -16,7 +16,8 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var prompt_template: String = node_data.data.get("prompt_template", "")
+	var ai_node := node_data as AIResponseNodeData
+	var prompt_template: String = ai_node.prompt_template if ai_node else ""
 
 	_add_hint_label("AI generates response")
 	if not prompt_template.is_empty():
@@ -98,7 +99,8 @@ func _calculate_tokens() -> Dictionary:
 	var world_tokens := 0
 
 	# Prompt template tokens
-	var prompt_template: String = node_data.data.get("prompt_template", "")
+	var ai_node := node_data as AIResponseNodeData
+	var prompt_template: String = ai_node.prompt_template if ai_node else ""
 	template_tokens = ceili(prompt_template.length() / 4.0)
 
 	# Character and world tokens from graph

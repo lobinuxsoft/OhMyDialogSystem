@@ -13,21 +13,20 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var choices: Array = node_data.data.get("choices", [])
+	var choice_node := node_data as PlayerChoiceNodeData
+	var choices: PackedStringArray = choice_node.choices if choice_node else PackedStringArray()
 
-	if choices.is_empty():
-		choices = [{"text": "Choice 1"}]
-		node_data.data["choices"] = choices
+	if choices.is_empty() and choice_node:
+		choice_node.add_choice("Choice 1")
+		choices = choice_node.choices
 
 	# First choice goes in _content_container (slot 0 has input)
-	var first_choice: Dictionary = choices[0]
-	var first_text: String = first_choice.get("text", "Choice 1")
+	var first_text: String = choices[0] if not choices.is_empty() else "Choice 1"
 	_add_label("1. " + first_text)
 
 	# Remaining choices as direct children (slots 1, 2, 3...)
 	for i in range(1, choices.size()):
-		var choice: Dictionary = choices[i]
-		var text: String = choice.get("text", "Choice %d" % (i + 1))
+		var text: String = choices[i]
 
 		var row := HBoxContainer.new()
 		row.custom_minimum_size = Vector2(180, 20)

@@ -1,94 +1,51 @@
 @tool
 class_name StartNodeEditor
 extends BaseNodeEditor
-## Inspector editor for START nodes.
+## Wiki-style info panel for Start nodes.
 ##
-## Shows the trigger field for event-based dialogue starts.
-## Also allows selecting which AI model to use for this dialogue.
+## Shows trigger info and model status.
+
+
+var _info_label: RichTextLabel
 
 
 func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
-	super(node_data, graph)
-	ACCENT_COLOR = Color("#10b981")  # Start node green
+	super._init(node_data, graph)
+	ACCENT_COLOR = Color("#10b981")
+	ICON = "▶"
+	TITLE = "START NODE"
 
 
-func _setup_ui() -> void:
-	_create_main_header("Start Node", "▶")
-
-	var trigger_section := _create_section("Trigger Configuration")
-	_add_line_edit("Trigger", "trigger", "Event name (empty = manual)", trigger_section)
-
-	var model_section := _create_section("AI Model")
-	_add_model_selector("Model", "model_path", model_section)
+func _setup_info() -> void:
+	_info_label = _add_info_label()
+	_refresh_info()
 
 
-## Creates a model selector dropdown showing only downloaded models.
-func _add_model_selector(label_text: String, data_key: String, parent: Control = null) -> OptionButton:
-	var target := _get_target(parent)
-	var hbox := HBoxContainer.new()
+func _refresh_info() -> void:
+	if not _info_label or not _node_data:
+		return
 
-	var label := Label.new()
-	label.text = label_text + ":"
-	label.custom_minimum_size.x = 100
-	label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
-	hbox.add_child(label)
+	var start_node := _node_data as StartNodeData
+	if not start_node:
+		return
 
-	var option := OptionButton.new()
-	option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var text := ""
 
-	# First option: No AI model
-	option.add_item("(Ninguno - Sin IA)")
-	option.set_item_metadata(0, "")
-
-	# Get downloaded models from AIService
-	var downloaded_models := _get_downloaded_models()
-	for i in range(downloaded_models.size()):
-		var config: ModelConfig = downloaded_models[i]
-		option.add_item(config.display_name)
-		option.set_item_metadata(i + 1, config.get_effective_path())
-
-	# Select current value
-	var current_path: String = str(_node_data.data.get(data_key, ""))
-	if current_path.is_empty():
-		option.select(0)
+	# Trigger info
+	if start_node.trigger.is_empty():
+		text += "[color=#484f58]Trigger: manual (sin evento)[/color]"
 	else:
-		var found := false
-		for i in range(1, option.item_count):
-			if option.get_item_metadata(i) == current_path:
-				option.select(i)
-				found = true
-				break
-		if not found:
-			# Model path exists but not in list - show as custom entry
-			option.add_item("(Custom: %s)" % current_path.get_file())
-			option.set_item_metadata(option.item_count - 1, current_path)
-			option.select(option.item_count - 1)
+		text += "[b]Trigger:[/b] %s" % start_node.trigger
 
-	option.item_selected.connect(func(index: int):
-		var path: String = option.get_item_metadata(index)
-		_node_data.data[data_key] = path
-		_emit_changed()
-	)
+	# Model info
+	text += "\n"
+	if start_node.model_path.is_empty():
+		text += "[color=#f97316]⚠ Sin modelo IA configurado[/color]"
+	else:
+		var model_name := start_node.model_path.get_file().get_basename()
+		if FileAccess.file_exists(start_node.model_path):
+			text += "[color=#10b981]✓ Modelo: %s[/color]" % model_name
+		else:
+			text += "[color=#ef4444]✗ Modelo no encontrado: %s[/color]" % model_name
 
-	hbox.add_child(option)
-	target.add_child(hbox)
-	return option
-
-
-## Returns an array of downloaded ModelConfig from AIService.
-func _get_downloaded_models() -> Array[ModelConfig]:
-	var downloaded: Array[ModelConfig] = []
-
-	var ai_service := AIService.get_singleton()
-	if not ai_service:
-		return downloaded
-
-	var manager := ai_service.get_model_manager()
-	if not manager:
-		return downloaded
-
-	for config in manager.get_available_models():
-		if config.is_downloaded():
-			downloaded.append(config)
-
-	return downloaded
+	_info_label.text = text

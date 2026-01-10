@@ -13,5 +13,6 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var event_name: String = node_data.data.get("event_name", "")
+	var event_node := node_data as EventNodeData
+	var event_name: String = event_node.event_name if event_node else ""
 	_add_info("Event", event_name)

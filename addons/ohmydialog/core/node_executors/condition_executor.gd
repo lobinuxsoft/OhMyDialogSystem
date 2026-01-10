@@ -7,10 +7,11 @@ extends BaseNodeExecutor
 
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
-	var condition: String = node_data.data.get("condition", "")
-	var variable_name: String = node_data.data.get("variable", "")
-	var operator_raw: Variant = node_data.data.get("operator", DialogueNodeData.ComparisonOperator.EQUAL)
-	var compare_value: Variant = node_data.data.get("value", null)
+	var cond_node := node_data as ConditionNodeData
+	var condition: String = cond_node.expression if cond_node else ""
+	var variable_name: String = cond_node.variable if cond_node else ""
+	var operator_raw: Variant = cond_node.operator if cond_node else DialogueNodeData.ComparisonOperator.EQUAL
+	var compare_value: Variant = cond_node.value if cond_node else null
 
 	var result: bool = false
 

@@ -8,9 +8,10 @@ extends BaseNodeExecutor
 
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
-	var event_name: String = node_data.data.get("event_name", "")
-	var event_data: Dictionary = node_data.data.get("event_data", {})
-	var wait_for_completion: bool = node_data.data.get("wait_for_completion", false)
+	var event_node := node_data as EventNodeData
+	var event_name: String = event_node.event_name if event_node else ""
+	var event_data: Dictionary = event_node.event_data if event_node else {}
+	var wait_for_completion: bool = false  # Not currently in EventNodeData
 
 	if event_name.is_empty():
 		return error("EventExecutor: No event name specified")

@@ -100,7 +100,7 @@ func add_node(node: DialogueNodeData) -> String:
 ## Creates and adds a new node of the specified type.
 ## Returns the created node.
 func create_node(type: DialogueNodeData.NodeType, position: Vector2 = Vector2.ZERO) -> DialogueNodeData:
-	var node := DialogueNodeData.new(type)
+	var node := DialogueNodeData.create(type)
 	node.editor_position = position
 	add_node(node)
 	return node
@@ -410,13 +410,12 @@ func duplicate_graph() -> DialogueGraph:
 	# Create mapping of old IDs to new IDs
 	var id_map: Dictionary = {}
 
-	# Duplicate nodes with new IDs
+	# Duplicate nodes with new IDs (via serialization to preserve typed properties)
 	for old_id in nodes:
 		var old_node: DialogueNodeData = nodes[old_id]
-		var new_node := DialogueNodeData.new(old_node.node_type)
-		new_node.editor_position = old_node.editor_position
-		new_node.data = old_node.data.duplicate(true)
-		new_node.output_count = old_node.output_count
+		var new_node := DialogueNodeData.from_dict(old_node.to_dict())
+		# Generate a new node_id for the duplicate
+		new_node.node_id = new_node._generate_uuid()
 
 		id_map[old_id] = new_node.node_id
 		new_graph.nodes[new_node.node_id] = new_node

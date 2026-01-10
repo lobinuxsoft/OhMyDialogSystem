@@ -10,38 +10,49 @@ func _run() -> void:
 	graph.description = "A demonstration dialogue with Marcus the Merchant."
 	graph.local_variables = {"player_reputation": 60, "talked_to_merchant": false}
 
-	# Nodes
-	var start := graph.create_node(DialogueNodeData.NodeType.START, Vector2(50, 200))
+	# Nodes - using typed subclasses
+	var start: StartNodeData = graph.create_node(DialogueNodeData.NodeType.START, Vector2(50, 200))
 
-	var greeting := graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(250, 200))
-	greeting.data = {"text": "Welcome, traveler! I am Marcus, purveyor of fine goods. What brings you here?", "speaker": "Marcus"}
+	var greeting: StaticResponseNodeData = graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(250, 200))
+	greeting.speaker = "Marcus"
+	greeting.text = "Welcome, traveler! I am Marcus, purveyor of fine goods. What brings you here?"
 
-	var choice := graph.create_node(DialogueNodeData.NodeType.PLAYER_CHOICE, Vector2(550, 200))
-	choice.data = {"choices": [{"text": "I'm looking to buy."}, {"text": "Just browsing."}, {"text": "Special items?"}]}
-	choice.output_count = 3
+	var choice: PlayerChoiceNodeData = graph.create_node(DialogueNodeData.NodeType.PLAYER_CHOICE, Vector2(550, 200))
+	choice.add_choice("I'm looking to buy.")
+	choice.add_choice("Just browsing.")
+	choice.add_choice("Special items?")
 
-	var buy := graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(850, 50))
-	buy.data = {"text": "Excellent! I have potions, weapons, and magical trinkets!", "speaker": "Marcus"}
+	var buy: StaticResponseNodeData = graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(850, 50))
+	buy.speaker = "Marcus"
+	buy.text = "Excellent! I have potions, weapons, and magical trinkets!"
 
-	var browse := graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(850, 200))
-	browse.data = {"text": "Browse all you like! My prices are irresistible!", "speaker": "Marcus"}
+	var browse: StaticResponseNodeData = graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(850, 200))
+	browse.speaker = "Marcus"
+	browse.text = "Browse all you like! My prices are irresistible!"
 
-	var check := graph.create_node(DialogueNodeData.NodeType.CONDITION, Vector2(850, 350))
-	check.data = {"variable": "player_reputation", "operator": ">=", "value": 50}
+	var check: ConditionNodeData = graph.create_node(DialogueNodeData.NodeType.CONDITION, Vector2(850, 350))
+	check.variable = "player_reputation"
+	check.operator = DialogueNodeData.ComparisonOperator.GREATER_EQUAL
+	check.value = 50
 
-	var secret_yes := graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(1150, 300))
-	secret_yes.data = {"text": "*whispers* Follow me to the back room...", "speaker": "Marcus"}
+	var secret_yes: StaticResponseNodeData = graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(1150, 300))
+	secret_yes.speaker = "Marcus"
+	secret_yes.text = "*whispers* Follow me to the back room..."
 
-	var secret_no := graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(1150, 450))
-	secret_no.data = {"text": "Special items? I'm a legitimate merchant!", "speaker": "Marcus"}
+	var secret_no: StaticResponseNodeData = graph.create_node(DialogueNodeData.NodeType.STATIC_RESPONSE, Vector2(1150, 450))
+	secret_no.speaker = "Marcus"
+	secret_no.text = "Special items? I'm a legitimate merchant!"
 
-	var event := graph.create_node(DialogueNodeData.NodeType.EVENT, Vector2(1450, 300))
-	event.data = {"event_name": "secret_shop_unlocked", "event_data": {"merchant": "Marcus"}}
+	var event: EventNodeData = graph.create_node(DialogueNodeData.NodeType.EVENT, Vector2(1450, 300))
+	event.event_name = "secret_shop_unlocked"
+	event.event_data = {"merchant": "Marcus"}
 
-	var setvar := graph.create_node(DialogueNodeData.NodeType.SET_VARIABLE, Vector2(1150, 50))
-	setvar.data = {"variable": "talked_to_merchant", "operation": "set", "value": true}
+	var setvar: SetVariableNodeData = graph.create_node(DialogueNodeData.NodeType.SET_VARIABLE, Vector2(1150, 50))
+	setvar.variable = "talked_to_merchant"
+	setvar.operation = DialogueNodeData.VariableOperation.SET
+	setvar.value = true
 
-	var end := graph.create_node(DialogueNodeData.NodeType.END, Vector2(1450, 150))
+	var end: EndNodeData = graph.create_node(DialogueNodeData.NodeType.END, Vector2(1450, 150))
 
 	# Connections
 	graph.connect_nodes(start.node_id, 0, greeting.node_id)

@@ -13,7 +13,8 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var return_node: String = node_data.data.get("return_node_id", "")
+	var return_graph_node := node_data as ReturnToGraphNodeData
+	var return_node: String = return_graph_node.return_node_id if return_graph_node else ""
 	_add_hint_label("<- Return to graph")
 	if not return_node.is_empty():
 		_add_info("Node", return_node)

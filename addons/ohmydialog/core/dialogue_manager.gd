@@ -182,11 +182,9 @@ func start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = DialogueMo
 
 	# Load model from StartNode if specified
 	if graph:
-		var start_node := graph.get_start_node()
-		if start_node:
-			var model_path: String = start_node.data.get("model_path", "")
-			if not model_path.is_empty():
-				await _load_model_for_dialogue(model_path)
+		var start_node := graph.get_start_node() as StartNodeData
+		if start_node and not start_node.model_path.is_empty():
+			await _load_model_for_dialogue(start_node.model_path)
 
 	# Apply AI preset
 	if ai_preset and llama_interface:
@@ -556,7 +554,8 @@ func _clean_response(response: String) -> String:
 
 func _on_node_entered(node_data: DialogueNodeData) -> void:
 	# Update active character if node specifies one
-	var node_character: CharacterIdentity = node_data.data.get("character_override")
+	# Note: character_override is an optional property that may be added to specific node types
+	var node_character: CharacterIdentity = node_data.get("character_override")
 	if node_character:
 		active_character = node_character
 

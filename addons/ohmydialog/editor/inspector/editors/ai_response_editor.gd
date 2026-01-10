@@ -1,55 +1,38 @@
 @tool
 class_name AIResponseEditor
 extends BaseNodeEditor
-## Inspector editor for AI_RESPONSE nodes.
+## Wiki-style info panel for AI Response nodes.
 ##
-## Shows character, prompt template, emotion hint, max tokens, and context usage.
+## Shows token estimation, model info, and validation status.
 
 
-const EMOTIONS: Array[String] = ["", "neutral", "happy", "sad", "angry", "surprised", "confused", "scared"]
-const CHATML_BASE_TOKENS: int = 100  # Approximate tokens for ChatML template structure
+const CHATML_BASE_TOKENS: int = 100
 
-var _context_label: RichTextLabel
-var _prompt_template_edit: TextEdit
-var _context_section: VBoxContainer
+var _info_label: RichTextLabel
 
 
 func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
-	super(node_data, graph)
-	ACCENT_COLOR = Color("#3b82f6")  # AI response blue
+	super._init(node_data, graph)
+	ACCENT_COLOR = Color("#3b82f6")
+	ICON = "🧠"
+	TITLE = "AI RESPONSE"
 
 
-func _setup_ui() -> void:
-	_create_main_header("AI Response", "🤖")
-
-	var prompt_section := _create_section("Prompt Configuration")
-	_prompt_template_edit = _add_text_edit("Prompt Template", "prompt_template", 80, prompt_section)
-	_prompt_template_edit.text_changed.connect(_update_context_estimate)
-	_add_option_button("Emotion Hint", "emotion_hint", EMOTIONS, 0, prompt_section)
-	_add_spin_box("Max Tokens", "max_tokens", 32, 2048, 32, prompt_section)
-
-	_context_section = _create_section("Context Usage")
-	_add_context_estimate_ui()
-	_update_context_estimate()
+func _setup_info() -> void:
+	_info_label = _add_info_label()
+	_refresh_info()
 
 
-## Adds the context usage estimation UI.
-func _add_context_estimate_ui() -> void:
-	_context_label = RichTextLabel.new()
-	_context_label.bbcode_enabled = true
-	_context_label.fit_content = true
-	_context_label.scroll_active = false
-	_context_section.add_child(_context_label)
-
-
-## Updates the context usage estimation display.
-func _update_context_estimate() -> void:
-	if not _context_label:
+func _refresh_info() -> void:
+	if not _info_label or not _node_data:
 		return
 
-	var template_tokens := ceili(_prompt_template_edit.text.length() / 4.0) if _prompt_template_edit else 0
+	var ai_node := _node_data as AIResponseNodeData
+	if not ai_node:
+		return
 
-	# Get character and world from dialogue graph
+	# Calculate tokens
+	var template_tokens := ceili(ai_node.prompt_template.length() / 4.0)
 	var char_tokens := 0
 	var world_tokens := 0
 
@@ -61,8 +44,8 @@ func _update_context_estimate() -> void:
 
 	var total_base := CHATML_BASE_TOKENS + char_tokens + world_tokens + template_tokens
 
-	# Get model context size if available
-	var model_ctx := 4096  # Default
+	# Get model info
+	var model_ctx := 4096
 	var model_name := "unknown"
 	var ai_service := AIService.get_singleton()
 	if ai_service:
@@ -71,27 +54,30 @@ func _update_context_estimate() -> void:
 			model_ctx = config.n_ctx
 			model_name = config.display_name
 
-	# Build display text
-	var text := "[b]Context Usage Estimate[/b]\n"
-	text += "Template: ~%d tokens\n" % CHATML_BASE_TOKENS
-	text += "Character: ~%d tokens\n" % char_tokens
-	text += "World: ~%d tokens\n" % world_tokens
-	text += "Prompt: ~%d tokens\n" % template_tokens
-	text += "━━━━━━━━━━━━━━━━━\n"
-	text += "[b]Base Total: ~%d tokens[/b]\n" % total_base
-	text += "(+ history + player input)\n\n"
-
-	# Warning check
+	# Build display
+	var text := ""
 	var usage_percent := (total_base * 100.0) / model_ctx
-	if total_base > model_ctx * 0.7:
-		text += "[color=#ff6b6b]⚠ WARNING: Base context uses %.0f%% of model limit (%d tokens)!\n" % [usage_percent, model_ctx]
-		text += "Risk of crash or truncated responses.\n"
-		text += "Reduce character/world detail or use larger model.[/color]"
-	elif total_base > model_ctx * 0.5:
-		text += "[color=#ffd93d]⚠ CAUTION: Base context uses %.0f%% of model limit (%d tokens).\n" % [usage_percent, model_ctx]
-		text += "Limited space for conversation history.[/color]"
-	else:
-		text += "[color=#6bcb77]Model: %s (%d tokens)\n" % [model_name, model_ctx]
-		text += "Status: OK (%.0f%% used)[/color]" % usage_percent
 
-	_context_label.text = text
+	# Token breakdown
+	text += "[b]~%d tokens base[/b] " % total_base
+	if total_base > model_ctx * 0.7:
+		text += "[color=#ef4444](%.0f%% - RIESGO)[/color]" % usage_percent
+	elif total_base > model_ctx * 0.5:
+		text += "[color=#f97316](%.0f%% - cuidado)[/color]" % usage_percent
+	else:
+		text += "[color=#10b981](%.0f%% OK)[/color]" % usage_percent
+
+	text += "\n[color=#484f58]Modelo: %s (%d ctx)[/color]" % [model_name, model_ctx]
+
+	# Validation
+	if ai_node.prompt_template.is_empty():
+		text += "\n[color=#f97316]⚠ Sin prompt - usará contexto del grafo[/color]"
+	else:
+		var var_count := ai_node.prompt_template.count("{")
+		if var_count > 0:
+			text += "\n[color=#10b981]✓ %d variable(s) en prompt[/color]" % var_count
+
+	# Response limit
+	text += "\n[color=#484f58]Límite respuesta: %d tokens[/color]" % ai_node.max_tokens
+
+	_info_label.text = text

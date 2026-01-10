@@ -12,10 +12,11 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var variable: String = node_data.data.get("variable", "")
-	var operator_raw: Variant = node_data.data.get("operator", 0)
+	var cond_node := node_data as ConditionNodeData
+	var variable: String = cond_node.variable if cond_node else ""
+	var operator_raw: Variant = cond_node.operator if cond_node else 0
 	var operator_str: String = BaseDialogueNode.operator_to_string(operator_raw) if operator_raw is int else str(operator_raw)
-	var value: Variant = node_data.data.get("value", "")
+	var value: Variant = cond_node.value if cond_node else ""
 
 	# Show condition summary
 	var condition_str := "%s %s %s" % [variable, operator_str, str(value)]

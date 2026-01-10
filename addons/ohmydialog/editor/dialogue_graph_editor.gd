@@ -499,10 +499,10 @@ func _duplicate_selected() -> void:
 		return
 
 	var original := _selected_node.node_data
-	var new_data := DialogueNodeData.new(original.node_type)
+	# Duplicate via serialization to preserve typed properties
+	var new_data := DialogueNodeData.from_dict(original.to_dict())
+	new_data.node_id = new_data._generate_uuid()
 	new_data.editor_position = original.editor_position + Vector2(50, 50)
-	new_data.data = original.data.duplicate(true)
-	new_data.output_count = original.output_count
 
 	current_graph.add_node(new_data)
 	_create_visual_node(new_data)

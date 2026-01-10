@@ -31,10 +31,11 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 		# Create default prompt builder if not provided
 		pb = PromptBuilder.new()
 
-	# Get node-specific overrides
-	var temperature: float = node_data.data.get("temperature", 0.7)
-	var max_tokens: int = node_data.data.get("max_tokens", 64)  # Default to short responses
-	var prompt_template: String = node_data.data.get("prompt_template", "")
+	# Get node-specific overrides from typed subclass
+	var ai_node := node_data as AIResponseNodeData
+	var temperature: float = 0.7  # Default, AIResponseNodeData doesn't have temperature yet
+	var max_tokens: int = ai_node.max_tokens if ai_node else 64
+	var prompt_template: String = ai_node.prompt_template if ai_node else ""
 
 	# Build the prompt with instruction from prompt_template
 	var memories: Array[String] = []
