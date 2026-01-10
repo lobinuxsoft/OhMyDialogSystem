@@ -32,5 +32,6 @@ See `.claude/rules/` for detailed guidelines on:
 - @rules/git-workflow.md - Commits, branching, versioning
 - @rules/github-cli.md - Issues, PRs, project management
 - @rules/code-standards.md - C++, GDScript, C# conventions
+- @rules/build-workflow.md - Build scripts (ALWAYS use build.sh/build.bat)
 - @rules/warnings.md - Problem reporting protocol
 - @rules/project-context.md - Architecture, milestones
