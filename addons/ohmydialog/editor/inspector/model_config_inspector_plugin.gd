@@ -27,6 +27,8 @@ class ModelConfigEditorPanel extends VBoxContainer:
 	var _config: ModelConfig
 	var _sections: Dictionary = {}
 	var _undo_redo: EditorUndoRedoManager
+	var _property_controls: Dictionary = {}  # property_name -> Control
+	var _is_updating: bool = false  # Prevent infinite loops during refresh
 
 	func _init(config: ModelConfig) -> void:
 		_config = config
@@ -35,6 +37,39 @@ class ModelConfigEditorPanel extends VBoxContainer:
 	func _ready() -> void:
 		add_theme_constant_override("separation", 0)
 		_setup_ui()
+		# Connect to resource changes for Undo/Redo updates
+		_config.changed.connect(_on_resource_changed)
+
+	func _exit_tree() -> void:
+		if _config and _config.changed.is_connected(_on_resource_changed):
+			_config.changed.disconnect(_on_resource_changed)
+
+	func _on_resource_changed() -> void:
+		if _is_updating:
+			return
+		_is_updating = true
+		_refresh_controls()
+		_is_updating = false
+
+	func _refresh_controls() -> void:
+		for property in _property_controls:
+			var control: Variant = _property_controls[property]
+			var value: Variant = _config.get(property)
+			if control is LineEdit:
+				if control.text != str(value):
+					control.text = str(value)
+			elif control is TextEdit:
+				if control.text != value:
+					control.text = value
+			elif control is SpinBox:
+				if control.value != value:
+					control.value = value
+			elif control is HSlider:
+				if control.value != value:
+					control.value = value
+			elif control is CheckBox:
+				if control.button_pressed != value:
+					control.button_pressed = value
 
 	func _setup_ui() -> void:
 		# === MAIN HEADER ===
@@ -218,15 +253,21 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		edit.placeholder_text = placeholder
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		edit.text_submitted.connect(func(new_text: String):
+			if _is_updating:
+				return
 			var old_value: String = _config.get(property)
 			if old_value == new_text:
 				return
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, new_text)
 			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 		)
 		edit.focus_exited.connect(func():
+			if _is_updating:
+				return
 			var new_text: String = edit.text
 			var old_value: String = _config.get(property)
 			if old_value == new_text:
@@ -234,11 +275,14 @@ class ModelConfigEditorPanel extends VBoxContainer:
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, new_text)
 			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 		)
 		hbox.add_child(edit)
 
 		parent.add_child(hbox)
+		_property_controls[property] = edit
 
 
 	func _add_text_edit(parent: Control, label_text: String, property: String, placeholder: String = "", min_height: int = 80) -> void:
@@ -255,16 +299,21 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 		var last_text: String = edit.text
 		edit.focus_exited.connect(func():
+			if _is_updating:
+				return
 			var new_text: String = edit.text
 			if last_text == new_text:
 				return
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, new_text)
 			_undo_redo.add_undo_property(_config, property, last_text)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 			last_text = new_text
 		)
 		parent.add_child(edit)
+		_property_controls[property] = edit
 
 
 	func _add_file_picker(parent: Control, label_text: String, property: String, filter: String) -> void:
@@ -282,6 +331,8 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		edit.placeholder_text = "res://models/..."
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		edit.focus_exited.connect(func():
+			if _is_updating:
+				return
 			var new_text: String = edit.text
 			var old_value: String = _config.get(property)
 			if old_value == new_text:
@@ -289,6 +340,8 @@ class ModelConfigEditorPanel extends VBoxContainer:
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, new_text)
 			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 		)
 		hbox.add_child(edit)
@@ -297,6 +350,8 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		btn.text = "..."
 		btn.custom_minimum_size = Vector2(30, 0)
 		btn.pressed.connect(func():
+			if _is_updating:
+				return
 			var dialog := EditorFileDialog.new()
 			dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 			dialog.add_filter(filter)
@@ -306,6 +361,8 @@ class ModelConfigEditorPanel extends VBoxContainer:
 				_undo_redo.create_action("Change %s" % property)
 				_undo_redo.add_do_property(_config, property, path)
 				_undo_redo.add_undo_property(_config, property, old_value)
+				_undo_redo.add_do_method(_config, "emit_changed")
+				_undo_redo.add_undo_method(_config, "emit_changed")
 				_undo_redo.commit_action()
 				dialog.queue_free()
 			)
@@ -318,6 +375,7 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		hbox.add_child(btn)
 
 		parent.add_child(hbox)
+		_property_controls[property] = edit
 
 
 	func _add_spin_box(parent: Control, label_text: String, property: String, min_val: float, max_val: float, step: float) -> void:
@@ -338,18 +396,23 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var last_value: float = spin.value
 		spin.get_line_edit().focus_exited.connect(func():
+			if _is_updating:
+				return
 			var new_val: float = spin.value
 			if last_value == new_val:
 				return
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, new_val)
 			_undo_redo.add_undo_property(_config, property, last_value)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 			last_value = new_val
 		)
 		hbox.add_child(spin)
 
 		parent.add_child(hbox)
+		_property_controls[property] = spin
 
 
 	func _add_spin_box_int(parent: Control, label_text: String, property: String, min_val: int, max_val: int) -> void:
@@ -370,18 +433,23 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var last_value: int = int(spin.value)
 		spin.get_line_edit().focus_exited.connect(func():
+			if _is_updating:
+				return
 			var new_val: int = int(spin.value)
 			if last_value == new_val:
 				return
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, new_val)
 			_undo_redo.add_undo_property(_config, property, last_value)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 			last_value = new_val
 		)
 		hbox.add_child(spin)
 
 		parent.add_child(hbox)
+		_property_controls[property] = spin
 
 
 	func _add_slider(parent: Control, label_text: String, property: String, min_val: float, max_val: float, step: float) -> void:
@@ -413,6 +481,8 @@ class ModelConfigEditorPanel extends VBoxContainer:
 			value_label.text = "%.2f" % new_val
 		)
 		slider.drag_ended.connect(func(value_changed_flag: bool):
+			if _is_updating:
+				return
 			if not value_changed_flag:
 				return
 			var new_val: float = slider.value
@@ -421,11 +491,14 @@ class ModelConfigEditorPanel extends VBoxContainer:
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, new_val)
 			_undo_redo.add_undo_property(_config, property, last_value)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 			last_value = new_val
 		)
 
 		parent.add_child(hbox)
+		_property_controls[property] = slider
 
 
 	func _add_check_box(parent: Control, label_text: String, property: String) -> void:
@@ -441,15 +514,20 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		var check := CheckBox.new()
 		check.button_pressed = _config.get(property)
 		check.toggled.connect(func(pressed: bool):
+			if _is_updating:
+				return
 			var old_value: bool = _config.get(property)
 			_undo_redo.create_action("Change %s" % property)
 			_undo_redo.add_do_property(_config, property, pressed)
 			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.add_do_method(_config, "emit_changed")
+			_undo_redo.add_undo_method(_config, "emit_changed")
 			_undo_redo.commit_action()
 		)
 		hbox.add_child(check)
 
 		parent.add_child(hbox)
+		_property_controls[property] = check
 
 
 	func _add_status_display(parent: Control) -> void:
