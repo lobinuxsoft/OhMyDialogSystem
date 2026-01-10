@@ -31,11 +31,6 @@ func _parse_begin(object: Object) -> void:
 		add_custom_control(editor)
 
 
-func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
-	# Hide all default properties - we handle everything in our custom editors
-	return true
-
-
 func _create_editor_for_type(node_data: DialogueNodeData) -> Control:
 	# Pass current_graph to editors that need variable access
 	match node_data.node_type:
