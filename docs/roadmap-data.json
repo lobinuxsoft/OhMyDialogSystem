@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-09T05:40:38Z",
+  "updated_at": "2026-01-10T19:51:49Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -7,8 +7,8 @@
       "title": "M1: Fundación - GDExtension Core",
       "description": "Setup inicial, GDExtension con llama.cpp, LlamaInterface",
       "open": 7,
-      "closed": 11,
-      "progress": 61,
+      "closed": 12,
+      "progress": 63,
       "state": "open"
     },
     {
@@ -197,16 +197,15 @@
         {
           "number": 166,
           "title": "[Editor] Implementar ModelRequiredDialog",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M1: Fundación - GDExtension Core",
           "labels": [
             "priority:high",
             "difficulty:easy",
-            "editor",
-            "next-session"
+            "editor"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Order": 8.0
           }
         },
@@ -857,6 +856,80 @@
           "fields": {
             "Status": "Done"
           }
+        },
+        {
+          "number": 193,
+          "title": "[Editor] Implementar Model Manager Window",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 195,
+          "title": "GDExtension: Crash when prompt exceeds model context size",
+          "state": "OPEN",
+          "milestone": null,
+          "labels": [
+            "bug",
+            "priority:high",
+            "gdextension",
+            "next-session"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 196,
+          "title": "GDExtension: Exponer funciones útiles del tokenizador de llama.cpp",
+          "state": "OPEN",
+          "milestone": null,
+          "labels": [
+            "enhancement",
+            "priority:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 198,
+          "title": "refactor(core): mover AIPreset de DialogueManager a DialogueGraph",
+          "state": "OPEN",
+          "milestone": null,
+          "labels": [
+            "enhancement",
+            "priority:medium",
+            "difficulty:easy",
+            "core"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 200,
+          "title": "feat(editor): mejorar UX del browser de HuggingFace con advertencias de compatibilidad",
+          "state": "OPEN",
+          "milestone": null,
+          "labels": [
+            "enhancement",
+            "priority:medium",
+            "difficulty:easy",
+            "editor",
+            "next-session"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
         }
       ]
     },
@@ -1296,16 +1369,15 @@
     {
       "number": 166,
       "title": "[Editor] Implementar ModelRequiredDialog",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M1: Fundación - GDExtension Core",
       "labels": [
         "priority:high",
         "difficulty:easy",
-        "editor",
-        "next-session"
+        "editor"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Order": 8.0
       }
     },
@@ -2438,6 +2510,80 @@
       ],
       "fields": {
         "Status": "Done"
+      }
+    },
+    {
+      "number": 193,
+      "title": "[Editor] Implementar Model Manager Window",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 195,
+      "title": "GDExtension: Crash when prompt exceeds model context size",
+      "state": "OPEN",
+      "milestone": null,
+      "labels": [
+        "bug",
+        "priority:high",
+        "gdextension",
+        "next-session"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 196,
+      "title": "GDExtension: Exponer funciones útiles del tokenizador de llama.cpp",
+      "state": "OPEN",
+      "milestone": null,
+      "labels": [
+        "enhancement",
+        "priority:medium",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 198,
+      "title": "refactor(core): mover AIPreset de DialogueManager a DialogueGraph",
+      "state": "OPEN",
+      "milestone": null,
+      "labels": [
+        "enhancement",
+        "priority:medium",
+        "difficulty:easy",
+        "core"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 200,
+      "title": "feat(editor): mejorar UX del browser de HuggingFace con advertencias de compatibilidad",
+      "state": "OPEN",
+      "milestone": null,
+      "labels": [
+        "enhancement",
+        "priority:medium",
+        "difficulty:easy",
+        "editor",
+        "next-session"
+      ],
+      "fields": {
+        "Status": "Todo"
       }
     },
     {
