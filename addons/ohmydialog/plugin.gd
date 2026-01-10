@@ -8,17 +8,8 @@ extends EditorPlugin
 const AUTOLOAD_NAME := "AIServiceAutoload"
 const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
 
-## Reference to the toolbar container (HBoxContainer with icon + AI label + menu).
-var _toolbar_container: HBoxContainer
-
-## Reference to the toolbar menu button.
+## Reference to the toolbar menu button with icon.
 var _toolbar_menu: MenuButton
-
-## Reference to the plugin icon in toolbar.
-var _toolbar_icon: TextureRect
-
-## Reference to the AI status label.
-var _ai_label: Label
 
 ## Reference to the dialogue graph editor window.
 var _dialogue_graph_window: DialogueGraphWindow
@@ -87,39 +78,21 @@ func _enter_tree() -> void:
 	_model_manager_window = manager_scene.instantiate()
 	EditorInterface.get_base_control().add_child(_model_manager_window)
 
-	# Create toolbar container: [Icon] [AI] [▼]
-	_toolbar_container = HBoxContainer.new()
-	_toolbar_container.add_theme_constant_override("separation", 2)
-
-	# Plugin icon (16x16 to match toolbar size)
-	_toolbar_icon = TextureRect.new()
-	_toolbar_icon.texture = preload("res://addons/ohmydialog/icon.png")
-	_toolbar_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_toolbar_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_toolbar_icon.custom_minimum_size = Vector2(16, 16)
-	_toolbar_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_toolbar_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_toolbar_container.add_child(_toolbar_icon)
-
-	# AI status label
-	_ai_label = Label.new()
-	_ai_label.text = "AI"
-	_ai_label.add_theme_font_size_override("font_size", 13)
-	_update_status_indicator(false, null)
-	_toolbar_container.add_child(_ai_label)
-
-	# Menu button (dropdown arrow only)
+	# Create toolbar MenuButton with icon and text
 	_toolbar_menu = MenuButton.new()
+	_toolbar_menu.text = "AI"
+	_toolbar_menu.icon = preload("res://addons/ohmydialog/icon.png")
 	_toolbar_menu.flat = true
 	_toolbar_menu.focus_mode = Control.FOCUS_NONE
+	_toolbar_menu.add_theme_constant_override("icon_max_width", 20)
 
 	var popup := _toolbar_menu.get_popup()
 	popup.add_item("AI Models", 0)
 	popup.add_item("Dialogue Graph", 1)
 	popup.id_pressed.connect(_on_toolbar_menu_id_pressed)
-	_toolbar_container.add_child(_toolbar_menu)
 
-	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_container)
+	_update_status_indicator(false, null)
+	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_menu)
 
 	# Connect to ModelManager signals after a frame (needs AIService to be ready)
 	call_deferred("_connect_model_manager_signals")
@@ -131,14 +104,11 @@ func _exit_tree() -> void:
 	# Disconnect ModelManager signals
 	_disconnect_model_manager_signals()
 
-	# Remove toolbar container
-	if _toolbar_container:
-		remove_control_from_container(CONTAINER_TOOLBAR, _toolbar_container)
-		_toolbar_container.queue_free()
-		_toolbar_container = null
+	# Remove toolbar menu
+	if _toolbar_menu:
+		remove_control_from_container(CONTAINER_TOOLBAR, _toolbar_menu)
+		_toolbar_menu.queue_free()
 		_toolbar_menu = null
-		_toolbar_icon = null
-		_ai_label = null
 
 	# Remove inspector plugins
 	if _node_inspector_plugin:
@@ -265,9 +235,9 @@ func _disconnect_model_manager_signals() -> void:
 		model_manager.models_changed.disconnect(_on_models_changed)
 
 
-## Updates the AI label appearance and tooltip.
+## Updates the toolbar button appearance and tooltip.
 func _update_status_indicator(is_loaded: bool, config: ModelConfig) -> void:
-	if not _ai_label:
+	if not _toolbar_menu:
 		return
 
 	# Build tooltip with model info
@@ -284,18 +254,16 @@ func _update_status_indicator(is_loaded: bool, config: ModelConfig) -> void:
 						downloaded_count += 1
 
 	if is_loaded and config:
-		_ai_label.add_theme_color_override("font_color", Color.GREEN)
+		_toolbar_menu.add_theme_color_override("font_color", Color.GREEN)
 		tooltip = "Active: %s\nAvailable models: %d" % [config.display_name, downloaded_count]
 	else:
-		_ai_label.remove_theme_color_override("font_color")
+		_toolbar_menu.remove_theme_color_override("font_color")
 		if downloaded_count > 0:
 			tooltip = "No model loaded\nAvailable models: %d" % downloaded_count
 		else:
 			tooltip = "No model loaded\nDownload a model from AI Models"
 
-	_ai_label.tooltip_text = tooltip
-	if _toolbar_container:
-		_toolbar_container.tooltip_text = tooltip
+	_toolbar_menu.tooltip_text = tooltip
 
 
 ## Called when a model is loaded.
