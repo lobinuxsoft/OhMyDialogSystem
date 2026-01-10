@@ -84,7 +84,7 @@ func _enter_tree() -> void:
 	_toolbar_menu.icon = preload("res://addons/ohmydialog/icon.png")
 	_toolbar_menu.flat = true
 	_toolbar_menu.focus_mode = Control.FOCUS_NONE
-	_toolbar_menu.add_theme_constant_override("icon_max_width", 20)
+	_toolbar_menu.add_theme_constant_override("icon_max_width", 28)
 
 	var popup := _toolbar_menu.get_popup()
 	popup.add_item("AI Models", 0)
