@@ -23,15 +23,21 @@ var _hf_api: HuggingFaceAPI
 var _search_results: Array[Dictionary] = []
 var _selected_model_id: String = ""
 var _selected_file: Dictionary = {}
+var _link_icon: Texture2D
+
+const BUTTON_ID_OPEN_URL := 0
 
 
 func _ready() -> void:
+	_link_icon = EditorInterface.get_editor_theme().get_icon("ExternalLink", "EditorIcons")
+
 	_setup_results_tree()
 	_setup_files_tree()
 
 	_search_btn.pressed.connect(_on_search_pressed)
 	_search_input.text_submitted.connect(_on_search_submitted)
 	_results_tree.item_selected.connect(_on_result_selected)
+	_results_tree.button_clicked.connect(_on_results_tree_button_clicked)
 	_files_tree.item_selected.connect(_on_file_selected)
 	_view_hf_btn.pressed.connect(_on_view_hf_pressed)
 	_add_btn.pressed.connect(_on_add_pressed)
@@ -63,16 +69,19 @@ func show_dialog() -> void:
 
 
 func _setup_results_tree() -> void:
-	_results_tree.columns = 3
+	_results_tree.columns = 4
 	_results_tree.set_column_title(0, "Model")
-	_results_tree.set_column_title(1, "Downloads")
-	_results_tree.set_column_title(2, "Likes")
+	_results_tree.set_column_title(1, "")  # Link button column
+	_results_tree.set_column_title(2, "Downloads")
+	_results_tree.set_column_title(3, "Likes")
 	_results_tree.column_titles_visible = true
 	_results_tree.set_column_expand(0, true)
 	_results_tree.set_column_expand(1, false)
 	_results_tree.set_column_expand(2, false)
-	_results_tree.set_column_custom_minimum_width(1, 80)
-	_results_tree.set_column_custom_minimum_width(2, 60)
+	_results_tree.set_column_expand(3, false)
+	_results_tree.set_column_custom_minimum_width(1, 32)
+	_results_tree.set_column_custom_minimum_width(2, 80)
+	_results_tree.set_column_custom_minimum_width(3, 60)
 
 
 func _setup_files_tree() -> void:
@@ -144,12 +153,15 @@ func _on_search_completed(results: Array[Dictionary]) -> void:
 		item.set_text(0, result.get("name", ""))
 		item.set_metadata(0, result.get("id", ""))
 
-		var downloads = result.get("downloads", 0)
-		item.set_text(1, _format_number(downloads))
-		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+		# Add link button
+		item.add_button(1, _link_icon, BUTTON_ID_OPEN_URL, false, "Open in HuggingFace")
 
-		item.set_text(2, str(result.get("likes", 0)))
+		var downloads = result.get("downloads", 0)
+		item.set_text(2, _format_number(downloads))
 		item.set_text_alignment(2, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		item.set_text(3, str(result.get("likes", 0)))
+		item.set_text_alignment(3, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 func _on_search_failed(error: String) -> void:
@@ -228,6 +240,13 @@ func _on_file_selected() -> void:
 
 	_selected_file = selected.get_metadata(0) as Dictionary
 	_add_btn.disabled = _selected_file.is_empty()
+
+
+func _on_results_tree_button_clicked(item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
+	if id == BUTTON_ID_OPEN_URL:
+		var model_id = item.get_metadata(0) as String
+		if not model_id.is_empty():
+			OS.shell_open("https://huggingface.co/%s" % model_id)
 
 
 func _on_view_hf_pressed() -> void:
