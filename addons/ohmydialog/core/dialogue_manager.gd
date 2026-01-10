@@ -83,7 +83,8 @@ var llama_interface: Object
 ## World context for AI generation.
 @export var world_context: WorldContext
 
-## AI generation preset.
+## AI generation preset (DEPRECATED: use DialogueGraph.ai_preset instead).
+## This property is kept for backwards compatibility and will emit a warning when used.
 @export var ai_preset: AIPreset
 
 ## Enable streaming responses.
@@ -186,9 +187,16 @@ func start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = DialogueMo
 		if start_node and not start_node.model_path.is_empty():
 			await _load_model_for_dialogue(start_node.model_path)
 
-	# Apply AI preset
-	if ai_preset and llama_interface:
-		ai_preset.apply_to(llama_interface)
+	# Apply AI preset (prefer graph.ai_preset, fallback to self.ai_preset for backwards compat)
+	var effective_preset: AIPreset = null
+	if graph and graph.ai_preset:
+		effective_preset = graph.ai_preset
+	elif ai_preset:
+		effective_preset = ai_preset
+		push_warning("DialogueManager.ai_preset is deprecated. Set ai_preset on DialogueGraph instead.")
+
+	if effective_preset and llama_interface:
+		effective_preset.apply_to(llama_interface)
 
 	dialogue_started.emit(graph)
 
@@ -263,8 +271,9 @@ func set_llama_interface(interface: Object) -> void:
 	llama_interface = interface
 
 
-## Sets the AI preset.
+## Sets the AI preset (DEPRECATED: use DialogueGraph.ai_preset instead).
 func set_ai_preset(preset: AIPreset) -> void:
+	push_warning("DialogueManager.set_ai_preset() is deprecated. Set ai_preset on DialogueGraph instead.")
 	ai_preset = preset
 	if llama_interface and preset:
 		preset.apply_to(llama_interface)
