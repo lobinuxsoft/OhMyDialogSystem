@@ -33,10 +33,17 @@ class AIPresetHeader extends PanelContainer:
 		add_theme_stylebox_override("panel", WikiInspectorTheme.create_header_style(ACCENT_COLOR))
 		_setup_ui()
 		_preset.changed.connect(_update_info)
+		EditorInterface.get_inspector().property_edited.connect(_on_property_edited)
 
 	func _exit_tree() -> void:
 		if _preset and _preset.changed.is_connected(_update_info):
 			_preset.changed.disconnect(_update_info)
+		var inspector := EditorInterface.get_inspector()
+		if inspector and inspector.property_edited.is_connected(_on_property_edited):
+			inspector.property_edited.disconnect(_on_property_edited)
+
+	func _on_property_edited(_property: String) -> void:
+		_update_info()
 
 	func _setup_ui() -> void:
 		var vbox := VBoxContainer.new()

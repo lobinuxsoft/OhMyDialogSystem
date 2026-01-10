@@ -33,10 +33,17 @@ class WorldContextHeader extends PanelContainer:
 		add_theme_stylebox_override("panel", WikiInspectorTheme.create_header_style(ACCENT_COLOR))
 		_setup_ui()
 		_world.changed.connect(_update_tokens)
+		EditorInterface.get_inspector().property_edited.connect(_on_property_edited)
 
 	func _exit_tree() -> void:
 		if _world and _world.changed.is_connected(_update_tokens):
 			_world.changed.disconnect(_update_tokens)
+		var inspector := EditorInterface.get_inspector()
+		if inspector and inspector.property_edited.is_connected(_on_property_edited):
+			inspector.property_edited.disconnect(_on_property_edited)
+
+	func _on_property_edited(_property: String) -> void:
+		_update_tokens()
 
 	func _setup_ui() -> void:
 		var vbox := VBoxContainer.new()

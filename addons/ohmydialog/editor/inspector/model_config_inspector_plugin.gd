@@ -33,10 +33,17 @@ class ModelConfigHeader extends PanelContainer:
 		add_theme_stylebox_override("panel", WikiInspectorTheme.create_header_style(ACCENT_COLOR))
 		_setup_ui()
 		_config.changed.connect(_update_status)
+		EditorInterface.get_inspector().property_edited.connect(_on_property_edited)
 
 	func _exit_tree() -> void:
 		if _config and _config.changed.is_connected(_update_status):
 			_config.changed.disconnect(_update_status)
+		var inspector := EditorInterface.get_inspector()
+		if inspector and inspector.property_edited.is_connected(_on_property_edited):
+			inspector.property_edited.disconnect(_on_property_edited)
+
+	func _on_property_edited(_property: String) -> void:
+		_update_status()
 
 	func _setup_ui() -> void:
 		var vbox := VBoxContainer.new()
