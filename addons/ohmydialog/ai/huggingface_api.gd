@@ -165,6 +165,7 @@ func create_model_config(model_id: String, file_info: Dictionary) -> ModelConfig
 	config.description = "Downloaded from HuggingFace: %s" % model_id
 	config.size_mb = file_info.get("size_mb", 0.0)
 	config.download_url = get_download_url(model_id, file_info.get("filename", ""))
+	config.documentation_url = "%s/%s" % [DOWNLOAD_BASE, model_id]
 	config.is_custom = true
 
 	# Set reasonable defaults based on size
