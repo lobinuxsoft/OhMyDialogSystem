@@ -22,6 +22,12 @@ func _can_handle(object: Object) -> bool:
 	return object is CharacterIdentity
 
 
+func _parse_category(object: Object, category: String) -> void:
+	# Hide the CharacterIdentity category - we show everything in custom panel
+	if category == "CharacterIdentity":
+		return
+
+
 func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
 	# Hide our custom properties - we display them in the custom panel
 	if name in HIDDEN_PROPERTIES:
@@ -42,12 +48,13 @@ func _parse_begin(object: Object) -> void:
 class CharacterIdentityEditorPanel extends VBoxContainer:
 	var _character: CharacterIdentity
 	var _token_label: RichTextLabel
+	var _sections: Dictionary = {}  # section_name -> {header, content, expanded}
 
 	func _init(character: CharacterIdentity) -> void:
 		_character = character
 
 	func _ready() -> void:
-		add_theme_constant_override("separation", 8)
+		add_theme_constant_override("separation", 4)
 		_setup_ui()
 
 	func _setup_ui() -> void:
@@ -74,39 +81,39 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		add_child(header_panel)
 
 		# === IDENTITY SECTION ===
-		_add_section("Identity")
-		_add_line_edit("ID", "character_id", "unique_id")
-		_add_line_edit("Name", "character_name", "Display Name")
-		_add_resource_picker("Portrait", "portrait", "Texture2D")
+		var identity_content := _create_section("Identity", true)
+		_add_line_edit(identity_content, "ID", "character_id", "unique_id")
+		_add_line_edit(identity_content, "Name", "character_name", "Display Name")
+		_add_resource_picker(identity_content, "Portrait", "portrait", "Texture2D")
 
 		# === PERSONALITY SECTION ===
-		_add_section("Personality")
-		_add_text_edit("Personality", "personality", "Core traits and behavior...", 60)
-		_add_text_edit("Background", "background", "History and origin...", 60)
-		_add_speech_style_picker()
-		_add_text_edit("Speech Patterns", "speech_patterns", "Verbal tics, catchphrases...", 40)
+		var personality_content := _create_section("Personality", true)
+		_add_text_edit(personality_content, "Personality", "personality", "Core traits and behavior...", 80)
+		_add_text_edit(personality_content, "Background", "background", "History and origin...", 80)
+		_add_speech_style_picker(personality_content)
+		_add_text_edit(personality_content, "Speech Patterns", "speech_patterns", "Verbal tics, catchphrases...", 60)
 
 		# === KNOWLEDGE SECTION ===
-		_add_section("Knowledge & Secrets")
-		_add_string_array_edit("Knowledge", "knowledge", "Topics they know about")
-		_add_string_array_edit("Secrets", "secrets", "Hidden information")
+		var knowledge_content := _create_section("Knowledge & Secrets", true)
+		_add_string_array_edit(knowledge_content, "Knowledge", "knowledge", "Topics they know about")
+		_add_string_array_edit(knowledge_content, "Secrets", "secrets", "Hidden information")
 
 		# === MOTIVATION SECTION ===
-		_add_section("Motivation")
-		_add_string_array_edit("Goals", "goals", "What they want to achieve")
-		_add_string_array_edit("Fears", "fears", "What they avoid or dread")
+		var motivation_content := _create_section("Motivation", true)
+		_add_string_array_edit(motivation_content, "Goals", "goals", "What they want to achieve")
+		_add_string_array_edit(motivation_content, "Fears", "fears", "What they avoid or dread")
 
 		# === RELATIONSHIPS SECTION ===
-		_add_section("Relationships")
-		_add_dictionary_edit("Relationships", "relationships", "character_id", "description")
+		var relationships_content := _create_section("Relationships", false)
+		_add_dictionary_edit(relationships_content, "Relationships", "relationships", "character_id", "description")
 
 		# === EXAMPLES SECTION ===
-		_add_section("Examples")
-		_add_string_array_edit("Example Dialogues", "example_dialogues", "Sample lines showing their voice")
+		var examples_content := _create_section("Examples", false)
+		_add_string_array_edit(examples_content, "Example Dialogues", "example_dialogues", "Sample lines showing their voice")
 
 		# === PREVIEW SECTION ===
-		_add_section("Preview")
-		_add_prompt_preview()
+		var preview_content := _create_section("Preview", false)
+		_add_prompt_preview(preview_content)
 
 		add_child(HSeparator.new())
 
@@ -123,15 +130,51 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		return style
 
 
-	func _add_section(title: String) -> void:
-		var label := Label.new()
-		label.text = title
-		label.add_theme_font_size_override("font_size", 12)
-		label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
-		add_child(label)
+	func _create_section(title: String, expanded: bool = true) -> VBoxContainer:
+		var section_container := VBoxContainer.new()
+		section_container.add_theme_constant_override("separation", 4)
+
+		# Header button (clickable to expand/collapse)
+		var header_btn := Button.new()
+		header_btn.text = ("▼ " if expanded else "▶ ") + title
+		header_btn.flat = true
+		header_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		header_btn.add_theme_font_size_override("font_size", 12)
+		header_btn.add_theme_color_override("font_color", Color(0.6, 0.75, 0.9))
+		header_btn.add_theme_color_override("font_hover_color", Color(0.8, 0.9, 1.0))
+		section_container.add_child(header_btn)
+
+		# Content container
+		var content := VBoxContainer.new()
+		content.add_theme_constant_override("separation", 6)
+		content.visible = expanded
+
+		# Indent content slightly
+		var margin := MarginContainer.new()
+		margin.add_theme_constant_override("margin_left", 12)
+		margin.add_child(content)
+		section_container.add_child(margin)
+
+		# Store references
+		_sections[title] = {
+			"header": header_btn,
+			"content": content,
+			"expanded": expanded
+		}
+
+		# Toggle on click
+		header_btn.pressed.connect(func():
+			var section: Dictionary = _sections[title]
+			section.expanded = not section.expanded
+			section.content.visible = section.expanded
+			section.header.text = ("▼ " if section.expanded else "▶ ") + title
+		)
+
+		add_child(section_container)
+		return content
 
 
-	func _add_line_edit(label_text: String, property: String, placeholder: String = "") -> void:
+	func _add_line_edit(parent: Control, label_text: String, property: String, placeholder: String = "") -> void:
 		var hbox := HBoxContainer.new()
 
 		var label := Label.new()
@@ -150,13 +193,13 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		)
 		hbox.add_child(edit)
 
-		add_child(hbox)
+		parent.add_child(hbox)
 
 
-	func _add_text_edit(label_text: String, property: String, placeholder: String = "", min_height: int = 60) -> void:
+	func _add_text_edit(parent: Control, label_text: String, property: String, placeholder: String = "", min_height: int = 80) -> void:
 		var label := Label.new()
 		label.text = label_text + ":"
-		add_child(label)
+		parent.add_child(label)
 
 		var edit := TextEdit.new()
 		edit.text = _character.get(property)
@@ -169,10 +212,10 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 			_character.emit_changed()
 			_update_token_display()
 		)
-		add_child(edit)
+		parent.add_child(edit)
 
 
-	func _add_speech_style_picker() -> void:
+	func _add_speech_style_picker(parent: Control) -> void:
 		var hbox := HBoxContainer.new()
 
 		var label := Label.new()
@@ -192,10 +235,10 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		)
 		hbox.add_child(option)
 
-		add_child(hbox)
+		parent.add_child(hbox)
 
 
-	func _add_resource_picker(label_text: String, property: String, base_type: String) -> void:
+	func _add_resource_picker(parent: Control, label_text: String, property: String, base_type: String) -> void:
 		var hbox := HBoxContainer.new()
 
 		var label := Label.new()
@@ -213,12 +256,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		)
 		hbox.add_child(picker)
 
-		add_child(hbox)
+		parent.add_child(hbox)
 
 
-	func _add_string_array_edit(label_text: String, property: String, placeholder: String) -> void:
+	func _add_string_array_edit(parent: Control, label_text: String, property: String, placeholder: String) -> void:
 		var container := VBoxContainer.new()
-		container.add_theme_constant_override("separation", 2)
+		container.add_theme_constant_override("separation", 4)
 
 		var header := HBoxContainer.new()
 		var label := Label.new()
@@ -228,12 +271,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size.x = 24
+		add_btn.custom_minimum_size.x = 28
 		header.add_child(add_btn)
 		container.add_child(header)
 
 		var items_container := VBoxContainer.new()
-		items_container.add_theme_constant_override("separation", 2)
+		items_container.add_theme_constant_override("separation", 4)
 		container.add_child(items_container)
 
 		var rebuild_list: Callable
@@ -260,7 +303,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 				var del_btn := Button.new()
 				del_btn.text = "x"
-				del_btn.custom_minimum_size.x = 24
+				del_btn.custom_minimum_size.x = 28
 				del_btn.pressed.connect(func():
 					var current_arr: Array = _character.get(property)
 					current_arr.remove_at(idx)
@@ -280,12 +323,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		)
 
 		rebuild_list.call()
-		add_child(container)
+		parent.add_child(container)
 
 
-	func _add_dictionary_edit(label_text: String, property: String, key_hint: String, value_hint: String) -> void:
+	func _add_dictionary_edit(parent: Control, label_text: String, property: String, key_hint: String, value_hint: String) -> void:
 		var container := VBoxContainer.new()
-		container.add_theme_constant_override("separation", 2)
+		container.add_theme_constant_override("separation", 4)
 
 		var header := HBoxContainer.new()
 		var label := Label.new()
@@ -295,12 +338,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size.x = 24
+		add_btn.custom_minimum_size.x = 28
 		header.add_child(add_btn)
 		container.add_child(header)
 
 		var items_container := VBoxContainer.new()
-		items_container.add_theme_constant_override("separation", 2)
+		items_container.add_theme_constant_override("separation", 4)
 		container.add_child(items_container)
 
 		var rebuild_list: Callable
@@ -317,7 +360,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				key_edit.text = key
 				key_edit.placeholder_text = key_hint
 				key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				key_edit.custom_minimum_size.x = 80
+				key_edit.custom_minimum_size.x = 100
 				var old_key: String = key
 				key_edit.text_changed.connect(func(new_key: String):
 					var current_dict: Dictionary = _character.get(property)
@@ -345,7 +388,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 				var del_btn := Button.new()
 				del_btn.text = "x"
-				del_btn.custom_minimum_size.x = 24
+				del_btn.custom_minimum_size.x = 28
 				var dk: String = key
 				del_btn.pressed.connect(func():
 					var current_dict: Dictionary = _character.get(property)
@@ -360,25 +403,23 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		add_btn.pressed.connect(func():
 			var dict: Dictionary = _character.get(property)
-			var new_key := "new_key_%d" % dict.size()
+			var new_key := "new_%d" % dict.size()
 			dict[new_key] = ""
 			_character.emit_changed()
 			rebuild_list.call()
 		)
 
 		rebuild_list.call()
-		add_child(container)
+		parent.add_child(container)
 
 
-	func _add_prompt_preview() -> void:
+	func _add_prompt_preview(parent: Control) -> void:
 		var btn := Button.new()
 		btn.text = "Show System Prompt Preview"
-		add_child(btn)
-
-		var preview_container := VBoxContainer.new()
-		preview_container.visible = false
+		parent.add_child(btn)
 
 		var preview_panel := PanelContainer.new()
+		preview_panel.visible = false
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color(0.1, 0.12, 0.18, 0.9)
 		style.set_border_width_all(1)
@@ -393,13 +434,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		preview_label.scroll_active = false
 		preview_label.selection_enabled = true
 		preview_panel.add_child(preview_label)
-		preview_container.add_child(preview_panel)
-		add_child(preview_container)
+		parent.add_child(preview_panel)
 
 		btn.pressed.connect(func():
-			preview_container.visible = not preview_container.visible
-			btn.text = "Hide System Prompt Preview" if preview_container.visible else "Show System Prompt Preview"
-			if preview_container.visible:
+			preview_panel.visible = not preview_panel.visible
+			btn.text = "Hide System Prompt Preview" if preview_panel.visible else "Show System Prompt Preview"
+			if preview_panel.visible:
 				var prompt := _character.to_system_prompt()
 				prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
 				preview_label.text = "[code]%s[/code]" % prompt

@@ -22,6 +22,12 @@ func _can_handle(object: Object) -> bool:
 	return object is WorldContext
 
 
+func _parse_category(object: Object, category: String) -> void:
+	# Hide the WorldContext category - we show everything in custom panel
+	if category == "WorldContext":
+		return
+
+
 func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
 	# Hide our custom properties - we display them in the custom panel
 	if name in HIDDEN_PROPERTIES:
@@ -42,12 +48,13 @@ func _parse_begin(object: Object) -> void:
 class WorldContextEditorPanel extends VBoxContainer:
 	var _world: WorldContext
 	var _token_label: RichTextLabel
+	var _sections: Dictionary = {}  # section_name -> {header, content, expanded}
 
 	func _init(world: WorldContext) -> void:
 		_world = world
 
 	func _ready() -> void:
-		add_theme_constant_override("separation", 8)
+		add_theme_constant_override("separation", 4)
 		_setup_ui()
 
 	func _setup_ui() -> void:
@@ -74,40 +81,40 @@ class WorldContextEditorPanel extends VBoxContainer:
 		add_child(header_panel)
 
 		# === WORLD IDENTITY SECTION ===
-		_add_section("World Identity")
-		_add_line_edit("ID", "world_id", "unique_world_id")
-		_add_line_edit("Name", "world_name", "World Name")
-		_add_text_edit("Setting", "setting", "Brief description of the setting...", 50)
-		_add_time_period_picker()
+		var identity_content := _create_section("World Identity", true)
+		_add_line_edit(identity_content, "ID", "world_id", "unique_world_id")
+		_add_line_edit(identity_content, "Name", "world_name", "World Name")
+		_add_text_edit(identity_content, "Setting", "setting", "Brief description of the setting...", 80)
+		_add_time_period_picker(identity_content)
 
 		# === LORE & HISTORY SECTION ===
-		_add_section("Lore & History")
-		_add_text_edit("Lore", "lore", "Deep background lore and history...", 80)
-		_add_dictionary_edit("Factions", "factions", "faction_id", "description")
+		var lore_content := _create_section("Lore & History", true)
+		_add_text_edit(lore_content, "Lore", "lore", "Deep background lore and history...", 100)
+		_add_dictionary_edit(lore_content, "Factions", "factions", "faction_id", "description")
 
 		# === GEOGRAPHY SECTION ===
-		_add_section("Geography")
-		_add_dictionary_edit("Locations", "locations", "location_id", "description")
-		_add_line_edit("Current Location", "current_location", "location_id or description")
+		var geography_content := _create_section("Geography", true)
+		_add_dictionary_edit(geography_content, "Locations", "locations", "location_id", "description")
+		_add_line_edit(geography_content, "Current Location", "current_location", "location_id or description")
 
 		# === CHARACTERS SECTION ===
-		_add_section("Characters")
-		_add_dictionary_edit("Important NPCs", "important_npcs", "character_id", "brief description")
+		var characters_content := _create_section("Characters", false)
+		_add_dictionary_edit(characters_content, "Important NPCs", "important_npcs", "character_id", "brief description")
 
 		# === CURRENT STATE SECTION ===
-		_add_section("Current State")
-		_add_string_array_edit("Current Events", "current_events", "Event happening now...")
-		_add_string_array_edit("Rules", "rules", "World constraint or rule...")
-		_add_dictionary_edit("Dynamic State", "dynamic_state", "variable_name", "value")
+		var state_content := _create_section("Current State", true)
+		_add_string_array_edit(state_content, "Current Events", "current_events", "Event happening now...")
+		_add_string_array_edit(state_content, "Rules", "rules", "World constraint or rule...")
+		_add_dictionary_edit(state_content, "Dynamic State", "dynamic_state", "variable_name", "value")
 
 		# === TONE & STYLE SECTION ===
-		_add_section("Tone & Style")
-		_add_text_edit("Tone", "tone", "Overall tone of the world...", 40)
-		_add_string_array_edit("Forbidden Topics", "forbidden_topics", "Topic to avoid...")
+		var tone_content := _create_section("Tone & Style", false)
+		_add_text_edit(tone_content, "Tone", "tone", "Overall tone of the world...", 60)
+		_add_string_array_edit(tone_content, "Forbidden Topics", "forbidden_topics", "Topic to avoid...")
 
 		# === PREVIEW SECTION ===
-		_add_section("Preview")
-		_add_prompt_preview()
+		var preview_content := _create_section("Preview", false)
+		_add_prompt_preview(preview_content)
 
 		add_child(HSeparator.new())
 
@@ -124,15 +131,51 @@ class WorldContextEditorPanel extends VBoxContainer:
 		return style
 
 
-	func _add_section(title: String) -> void:
-		var label := Label.new()
-		label.text = title
-		label.add_theme_font_size_override("font_size", 12)
-		label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.7))
-		add_child(label)
+	func _create_section(title: String, expanded: bool = true) -> VBoxContainer:
+		var section_container := VBoxContainer.new()
+		section_container.add_theme_constant_override("separation", 4)
+
+		# Header button (clickable to expand/collapse)
+		var header_btn := Button.new()
+		header_btn.text = ("▼ " if expanded else "▶ ") + title
+		header_btn.flat = true
+		header_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		header_btn.add_theme_font_size_override("font_size", 12)
+		header_btn.add_theme_color_override("font_color", Color(0.6, 0.85, 0.75))
+		header_btn.add_theme_color_override("font_hover_color", Color(0.8, 1.0, 0.9))
+		section_container.add_child(header_btn)
+
+		# Content container
+		var content := VBoxContainer.new()
+		content.add_theme_constant_override("separation", 6)
+		content.visible = expanded
+
+		# Indent content slightly
+		var margin := MarginContainer.new()
+		margin.add_theme_constant_override("margin_left", 12)
+		margin.add_child(content)
+		section_container.add_child(margin)
+
+		# Store references
+		_sections[title] = {
+			"header": header_btn,
+			"content": content,
+			"expanded": expanded
+		}
+
+		# Toggle on click
+		header_btn.pressed.connect(func():
+			var section: Dictionary = _sections[title]
+			section.expanded = not section.expanded
+			section.content.visible = section.expanded
+			section.header.text = ("▼ " if section.expanded else "▶ ") + title
+		)
+
+		add_child(section_container)
+		return content
 
 
-	func _add_line_edit(label_text: String, property: String, placeholder: String = "") -> void:
+	func _add_line_edit(parent: Control, label_text: String, property: String, placeholder: String = "") -> void:
 		var hbox := HBoxContainer.new()
 
 		var label := Label.new()
@@ -151,13 +194,13 @@ class WorldContextEditorPanel extends VBoxContainer:
 		)
 		hbox.add_child(edit)
 
-		add_child(hbox)
+		parent.add_child(hbox)
 
 
-	func _add_text_edit(label_text: String, property: String, placeholder: String = "", min_height: int = 60) -> void:
+	func _add_text_edit(parent: Control, label_text: String, property: String, placeholder: String = "", min_height: int = 80) -> void:
 		var label := Label.new()
 		label.text = label_text + ":"
-		add_child(label)
+		parent.add_child(label)
 
 		var edit := TextEdit.new()
 		edit.text = _world.get(property)
@@ -170,10 +213,10 @@ class WorldContextEditorPanel extends VBoxContainer:
 			_world.emit_changed()
 			_update_token_display()
 		)
-		add_child(edit)
+		parent.add_child(edit)
 
 
-	func _add_time_period_picker() -> void:
+	func _add_time_period_picker(parent: Control) -> void:
 		var hbox := HBoxContainer.new()
 
 		var label := Label.new()
@@ -193,12 +236,12 @@ class WorldContextEditorPanel extends VBoxContainer:
 		)
 		hbox.add_child(option)
 
-		add_child(hbox)
+		parent.add_child(hbox)
 
 
-	func _add_string_array_edit(label_text: String, property: String, placeholder: String) -> void:
+	func _add_string_array_edit(parent: Control, label_text: String, property: String, placeholder: String) -> void:
 		var container := VBoxContainer.new()
-		container.add_theme_constant_override("separation", 2)
+		container.add_theme_constant_override("separation", 4)
 
 		var header := HBoxContainer.new()
 		var label := Label.new()
@@ -208,12 +251,12 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size.x = 24
+		add_btn.custom_minimum_size.x = 28
 		header.add_child(add_btn)
 		container.add_child(header)
 
 		var items_container := VBoxContainer.new()
-		items_container.add_theme_constant_override("separation", 2)
+		items_container.add_theme_constant_override("separation", 4)
 		container.add_child(items_container)
 
 		var rebuild_list: Callable
@@ -240,7 +283,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 				var del_btn := Button.new()
 				del_btn.text = "x"
-				del_btn.custom_minimum_size.x = 24
+				del_btn.custom_minimum_size.x = 28
 				del_btn.pressed.connect(func():
 					var current_arr: Array = _world.get(property)
 					current_arr.remove_at(idx)
@@ -260,12 +303,12 @@ class WorldContextEditorPanel extends VBoxContainer:
 		)
 
 		rebuild_list.call()
-		add_child(container)
+		parent.add_child(container)
 
 
-	func _add_dictionary_edit(label_text: String, property: String, key_hint: String, value_hint: String) -> void:
+	func _add_dictionary_edit(parent: Control, label_text: String, property: String, key_hint: String, value_hint: String) -> void:
 		var container := VBoxContainer.new()
-		container.add_theme_constant_override("separation", 2)
+		container.add_theme_constant_override("separation", 4)
 
 		var header := HBoxContainer.new()
 		var label := Label.new()
@@ -275,12 +318,12 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size.x = 24
+		add_btn.custom_minimum_size.x = 28
 		header.add_child(add_btn)
 		container.add_child(header)
 
 		var items_container := VBoxContainer.new()
-		items_container.add_theme_constant_override("separation", 2)
+		items_container.add_theme_constant_override("separation", 4)
 		container.add_child(items_container)
 
 		var rebuild_list: Callable
@@ -297,7 +340,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 				key_edit.text = str(key)
 				key_edit.placeholder_text = key_hint
 				key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				key_edit.custom_minimum_size.x = 80
+				key_edit.custom_minimum_size.x = 100
 				var old_key = key
 				key_edit.text_changed.connect(func(new_key: String):
 					var current_dict: Dictionary = _world.get(property)
@@ -325,7 +368,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 				var del_btn := Button.new()
 				del_btn.text = "x"
-				del_btn.custom_minimum_size.x = 24
+				del_btn.custom_minimum_size.x = 28
 				var dk = key
 				del_btn.pressed.connect(func():
 					var current_dict: Dictionary = _world.get(property)
@@ -340,25 +383,23 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 		add_btn.pressed.connect(func():
 			var dict: Dictionary = _world.get(property)
-			var new_key := "new_key_%d" % dict.size()
+			var new_key := "new_%d" % dict.size()
 			dict[new_key] = ""
 			_world.emit_changed()
 			rebuild_list.call()
 		)
 
 		rebuild_list.call()
-		add_child(container)
+		parent.add_child(container)
 
 
-	func _add_prompt_preview() -> void:
+	func _add_prompt_preview(parent: Control) -> void:
 		var btn := Button.new()
 		btn.text = "Show Context Prompt Preview"
-		add_child(btn)
-
-		var preview_container := VBoxContainer.new()
-		preview_container.visible = false
+		parent.add_child(btn)
 
 		var preview_panel := PanelContainer.new()
+		preview_panel.visible = false
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color(0.1, 0.15, 0.12, 0.9)
 		style.set_border_width_all(1)
@@ -373,13 +414,12 @@ class WorldContextEditorPanel extends VBoxContainer:
 		preview_label.scroll_active = false
 		preview_label.selection_enabled = true
 		preview_panel.add_child(preview_label)
-		preview_container.add_child(preview_panel)
-		add_child(preview_container)
+		parent.add_child(preview_panel)
 
 		btn.pressed.connect(func():
-			preview_container.visible = not preview_container.visible
-			btn.text = "Hide Context Prompt Preview" if preview_container.visible else "Show Context Prompt Preview"
-			if preview_container.visible:
+			preview_panel.visible = not preview_panel.visible
+			btn.text = "Hide Context Prompt Preview" if preview_panel.visible else "Show Context Prompt Preview"
+			if preview_panel.visible:
 				var prompt := _world.to_context_prompt()
 				prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
 				preview_label.text = "[code]%s[/code]" % prompt
