@@ -47,7 +47,7 @@ class AIPresetHeader extends PanelContainer:
 		title_hbox.add_theme_constant_override("separation", 10)
 
 		var icon := Label.new()
-		icon.text = WikiInspectorTheme.ICON_SPARKLES
+		icon.text = WikiInspectorTheme.ICON_BOLT
 		icon.add_theme_font_size_override("font_size", 18)
 		icon.add_theme_color_override("font_color", ACCENT_COLOR)
 		title_hbox.add_child(icon)

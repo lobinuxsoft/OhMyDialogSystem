@@ -47,7 +47,7 @@ class WorldContextHeader extends PanelContainer:
 		title_hbox.add_theme_constant_override("separation", 10)
 
 		var icon := Label.new()
-		icon.text = WikiInspectorTheme.ICON_GLOBE
+		icon.text = WikiInspectorTheme.ICON_CIRCLE_TARGET
 		icon.add_theme_font_size_override("font_size", 18)
 		icon.add_theme_color_override("font_color", ACCENT_COLOR)
 		title_hbox.add_child(icon)
