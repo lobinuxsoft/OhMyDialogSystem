@@ -118,33 +118,28 @@ func show_window() -> void:
 
 
 func _setup_models_tree() -> void:
-	_models_tree.columns = 5
+	_models_tree.columns = 4
 	_models_tree.set_column_title(0, "Model")
-	_models_tree.set_column_title(1, "")  # Link button column
-	_models_tree.set_column_title(2, "Size")
-	_models_tree.set_column_title(3, "Context")
-	_models_tree.set_column_title(4, "Status")
+	_models_tree.set_column_title(1, "Size")
+	_models_tree.set_column_title(2, "Context")
+	_models_tree.set_column_title(3, "Status")
 	_models_tree.column_titles_visible = true
 	_models_tree.set_column_expand(0, true)
 	_models_tree.set_column_expand(1, false)
 	_models_tree.set_column_expand(2, false)
 	_models_tree.set_column_expand(3, false)
-	_models_tree.set_column_expand(4, false)
-	_models_tree.set_column_custom_minimum_width(1, 32)
+	_models_tree.set_column_custom_minimum_width(1, 80)
 	_models_tree.set_column_custom_minimum_width(2, 80)
-	_models_tree.set_column_custom_minimum_width(3, 80)
-	_models_tree.set_column_custom_minimum_width(4, 100)
+	_models_tree.set_column_custom_minimum_width(3, 100)
 
 
 func _update_column_titles() -> void:
-	var titles = ["Model", "", "Size", "Context", "Status"]
-	var arrows = ["", "", "", "", ""]
+	var titles = ["Model", "Size", "Context", "Status"]
+	var arrows = ["", "", "", ""]
 	var arrow = " ↑" if _sort_ascending else " ↓"
-	# Map sort enum to column index (accounting for link button column)
-	var sort_column_map = [0, 2, 3, 4]  # NAME->0, SIZE->2, CONTEXT->3, STATUS->4
-	arrows[sort_column_map[_current_sort]] = arrow
+	arrows[_current_sort] = arrow
 
-	for i in range(5):
+	for i in range(4):
 		_models_tree.set_column_title(i, titles[i] + arrows[i])
 
 
@@ -166,30 +161,28 @@ func _populate_models_tree() -> void:
 		item.set_text(0, model.display_name)
 		item.set_metadata(0, model.id)
 
-		# Add link button (only if model has documentation_url)
-		var has_docs = not model.documentation_url.is_empty()
-		if has_docs:
-			item.add_button(1, _link_icon, BUTTON_ID_OPEN_URL, false, "Open documentation")
-			item.set_metadata(1, model.documentation_url)
+		# Add link button in column 0 (if model has documentation_url)
+		if not model.documentation_url.is_empty():
+			item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open documentation")
 
-		item.set_text(2, "%.0f MB" % model.size_mb)
+		item.set_text(1, "%.0f MB" % model.size_mb)
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
+
+		item.set_text(2, "%d" % model.n_ctx)
 		item.set_text_alignment(2, HORIZONTAL_ALIGNMENT_RIGHT)
-
-		item.set_text(3, "%d" % model.n_ctx)
-		item.set_text_alignment(3, HORIZONTAL_ALIGNMENT_RIGHT)
 
 		var is_downloaded = model.is_downloaded()
 		var is_loaded = _is_model_loaded(model)
 
 		if is_loaded:
-			item.set_text(4, "Loaded")
-			item.set_custom_color(4, Color.GREEN)
+			item.set_text(3, "Loaded")
+			item.set_custom_color(3, Color.GREEN)
 		elif is_downloaded:
-			item.set_text(4, "Ready")
-			item.set_custom_color(4, Color.CYAN)
+			item.set_text(3, "Ready")
+			item.set_custom_color(3, Color.CYAN)
 		else:
-			item.set_text(4, "Not Downloaded")
-			item.set_custom_color(4, Color.GRAY)
+			item.set_text(3, "Not Downloaded")
+			item.set_custom_color(3, Color.GRAY)
 
 		if model.is_custom:
 			item.set_custom_color(0, Color.YELLOW)
@@ -347,12 +340,7 @@ func _on_close_requested() -> void:
 
 
 func _on_column_title_clicked(column: int, _mouse_button_index: int) -> void:
-	# Map column index to SortBy enum (skip link button column at index 1)
-	var column_to_sort = {0: SortBy.NAME, 2: SortBy.SIZE, 3: SortBy.CONTEXT, 4: SortBy.STATUS}
-	if not column_to_sort.has(column):
-		return  # Clicked on link button column, ignore
-
-	var new_sort = column_to_sort[column]
+	var new_sort = column as SortBy
 	if new_sort == _current_sort:
 		_sort_ascending = not _sort_ascending
 	else:
@@ -363,9 +351,11 @@ func _on_column_title_clicked(column: int, _mouse_button_index: int) -> void:
 
 func _on_models_tree_button_clicked(item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
 	if id == BUTTON_ID_OPEN_URL:
-		var url = item.get_metadata(1) as String
-		if not url.is_empty():
-			OS.shell_open(url)
+		var model_id = item.get_metadata(0) as String
+		if not model_id.is_empty():
+			var model = _model_manager.registry.get_model_by_id(model_id)
+			if model and not model.documentation_url.is_empty():
+				OS.shell_open(model.documentation_url)
 
 
 func _on_model_details_link_clicked(meta: Variant) -> void:

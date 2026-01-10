@@ -69,19 +69,16 @@ func show_dialog() -> void:
 
 
 func _setup_results_tree() -> void:
-	_results_tree.columns = 4
+	_results_tree.columns = 3
 	_results_tree.set_column_title(0, "Model")
-	_results_tree.set_column_title(1, "")  # Link button column
-	_results_tree.set_column_title(2, "Downloads")
-	_results_tree.set_column_title(3, "Likes")
+	_results_tree.set_column_title(1, "Downloads")
+	_results_tree.set_column_title(2, "Likes")
 	_results_tree.column_titles_visible = true
 	_results_tree.set_column_expand(0, true)
 	_results_tree.set_column_expand(1, false)
 	_results_tree.set_column_expand(2, false)
-	_results_tree.set_column_expand(3, false)
-	_results_tree.set_column_custom_minimum_width(1, 32)
-	_results_tree.set_column_custom_minimum_width(2, 80)
-	_results_tree.set_column_custom_minimum_width(3, 60)
+	_results_tree.set_column_custom_minimum_width(1, 80)
+	_results_tree.set_column_custom_minimum_width(2, 60)
 
 
 func _setup_files_tree() -> void:
@@ -152,16 +149,15 @@ func _on_search_completed(results: Array[Dictionary]) -> void:
 		var item = _results_tree.create_item(root)
 		item.set_text(0, result.get("name", ""))
 		item.set_metadata(0, result.get("id", ""))
-
-		# Add link button
-		item.add_button(1, _link_icon, BUTTON_ID_OPEN_URL, false, "Open in HuggingFace")
+		# Add link button in column 0 (next to model name)
+		item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open in HuggingFace")
 
 		var downloads = result.get("downloads", 0)
-		item.set_text(2, _format_number(downloads))
-		item.set_text_alignment(2, HORIZONTAL_ALIGNMENT_RIGHT)
+		item.set_text(1, _format_number(downloads))
+		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
 
-		item.set_text(3, str(result.get("likes", 0)))
-		item.set_text_alignment(3, HORIZONTAL_ALIGNMENT_RIGHT)
+		item.set_text(2, str(result.get("likes", 0)))
+		item.set_text_alignment(2, HORIZONTAL_ALIGNMENT_RIGHT)
 
 
 func _on_search_failed(error: String) -> void:
