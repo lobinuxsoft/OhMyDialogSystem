@@ -38,9 +38,6 @@ var _main_screen_button: Button
 ## Last active main screen before opening AI Models.
 var _last_main_screen: String = "2D"
 
-## Flag to track if user clicked the AI button (vs automatic activation).
-var _user_clicked_ai_button: bool = false
-
 ## Reference to the model manager window.
 var _model_manager_window: ModelManagerWindow
 
@@ -74,10 +71,6 @@ func _enter_tree() -> void:
 	_ai_preset_inspector_plugin = AIPresetInspectorPlugin.new()
 	add_inspector_plugin(_ai_preset_inspector_plugin)
 
-	# Register inspector plugin for DialogueGraph
-	_dialogue_graph_inspector_plugin = DialogueGraphInspectorPlugin.new()
-	add_inspector_plugin(_dialogue_graph_inspector_plugin)
-
 	# Load and instantiate the dialogue graph editor
 	var editor_scene := preload("res://addons/ohmydialog/editor/dialogue_graph_editor.tscn")
 	_editor_instance = editor_scene.instantiate()
@@ -88,6 +81,11 @@ func _enter_tree() -> void:
 
 	# Add as bottom panel (more space for graph editing than dock)
 	add_control_to_bottom_panel(_editor_instance, "Dialogue Graph")
+
+	# Register inspector plugin for DialogueGraph (after editor is ready)
+	_dialogue_graph_inspector_plugin = DialogueGraphInspectorPlugin.new()
+	_dialogue_graph_inspector_plugin.setup(self, _editor_instance)
+	add_inspector_plugin(_dialogue_graph_inspector_plugin)
 
 	# Connect to AI service signals for main screen button updates
 	_ai_service.model_loaded.connect(_on_model_status_changed)
@@ -169,8 +167,10 @@ func _register_autoload() -> void:
 
 
 ## Returns true if this plugin handles the given object type.
-func _handles(object: Object) -> bool:
-	return object is DialogueGraph
+## Note: Returns false to prevent Godot from auto-activating the main screen
+## when a DialogueGraph is selected. The bottom panel works independently.
+func _handles(_object: Object) -> bool:
+	return false
 
 
 # ==================== Main Screen Plugin Methods ====================
@@ -191,29 +191,13 @@ func _get_plugin_icon() -> Texture2D:
 	return EditorInterface.get_editor_theme().get_icon("Environment", "EditorIcons")
 
 
-## Called when the user selects an object this plugin handles.
-func _edit(object: Object) -> void:
-	if object is DialogueGraph and _editor_instance:
-		# Update inspector plugin with current graph for variable lookups
-		if _inspector_plugin:
-			_inspector_plugin.set_current_graph(object)
-
-		# Make panel visible FIRST, then load the graph
-		make_bottom_panel_item_visible(_editor_instance)
-		# Use call_deferred to ensure panel is visible before loading
-		_editor_instance.call_deferred("edit_graph", object)
-
-
 ## Makes the main screen visible. For AI, we open the Model Manager and return.
 func _make_visible(visible: bool) -> void:
 	if visible:
-		# Only open Model Manager if user explicitly clicked the AI button
-		# (not when Godot auto-activates due to _handles() returning true)
-		if _user_clicked_ai_button:
-			_user_clicked_ai_button = false
-			if _model_manager_window:
-				_model_manager_window.show_window()
-		# Always return to previous main screen (AI has no actual screen)
+		# Open Model Manager Window
+		if _model_manager_window:
+			_model_manager_window.show_window()
+		# Return to previous main screen (AI has no actual screen content)
 		call_deferred("_return_to_last_screen")
 
 
@@ -240,17 +224,7 @@ func _find_and_update_main_screen_button() -> void:
 	# We search for our button by checking the text
 	var base := EditorInterface.get_base_control()
 	_main_screen_button = _find_button_recursive(base, "AI")
-
-	# Connect to button press to track user clicks
-	if _main_screen_button and not _main_screen_button.pressed.is_connected(_on_ai_button_pressed):
-		_main_screen_button.pressed.connect(_on_ai_button_pressed)
-
 	_update_main_screen_button_text()
-
-
-## Called when user clicks the AI main screen button.
-func _on_ai_button_pressed() -> void:
-	_user_clicked_ai_button = true
 
 
 ## Recursively searches for a button with specific text.

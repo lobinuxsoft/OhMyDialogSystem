@@ -5,6 +5,18 @@ extends EditorInspectorPlugin
 ##
 ## Adds a wiki-styled header with statistics above Godot's default inspector.
 
+## Reference to the main plugin for bottom panel access.
+var _plugin: EditorPlugin
+
+## Reference to the dialogue graph editor.
+var _editor: DialogueGraphEditor
+
+
+## Sets the plugin and editor references for opening graphs.
+func setup(plugin: EditorPlugin, editor: DialogueGraphEditor) -> void:
+	_plugin = plugin
+	_editor = editor
+
 
 func _can_handle(object: Object) -> bool:
 	return object is DialogueGraph
@@ -15,7 +27,7 @@ func _parse_begin(object: Object) -> void:
 	if not graph:
 		return
 
-	var header := DialogueGraphHeader.new(graph)
+	var header := DialogueGraphHeader.new(graph, _plugin, _editor)
 	add_custom_control(header)
 
 
@@ -24,10 +36,14 @@ class DialogueGraphHeader extends PanelContainer:
 	const ACCENT_COLOR := WikiInspectorTheme.AI_PURPLE
 
 	var _graph: DialogueGraph
+	var _plugin: EditorPlugin
+	var _editor: DialogueGraphEditor
 	var _stats_label: RichTextLabel
 
-	func _init(graph: DialogueGraph) -> void:
+	func _init(graph: DialogueGraph, plugin: EditorPlugin, editor: DialogueGraphEditor) -> void:
 		_graph = graph
+		_plugin = plugin
+		_editor = editor
 
 	func _ready() -> void:
 		add_theme_stylebox_override("panel", WikiInspectorTheme.create_header_style(ACCENT_COLOR))
@@ -49,7 +65,7 @@ class DialogueGraphHeader extends PanelContainer:
 		var vbox := VBoxContainer.new()
 		vbox.add_theme_constant_override("separation", 6)
 
-		# Title row
+		# Title row with Open button
 		var title_hbox := HBoxContainer.new()
 		title_hbox.add_theme_constant_override("separation", 10)
 
@@ -64,6 +80,19 @@ class DialogueGraphHeader extends PanelContainer:
 		title.add_theme_font_size_override("font_size", 13)
 		title.add_theme_color_override("font_color", ACCENT_COLOR)
 		title_hbox.add_child(title)
+
+		# Spacer
+		var spacer := Control.new()
+		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		title_hbox.add_child(spacer)
+
+		# Open in Editor button
+		var open_btn := Button.new()
+		open_btn.text = "Open in Editor"
+		open_btn.flat = true
+		open_btn.add_theme_color_override("font_color", ACCENT_COLOR)
+		open_btn.pressed.connect(_on_open_pressed)
+		title_hbox.add_child(open_btn)
 
 		vbox.add_child(title_hbox)
 
@@ -94,3 +123,11 @@ class DialogueGraphHeader extends PanelContainer:
 
 		var text := "[code]Nodes: %d | Connections: %d | Variables: %d[/code]" % [nodes, connections, variables]
 		_stats_label.text = text
+
+	func _on_open_pressed() -> void:
+		if not _graph:
+			return
+		if _editor:
+			_editor.edit_graph(_graph)
+		if _plugin and _editor:
+			_plugin.make_bottom_panel_item_visible(_editor)
