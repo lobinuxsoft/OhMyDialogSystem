@@ -4,13 +4,21 @@ extends EditorPlugin
 ##
 ## Main plugin entry point. Handles initialization and cleanup of
 ## editor components, custom types, and windows.
-## Delegates DialogueGraph editing to DialogueGraphPlugin.
 
 const AUTOLOAD_NAME := "AIServiceAutoload"
 const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
 
-## Reference to the DialogueGraph sub-plugin.
-var _dialogue_graph_plugin: DialogueGraphPlugin
+## Reference to the toolbar menu button.
+var _toolbar_menu: MenuButton
+
+## Reference to the dialogue graph editor window.
+var _dialogue_graph_window: DialogueGraphWindow
+
+## Reference to the DialogueNodeData inspector plugin.
+var _node_inspector_plugin: DialogueNodeInspectorPlugin
+
+## Reference to the DialogueGraph inspector plugin.
+var _dialogue_graph_inspector_plugin: DialogueGraphInspectorPlugin
 
 ## Reference to the CharacterIdentity inspector plugin.
 var _character_inspector_plugin: CharacterIdentityInspectorPlugin
@@ -27,12 +35,6 @@ var _ai_preset_inspector_plugin: AIPresetInspectorPlugin
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
-## Reference to the main screen button (found in editor tree).
-var _main_screen_button: Button
-
-## Last active main screen before opening AI Models.
-var _last_main_screen: String = "2D"
-
 ## Reference to the model manager window.
 var _model_manager_window: ModelManagerWindow
 
@@ -46,47 +48,68 @@ func _enter_tree() -> void:
 	_ai_service.name = "AIService"
 	add_child(_ai_service)
 
-	# Register inspector plugin for CharacterIdentity
+	# Register inspector plugins
+	_node_inspector_plugin = DialogueNodeInspectorPlugin.new()
+	add_inspector_plugin(_node_inspector_plugin)
+
 	_character_inspector_plugin = CharacterIdentityInspectorPlugin.new()
 	add_inspector_plugin(_character_inspector_plugin)
 
-	# Register inspector plugin for WorldContext
 	_world_inspector_plugin = WorldContextInspectorPlugin.new()
 	add_inspector_plugin(_world_inspector_plugin)
 
-	# Register inspector plugin for ModelConfig
 	_model_config_inspector_plugin = ModelConfigInspectorPlugin.new()
 	add_inspector_plugin(_model_config_inspector_plugin)
 
-	# Register inspector plugin for AIPreset
 	_ai_preset_inspector_plugin = AIPresetInspectorPlugin.new()
 	add_inspector_plugin(_ai_preset_inspector_plugin)
 
-	# Initialize DialogueGraph sub-plugin
-	_dialogue_graph_plugin = DialogueGraphPlugin.new()
-	add_child(_dialogue_graph_plugin)
+	# Initialize dialogue graph editor window
+	_dialogue_graph_window = DialogueGraphWindow.new()
+	EditorInterface.get_base_control().add_child(_dialogue_graph_window)
+	_dialogue_graph_window.ready.connect(_on_dialogue_graph_window_ready)
 
-	# Connect to AI service signals for main screen button updates
-	_ai_service.model_loaded.connect(_on_model_status_changed)
-	_ai_service.model_unloaded.connect(_on_model_status_changed)
-	_ai_service.models_changed.connect(_on_model_status_changed)
-
-	# Track main screen changes to know where to return
-	main_screen_changed.connect(_on_main_screen_changed)
-
-	# Find and update main screen button after editor is ready
-	call_deferred("_find_and_update_main_screen_button")
+	# Register inspector plugin for DialogueGraph
+	_dialogue_graph_inspector_plugin = DialogueGraphInspectorPlugin.new()
+	add_inspector_plugin(_dialogue_graph_inspector_plugin)
 
 	# Initialize model manager window
 	var manager_scene := preload("res://addons/ohmydialog/editor/model_manager_window.tscn")
 	_model_manager_window = manager_scene.instantiate()
 	EditorInterface.get_base_control().add_child(_model_manager_window)
 
+	# Create toolbar menu button
+	_toolbar_menu = MenuButton.new()
+	_toolbar_menu.text = "OhMyDialog"
+	_toolbar_menu.flat = true
+	_toolbar_menu.focus_mode = Control.FOCUS_NONE
+
+	var popup := _toolbar_menu.get_popup()
+	popup.add_item("AI Models", 0)
+	popup.add_item("Dialogue Graph", 1)
+	popup.id_pressed.connect(_on_toolbar_menu_id_pressed)
+
+	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_menu)
+
 	print("OhMyDialogSystem: Plugin loaded")
 
 
 func _exit_tree() -> void:
+	# Remove toolbar menu
+	if _toolbar_menu:
+		remove_control_from_container(CONTAINER_TOOLBAR, _toolbar_menu)
+		_toolbar_menu.queue_free()
+		_toolbar_menu = null
+
 	# Remove inspector plugins
+	if _node_inspector_plugin:
+		remove_inspector_plugin(_node_inspector_plugin)
+		_node_inspector_plugin = null
+
+	if _dialogue_graph_inspector_plugin:
+		remove_inspector_plugin(_dialogue_graph_inspector_plugin)
+		_dialogue_graph_inspector_plugin = null
+
 	if _character_inspector_plugin:
 		remove_inspector_plugin(_character_inspector_plugin)
 		_character_inspector_plugin = null
@@ -103,10 +126,10 @@ func _exit_tree() -> void:
 		remove_inspector_plugin(_ai_preset_inspector_plugin)
 		_ai_preset_inspector_plugin = null
 
-	# Clean up DialogueGraph sub-plugin
-	if _dialogue_graph_plugin:
-		_dialogue_graph_plugin.queue_free()
-		_dialogue_graph_plugin = null
+	# Clean up dialogue graph window
+	if _dialogue_graph_window:
+		_dialogue_graph_window.queue_free()
+		_dialogue_graph_window = null
 
 	# Clean up AI service
 	if _ai_service:
@@ -118,144 +141,46 @@ func _exit_tree() -> void:
 		_model_manager_window.queue_free()
 		_model_manager_window = null
 
-	# Note: We don't unregister the autoload here because:
-	# 1. It would break running games if user disables plugin while testing
-	# 2. User can manually remove it from Project Settings if needed
-
 	print("OhMyDialogSystem: Plugin unloaded")
 
 
 ## Registers the AIService AutoLoad if not already registered.
 func _register_autoload() -> void:
-	# Check if already registered
 	if ProjectSettings.has_setting("autoload/" + AUTOLOAD_NAME):
 		return
 
-	# Register the autoload
 	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
 	print("OhMyDialogSystem: Registered AIService AutoLoad")
 
 
-# ==================== Main Screen Plugin Methods ====================
+## Returns true if this plugin handles the given object type.
+func _handles(object: Object) -> bool:
+	return object is DialogueGraph
 
 
-## Returns true to show this as a main screen button (next to 2D, 3D, Script, etc.)
-func _has_main_screen() -> bool:
-	return true
+## Called when the user selects an object this plugin handles.
+func _edit(object: Object) -> void:
+	if object is DialogueGraph and _dialogue_graph_window:
+		if _node_inspector_plugin:
+			_node_inspector_plugin.set_current_graph(object)
+		_dialogue_graph_window.edit_graph(object)
 
 
-## Returns the name shown in the main screen button.
-func _get_plugin_name() -> String:
-	return "AI"
+## Called when the dialogue graph window is ready.
+func _on_dialogue_graph_window_ready() -> void:
+	var editor := _dialogue_graph_window.get_editor()
+	if editor and _node_inspector_plugin:
+		editor.set_inspector_plugin(_node_inspector_plugin)
+	if _dialogue_graph_inspector_plugin:
+		_dialogue_graph_inspector_plugin.setup(_dialogue_graph_window)
 
 
-## Returns the icon for the main screen button.
-func _get_plugin_icon() -> Texture2D:
-	return EditorInterface.get_editor_theme().get_icon("Environment", "EditorIcons")
-
-
-## Makes the main screen visible. For AI, we open the Model Manager and return.
-func _make_visible(visible: bool) -> void:
-	if visible:
-		# Open Model Manager Window
-		if _model_manager_window:
-			_model_manager_window.show_window()
-		# Return to previous main screen (AI has no actual screen content)
-		call_deferred("_return_to_last_screen")
-
-
-## Called when main screen changes (to track where to return).
-func _on_main_screen_changed(screen_name: String) -> void:
-	# Don't track our own screen as "last"
-	if screen_name != "AI" and screen_name != "Dialogue":
-		_last_main_screen = screen_name
-
-
-## Called when model is loaded or unloaded.
-func _on_model_status_changed(_arg = null) -> void:
-	_update_main_screen_button_text()
-
-
-## Returns to the last active main screen.
-func _return_to_last_screen() -> void:
-	EditorInterface.set_main_screen_editor(_last_main_screen)
-
-
-## Finds our main screen button in the editor tree.
-func _find_and_update_main_screen_button() -> void:
-	# Main screen buttons are in a specific container in the editor
-	# We search for our button by checking the text
-	var base := EditorInterface.get_base_control()
-	_main_screen_button = _find_button_recursive(base, "AI")
-	_update_main_screen_button_text()
-
-
-## Recursively searches for a button with specific text.
-func _find_button_recursive(node: Node, text: String) -> Button:
-	if node is Button and node.text == text:
-		return node
-	for child in node.get_children():
-		var result := _find_button_recursive(child, text)
-		if result:
-			return result
-	return null
-
-
-## Updates the main screen button text to show model status.
-func _update_main_screen_button_text() -> void:
-	if not _main_screen_button:
-		return
-
-	# Get available models count
-	var available_count := 0
-	if _ai_service and _ai_service.get_model_manager():
-		var models := _ai_service.get_model_manager().get_available_models()
-		for model in models:
-			if model.is_downloaded():
-				available_count += 1
-
-	if _ai_service and _ai_service.is_model_loaded():
-		var config := _ai_service.get_current_config()
-		_main_screen_button.text = "AI"
-		_main_screen_button.modulate = Color.WHITE
-		var tooltip := ""
-		if config:
-			tooltip = "Modelo activo: %s" % config.display_name
-		else:
-			tooltip = "Modelo cargado"
-		tooltip += "\n%d modelo(s) disponible(s)" % available_count
-		tooltip += "\nClick para gestionar modelos"
-		_main_screen_button.tooltip_text = tooltip
-		# Add green indicator icon
-		_main_screen_button.icon = _create_status_icon(Color("#10b981"))
-	else:
-		_main_screen_button.text = "AI"
-		_main_screen_button.modulate = Color(0.7, 0.7, 0.7)
-		var tooltip := ""
-		if available_count > 0:
-			tooltip = "Sin modelo activo\n%d modelo(s) disponible(s)\nClick para activar un modelo" % available_count
-		else:
-			tooltip = "No hay modelos descargados\nDescarga al menos un modelo AI para usar DialogueGraph\nClick para descargar modelos"
-		_main_screen_button.tooltip_text = tooltip
-		# Add red/gray indicator icon
-		_main_screen_button.icon = _create_status_icon(Color("#6b7280"))
-
-
-## Creates a small colored circle icon for status indication.
-func _create_status_icon(color: Color) -> ImageTexture:
-	var size := 12
-	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
-	var center := Vector2(size / 2.0, size / 2.0)
-	var radius := size / 2.0 - 1.0
-
-	for x in size:
-		for y in size:
-			var dist := Vector2(x, y).distance_to(center)
-			if dist <= radius:
-				# Anti-aliased edge
-				var alpha := clampf(radius - dist + 0.5, 0.0, 1.0)
-				img.set_pixel(x, y, Color(color.r, color.g, color.b, alpha))
-			else:
-				img.set_pixel(x, y, Color(0, 0, 0, 0))
-
-	return ImageTexture.create_from_image(img)
+## Called when a toolbar menu item is pressed.
+func _on_toolbar_menu_id_pressed(id: int) -> void:
+	match id:
+		0:  # AI Models
+			if _model_manager_window:
+				_model_manager_window.show_window()
+		1:  # Dialogue Graph
+			if _dialogue_graph_window:
+				_dialogue_graph_window.show_window()
