@@ -115,8 +115,8 @@ class AIPresetEditorPanel extends VBoxContainer:
 
 
 	func _update_summary(label: RichTextLabel) -> void:
-		var type_name := AIPreset.PresetType.keys()[_preset.preset_type].capitalize()
-		var type_color := _get_preset_type_color(_preset.preset_type)
+		var type_name: String = AIPreset.PresetType.keys()[_preset.preset_type].capitalize()
+		var type_color: Color = _get_preset_type_color(_preset.preset_type)
 		label.text = "[color=#8b949e]%s[/color] | [color=%s]%s[/color] | [color=#8b949e]temp: %.2f[/color]" % [
 			_preset.preset_name if not _preset.preset_name.is_empty() else "Unnamed",
 			type_color.to_html(),
@@ -368,8 +368,9 @@ class AIPresetEditorPanel extends VBoxContainer:
 		items_container.add_theme_constant_override("separation", 2)
 		container.add_child(items_container)
 
-		var rebuild_list: Callable
-		rebuild_list = func():
+		# Use Array wrapper for self-referencing callable
+		var rebuild_ref: Array = [null]
+		rebuild_ref[0] = func() -> void:
 			for child in items_container.get_children():
 				child.queue_free()
 
@@ -383,7 +384,7 @@ class AIPresetEditorPanel extends VBoxContainer:
 				item_edit.placeholder_text = placeholder
 				item_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				var idx := i
-				item_edit.text_changed.connect(func(new_text: String):
+				item_edit.text_changed.connect(func(new_text: String) -> void:
 					var current_arr: Array = _preset.get(property)
 					current_arr[idx] = new_text
 					_preset.emit_changed()
@@ -393,22 +394,22 @@ class AIPresetEditorPanel extends VBoxContainer:
 				var del_btn := Button.new()
 				del_btn.text = "×"
 				del_btn.custom_minimum_size = Vector2(24, 24)
-				del_btn.pressed.connect(func():
+				del_btn.pressed.connect(func() -> void:
 					var current_arr: Array = _preset.get(property)
 					current_arr.remove_at(idx)
 					_preset.emit_changed()
-					rebuild_list.call()
+					(rebuild_ref[0] as Callable).call()
 				)
 				item_hbox.add_child(del_btn)
 
 				items_container.add_child(item_hbox)
 
-		add_btn.pressed.connect(func():
+		add_btn.pressed.connect(func() -> void:
 			var arr: Array = _preset.get(property)
 			arr.append("")
 			_preset.emit_changed()
-			rebuild_list.call()
+			(rebuild_ref[0] as Callable).call()
 		)
 
-		rebuild_list.call()
+		(rebuild_ref[0] as Callable).call()
 		parent.add_child(container)

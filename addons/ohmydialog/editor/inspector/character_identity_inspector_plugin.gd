@@ -307,8 +307,9 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		items_container.add_theme_constant_override("separation", 2)
 		container.add_child(items_container)
 
-		var rebuild_list: Callable
-		rebuild_list = func():
+		# Use Array wrapper for self-referencing callable
+		var rebuild_ref: Array = [null]
+		rebuild_ref[0] = func() -> void:
 			for child in items_container.get_children():
 				child.queue_free()
 
@@ -322,7 +323,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				item_edit.placeholder_text = placeholder
 				item_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				var idx := i
-				item_edit.text_changed.connect(func(new_text: String):
+				item_edit.text_changed.connect(func(new_text: String) -> void:
 					var current_arr: Array = _character.get(property)
 					current_arr[idx] = new_text
 					_character.emit_changed()
@@ -333,25 +334,25 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				var del_btn := Button.new()
 				del_btn.text = "×"
 				del_btn.custom_minimum_size = Vector2(24, 24)
-				del_btn.pressed.connect(func():
+				del_btn.pressed.connect(func() -> void:
 					var current_arr: Array = _character.get(property)
 					current_arr.remove_at(idx)
 					_character.emit_changed()
 					_update_token_display()
-					rebuild_list.call()
+					(rebuild_ref[0] as Callable).call()
 				)
 				item_hbox.add_child(del_btn)
 
 				items_container.add_child(item_hbox)
 
-		add_btn.pressed.connect(func():
+		add_btn.pressed.connect(func() -> void:
 			var arr: Array = _character.get(property)
 			arr.append("")
 			_character.emit_changed()
-			rebuild_list.call()
+			(rebuild_ref[0] as Callable).call()
 		)
 
-		rebuild_list.call()
+		(rebuild_ref[0] as Callable).call()
 		parent.add_child(container)
 
 
@@ -376,8 +377,9 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		items_container.add_theme_constant_override("separation", 2)
 		container.add_child(items_container)
 
-		var rebuild_list: Callable
-		rebuild_list = func():
+		# Use Array wrapper for self-referencing callable
+		var rebuild_ref: Array = [null]
+		rebuild_ref[0] = func() -> void:
 			for child in items_container.get_children():
 				child.queue_free()
 
@@ -392,9 +394,9 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				key_edit.custom_minimum_size.x = 80
 				var old_key: String = key
-				key_edit.text_changed.connect(func(new_key: String):
+				key_edit.text_changed.connect(func(new_key: String) -> void:
 					var current_dict: Dictionary = _character.get(property)
-					var value = current_dict.get(old_key, "")
+					var value: Variant = current_dict.get(old_key, "")
 					current_dict.erase(old_key)
 					current_dict[new_key] = value
 					old_key = new_key
@@ -408,7 +410,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				value_edit.placeholder_text = value_hint
 				value_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				var k: String = key
-				value_edit.text_changed.connect(func(new_value: String):
+				value_edit.text_changed.connect(func(new_value: String) -> void:
 					var current_dict: Dictionary = _character.get(property)
 					current_dict[k] = new_value
 					_character.emit_changed()
@@ -419,25 +421,25 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				var del_btn := Button.new()
 				del_btn.text = "×"
 				del_btn.custom_minimum_size = Vector2(24, 24)
-				del_btn.pressed.connect(func():
+				del_btn.pressed.connect(func() -> void:
 					var current_dict: Dictionary = _character.get(property)
 					current_dict.erase(k)
 					_character.emit_changed()
 					_update_token_display()
-					rebuild_list.call()
+					(rebuild_ref[0] as Callable).call()
 				)
 				item_hbox.add_child(del_btn)
 
 				items_container.add_child(item_hbox)
 
-		add_btn.pressed.connect(func():
+		add_btn.pressed.connect(func() -> void:
 			var dict: Dictionary = _character.get(property)
 			dict["new_%d" % dict.size()] = ""
 			_character.emit_changed()
-			rebuild_list.call()
+			(rebuild_ref[0] as Callable).call()
 		)
 
-		rebuild_list.call()
+		(rebuild_ref[0] as Callable).call()
 		parent.add_child(container)
 
 
