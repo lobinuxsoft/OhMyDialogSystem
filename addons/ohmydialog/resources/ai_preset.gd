@@ -6,6 +6,9 @@ extends Resource
 ##
 ## AIPresets allow quick switching between different generation styles
 ## (creative, consistent, balanced) without reconfiguring parameters.
+##
+## Properties are hidden from Godot's native inspector and displayed
+## via a custom inspector plugin instead.
 
 
 ## Predefined preset types.
@@ -19,96 +22,233 @@ enum PresetType {
 }
 
 
-@export_group("Identity")
+# === PROPERTY STORAGE (no @export - hidden from native inspector) ===
+
+# Identity
 
 ## Human-readable name for this preset.
-@export var preset_name: String = "Custom"
+var preset_name: String = "Custom"
 
 ## Description of when to use this preset.
-@export_multiline var description: String = ""
+var description: String = ""
 
 ## The preset type for quick identification.
-@export var preset_type: PresetType = PresetType.CUSTOM
+var preset_type: PresetType = PresetType.CUSTOM
 
-
-@export_group("Temperature & Sampling")
+# Temperature & Sampling
 
 ## Controls randomness in generation. Higher = more creative, lower = more deterministic.
-## Range: 0.0 to 2.0, Default: 0.7
-@export_range(0.0, 2.0, 0.05) var temperature: float = 0.7
+var temperature: float = 0.7
 
 ## Nucleus sampling: only consider tokens with cumulative probability >= top_p.
-## Lower values = more focused, higher = more diverse.
-## Range: 0.0 to 1.0, Default: 0.9
-@export_range(0.0, 1.0, 0.05) var top_p: float = 0.9
+var top_p: float = 0.9
 
 ## Only consider the top K most likely tokens.
-## Lower = more focused, 0 = disabled.
-## Range: 0 to 100, Default: 40
-@export_range(0, 100, 1) var top_k: int = 40
+var top_k: int = 40
 
 ## Minimum probability for a token to be considered (Min-P sampling).
-## Range: 0.0 to 1.0, Default: 0.05
-@export_range(0.0, 1.0, 0.01) var min_p: float = 0.05
+var min_p: float = 0.05
 
 ## Typical sampling parameter. Lower = more typical/predictable text.
-## Range: 0.0 to 1.0, Default: 1.0 (disabled)
-@export_range(0.0, 1.0, 0.05) var typical_p: float = 1.0
+var typical_p: float = 1.0
 
-
-@export_group("Output Control")
+# Output Control
 
 ## Maximum number of tokens to generate per response.
-## Range: 1 to 4096, Default: 256
-@export_range(1, 4096, 1) var max_tokens: int = 256
+var max_tokens: int = 256
 
 ## Sequences that stop generation when encountered.
-@export var stop_sequences: Array[String] = []
+var stop_sequences: Array[String] = []
 
-
-@export_group("Repetition Control")
+# Repetition Control
 
 ## Penalty for repeating tokens. Higher = less repetition.
-## Range: 1.0 to 2.0, Default: 1.1
-@export_range(1.0, 2.0, 0.05) var repeat_penalty: float = 1.1
+var repeat_penalty: float = 1.1
 
 ## How many recent tokens to consider for repetition penalty.
-## Range: 0 to 256, Default: 64
-@export_range(0, 256, 1) var repeat_last_n: int = 64
+var repeat_last_n: int = 64
 
 ## Frequency penalty (OpenAI-style). Penalizes based on frequency.
-## Range: 0.0 to 2.0, Default: 0.0
-@export_range(0.0, 2.0, 0.1) var frequency_penalty: float = 0.0
+var frequency_penalty: float = 0.0
 
 ## Presence penalty (OpenAI-style). Penalizes if token appeared at all.
-## Range: 0.0 to 2.0, Default: 0.0
-@export_range(0.0, 2.0, 0.1) var presence_penalty: float = 0.0
+var presence_penalty: float = 0.0
 
-
-@export_group("Context")
+# Context
 
 ## Maximum context size in tokens (model-dependent).
-## Range: 512 to 32768, Default: 4096
-@export_range(512, 32768, 256) var context_size: int = 4096
+var context_size: int = 4096
 
 ## Number of tokens to reserve for the response in context window.
-## Range: 64 to 1024, Default: 256
-@export_range(64, 1024, 32) var response_reserve: int = 256
+var response_reserve: int = 256
 
-
-@export_group("Advanced")
+# Advanced
 
 ## Seed for random number generation. -1 = random seed.
-@export var seed: int = -1
+var seed: int = -1
 
 ## Mirostat sampling mode (0 = disabled, 1 = v1, 2 = v2).
-@export_range(0, 2, 1) var mirostat: int = 0
+var mirostat: int = 0
 
 ## Mirostat target entropy (tau). Only used if mirostat > 0.
-@export_range(0.0, 10.0, 0.1) var mirostat_tau: float = 5.0
+var mirostat_tau: float = 5.0
 
 ## Mirostat learning rate (eta). Only used if mirostat > 0.
-@export_range(0.0, 1.0, 0.01) var mirostat_eta: float = 0.1
+var mirostat_eta: float = 0.1
+
+
+# === PROPERTY SYSTEM (for saving/loading without showing in native inspector) ===
+
+func _get_property_list() -> Array[Dictionary]:
+	var properties: Array[Dictionary] = []
+
+	# Identity
+	properties.append({
+		"name": "preset_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "description",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "preset_type",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": ",".join(PresetType.keys()),
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	# Temperature & Sampling
+	properties.append({
+		"name": "temperature",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,2.0,0.05",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "top_p",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,1.0,0.05",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "top_k",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0,100",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "min_p",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,1.0,0.01",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "typical_p",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,1.0,0.05",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	# Output Control
+	properties.append({
+		"name": "max_tokens",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "1,4096",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "stop_sequences",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	# Repetition Control
+	properties.append({
+		"name": "repeat_penalty",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "1.0,2.0,0.05",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "repeat_last_n",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0,256",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "frequency_penalty",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,2.0,0.1",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "presence_penalty",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,2.0,0.1",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	# Context
+	properties.append({
+		"name": "context_size",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "512,32768,256",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "response_reserve",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "64,1024,32",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	# Advanced
+	properties.append({
+		"name": "seed",
+		"type": TYPE_INT,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "mirostat",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0,2",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "mirostat_tau",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,10.0,0.1",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "mirostat_eta",
+		"type": TYPE_FLOAT,
+		"hint": PROPERTY_HINT_RANGE,
+		"hint_string": "0.0,1.0,0.01",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	return properties
 
 
 ## Applies this preset's settings to a LlamaInterface instance.
@@ -197,6 +337,21 @@ static func from_dict(dict: Dictionary) -> AIPreset:
 		preset.stop_sequences.append(seq)
 
 	return preset
+
+
+## Returns true if this preset has been modified from defaults.
+func is_valid() -> bool:
+	return not preset_name.is_empty()
+
+
+## Returns a short summary of the preset for debugging.
+func get_summary() -> String:
+	return "%s (%s) - temp:%.2f, top_p:%.2f" % [
+		preset_name,
+		PresetType.keys()[preset_type].to_lower(),
+		temperature,
+		top_p
+	]
 
 
 # ==================== Factory Methods for Built-in Presets ====================

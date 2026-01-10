@@ -20,6 +20,12 @@ var _character_inspector_plugin: CharacterIdentityInspectorPlugin
 ## Reference to the WorldContext inspector plugin.
 var _world_inspector_plugin: WorldContextInspectorPlugin
 
+## Reference to the ModelConfig inspector plugin.
+var _model_config_inspector_plugin: ModelConfigInspectorPlugin
+
+## Reference to the AIPreset inspector plugin.
+var _ai_preset_inspector_plugin: AIPresetInspectorPlugin
+
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
@@ -53,6 +59,14 @@ func _enter_tree() -> void:
 	# Register inspector plugin for WorldContext
 	_world_inspector_plugin = WorldContextInspectorPlugin.new()
 	add_inspector_plugin(_world_inspector_plugin)
+
+	# Register inspector plugin for ModelConfig
+	_model_config_inspector_plugin = ModelConfigInspectorPlugin.new()
+	add_inspector_plugin(_model_config_inspector_plugin)
+
+	# Register inspector plugin for AIPreset
+	_ai_preset_inspector_plugin = AIPresetInspectorPlugin.new()
+	add_inspector_plugin(_ai_preset_inspector_plugin)
 
 	# Load and instantiate the dialogue graph editor
 	var editor_scene := preload("res://addons/ohmydialog/editor/dialogue_graph_editor.tscn")
@@ -100,6 +114,14 @@ func _exit_tree() -> void:
 	if _world_inspector_plugin:
 		remove_inspector_plugin(_world_inspector_plugin)
 		_world_inspector_plugin = null
+
+	if _model_config_inspector_plugin:
+		remove_inspector_plugin(_model_config_inspector_plugin)
+		_model_config_inspector_plugin = null
+
+	if _ai_preset_inspector_plugin:
+		remove_inspector_plugin(_ai_preset_inspector_plugin)
+		_ai_preset_inspector_plugin = null
 
 	# Remove and clean up the editor
 	if _editor_instance:
