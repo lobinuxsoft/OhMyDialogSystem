@@ -77,33 +77,33 @@ class WorldContextEditorPanel extends VBoxContainer:
 		add_child(header)
 
 		# === SECTIONS ===
-		var identity_content := _create_section("World Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY)
+		var identity_content := _create_section("World Identity")
 		_add_line_edit(identity_content, "ID", "world_id", "unique_world_id")
 		_add_line_edit(identity_content, "Name", "world_name", "World Name")
 		_add_text_edit(identity_content, "Setting", "setting", "Brief description of the setting...", 80)
 		_add_time_period_picker(identity_content)
 
-		var lore_content := _create_section("Lore & History", WikiInspectorTheme.ICON_DIAMOND_DOT)
+		var lore_content := _create_section("Lore & History")
 		_add_text_edit(lore_content, "Lore", "lore", "Deep background lore and history...", 100)
 		_add_dictionary_edit(lore_content, "Factions", "factions", "faction_id", "description")
 
-		var geography_content := _create_section("Geography", WikiInspectorTheme.ICON_CIRCLE_DOT)
+		var geography_content := _create_section("Geography")
 		_add_dictionary_edit(geography_content, "Locations", "locations", "location_id", "description")
 		_add_line_edit(geography_content, "Current Location", "current_location", "location_id or description")
 
-		var characters_content := _create_section("Characters", WikiInspectorTheme.ICON_CIRCLE_TARGET)
+		var characters_content := _create_section("Characters")
 		_add_dictionary_edit(characters_content, "Important NPCs", "important_npcs", "character_id", "brief description")
 
-		var state_content := _create_section("Current State", WikiInspectorTheme.ICON_CIRCLE_HALF_LEFT)
+		var state_content := _create_section("Current State")
 		_add_string_array_edit(state_content, "Current Events", "current_events", "Event happening now...")
 		_add_string_array_edit(state_content, "Rules", "rules", "World constraint or rule...")
 		_add_dictionary_edit(state_content, "Dynamic State", "dynamic_state", "variable_name", "value")
 
-		var tone_content := _create_section("Tone & Style", WikiInspectorTheme.ICON_CIRCLE_HALF_RIGHT)
+		var tone_content := _create_section("Tone & Style")
 		_add_text_edit(tone_content, "Tone", "tone", "Overall tone of the world...", 60)
 		_add_string_array_edit(tone_content, "Forbidden Topics", "forbidden_topics", "Topic to avoid...")
 
-		var preview_content := _create_section("Preview", WikiInspectorTheme.ICON_CIRCLE_HALF_BOTTOM)
+		var preview_content := _create_section("Preview")
 		_add_prompt_preview(preview_content)
 
 		_update_token_display()
@@ -148,7 +148,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 		return header_panel
 
 
-	func _create_section(title: String, icon: String, expanded: bool = false) -> VBoxContainer:
+	func _create_section(title: String, expanded: bool = false) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
 		section_container.add_theme_constant_override("separation", 0)
 
@@ -162,23 +162,14 @@ class WorldContextEditorPanel extends VBoxContainer:
 		header_hbox.alignment = BoxContainer.ALIGNMENT_BEGIN
 		header_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-		# Arrow indicator
+		# Arrow indicator (larger for better visibility)
 		var arrow := Label.new()
 		arrow.text = "▼" if expanded else "▶"
-		arrow.add_theme_font_size_override("font_size", 10)
-		arrow.add_theme_color_override("font_color", WikiInspectorTheme.AI_PURPLE)
+		arrow.add_theme_font_size_override("font_size", 16)
+		arrow.add_theme_color_override("font_color", ACCENT_COLOR)
 		arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(arrow)
-
-		# Large icon
-		var icon_label := Label.new()
-		icon_label.text = icon
-		icon_label.add_theme_font_size_override("font_size", 14)
-		icon_label.add_theme_color_override("font_color", ACCENT_COLOR)
-		icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		header_hbox.add_child(icon_label)
 
 		# Title
 		var title_label := Label.new()

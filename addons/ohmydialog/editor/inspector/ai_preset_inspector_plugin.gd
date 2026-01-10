@@ -80,33 +80,33 @@ class AIPresetEditorPanel extends VBoxContainer:
 		add_child(header)
 
 		# === SECTIONS ===
-		var identity_content := _create_section("Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY)
+		var identity_content := _create_section("Identity")
 		_add_line_edit(identity_content, "Name", "preset_name", "Preset name")
 		_add_text_edit(identity_content, "Description", "description", "When to use this preset...", 60)
 		_add_preset_type_picker(identity_content)
 
-		var sampling_content := _create_section("Temperature & Sampling", WikiInspectorTheme.ICON_BOLT)
+		var sampling_content := _create_section("Temperature & Sampling")
 		_add_slider(sampling_content, "Temperature", "temperature", 0.0, 2.0, 0.05)
 		_add_slider(sampling_content, "Top P", "top_p", 0.0, 1.0, 0.05)
 		_add_spin_box_int(sampling_content, "Top K", "top_k", 0, 100)
 		_add_slider(sampling_content, "Min P", "min_p", 0.0, 1.0, 0.01)
 		_add_slider(sampling_content, "Typical P", "typical_p", 0.0, 1.0, 0.05)
 
-		var output_content := _create_section("Output Control", WikiInspectorTheme.ICON_DIAMOND_DOT)
+		var output_content := _create_section("Output Control")
 		_add_spin_box_int(output_content, "Max Tokens", "max_tokens", 1, 4096)
 		_add_string_array_edit(output_content, "Stop Sequences", "stop_sequences", "\\n, </s>, etc.")
 
-		var repetition_content := _create_section("Repetition Control", WikiInspectorTheme.ICON_CIRCLE_DOT)
+		var repetition_content := _create_section("Repetition Control")
 		_add_slider(repetition_content, "Repeat Penalty", "repeat_penalty", 1.0, 2.0, 0.05)
 		_add_spin_box_int(repetition_content, "Repeat Last N", "repeat_last_n", 0, 256)
 		_add_slider(repetition_content, "Frequency Penalty", "frequency_penalty", 0.0, 2.0, 0.1)
 		_add_slider(repetition_content, "Presence Penalty", "presence_penalty", 0.0, 2.0, 0.1)
 
-		var context_content := _create_section("Context", WikiInspectorTheme.ICON_CIRCLE_TARGET)
+		var context_content := _create_section("Context")
 		_add_spin_box_int(context_content, "Context Size", "context_size", 512, 32768)
 		_add_spin_box_int(context_content, "Response Reserve", "response_reserve", 64, 1024)
 
-		var advanced_content := _create_section("Advanced", WikiInspectorTheme.ICON_GEAR)
+		var advanced_content := _create_section("Advanced")
 		_add_spin_box_int(advanced_content, "Seed", "seed", -1, 999999999)
 		_add_spin_box_int(advanced_content, "Mirostat", "mirostat", 0, 2)
 		_add_slider(advanced_content, "Mirostat Tau", "mirostat_tau", 0.0, 10.0, 0.1)
@@ -181,7 +181,7 @@ class AIPresetEditorPanel extends VBoxContainer:
 				return WikiInspectorTheme.TEXT_SECONDARY
 
 
-	func _create_section(title: String, icon: String, expanded: bool = false) -> VBoxContainer:
+	func _create_section(title: String, expanded: bool = false) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
 		section_container.add_theme_constant_override("separation", 0)
 
@@ -195,23 +195,14 @@ class AIPresetEditorPanel extends VBoxContainer:
 		header_hbox.alignment = BoxContainer.ALIGNMENT_BEGIN
 		header_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-		# Arrow indicator
+		# Arrow indicator (larger for better visibility)
 		var arrow := Label.new()
 		arrow.text = "▼" if expanded else "▶"
-		arrow.add_theme_font_size_override("font_size", 10)
-		arrow.add_theme_color_override("font_color", WikiInspectorTheme.AI_CYAN)
+		arrow.add_theme_font_size_override("font_size", 16)
+		arrow.add_theme_color_override("font_color", ACCENT_COLOR)
 		arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(arrow)
-
-		# Large icon
-		var icon_label := Label.new()
-		icon_label.text = icon
-		icon_label.add_theme_font_size_override("font_size", 14)
-		icon_label.add_theme_color_override("font_color", ACCENT_COLOR)
-		icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		header_hbox.add_child(icon_label)
 
 		# Title
 		var title_label := Label.new()

@@ -80,32 +80,32 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		add_child(header)
 
 		# === SECTIONS ===
-		var identity_content := _create_section("Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY)
+		var identity_content := _create_section("Identity")
 		_add_line_edit(identity_content, "ID", "character_id", "unique_id")
 		_add_line_edit(identity_content, "Name", "character_name", "Display Name")
 		_add_resource_picker(identity_content, "Portrait", "portrait", "Texture2D")
 
-		var personality_content := _create_section("Personality", WikiInspectorTheme.ICON_DIAMOND_DOT)
+		var personality_content := _create_section("Personality")
 		_add_text_edit(personality_content, "Personality", "personality", "Core traits and behavior...", 80)
 		_add_text_edit(personality_content, "Background", "background", "History and origin...", 80)
 		_add_speech_style_picker(personality_content)
 		_add_text_edit(personality_content, "Speech Patterns", "speech_patterns", "Verbal tics, catchphrases...", 60)
 
-		var knowledge_content := _create_section("Knowledge & Secrets", WikiInspectorTheme.ICON_CIRCLE_DOT)
+		var knowledge_content := _create_section("Knowledge & Secrets")
 		_add_string_array_edit(knowledge_content, "Knowledge", "knowledge", "Topic...")
 		_add_string_array_edit(knowledge_content, "Secrets", "secrets", "Secret...")
 
-		var motivation_content := _create_section("Motivation", WikiInspectorTheme.ICON_CIRCLE_TARGET)
+		var motivation_content := _create_section("Motivation")
 		_add_string_array_edit(motivation_content, "Goals", "goals", "Goal...")
 		_add_string_array_edit(motivation_content, "Fears", "fears", "Fear...")
 
-		var relationships_content := _create_section("Relationships", WikiInspectorTheme.ICON_CIRCLE_HALF_LEFT)
+		var relationships_content := _create_section("Relationships")
 		_add_dictionary_edit(relationships_content, "Relationships", "relationships", "character_id", "relationship")
 
-		var examples_content := _create_section("Examples", WikiInspectorTheme.ICON_CIRCLE_HALF_RIGHT)
+		var examples_content := _create_section("Examples")
 		_add_string_array_edit(examples_content, "Example Dialogues", "example_dialogues", "Example line...")
 
-		var preview_content := _create_section("Preview", WikiInspectorTheme.ICON_CIRCLE_HALF_BOTTOM)
+		var preview_content := _create_section("Preview")
 		_add_prompt_preview(preview_content)
 
 		_update_token_display()
@@ -150,7 +150,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		return header_panel
 
 
-	func _create_section(title: String, icon: String, expanded: bool = false) -> VBoxContainer:
+	func _create_section(title: String, expanded: bool = false) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
 		section_container.add_theme_constant_override("separation", 0)
 
@@ -164,25 +164,16 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		header_hbox.alignment = BoxContainer.ALIGNMENT_BEGIN
 		header_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-		# Arrow indicator
+		# Arrow indicator (larger for better visibility)
 		var arrow := Label.new()
 		arrow.text = "▼" if expanded else "▶"
-		arrow.add_theme_font_size_override("font_size", 10)
-		arrow.add_theme_color_override("font_color", WikiInspectorTheme.AI_PURPLE)
+		arrow.add_theme_font_size_override("font_size", 16)
+		arrow.add_theme_color_override("font_color", ACCENT_COLOR)
 		arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(arrow)
 
-		# Large icon
-		var icon_label := Label.new()
-		icon_label.text = icon
-		icon_label.add_theme_font_size_override("font_size", 14)
-		icon_label.add_theme_color_override("font_color", ACCENT_COLOR)
-		icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		header_hbox.add_child(icon_label)
-
-		# Title (uppercase for emphasis instead of bold)
+		# Title
 		var title_label := Label.new()
 		title_label.text = title
 		title_label.add_theme_font_size_override("font_size", 12)
