@@ -3,37 +3,37 @@ class_name CharacterIdentityInspectorPlugin
 extends EditorInspectorPlugin
 ## Custom inspector plugin for CharacterIdentity resources.
 ##
-## Replaces default property editors with a custom panel showing
-## character info, token estimation, and organized editing fields.
+## Provides a wiki-styled editor panel with neural network aesthetic.
+## Properties are stored via _get_property_list() with STORAGE only,
+## so no native Godot properties appear in the inspector.
 
-# Wiki color palette
-const COLOR_AI_BLUE := Color("#3b82f6")
-const COLOR_AI_BLUE_DIM := Color("#2563eb")
-const COLOR_AI_BLUE_DARK := Color("#1e3a5f")
-const COLOR_BG_DARK := Color("#1a1d24")
-const COLOR_BG_SECTION := Color("#252830")
-const COLOR_TEXT_DIM := Color("#9ca3af")
-const COLOR_TEXT := Color("#e5e7eb")
+# === WIKI COLOR PALETTE (Neural Network Theme) ===
+# Backgrounds
+const COLOR_BG_PRIMARY := Color("#0a0d12")
+const COLOR_BG_SECONDARY := Color("#0f1419")
+const COLOR_BG_TERTIARY := Color("#161d26")
+const COLOR_BG_CARD := Color("#121921")
 
-## Properties to hide (we show them in custom panel instead).
-const HIDDEN_PROPERTIES: Array[String] = [
-	"character_id", "character_name", "portrait",
-	"personality", "background", "speech_style", "speech_patterns",
-	"knowledge", "secrets",
-	"goals", "fears",
-	"relationships",
-	"example_dialogues"
-]
+# Text
+const COLOR_TEXT_PRIMARY := Color("#e6edf3")
+const COLOR_TEXT_SECONDARY := Color("#8b949e")
+const COLOR_TEXT_MUTED := Color("#484f58")
+
+# AI Accent Colors
+const COLOR_AI_CYAN := Color("#00d4ff")
+const COLOR_AI_CYAN_DIM := Color("#0099cc")
+const COLOR_AI_PURPLE := Color("#a855f7")
+const COLOR_AI_PURPLE_DIM := Color("#7c3aed")
+const COLOR_AI_GREEN := Color("#10b981")
+const COLOR_AI_PINK := Color("#ec4899")
+const COLOR_AI_ORANGE := Color("#f97316")
+
+# Borders
+const COLOR_BORDER := Color("#21262d")
 
 
 func _can_handle(object: Object) -> bool:
 	return object is CharacterIdentity
-
-
-func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
-	if name in HIDDEN_PROPERTIES:
-		return true
-	return false
 
 
 func _parse_begin(object: Object) -> void:
@@ -45,7 +45,7 @@ func _parse_begin(object: Object) -> void:
 	add_custom_control(panel)
 
 
-## Full editor panel for CharacterIdentity.
+## Full editor panel for CharacterIdentity with wiki-style aesthetics.
 class CharacterIdentityEditorPanel extends VBoxContainer:
 	var _character: CharacterIdentity
 	var _token_label: RichTextLabel
@@ -59,19 +59,30 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		_setup_ui()
 
 	func _setup_ui() -> void:
-		# === MAIN HEADER ===
+		# === MAIN HEADER WITH GRADIENT EFFECT ===
 		var header_panel := PanelContainer.new()
-		header_panel.add_theme_stylebox_override("panel", _create_main_header_style())
+		header_panel.add_theme_stylebox_override("panel", _create_header_style())
 
 		var header_vbox := VBoxContainer.new()
-		header_vbox.add_theme_constant_override("separation", 4)
+		header_vbox.add_theme_constant_override("separation", 6)
+
+		# Title with icon-like prefix
+		var title_hbox := HBoxContainer.new()
+		title_hbox.add_theme_constant_override("separation", 8)
+
+		var icon_label := Label.new()
+		icon_label.text = "◆"
+		icon_label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_AI_CYAN)
+		title_hbox.add_child(icon_label)
 
 		var title := Label.new()
-		title.text = "Character Identity"
-		title.add_theme_font_size_override("font_size", 13)
-		title.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_AI_BLUE)
-		header_vbox.add_child(title)
+		title.text = "CHARACTER IDENTITY"
+		title.add_theme_font_size_override("font_size", 12)
+		title.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_AI_CYAN)
+		title_hbox.add_child(title)
+		header_vbox.add_child(title_hbox)
 
+		# Token display
 		_token_label = RichTextLabel.new()
 		_token_label.bbcode_enabled = true
 		_token_label.fit_content = true
@@ -82,102 +93,116 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		add_child(header_panel)
 
 		# === SECTIONS ===
-		var identity_content := _create_section("Identity", true)
+		var identity_content := _create_section("Identity", "◇", true)
 		_add_line_edit(identity_content, "ID", "character_id", "unique_id")
 		_add_line_edit(identity_content, "Name", "character_name", "Display Name")
 		_add_resource_picker(identity_content, "Portrait", "portrait", "Texture2D")
 
-		var personality_content := _create_section("Personality", true)
+		var personality_content := _create_section("Personality", "◈", true)
 		_add_text_edit(personality_content, "Personality", "personality", "Core traits and behavior...", 80)
 		_add_text_edit(personality_content, "Background", "background", "History and origin...", 80)
 		_add_speech_style_picker(personality_content)
 		_add_text_edit(personality_content, "Speech Patterns", "speech_patterns", "Verbal tics, catchphrases...", 60)
 
-		var knowledge_content := _create_section("Knowledge & Secrets", true)
+		var knowledge_content := _create_section("Knowledge & Secrets", "◉", true)
 		_add_string_array_edit(knowledge_content, "Knowledge", "knowledge", "Topic...")
 		_add_string_array_edit(knowledge_content, "Secrets", "secrets", "Secret...")
 
-		var motivation_content := _create_section("Motivation", false)
+		var motivation_content := _create_section("Motivation", "◎", false)
 		_add_string_array_edit(motivation_content, "Goals", "goals", "Goal...")
 		_add_string_array_edit(motivation_content, "Fears", "fears", "Fear...")
 
-		var relationships_content := _create_section("Relationships", false)
+		var relationships_content := _create_section("Relationships", "◐", false)
 		_add_dictionary_edit(relationships_content, "Relationships", "relationships", "character_id", "relationship")
 
-		var examples_content := _create_section("Examples", false)
+		var examples_content := _create_section("Examples", "◑", false)
 		_add_string_array_edit(examples_content, "Example Dialogues", "example_dialogues", "Example line...")
 
-		var preview_content := _create_section("Preview", false)
+		var preview_content := _create_section("Preview", "◒", false)
 		_add_prompt_preview(preview_content)
 
 		_update_token_display()
 
 
-	func _create_main_header_style() -> StyleBoxFlat:
+	func _create_header_style() -> StyleBoxFlat:
 		var style := StyleBoxFlat.new()
-		style.bg_color = CharacterIdentityInspectorPlugin.COLOR_AI_BLUE_DARK
-		style.border_color = CharacterIdentityInspectorPlugin.COLOR_AI_BLUE
+		style.bg_color = CharacterIdentityInspectorPlugin.COLOR_BG_CARD
+		style.border_color = CharacterIdentityInspectorPlugin.COLOR_AI_CYAN
 		style.set_border_width_all(1)
 		style.border_width_left = 3
-		style.set_corner_radius_all(2)
-		style.set_content_margin_all(10)
+		style.border_width_top = 2
+		style.set_corner_radius_all(4)
+		style.corner_radius_top_left = 6
+		style.corner_radius_top_right = 6
+		style.set_content_margin_all(12)
 		return style
 
 
 	func _create_section_header_style(is_hovered: bool = false) -> StyleBoxFlat:
 		var style := StyleBoxFlat.new()
-		style.bg_color = CharacterIdentityInspectorPlugin.COLOR_BG_SECTION if not is_hovered else CharacterIdentityInspectorPlugin.COLOR_BG_SECTION.lightened(0.1)
+		var base_color := CharacterIdentityInspectorPlugin.COLOR_BG_TERTIARY
+		style.bg_color = base_color if not is_hovered else base_color.lightened(0.08)
+		style.border_color = CharacterIdentityInspectorPlugin.COLOR_BORDER
+		style.set_border_width_all(0)
+		style.border_width_bottom = 1
 		style.set_corner_radius_all(0)
 		style.set_content_margin_all(0)
-		style.content_margin_left = 4
-		style.content_margin_right = 4
-		style.content_margin_top = 6
-		style.content_margin_bottom = 6
+		style.content_margin_left = 8
+		style.content_margin_right = 8
+		style.content_margin_top = 8
+		style.content_margin_bottom = 8
 		return style
 
 
-	func _create_section(title: String, expanded: bool = true) -> VBoxContainer:
+	func _create_section(title: String, icon: String, expanded: bool = true) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
 		section_container.add_theme_constant_override("separation", 0)
 
-		# Section header (looks like Godot's foldable sections)
+		# Section header
 		var header_panel := PanelContainer.new()
 		header_panel.add_theme_stylebox_override("panel", _create_section_header_style())
 
 		var header_hbox := HBoxContainer.new()
-		header_hbox.add_theme_constant_override("separation", 6)
+		header_hbox.add_theme_constant_override("separation", 8)
 
 		# Arrow indicator
 		var arrow := Label.new()
 		arrow.text = "▼" if expanded else "▶"
 		arrow.add_theme_font_size_override("font_size", 10)
-		arrow.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		arrow.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_AI_PURPLE)
 		header_hbox.add_child(arrow)
+
+		# Icon
+		var icon_label := Label.new()
+		icon_label.text = icon
+		icon_label.add_theme_font_size_override("font_size", 12)
+		icon_label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_AI_CYAN)
+		header_hbox.add_child(icon_label)
 
 		# Title
 		var title_label := Label.new()
 		title_label.text = title
-		title_label.add_theme_font_size_override("font_size", 13)
-		title_label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT)
+		title_label.add_theme_font_size_override("font_size", 12)
+		title_label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_PRIMARY)
 		header_hbox.add_child(title_label)
 
 		header_panel.add_child(header_hbox)
 		section_container.add_child(header_panel)
 
-		# Content container with indent
+		# Content container
 		var content_panel := PanelContainer.new()
 		var content_style := StyleBoxFlat.new()
-		content_style.bg_color = CharacterIdentityInspectorPlugin.COLOR_BG_DARK
+		content_style.bg_color = CharacterIdentityInspectorPlugin.COLOR_BG_SECONDARY
 		content_style.set_content_margin_all(0)
-		content_style.content_margin_left = 16
-		content_style.content_margin_right = 8
-		content_style.content_margin_top = 8
-		content_style.content_margin_bottom = 8
+		content_style.content_margin_left = 20
+		content_style.content_margin_right = 10
+		content_style.content_margin_top = 10
+		content_style.content_margin_bottom = 10
 		content_panel.add_theme_stylebox_override("panel", content_style)
 		content_panel.visible = expanded
 
 		var content := VBoxContainer.new()
-		content.add_theme_constant_override("separation", 8)
+		content.add_theme_constant_override("separation", 10)
 		content_panel.add_child(content)
 		section_container.add_child(content_panel)
 
@@ -188,7 +213,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 			"expanded": expanded
 		}
 
-		# Make header clickable
+		# Click to toggle
 		header_panel.gui_input.connect(func(event: InputEvent):
 			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 				var section: Dictionary = _sections[title]
@@ -215,8 +240,8 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		var label := Label.new()
 		label.text = label_text
-		label.custom_minimum_size.x = 90
-		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		label.custom_minimum_size.x = 80
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_SECONDARY)
 		hbox.add_child(label)
 
 		var edit := LineEdit.new()
@@ -236,7 +261,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 	func _add_text_edit(parent: Control, label_text: String, property: String, placeholder: String = "", min_height: int = 80) -> void:
 		var label := Label.new()
 		label.text = label_text
-		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_SECONDARY)
 		parent.add_child(label)
 
 		var edit := TextEdit.new()
@@ -259,8 +284,8 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		var label := Label.new()
 		label.text = "Speech Style"
-		label.custom_minimum_size.x = 90
-		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		label.custom_minimum_size.x = 80
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_SECONDARY)
 		hbox.add_child(label)
 
 		var option := OptionButton.new()
@@ -284,8 +309,8 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		var label := Label.new()
 		label.text = label_text
-		label.custom_minimum_size.x = 90
-		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		label.custom_minimum_size.x = 80
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_SECONDARY)
 		hbox.add_child(label)
 
 		var picker := EditorResourcePicker.new()
@@ -309,7 +334,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		var label := Label.new()
 		label.text = label_text
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_SECONDARY)
 		header.add_child(label)
 
 		var add_btn := Button.new()
@@ -378,7 +403,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		var label := Label.new()
 		label.text = label_text
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_SECONDARY)
 		header.add_child(label)
 
 		var add_btn := Button.new()
@@ -464,11 +489,11 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		var preview_panel := PanelContainer.new()
 		preview_panel.visible = false
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.08, 0.09, 0.12)
+		style.bg_color = CharacterIdentityInspectorPlugin.COLOR_BG_PRIMARY
 		style.set_border_width_all(1)
-		style.border_color = CharacterIdentityInspectorPlugin.COLOR_AI_BLUE_DIM
+		style.border_color = CharacterIdentityInspectorPlugin.COLOR_AI_PURPLE_DIM
 		style.set_corner_radius_all(4)
-		style.set_content_margin_all(8)
+		style.set_content_margin_all(10)
 		preview_panel.add_theme_stylebox_override("panel", style)
 
 		var preview_label := RichTextLabel.new()
@@ -510,10 +535,10 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		if tokens > model_ctx * 0.5:
 			text += "[color=#ef4444](%.0f%% - WARNING)[/color]" % usage_percent
 		elif tokens > model_ctx * 0.3:
-			text += "[color=#eab308](%.0f%% - caution)[/color]" % usage_percent
+			text += "[color=#f97316](%.0f%% - caution)[/color]" % usage_percent
 		else:
 			text += "[color=#10b981](%.0f%% OK)[/color]" % usage_percent
 
-		text += "\n[color=#6b7280]Model: %s (%d ctx)[/color]" % [model_name, model_ctx]
+		text += "\n[color=#484f58]Model: %s (%d ctx)[/color]" % [model_name, model_ctx]
 
 		_token_label.text = text

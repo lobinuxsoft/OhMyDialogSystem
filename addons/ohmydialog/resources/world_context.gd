@@ -7,6 +7,9 @@ extends Resource
 ## This resource contains information about the game world that helps
 ## the LLM generate contextually appropriate responses. It includes
 ## setting details, lore, current events, and dynamic state tracking.
+##
+## Properties are hidden from Godot's native inspector and displayed
+## via a custom inspector plugin instead.
 
 
 ## Time period presets that affect the world's technological and cultural level.
@@ -26,78 +29,139 @@ enum TimePeriod {
 }
 
 
-@export_group("World Identity")
+# === PROPERTY STORAGE (no @export - hidden from native inspector) ===
 
 ## Unique identifier for this world context.
-@export var world_id: String = ""
+var world_id: String = ""
 
 ## Display name of the world/setting.
-@export var world_name: String = ""
+var world_name: String = ""
 
 ## Brief description of the setting.
-## Example: "A war-torn kingdom struggling to rebuild after dragon attacks."
-@export_multiline var setting: String = ""
+var setting: String = ""
 
 ## The technological and cultural era of this world.
-@export var time_period: TimePeriod = TimePeriod.FANTASY
-
-
-@export_group("Lore & History")
+var time_period: TimePeriod = TimePeriod.FANTASY
 
 ## Deep background lore and history of the world.
-## Example: "The First War ended 500 years ago when the gods departed..."
-@export_multiline var lore: String = ""
+var lore: String = ""
 
 ## Major factions, nations, or groups in the world.
-## Key: faction_id, Value: description
-## Example: {"iron_guild": "Powerful merchant consortium controlling trade routes"}
-@export var factions: Dictionary = {}
-
-
-@export_group("Geography")
+var factions: Dictionary = {}
 
 ## Known locations in the world.
-## Key: location_id, Value: description
-## Example: {"silverpine_forest": "Ancient woods said to be haunted by spirits"}
-@export var locations: Dictionary = {}
+var locations: Dictionary = {}
 
 ## The current location context (can be updated dynamically).
-@export var current_location: String = ""
-
-
-@export_group("Characters")
+var current_location: String = ""
 
 ## Important NPCs the player might hear about.
-## Key: character_id, Value: brief description
-## Example: {"king_aldric": "The aging king, beloved but seen as weak"}
-@export var important_npcs: Dictionary = {}
-
-
-@export_group("Current State")
+var important_npcs: Dictionary = {}
 
 ## Current events happening in the world (can be updated dynamically).
-## Example: ["The harvest festival begins tomorrow", "Bandits spotted on the north road"]
-@export var current_events: Array[String] = []
+var current_events: Array[String] = []
 
 ## World rules and constraints for the AI.
-## Example: ["Magic is rare and feared", "Dragons are extinct", "No modern technology"]
-@export var rules: Array[String] = []
+var rules: Array[String] = []
 
 ## Dynamic state variables that can change during gameplay.
-## Key: variable_name, Value: current value
-## Example: {"war_status": "ongoing", "season": "winter", "player_reputation": 50}
-@export var dynamic_state: Dictionary = {}
-
-
-@export_group("Tone & Style")
+var dynamic_state: Dictionary = {}
 
 ## The overall tone of the world.
-## Example: "Dark and gritty with moments of hope"
-@export_multiline var tone: String = ""
+var tone: String = ""
 
 ## Topics or themes to avoid in this world.
-## Example: ["modern technology references", "fourth wall breaking"]
-@export var forbidden_topics: Array[String] = []
+var forbidden_topics: Array[String] = []
+
+
+# === PROPERTY SYSTEM (for saving/loading without showing in native inspector) ===
+
+func _get_property_list() -> Array[Dictionary]:
+	var properties: Array[Dictionary] = []
+
+	# All properties use STORAGE only - they save/load but don't show in native inspector
+	# Our custom EditorInspectorPlugin handles the UI
+
+	properties.append({
+		"name": "world_id",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "world_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "setting",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "time_period",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": ",".join(TimePeriod.keys()),
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "lore",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "factions",
+		"type": TYPE_DICTIONARY,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "locations",
+		"type": TYPE_DICTIONARY,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "current_location",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "important_npcs",
+		"type": TYPE_DICTIONARY,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "current_events",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "rules",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "dynamic_state",
+		"type": TYPE_DICTIONARY,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "tone",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "forbidden_topics",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	return properties
 
 
 ## Generates a context prompt that describes the world for the LLM.

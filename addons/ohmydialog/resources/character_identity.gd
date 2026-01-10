@@ -8,6 +8,9 @@ extends Resource
 ## a consistent personality when generating dialogue with the LLM.
 ## The [method to_system_prompt] method converts this data into a system
 ## prompt that instructs the AI how to roleplay as this character.
+##
+## Properties are hidden from Godot's native inspector and displayed
+## via a custom inspector plugin instead.
 
 
 ## Speech style presets that affect how the character communicates.
@@ -25,70 +28,137 @@ enum SpeechStyle {
 }
 
 
-@export_group("Identity")
+# === PROPERTY STORAGE (no @export - hidden from native inspector) ===
 
 ## Unique identifier for this character (used for references and saves).
-@export var character_id: String = ""
+var character_id: String = ""
 
 ## The character's display name shown in dialogues.
-@export var character_name: String = ""
+var character_name: String = ""
 
 ## Optional portrait/avatar texture for UI display.
-@export var portrait: Texture2D = null
-
-
-@export_group("Personality")
+var portrait: Texture2D = null
 
 ## Core personality traits and behavioral tendencies.
-## Example: "Cheerful and optimistic, but hides deep insecurities."
-@export_multiline var personality: String = ""
+var personality: String = ""
 
 ## Character's history, origin, and life experiences.
-## Example: "A former knight who abandoned their oath after witnessing corruption."
-@export_multiline var background: String = ""
+var background: String = ""
 
 ## How the character speaks - affects vocabulary and sentence structure.
-@export var speech_style: SpeechStyle = SpeechStyle.CASUAL
+var speech_style: SpeechStyle = SpeechStyle.CASUAL
 
 ## Custom speech patterns or verbal tics.
-## Example: "Often says 'by the stars' as an exclamation."
-@export_multiline var speech_patterns: String = ""
-
-
-@export_group("Knowledge & Secrets")
+var speech_patterns: String = ""
 
 ## Things this character knows about (topics they can discuss).
-## Example: ["blacksmithing", "local politics", "ancient history"]
-@export var knowledge: Array[String] = []
+var knowledge: Array[String] = []
 
 ## Information the character hides or reveals only under certain conditions.
-## Example: ["Is actually the missing prince", "Knows where the treasure is"]
-@export var secrets: Array[String] = []
-
-
-@export_group("Motivation")
+var secrets: Array[String] = []
 
 ## What the character wants to achieve.
-## Example: ["Find their missing sister", "Become the best blacksmith"]
-@export var goals: Array[String] = []
+var goals: Array[String] = []
 
 ## What the character fears or avoids.
-## Example: ["Being discovered as a fraud", "Deep water"]
-@export var fears: Array[String] = []
-
-
-@export_group("Relationships")
+var fears: Array[String] = []
 
 ## Dictionary of character_id -> relationship description.
-## Example: {"merchant_bob": "Old friend, trusts completely", "guard_captain": "Suspects of corruption"}
-@export var relationships: Dictionary = {}
-
-
-@export_group("Examples")
+var relationships: Dictionary = {}
 
 ## Example dialogue lines that demonstrate the character's voice.
-## These are included in the prompt to help the AI match the style.
-@export var example_dialogues: Array[String] = []
+var example_dialogues: Array[String] = []
+
+
+# === PROPERTY SYSTEM (for saving/loading without showing in native inspector) ===
+
+func _get_property_list() -> Array[Dictionary]:
+	var properties: Array[Dictionary] = []
+
+	# All properties use STORAGE only - they save/load but don't show in native inspector
+	# Our custom EditorInspectorPlugin handles the UI
+
+	properties.append({
+		"name": "character_id",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "character_name",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "portrait",
+		"type": TYPE_OBJECT,
+		"hint": PROPERTY_HINT_RESOURCE_TYPE,
+		"hint_string": "Texture2D",
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "personality",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "background",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "speech_style",
+		"type": TYPE_INT,
+		"hint": PROPERTY_HINT_ENUM,
+		"hint_string": ",".join(SpeechStyle.keys()),
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "speech_patterns",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "knowledge",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "secrets",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "goals",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "fears",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "relationships",
+		"type": TYPE_DICTIONARY,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+	properties.append({
+		"name": "example_dialogues",
+		"type": TYPE_ARRAY,
+		"hint": PROPERTY_HINT_TYPE_STRING,
+		"hint_string": "%d:" % TYPE_STRING,
+		"usage": PROPERTY_USAGE_STORAGE
+	})
+
+	return properties
 
 
 ## Generates a system prompt that instructs the LLM to roleplay as this character.
