@@ -32,18 +32,8 @@ func _parse_begin(object: Object) -> void:
 
 
 func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
-	# Hide "data" dictionary - we show it with custom editors
-	if name == "data":
-		return true  # true = hide default editor
-
-	# Hide internal properties that users shouldn't edit directly
-	if name in ["node_id", "output_count", "editor_position", "editor_size"]:
-		return true
-
-	# Let Godot handle metadata natively
-	# (properties starting with "metadata/" are not intercepted)
-
-	return false  # false = use default editor
+	# Hide all default properties - we handle everything in our custom editors
+	return true
 
 
 func _create_editor_for_type(node_data: DialogueNodeData) -> Control:

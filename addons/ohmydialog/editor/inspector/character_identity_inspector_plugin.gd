@@ -20,6 +20,11 @@ func _parse_begin(object: Object) -> void:
 	add_custom_control(panel)
 
 
+func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
+	# Hide all default properties - we handle everything in our custom panel
+	return true
+
+
 ## Full editor panel for CharacterIdentity with wiki-style aesthetics.
 class CharacterIdentityEditorPanel extends VBoxContainer:
 	const ACCENT_COLOR := WikiInspectorTheme.AI_CYAN
