@@ -8,7 +8,7 @@ extends VBoxContainer
 
 
 ## Accent color for this editor - override in subclasses.
-var ACCENT_COLOR: Color = WikiInspectorTheme.AI_BLUE
+var ACCENT_COLOR: Color = WikiInspectorTheme.AI_CYAN
 
 var _node_data: DialogueNodeData
 var _dialogue_graph: DialogueGraph
