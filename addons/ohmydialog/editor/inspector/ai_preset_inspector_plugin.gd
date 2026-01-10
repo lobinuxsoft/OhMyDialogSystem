@@ -148,33 +148,38 @@ class AIPresetEditorPanel extends VBoxContainer:
 		# Section header
 		var header_panel := PanelContainer.new()
 		header_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_section_header_style())
+		header_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 
 		var header_hbox := HBoxContainer.new()
-		header_hbox.add_theme_constant_override("separation", 10)
+		header_hbox.add_theme_constant_override("separation", 8)
+		header_hbox.alignment = BoxContainer.ALIGNMENT_BEGIN
+		header_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 		# Arrow indicator
 		var arrow := Label.new()
 		arrow.text = "▼" if expanded else "▶"
 		arrow.add_theme_font_size_override("font_size", 10)
 		arrow.add_theme_color_override("font_color", WikiInspectorTheme.AI_CYAN)
+		arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(arrow)
 
 		# Large icon
 		var icon_label := Label.new()
 		icon_label.text = icon
-		icon_label.add_theme_font_size_override("font_size", 16)
+		icon_label.add_theme_font_size_override("font_size", 14)
 		icon_label.add_theme_color_override("font_color", ACCENT_COLOR)
+		icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(icon_label)
 
-		# Bold title
-		var title_label := RichTextLabel.new()
-		title_label.bbcode_enabled = true
-		title_label.fit_content = true
-		title_label.scroll_active = false
-		title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		title_label.text = "[b]%s[/b]" % title
-		title_label.add_theme_font_size_override("normal_font_size", 12)
-		title_label.add_theme_color_override("default_color", WikiInspectorTheme.TEXT_PRIMARY)
+		# Title
+		var title_label := Label.new()
+		title_label.text = title
+		title_label.add_theme_font_size_override("font_size", 12)
+		title_label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_PRIMARY)
+		title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(title_label)
 
 		header_panel.add_child(header_hbox)

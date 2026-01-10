@@ -26,6 +26,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 	var _character: CharacterIdentity
 	var _token_label: RichTextLabel
+	var _preview_label: RichTextLabel
 	var _sections: Dictionary = {}
 
 	func _init(character: CharacterIdentity) -> void:
@@ -118,33 +119,38 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		# Section header
 		var header_panel := PanelContainer.new()
 		header_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_section_header_style())
+		header_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 
 		var header_hbox := HBoxContainer.new()
-		header_hbox.add_theme_constant_override("separation", 10)
+		header_hbox.add_theme_constant_override("separation", 8)
+		header_hbox.alignment = BoxContainer.ALIGNMENT_BEGIN
+		header_hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 		# Arrow indicator
 		var arrow := Label.new()
 		arrow.text = "▼" if expanded else "▶"
 		arrow.add_theme_font_size_override("font_size", 10)
 		arrow.add_theme_color_override("font_color", WikiInspectorTheme.AI_PURPLE)
+		arrow.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		arrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(arrow)
 
 		# Large icon
 		var icon_label := Label.new()
 		icon_label.text = icon
-		icon_label.add_theme_font_size_override("font_size", 16)
+		icon_label.add_theme_font_size_override("font_size", 14)
 		icon_label.add_theme_color_override("font_color", ACCENT_COLOR)
+		icon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		icon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(icon_label)
 
-		# Bold title
-		var title_label := RichTextLabel.new()
-		title_label.bbcode_enabled = true
-		title_label.fit_content = true
-		title_label.scroll_active = false
-		title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		title_label.text = "[b]%s[/b]" % title
-		title_label.add_theme_font_size_override("normal_font_size", 12)
-		title_label.add_theme_color_override("default_color", WikiInspectorTheme.TEXT_PRIMARY)
+		# Title (uppercase for emphasis instead of bold)
+		var title_label := Label.new()
+		title_label.text = title
+		title_label.add_theme_font_size_override("font_size", 12)
+		title_label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_PRIMARY)
+		title_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		header_hbox.add_child(title_label)
 
 		header_panel.add_child(header_hbox)
@@ -436,12 +442,14 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 
 	func _add_prompt_preview(parent: Control) -> void:
-		var btn := Button.new()
-		btn.text = "Show System Prompt"
-		parent.add_child(btn)
+		# Title label
+		var title := Label.new()
+		title.text = "System Prompt"
+		title.add_theme_color_override("font_color", WikiInspectorTheme.AI_PURPLE)
+		title.add_theme_font_size_override("font_size", 11)
+		parent.add_child(title)
 
 		var preview_panel := PanelContainer.new()
-		preview_panel.visible = false
 		preview_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_preview_style(WikiInspectorTheme.AI_PURPLE_DIM))
 
 		var preview_label := RichTextLabel.new()
@@ -449,17 +457,17 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		preview_label.fit_content = true
 		preview_label.scroll_active = false
 		preview_label.selection_enabled = true
+
+		# Generate preview immediately
+		var prompt := _character.to_system_prompt()
+		prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
+		preview_label.text = "[code]%s[/code]" % prompt
+
 		preview_panel.add_child(preview_label)
 		parent.add_child(preview_panel)
 
-		btn.pressed.connect(func():
-			preview_panel.visible = not preview_panel.visible
-			btn.text = "Hide System Prompt" if preview_panel.visible else "Show System Prompt"
-			if preview_panel.visible:
-				var prompt := _character.to_system_prompt()
-				prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
-				preview_label.text = "[code]%s[/code]" % prompt
-		)
+		# Store reference for updates
+		_preview_label = preview_label
 
 
 	func _update_token_display() -> void:
@@ -478,3 +486,9 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				model_name = config.display_name
 
 		_token_label.text = WikiInspectorTheme.format_token_display(tokens, model_ctx, model_name)
+
+		# Update preview if visible
+		if _preview_label:
+			var prompt := _character.to_system_prompt()
+			prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
+			_preview_label.text = "[code]%s[/code]" % prompt
