@@ -293,20 +293,37 @@ func _update_main_screen_button_text() -> void:
 	if not _main_screen_button:
 		return
 
+	# Get available models count
+	var available_count := 0
+	if _ai_service and _ai_service.get_model_manager():
+		var models := _ai_service.get_model_manager().get_available_models()
+		for model in models:
+			if model.is_downloaded():
+				available_count += 1
+
 	if _ai_service and _ai_service.is_model_loaded():
 		var config := _ai_service.get_current_config()
 		_main_screen_button.text = "AI"
 		_main_screen_button.modulate = Color.WHITE
+		var tooltip := ""
 		if config:
-			_main_screen_button.tooltip_text = "Model: %s\nClick to manage AI models" % config.display_name
+			tooltip = "Modelo activo: %s" % config.display_name
 		else:
-			_main_screen_button.tooltip_text = "Model loaded\nClick to manage AI models"
+			tooltip = "Modelo cargado"
+		tooltip += "\n%d modelo(s) disponible(s)" % available_count
+		tooltip += "\nClick para gestionar modelos"
+		_main_screen_button.tooltip_text = tooltip
 		# Add green indicator icon
 		_main_screen_button.icon = _create_status_icon(Color("#10b981"))
 	else:
 		_main_screen_button.text = "AI"
 		_main_screen_button.modulate = Color(0.7, 0.7, 0.7)
-		_main_screen_button.tooltip_text = "No model loaded\nClick to manage AI models"
+		var tooltip := ""
+		if available_count > 0:
+			tooltip = "Sin modelo activo\n%d modelo(s) disponible(s)\nClick para activar un modelo" % available_count
+		else:
+			tooltip = "No hay modelos descargados\nDescarga al menos un modelo AI para usar DialogueGraph\nClick para descargar modelos"
+		_main_screen_button.tooltip_text = tooltip
 		# Add red/gray indicator icon
 		_main_screen_button.icon = _create_status_icon(Color("#6b7280"))
 
