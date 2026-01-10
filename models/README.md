@@ -7,9 +7,9 @@ Place your .gguf model files here. Models in this directory:
 ## Downloading Models
 
 Use the Model Manager in the editor:
-1. Open the OhMyDialog dock (bottom panel)
-2. Click "Model Manager" button
-3. Select a model and click "Download"
+1. Click the **AI** button in the editor toolbar
+2. Select **AI Models** from the menu
+3. Select a model and click **Download**
 
 ## Recommended Models
 
