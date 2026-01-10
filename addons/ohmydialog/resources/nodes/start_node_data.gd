@@ -11,11 +11,8 @@ extends DialogueNodeData
 		emit_changed()
 
 ## Path to the AI model (DEPRECATED: use DialogueGraph.model_path instead).
-## Kept for backwards compatibility. Will be removed in a future version.
-@export_file("*.gguf") var model_path: String = "":
-	set(value):
-		model_path = value
-		emit_changed()
+## Hidden from inspector. Kept only for loading old resources.
+@export_storage var model_path: String = ""
 
 
 func _get_node_type() -> DialogueNodeData.NodeType:
