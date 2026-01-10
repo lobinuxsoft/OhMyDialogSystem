@@ -77,7 +77,7 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		add_child(header)
 
 		# === SECTIONS ===
-		var info_content := _create_section("Model Info", WikiInspectorTheme.ICON_DIAMOND_EMPTY, true)
+		var info_content := _create_section("Model Info", WikiInspectorTheme.ICON_DIAMOND_EMPTY)
 		_add_line_edit(info_content, "ID", "id", "model-id")
 		_add_line_edit(info_content, "Display Name", "display_name", "Model Name")
 		_add_text_edit(info_content, "Description", "description", "Model description...", 60)
@@ -87,7 +87,7 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		_add_check_box(info_content, "Is Custom", "is_custom")
 		_add_check_box(info_content, "Include in Export", "include_in_export")
 
-		var sampling_content := _create_section("Default Sampling", WikiInspectorTheme.ICON_DIAMOND_DOT, true)
+		var sampling_content := _create_section("Default Sampling", WikiInspectorTheme.ICON_DIAMOND_DOT)
 		_add_slider(sampling_content, "Temperature", "default_temperature", 0.0, 2.0, 0.01)
 		_add_slider(sampling_content, "Top P", "default_top_p", 0.0, 1.0, 0.01)
 		_add_spin_box_int(sampling_content, "Top K", "default_top_k", 0, 100)
@@ -95,12 +95,12 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		_add_slider(sampling_content, "Repeat Penalty", "default_repeat_penalty", 1.0, 2.0, 0.01)
 		_add_slider(sampling_content, "Min P", "default_min_p", 0.0, 1.0, 0.01)
 
-		var context_content := _create_section("Context Settings", WikiInspectorTheme.ICON_GEAR, false)
+		var context_content := _create_section("Context Settings", WikiInspectorTheme.ICON_GEAR)
 		_add_spin_box_int(context_content, "Context Size", "n_ctx", 512, 131072)
 		_add_spin_box_int(context_content, "GPU Layers", "n_gpu_layers", 0, 999)
 		_add_spin_box_int(context_content, "Batch Size", "n_batch", 1, 4096)
 
-		var status_content := _create_section("Status", WikiInspectorTheme.ICON_CIRCLE_DOT, false)
+		var status_content := _create_section("Status", WikiInspectorTheme.ICON_CIRCLE_DOT)
 		_add_status_display(status_content)
 
 
@@ -156,7 +156,7 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		]
 
 
-	func _create_section(title: String, icon: String, expanded: bool = true) -> VBoxContainer:
+	func _create_section(title: String, icon: String, expanded: bool = false) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
 		section_container.add_theme_constant_override("separation", 0)
 

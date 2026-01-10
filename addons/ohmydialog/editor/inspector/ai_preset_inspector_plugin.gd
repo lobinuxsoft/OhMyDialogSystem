@@ -80,33 +80,33 @@ class AIPresetEditorPanel extends VBoxContainer:
 		add_child(header)
 
 		# === SECTIONS ===
-		var identity_content := _create_section("Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY, true)
+		var identity_content := _create_section("Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY)
 		_add_line_edit(identity_content, "Name", "preset_name", "Preset name")
 		_add_text_edit(identity_content, "Description", "description", "When to use this preset...", 60)
 		_add_preset_type_picker(identity_content)
 
-		var sampling_content := _create_section("Temperature & Sampling", WikiInspectorTheme.ICON_BOLT, true)
+		var sampling_content := _create_section("Temperature & Sampling", WikiInspectorTheme.ICON_BOLT)
 		_add_slider(sampling_content, "Temperature", "temperature", 0.0, 2.0, 0.05)
 		_add_slider(sampling_content, "Top P", "top_p", 0.0, 1.0, 0.05)
 		_add_spin_box_int(sampling_content, "Top K", "top_k", 0, 100)
 		_add_slider(sampling_content, "Min P", "min_p", 0.0, 1.0, 0.01)
 		_add_slider(sampling_content, "Typical P", "typical_p", 0.0, 1.0, 0.05)
 
-		var output_content := _create_section("Output Control", WikiInspectorTheme.ICON_DIAMOND_DOT, true)
+		var output_content := _create_section("Output Control", WikiInspectorTheme.ICON_DIAMOND_DOT)
 		_add_spin_box_int(output_content, "Max Tokens", "max_tokens", 1, 4096)
 		_add_string_array_edit(output_content, "Stop Sequences", "stop_sequences", "\\n, </s>, etc.")
 
-		var repetition_content := _create_section("Repetition Control", WikiInspectorTheme.ICON_CIRCLE_DOT, false)
+		var repetition_content := _create_section("Repetition Control", WikiInspectorTheme.ICON_CIRCLE_DOT)
 		_add_slider(repetition_content, "Repeat Penalty", "repeat_penalty", 1.0, 2.0, 0.05)
 		_add_spin_box_int(repetition_content, "Repeat Last N", "repeat_last_n", 0, 256)
 		_add_slider(repetition_content, "Frequency Penalty", "frequency_penalty", 0.0, 2.0, 0.1)
 		_add_slider(repetition_content, "Presence Penalty", "presence_penalty", 0.0, 2.0, 0.1)
 
-		var context_content := _create_section("Context", WikiInspectorTheme.ICON_CIRCLE_TARGET, false)
+		var context_content := _create_section("Context", WikiInspectorTheme.ICON_CIRCLE_TARGET)
 		_add_spin_box_int(context_content, "Context Size", "context_size", 512, 32768)
 		_add_spin_box_int(context_content, "Response Reserve", "response_reserve", 64, 1024)
 
-		var advanced_content := _create_section("Advanced", WikiInspectorTheme.ICON_GEAR, false)
+		var advanced_content := _create_section("Advanced", WikiInspectorTheme.ICON_GEAR)
 		_add_spin_box_int(advanced_content, "Seed", "seed", -1, 999999999)
 		_add_spin_box_int(advanced_content, "Mirostat", "mirostat", 0, 2)
 		_add_slider(advanced_content, "Mirostat Tau", "mirostat_tau", 0.0, 10.0, 0.1)
@@ -181,7 +181,7 @@ class AIPresetEditorPanel extends VBoxContainer:
 				return WikiInspectorTheme.TEXT_SECONDARY
 
 
-	func _create_section(title: String, icon: String, expanded: bool = true) -> VBoxContainer:
+	func _create_section(title: String, icon: String, expanded: bool = false) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
 		section_container.add_theme_constant_override("separation", 0)
 

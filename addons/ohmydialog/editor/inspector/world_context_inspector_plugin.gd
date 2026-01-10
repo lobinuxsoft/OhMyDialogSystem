@@ -77,33 +77,33 @@ class WorldContextEditorPanel extends VBoxContainer:
 		add_child(header)
 
 		# === SECTIONS ===
-		var identity_content := _create_section("World Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY, true)
+		var identity_content := _create_section("World Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY)
 		_add_line_edit(identity_content, "ID", "world_id", "unique_world_id")
 		_add_line_edit(identity_content, "Name", "world_name", "World Name")
 		_add_text_edit(identity_content, "Setting", "setting", "Brief description of the setting...", 80)
 		_add_time_period_picker(identity_content)
 
-		var lore_content := _create_section("Lore & History", WikiInspectorTheme.ICON_DIAMOND_DOT, true)
+		var lore_content := _create_section("Lore & History", WikiInspectorTheme.ICON_DIAMOND_DOT)
 		_add_text_edit(lore_content, "Lore", "lore", "Deep background lore and history...", 100)
 		_add_dictionary_edit(lore_content, "Factions", "factions", "faction_id", "description")
 
-		var geography_content := _create_section("Geography", WikiInspectorTheme.ICON_CIRCLE_DOT, true)
+		var geography_content := _create_section("Geography", WikiInspectorTheme.ICON_CIRCLE_DOT)
 		_add_dictionary_edit(geography_content, "Locations", "locations", "location_id", "description")
 		_add_line_edit(geography_content, "Current Location", "current_location", "location_id or description")
 
-		var characters_content := _create_section("Characters", WikiInspectorTheme.ICON_CIRCLE_TARGET, false)
+		var characters_content := _create_section("Characters", WikiInspectorTheme.ICON_CIRCLE_TARGET)
 		_add_dictionary_edit(characters_content, "Important NPCs", "important_npcs", "character_id", "brief description")
 
-		var state_content := _create_section("Current State", WikiInspectorTheme.ICON_CIRCLE_HALF_LEFT, true)
+		var state_content := _create_section("Current State", WikiInspectorTheme.ICON_CIRCLE_HALF_LEFT)
 		_add_string_array_edit(state_content, "Current Events", "current_events", "Event happening now...")
 		_add_string_array_edit(state_content, "Rules", "rules", "World constraint or rule...")
 		_add_dictionary_edit(state_content, "Dynamic State", "dynamic_state", "variable_name", "value")
 
-		var tone_content := _create_section("Tone & Style", WikiInspectorTheme.ICON_CIRCLE_HALF_RIGHT, false)
+		var tone_content := _create_section("Tone & Style", WikiInspectorTheme.ICON_CIRCLE_HALF_RIGHT)
 		_add_text_edit(tone_content, "Tone", "tone", "Overall tone of the world...", 60)
 		_add_string_array_edit(tone_content, "Forbidden Topics", "forbidden_topics", "Topic to avoid...")
 
-		var preview_content := _create_section("Preview", WikiInspectorTheme.ICON_CIRCLE_HALF_BOTTOM, false)
+		var preview_content := _create_section("Preview", WikiInspectorTheme.ICON_CIRCLE_HALF_BOTTOM)
 		_add_prompt_preview(preview_content)
 
 		_update_token_display()
@@ -148,7 +148,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 		return header_panel
 
 
-	func _create_section(title: String, icon: String, expanded: bool = true) -> VBoxContainer:
+	func _create_section(title: String, icon: String, expanded: bool = false) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
 		section_container.add_theme_constant_override("separation", 0)
 
