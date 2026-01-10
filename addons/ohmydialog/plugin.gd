@@ -3,16 +3,14 @@ extends EditorPlugin
 ## OhMyDialogSystem - AI-powered dialogue system for Godot
 ##
 ## Main plugin entry point. Handles initialization and cleanup of
-## editor components, custom types, and dock panels.
+## editor components, custom types, and windows.
+## Delegates DialogueGraph editing to DialogueGraphPlugin.
 
 const AUTOLOAD_NAME := "AIServiceAutoload"
 const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
 
-## Reference to the dialogue graph editor window.
-var _dialogue_graph_window: DialogueGraphWindow
-
-## Reference to the custom inspector plugin.
-var _inspector_plugin: DialogueNodeInspectorPlugin
+## Reference to the DialogueGraph sub-plugin.
+var _dialogue_graph_plugin: DialogueGraphPlugin
 
 ## Reference to the CharacterIdentity inspector plugin.
 var _character_inspector_plugin: CharacterIdentityInspectorPlugin
@@ -25,9 +23,6 @@ var _model_config_inspector_plugin: ModelConfigInspectorPlugin
 
 ## Reference to the AIPreset inspector plugin.
 var _ai_preset_inspector_plugin: AIPresetInspectorPlugin
-
-## Reference to the DialogueGraph inspector plugin.
-var _dialogue_graph_inspector_plugin: DialogueGraphInspectorPlugin
 
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
@@ -51,10 +46,6 @@ func _enter_tree() -> void:
 	_ai_service.name = "AIService"
 	add_child(_ai_service)
 
-	# Register inspector plugin for DialogueNodeData
-	_inspector_plugin = DialogueNodeInspectorPlugin.new()
-	add_inspector_plugin(_inspector_plugin)
-
 	# Register inspector plugin for CharacterIdentity
 	_character_inspector_plugin = CharacterIdentityInspectorPlugin.new()
 	add_inspector_plugin(_character_inspector_plugin)
@@ -71,17 +62,9 @@ func _enter_tree() -> void:
 	_ai_preset_inspector_plugin = AIPresetInspectorPlugin.new()
 	add_inspector_plugin(_ai_preset_inspector_plugin)
 
-	# Initialize dialogue graph editor window
-	_dialogue_graph_window = DialogueGraphWindow.new()
-	EditorInterface.get_base_control().add_child(_dialogue_graph_window)
-
-	# Pass inspector plugin reference to editor for context updates
-	# (wait for window to be ready)
-	_dialogue_graph_window.ready.connect(_on_dialogue_graph_window_ready)
-
-	# Register inspector plugin for DialogueGraph
-	_dialogue_graph_inspector_plugin = DialogueGraphInspectorPlugin.new()
-	add_inspector_plugin(_dialogue_graph_inspector_plugin)
+	# Initialize DialogueGraph sub-plugin
+	_dialogue_graph_plugin = DialogueGraphPlugin.new()
+	add_child(_dialogue_graph_plugin)
 
 	# Connect to AI service signals for main screen button updates
 	_ai_service.model_loaded.connect(_on_model_status_changed)
@@ -104,10 +87,6 @@ func _enter_tree() -> void:
 
 func _exit_tree() -> void:
 	# Remove inspector plugins
-	if _inspector_plugin:
-		remove_inspector_plugin(_inspector_plugin)
-		_inspector_plugin = null
-
 	if _character_inspector_plugin:
 		remove_inspector_plugin(_character_inspector_plugin)
 		_character_inspector_plugin = null
@@ -124,14 +103,10 @@ func _exit_tree() -> void:
 		remove_inspector_plugin(_ai_preset_inspector_plugin)
 		_ai_preset_inspector_plugin = null
 
-	if _dialogue_graph_inspector_plugin:
-		remove_inspector_plugin(_dialogue_graph_inspector_plugin)
-		_dialogue_graph_inspector_plugin = null
-
-	# Clean up dialogue graph window
-	if _dialogue_graph_window:
-		_dialogue_graph_window.queue_free()
-		_dialogue_graph_window = null
+	# Clean up DialogueGraph sub-plugin
+	if _dialogue_graph_plugin:
+		_dialogue_graph_plugin.queue_free()
+		_dialogue_graph_plugin = null
 
 	# Clean up AI service
 	if _ai_service:
@@ -159,21 +134,6 @@ func _register_autoload() -> void:
 	# Register the autoload
 	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
 	print("OhMyDialogSystem: Registered AIService AutoLoad")
-
-
-## Returns true if this plugin handles the given object type.
-func _handles(object: Object) -> bool:
-	return object is DialogueGraph
-
-
-## Called when the user selects an object this plugin handles.
-func _edit(object: Object) -> void:
-	if object is DialogueGraph and _dialogue_graph_window:
-		# Update inspector plugin with current graph for variable lookups
-		if _inspector_plugin:
-			_inspector_plugin.set_current_graph(object)
-		# Open the graph in the floating window
-		_dialogue_graph_window.edit_graph(object)
 
 
 # ==================== Main Screen Plugin Methods ====================
@@ -207,23 +167,13 @@ func _make_visible(visible: bool) -> void:
 ## Called when main screen changes (to track where to return).
 func _on_main_screen_changed(screen_name: String) -> void:
 	# Don't track our own screen as "last"
-	if screen_name != "AI":
+	if screen_name != "AI" and screen_name != "Dialogue":
 		_last_main_screen = screen_name
 
 
 ## Called when model is loaded or unloaded.
 func _on_model_status_changed(_arg = null) -> void:
 	_update_main_screen_button_text()
-
-
-## Called when the dialogue graph window is ready.
-func _on_dialogue_graph_window_ready() -> void:
-	var editor := _dialogue_graph_window.get_editor()
-	if editor and _inspector_plugin:
-		editor.set_inspector_plugin(_inspector_plugin)
-	# Setup the inspector plugin with references
-	if _dialogue_graph_inspector_plugin:
-		_dialogue_graph_inspector_plugin.setup(_dialogue_graph_window)
 
 
 ## Returns to the last active main screen.
