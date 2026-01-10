@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://crksbq8x7vmg1"]
 
 [ext_resource type="Script" path="res://addons/ohmydialog/editor/dialogue_graph_editor.gd" id="1_editor"]
-[ext_resource type="Theme" uid="uid://c0i8d1mm5nrve" path="res://addons/ohmydialog/examples/neural_theme.tres" id="2_theme"]
+[ext_resource type="Theme" uid="uid://c0i8d1mm5nrve" path="res://addons/ohmydialog/editor/themes/neural_theme.tres" id="2_theme"]
 
 [node name="DialogueGraphEditor" type="Control"]
 theme = ExtResource("2_theme")

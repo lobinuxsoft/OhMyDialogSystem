@@ -10,7 +10,7 @@ extends BaseNodeExecutor
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	# Get required components from context
 	var has_context := context.has_method("get_context")
-	# Use duck typing - llama can be LlamaInterface or MockLlamaInterface
+	# Duck typing - any object with generate() method works
 	var llama: Object = context.get_context("llama_interface") if has_context else null
 	var pb: PromptBuilder = context.get_context("prompt_builder") if has_context else null
 	# Character and world come from DialogueGraph context (set when dialogue starts)

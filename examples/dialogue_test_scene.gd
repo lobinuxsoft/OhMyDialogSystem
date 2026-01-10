@@ -1,7 +1,8 @@
 extends Control
 ## Test scene for the OhMyDialog system.
 ##
-## Demonstrates DialogueManager with a sample dialogue graph.
+## Demonstrates DialogueManager with AIService integration.
+## Requires a model to be loaded via Model Manager before AI responses work.
 
 
 @onready var dialogue_panel: PanelContainer = %DialoguePanel
@@ -16,7 +17,6 @@ extends Control
 @onready var debug_label: Label = %DebugLabel
 
 var dialogue_manager: DialogueManager
-var mock_llama: MockLlamaInterface
 
 # Debug tracking
 var last_player_input: String = ""
@@ -34,23 +34,25 @@ func _ready() -> void:
 	_connect_signals()
 	_load_resources()
 	_update_ui_state()
+	_check_ai_service()
 
 
 func _setup_dialogue_system() -> void:
-	# Create DialogueManager
+	# Create DialogueManager - it will use AIService automatically
 	dialogue_manager = DialogueManager.new()
 	add_child(dialogue_manager)
 
-	# Create mock LLM
-	mock_llama = MockLlamaInterface.new()
-	mock_llama.add_character_responses("Marcus", [
-		"Ah yes, that's a fine choice! Only 50 gold pieces!",
-		"A bargain, my friend! You won't find better!",
-		"For you, a special discount! Today only!",
-		"Excellent taste! This item has quite the history...",
-	])
 
-	dialogue_manager.llama_interface = mock_llama
+func _check_ai_service() -> void:
+	var ai_service := AIService.get_singleton()
+	if not ai_service:
+		status_label.text = "AIService not available"
+		return
+
+	if ai_service.is_model_loaded():
+		status_label.text = "Model loaded - Ready to start"
+	else:
+		status_label.text = "No model loaded - Load one via Model Manager for AI responses"
 
 
 func _load_resources() -> void:

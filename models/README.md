@@ -6,10 +6,10 @@ Place your .gguf model files here. Models in this directory:
 
 ## Downloading Models
 
-Use the test scene to download models automatically:
-1. Open `addons/ohmydialog/examples/llama_test_scene.tscn`
-2. Select a model from the dropdown
-3. Click "Download"
+Use the Model Manager in the editor:
+1. Open the OhMyDialog dock (bottom panel)
+2. Click "Model Manager" button
+3. Select a model and click "Download"
 
 ## Recommended Models
 
