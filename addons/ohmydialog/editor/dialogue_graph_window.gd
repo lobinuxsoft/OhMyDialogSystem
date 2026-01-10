@@ -13,7 +13,6 @@ var _editor: DialogueGraphEditor
 
 func _init() -> void:
 	title = "Dialogue Graph Editor"
-	initial_position = Window.WINDOW_INITIAL_POSITION_CENTER_MAIN_WINDOW_SCREEN
 	size = Vector2i(1200, 800)
 	min_size = Vector2i(800, 600)
 	visible = false
