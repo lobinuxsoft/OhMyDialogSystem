@@ -32,8 +32,8 @@ var _dialogue_graph_inspector_plugin: DialogueGraphInspectorPlugin
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
-## Reference to the AI dock panel.
-var _ai_dock: AIDock
+## Reference to the AI Models toolbar button.
+var _ai_models_button: Button
 
 ## Reference to the model required dialog.
 var _model_required_dialog: ModelRequiredDialog
@@ -83,15 +83,23 @@ func _enter_tree() -> void:
 	if _editor_instance.has_method("set_inspector_plugin"):
 		_editor_instance.set_inspector_plugin(_inspector_plugin)
 
+	# Pass AI service reference to editor for model status checks
+	if _editor_instance.has_method("set_ai_service"):
+		_editor_instance.set_ai_service(_ai_service)
+
+	# Connect editor signals
+	if _editor_instance.has_signal("ai_model_required"):
+		_editor_instance.ai_model_required.connect(_on_ai_model_required)
+
 	# Add as bottom panel (more space for graph editing than dock)
 	add_control_to_bottom_panel(_editor_instance, "Dialogue Graph")
 
-	# Initialize AI dock panel
-	var dock_scene := preload("res://addons/ohmydialog/editor/ai_dock.tscn")
-	_ai_dock = dock_scene.instantiate()
-	_ai_dock.config_requested.connect(_on_ai_config_requested)
-	_ai_dock.load_requested.connect(_on_ai_load_requested)
-	add_control_to_dock(DOCK_SLOT_RIGHT_UL, _ai_dock)
+	# Initialize AI Models toolbar button
+	_ai_models_button = Button.new()
+	_ai_models_button.text = "AI Models"
+	_ai_models_button.flat = true
+	_ai_models_button.pressed.connect(_on_ai_models_button_pressed)
+	add_control_to_container(CONTAINER_TOOLBAR, _ai_models_button)
 
 	# Initialize model required dialog
 	var dialog_scene := preload("res://addons/ohmydialog/editor/model_required_dialog.tscn")
@@ -140,11 +148,11 @@ func _exit_tree() -> void:
 		_editor_instance.queue_free()
 		_editor_instance = null
 
-	# Clean up AI dock
-	if _ai_dock:
-		remove_control_from_docks(_ai_dock)
-		_ai_dock.queue_free()
-		_ai_dock = null
+	# Clean up AI Models button
+	if _ai_models_button:
+		remove_control_from_container(CONTAINER_TOOLBAR, _ai_models_button)
+		_ai_models_button.queue_free()
+		_ai_models_button = null
 
 	# Clean up AI service
 	if _ai_service:
@@ -204,15 +212,14 @@ func _make_visible(visible: bool) -> void:
 			make_bottom_panel_item_visible(_editor_instance)
 
 
-## Called when user requests AI configuration from dock.
-## Opens the Model Manager window.
-func _on_ai_config_requested() -> void:
+## Called when user clicks the AI Models toolbar button.
+func _on_ai_models_button_pressed() -> void:
 	if _model_manager_window:
 		_model_manager_window.show_window()
 
 
-## Called when user requests to load a model from dock.
-func _on_ai_load_requested() -> void:
+## Called when an AI node is added but no model is loaded.
+func _on_ai_model_required() -> void:
 	if _model_required_dialog:
 		_model_required_dialog.show_dialog()
 
