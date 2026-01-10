@@ -91,11 +91,13 @@ func _enter_tree() -> void:
 	_toolbar_container = HBoxContainer.new()
 	_toolbar_container.add_theme_constant_override("separation", 2)
 
-	# Plugin icon
+	# Plugin icon (16x16 to match toolbar size)
 	_toolbar_icon = TextureRect.new()
 	_toolbar_icon.texture = preload("res://addons/ohmydialog/icon.png")
+	_toolbar_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_toolbar_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_toolbar_icon.custom_minimum_size = Vector2(16, 16)
+	_toolbar_icon.custom_maximum_size = Vector2(16, 16)
 	_toolbar_container.add_child(_toolbar_icon)
 
 	# AI status label
@@ -273,10 +275,12 @@ func _update_status_indicator(is_loaded: bool, config: ModelConfig) -> void:
 
 	if _ai_service:
 		var model_manager := _ai_service.get_model_manager()
-		if model_manager:
-			for model in model_manager.get_available_models():
-				if model.is_downloaded():
-					downloaded_count += 1
+		if model_manager and model_manager.registry:
+			var models := model_manager.get_available_models()
+			if models:
+				for model in models:
+					if model and model.is_downloaded():
+						downloaded_count += 1
 
 	if is_loaded and config:
 		_ai_label.add_theme_color_override("font_color", Color.GREEN)
