@@ -32,8 +32,11 @@ var _dialogue_graph_inspector_plugin: DialogueGraphInspectorPlugin
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
-## Reference to the AI Models toolbar button.
-var _ai_models_button: Button
+## Reference to the main screen button (found in editor tree).
+var _main_screen_button: Button
+
+## Last active main screen before opening AI Models.
+var _last_main_screen: String = "2D"
 
 ## Reference to the model required dialog.
 var _model_required_dialog: ModelRequiredDialog
@@ -94,12 +97,15 @@ func _enter_tree() -> void:
 	# Add as bottom panel (more space for graph editing than dock)
 	add_control_to_bottom_panel(_editor_instance, "Dialogue Graph")
 
-	# Initialize AI Models toolbar button
-	_ai_models_button = Button.new()
-	_ai_models_button.text = "AI Models"
-	_ai_models_button.flat = true
-	_ai_models_button.pressed.connect(_on_ai_models_button_pressed)
-	add_control_to_container(CONTAINER_TOOLBAR, _ai_models_button)
+	# Connect to AI service signals for main screen button updates
+	_ai_service.model_loaded.connect(_on_model_status_changed)
+	_ai_service.model_unloaded.connect(_on_model_status_changed)
+
+	# Track main screen changes to know where to return
+	main_screen_changed.connect(_on_main_screen_changed)
+
+	# Find and update main screen button after editor is ready
+	call_deferred("_find_and_update_main_screen_button")
 
 	# Initialize model required dialog
 	var dialog_scene := preload("res://addons/ohmydialog/editor/model_required_dialog.tscn")
@@ -148,12 +154,6 @@ func _exit_tree() -> void:
 		_editor_instance.queue_free()
 		_editor_instance = null
 
-	# Clean up AI Models button
-	if _ai_models_button:
-		remove_control_from_container(CONTAINER_TOOLBAR, _ai_models_button)
-		_ai_models_button.queue_free()
-		_ai_models_button = null
-
 	# Clean up AI service
 	if _ai_service:
 		_ai_service.queue_free()
@@ -192,6 +192,24 @@ func _handles(object: Object) -> bool:
 	return object is DialogueGraph
 
 
+# ==================== Main Screen Plugin Methods ====================
+
+
+## Returns true to show this as a main screen button (next to 2D, 3D, Script, etc.)
+func _has_main_screen() -> bool:
+	return true
+
+
+## Returns the name shown in the main screen button.
+func _get_plugin_name() -> String:
+	return "AI"
+
+
+## Returns the icon for the main screen button.
+func _get_plugin_icon() -> Texture2D:
+	return EditorInterface.get_editor_theme().get_icon("Environment", "EditorIcons")
+
+
 ## Called when the user selects an object this plugin handles.
 func _edit(object: Object) -> void:
 	if object is DialogueGraph and _editor_instance:
@@ -205,17 +223,14 @@ func _edit(object: Object) -> void:
 		_editor_instance.call_deferred("edit_graph", object)
 
 
-## Makes the dialogue graph editor visible when editing.
+## Makes the main screen visible. For AI, we open the Model Manager and return.
 func _make_visible(visible: bool) -> void:
-	if _editor_instance:
-		if visible:
-			make_bottom_panel_item_visible(_editor_instance)
-
-
-## Called when user clicks the AI Models toolbar button.
-func _on_ai_models_button_pressed() -> void:
-	if _model_manager_window:
-		_model_manager_window.show_window()
+	if visible:
+		# Open Model Manager Window
+		if _model_manager_window:
+			_model_manager_window.show_window()
+		# Return to previous main screen
+		call_deferred("_return_to_last_screen")
 
 
 ## Called when an AI node is added but no model is loaded.
@@ -233,3 +248,59 @@ func _on_open_model_manager_requested() -> void:
 ## Called when a model is activated from the dialog.
 func _on_model_activated(config: ModelConfig) -> void:
 	print("OhMyDialogSystem: Model activated - %s" % config.display_name)
+	_update_main_screen_button_text()
+
+
+## Called when main screen changes (to track where to return).
+func _on_main_screen_changed(screen_name: String) -> void:
+	# Don't track our own screen as "last"
+	if screen_name != "AI":
+		_last_main_screen = screen_name
+
+
+## Called when model is loaded or unloaded.
+func _on_model_status_changed(_arg = null) -> void:
+	_update_main_screen_button_text()
+
+
+## Returns to the last active main screen.
+func _return_to_last_screen() -> void:
+	EditorInterface.set_main_screen_editor(_last_main_screen)
+
+
+## Finds our main screen button in the editor tree.
+func _find_and_update_main_screen_button() -> void:
+	# Main screen buttons are in a specific container in the editor
+	# We search for our button by checking the text
+	var base := EditorInterface.get_base_control()
+	_main_screen_button = _find_button_recursive(base, "AI")
+	_update_main_screen_button_text()
+
+
+## Recursively searches for a button with specific text.
+func _find_button_recursive(node: Node, text: String) -> Button:
+	if node is Button and node.text == text:
+		return node
+	for child in node.get_children():
+		var result := _find_button_recursive(child, text)
+		if result:
+			return result
+	return null
+
+
+## Updates the main screen button text to show model status.
+func _update_main_screen_button_text() -> void:
+	if not _main_screen_button:
+		return
+
+	if _ai_service and _ai_service.is_model_loaded():
+		var config := _ai_service.get_current_config()
+		if config:
+			_main_screen_button.text = "AI: %s" % config.display_name
+			_main_screen_button.tooltip_text = "AI Model: %s\nClick to open Model Manager" % config.display_name
+		else:
+			_main_screen_button.text = "AI: Active"
+			_main_screen_button.tooltip_text = "AI Model loaded\nClick to open Model Manager"
+	else:
+		_main_screen_button.text = "AI: No Model"
+		_main_screen_button.tooltip_text = "No AI model loaded\nClick to open Model Manager"
