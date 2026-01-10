@@ -51,6 +51,10 @@ signal connection_removed(from_node: String, from_slot: int, to_node: String, to
 ## Controls temperature, sampling parameters, and stop sequences.
 @export var ai_preset: AIPreset = null
 
+## Path to the GGUF model file for AI responses in this dialogue.
+## If empty, uses the currently loaded model from AIService.
+@export_file("*.gguf") var model_path: String = ""
+
 
 @export_group("Variables")
 
@@ -354,6 +358,10 @@ func to_dict() -> Dictionary:
 	if ai_preset:
 		result["ai_preset"] = ai_preset.to_dict()
 
+	# Serialize model_path if set
+	if not model_path.is_empty():
+		result["model_path"] = model_path
+
 	return result
 
 
@@ -370,6 +378,9 @@ static func from_dict(dict: Dictionary) -> DialogueGraph:
 	# Reconstruct ai_preset if present
 	if dict.has("ai_preset"):
 		graph.ai_preset = AIPreset.from_dict(dict["ai_preset"])
+
+	# Reconstruct model_path if present
+	graph.model_path = dict.get("model_path", "")
 
 	# Reconstruct nodes
 	var nodes_dict: Dictionary = dict.get("nodes", {})
@@ -419,6 +430,7 @@ func duplicate_graph() -> DialogueGraph:
 	new_graph.default_character = default_character
 	new_graph.world_context = world_context
 	new_graph.ai_preset = ai_preset
+	new_graph.model_path = model_path
 	new_graph.local_variables = local_variables.duplicate()
 	new_graph.editor_metadata = editor_metadata.duplicate()
 

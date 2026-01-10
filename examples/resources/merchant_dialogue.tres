@@ -170,7 +170,6 @@ editor_position = Vector2(150, 200)
 
 [sub_resource type="Resource" id="node_start"]
 script = ExtResource("5_start")
-model_path = "res://models/qwen2.5-0.5b-instruct-q8_0.gguf"
 node_id = "start_node"
 editor_position = Vector2(-400, 200)
 
@@ -224,6 +223,7 @@ description = "Complex dialogue testing all node types: CHOICE, AI_RESPONSE, STA
 default_character = ExtResource("1_p5lqr")
 world_context = ExtResource("4_1mjo3")
 ai_preset = ExtResource("5_preset")
+model_path = "res://models/qwen2.5-0.5b-instruct-q8_0.gguf"
 local_variables = {
 "merchant_visits": 0,
 "player_reputation": 60,

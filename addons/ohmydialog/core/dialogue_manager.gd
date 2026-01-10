@@ -181,11 +181,19 @@ func start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = DialogueMo
 		if graph.default_character:
 			active_character = graph.default_character
 
-	# Load model from StartNode if specified
+	# Load model (prefer graph.model_path, fallback to start_node.model_path for backwards compat)
 	if graph:
-		var start_node := graph.get_start_node() as StartNodeData
-		if start_node and not start_node.model_path.is_empty():
-			await _load_model_for_dialogue(start_node.model_path)
+		var effective_model_path: String = ""
+		if not graph.model_path.is_empty():
+			effective_model_path = graph.model_path
+		else:
+			var start_node := graph.get_start_node() as StartNodeData
+			if start_node and not start_node.model_path.is_empty():
+				effective_model_path = start_node.model_path
+				push_warning("StartNodeData.model_path is deprecated. Set model_path on DialogueGraph instead.")
+
+		if not effective_model_path.is_empty():
+			await _load_model_for_dialogue(effective_model_path)
 
 	# Apply AI preset (prefer graph.ai_preset, fallback to self.ai_preset for backwards compat)
 	var effective_preset: AIPreset = null

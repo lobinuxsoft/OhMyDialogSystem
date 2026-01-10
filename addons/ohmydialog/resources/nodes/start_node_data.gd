@@ -10,7 +10,8 @@ extends DialogueNodeData
 		trigger = value
 		emit_changed()
 
-## Path to the AI model to use for this dialogue graph.
+## Path to the AI model (DEPRECATED: use DialogueGraph.model_path instead).
+## Kept for backwards compatibility. Will be removed in a future version.
 @export_file("*.gguf") var model_path: String = "":
 	set(value):
 		model_path = value
