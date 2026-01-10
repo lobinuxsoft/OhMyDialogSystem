@@ -123,7 +123,8 @@ class WorldContextSummaryPanel extends VBoxContainer:
 			return
 
 		var tokens := _world.estimate_tokens()
-		var period_name := WorldContext.TimePeriod.keys()[_world.time_period].to_lower().replace("_", " ")
+		var period_name: String = WorldContext.TimePeriod.keys()[_world.time_period]
+		period_name = period_name.to_lower().replace("_", " ")
 
 		var text := ""
 

@@ -123,7 +123,8 @@ class CharacterIdentitySummaryPanel extends VBoxContainer:
 			return
 
 		var tokens := _character.estimate_tokens()
-		var style_name := CharacterIdentity.SpeechStyle.keys()[_character.speech_style].to_lower().replace("_", " ")
+		var style_name: String = CharacterIdentity.SpeechStyle.keys()[_character.speech_style]
+		style_name = style_name.to_lower().replace("_", " ")
 
 		var text := ""
 
