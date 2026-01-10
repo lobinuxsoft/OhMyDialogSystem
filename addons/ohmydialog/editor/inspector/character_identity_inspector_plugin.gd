@@ -3,11 +3,30 @@ class_name CharacterIdentityInspectorPlugin
 extends EditorInspectorPlugin
 ## Custom inspector plugin for CharacterIdentity resources.
 ##
-## Adds a visual summary panel showing character info and token estimation.
+## Replaces default property editors with a custom panel showing
+## character info, token estimation, and organized editing fields.
+
+
+## Properties to hide (we show them in custom panel instead).
+const HIDDEN_PROPERTIES: Array[String] = [
+	"character_id", "character_name", "portrait",
+	"personality", "background", "speech_style", "speech_patterns",
+	"knowledge", "secrets",
+	"goals", "fears",
+	"relationships",
+	"example_dialogues"
+]
 
 
 func _can_handle(object: Object) -> bool:
 	return object is CharacterIdentity
+
+
+func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
+	# Hide our custom properties - we display them in the custom panel
+	if name in HIDDEN_PROPERTIES:
+		return true  # true = hide default editor
+	return false  # false = use default editor
 
 
 func _parse_begin(object: Object) -> void:
@@ -15,90 +34,86 @@ func _parse_begin(object: Object) -> void:
 	if not character:
 		return
 
-	var panel := CharacterIdentitySummaryPanel.new(character)
+	var panel := CharacterIdentityEditorPanel.new(character)
 	add_custom_control(panel)
 
 
-## Visual summary panel for CharacterIdentity.
-class CharacterIdentitySummaryPanel extends VBoxContainer:
+## Full editor panel for CharacterIdentity.
+class CharacterIdentityEditorPanel extends VBoxContainer:
 	var _character: CharacterIdentity
-	var _info_label: RichTextLabel
-	var _preview_button: Button
-	var _preview_container: VBoxContainer
-	var _preview_label: RichTextLabel
-	var _preview_visible: bool = false
-
+	var _token_label: RichTextLabel
 
 	func _init(character: CharacterIdentity) -> void:
 		_character = character
 
-
 	func _ready() -> void:
 		add_theme_constant_override("separation", 8)
 		_setup_ui()
-		_update_info()
-
-		# Listen for changes
-		if _character.changed.is_connected(_update_info):
-			return
-		_character.changed.connect(_update_info)
-
 
 	func _setup_ui() -> void:
-		# Main info panel
-		var panel := PanelContainer.new()
-		panel.add_theme_stylebox_override("panel", _create_panel_style())
+		# === HEADER WITH TOKEN INFO ===
+		var header_panel := PanelContainer.new()
+		header_panel.add_theme_stylebox_override("panel", _create_header_style())
 
-		var vbox := VBoxContainer.new()
-		vbox.add_theme_constant_override("separation", 4)
+		var header_vbox := VBoxContainer.new()
+		header_vbox.add_theme_constant_override("separation", 4)
 
-		# Header
-		var header := Label.new()
-		header.text = "Character Summary"
-		header.add_theme_font_size_override("font_size", 14)
-		header.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-		vbox.add_child(header)
+		var title := Label.new()
+		title.text = "Character Identity"
+		title.add_theme_font_size_override("font_size", 14)
+		title.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		header_vbox.add_child(title)
 
-		# Info label
-		_info_label = RichTextLabel.new()
-		_info_label.bbcode_enabled = true
-		_info_label.fit_content = true
-		_info_label.scroll_active = false
-		_info_label.selection_enabled = true
-		vbox.add_child(_info_label)
+		_token_label = RichTextLabel.new()
+		_token_label.bbcode_enabled = true
+		_token_label.fit_content = true
+		_token_label.scroll_active = false
+		header_vbox.add_child(_token_label)
 
-		panel.add_child(vbox)
-		add_child(panel)
+		header_panel.add_child(header_vbox)
+		add_child(header_panel)
 
-		# Preview button
-		_preview_button = Button.new()
-		_preview_button.text = "Show System Prompt Preview"
-		_preview_button.pressed.connect(_toggle_preview)
-		add_child(_preview_button)
+		# === IDENTITY SECTION ===
+		_add_section("Identity")
+		_add_line_edit("ID", "character_id", "unique_id")
+		_add_line_edit("Name", "character_name", "Display Name")
+		_add_resource_picker("Portrait", "portrait", "Texture2D")
 
-		# Preview container (hidden by default)
-		_preview_container = VBoxContainer.new()
-		_preview_container.visible = false
+		# === PERSONALITY SECTION ===
+		_add_section("Personality")
+		_add_text_edit("Personality", "personality", "Core traits and behavior...", 60)
+		_add_text_edit("Background", "background", "History and origin...", 60)
+		_add_speech_style_picker()
+		_add_text_edit("Speech Patterns", "speech_patterns", "Verbal tics, catchphrases...", 40)
 
-		var preview_panel := PanelContainer.new()
-		preview_panel.add_theme_stylebox_override("panel", _create_preview_style())
+		# === KNOWLEDGE SECTION ===
+		_add_section("Knowledge & Secrets")
+		_add_string_array_edit("Knowledge", "knowledge", "Topics they know about")
+		_add_string_array_edit("Secrets", "secrets", "Hidden information")
 
-		_preview_label = RichTextLabel.new()
-		_preview_label.bbcode_enabled = true
-		_preview_label.fit_content = true
-		_preview_label.scroll_active = false
-		_preview_label.selection_enabled = true
-		_preview_label.custom_minimum_size.y = 100
+		# === MOTIVATION SECTION ===
+		_add_section("Motivation")
+		_add_string_array_edit("Goals", "goals", "What they want to achieve")
+		_add_string_array_edit("Fears", "fears", "What they avoid or dread")
 
-		preview_panel.add_child(_preview_label)
-		_preview_container.add_child(preview_panel)
-		add_child(_preview_container)
+		# === RELATIONSHIPS SECTION ===
+		_add_section("Relationships")
+		_add_dictionary_edit("Relationships", "relationships", "character_id", "description")
 
-		# Separator
+		# === EXAMPLES SECTION ===
+		_add_section("Examples")
+		_add_string_array_edit("Example Dialogues", "example_dialogues", "Sample lines showing their voice")
+
+		# === PREVIEW SECTION ===
+		_add_section("Preview")
+		_add_prompt_preview()
+
 		add_child(HSeparator.new())
 
+		_update_token_display()
 
-	func _create_panel_style() -> StyleBoxFlat:
+
+	func _create_header_style() -> StyleBoxFlat:
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color(0.15, 0.18, 0.25, 0.9)
 		style.border_color = Color(0.3, 0.5, 0.8, 0.5)
@@ -108,68 +123,294 @@ class CharacterIdentitySummaryPanel extends VBoxContainer:
 		return style
 
 
-	func _create_preview_style() -> StyleBoxFlat:
+	func _add_section(title: String) -> void:
+		var label := Label.new()
+		label.text = title
+		label.add_theme_font_size_override("font_size", 12)
+		label.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8))
+		add_child(label)
+
+
+	func _add_line_edit(label_text: String, property: String, placeholder: String = "") -> void:
+		var hbox := HBoxContainer.new()
+
+		var label := Label.new()
+		label.text = label_text + ":"
+		label.custom_minimum_size.x = 100
+		hbox.add_child(label)
+
+		var edit := LineEdit.new()
+		edit.text = _character.get(property)
+		edit.placeholder_text = placeholder
+		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		edit.text_changed.connect(func(new_text: String):
+			_character.set(property, new_text)
+			_character.emit_changed()
+			_update_token_display()
+		)
+		hbox.add_child(edit)
+
+		add_child(hbox)
+
+
+	func _add_text_edit(label_text: String, property: String, placeholder: String = "", min_height: int = 60) -> void:
+		var label := Label.new()
+		label.text = label_text + ":"
+		add_child(label)
+
+		var edit := TextEdit.new()
+		edit.text = _character.get(property)
+		edit.placeholder_text = placeholder
+		edit.custom_minimum_size.y = min_height
+		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+		edit.text_changed.connect(func():
+			_character.set(property, edit.text)
+			_character.emit_changed()
+			_update_token_display()
+		)
+		add_child(edit)
+
+
+	func _add_speech_style_picker() -> void:
+		var hbox := HBoxContainer.new()
+
+		var label := Label.new()
+		label.text = "Speech Style:"
+		label.custom_minimum_size.x = 100
+		hbox.add_child(label)
+
+		var option := OptionButton.new()
+		for style in CharacterIdentity.SpeechStyle.keys():
+			option.add_item(style.capitalize().replace("_", " "))
+		option.select(_character.speech_style)
+		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		option.item_selected.connect(func(index: int):
+			_character.speech_style = index as CharacterIdentity.SpeechStyle
+			_character.emit_changed()
+			_update_token_display()
+		)
+		hbox.add_child(option)
+
+		add_child(hbox)
+
+
+	func _add_resource_picker(label_text: String, property: String, base_type: String) -> void:
+		var hbox := HBoxContainer.new()
+
+		var label := Label.new()
+		label.text = label_text + ":"
+		label.custom_minimum_size.x = 100
+		hbox.add_child(label)
+
+		var picker := EditorResourcePicker.new()
+		picker.base_type = base_type
+		picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		picker.edited_resource = _character.get(property)
+		picker.resource_changed.connect(func(res: Resource):
+			_character.set(property, res)
+			_character.emit_changed()
+		)
+		hbox.add_child(picker)
+
+		add_child(hbox)
+
+
+	func _add_string_array_edit(label_text: String, property: String, placeholder: String) -> void:
+		var container := VBoxContainer.new()
+		container.add_theme_constant_override("separation", 2)
+
+		var header := HBoxContainer.new()
+		var label := Label.new()
+		label.text = label_text + ":"
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		header.add_child(label)
+
+		var add_btn := Button.new()
+		add_btn.text = "+"
+		add_btn.custom_minimum_size.x = 24
+		header.add_child(add_btn)
+		container.add_child(header)
+
+		var items_container := VBoxContainer.new()
+		items_container.add_theme_constant_override("separation", 2)
+		container.add_child(items_container)
+
+		var rebuild_list: Callable
+		rebuild_list = func():
+			for child in items_container.get_children():
+				child.queue_free()
+
+			var arr: Array = _character.get(property)
+			for i in arr.size():
+				var item_hbox := HBoxContainer.new()
+
+				var item_edit := LineEdit.new()
+				item_edit.text = arr[i]
+				item_edit.placeholder_text = placeholder
+				item_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				var idx := i
+				item_edit.text_changed.connect(func(new_text: String):
+					var current_arr: Array = _character.get(property)
+					current_arr[idx] = new_text
+					_character.emit_changed()
+					_update_token_display()
+				)
+				item_hbox.add_child(item_edit)
+
+				var del_btn := Button.new()
+				del_btn.text = "x"
+				del_btn.custom_minimum_size.x = 24
+				del_btn.pressed.connect(func():
+					var current_arr: Array = _character.get(property)
+					current_arr.remove_at(idx)
+					_character.emit_changed()
+					_update_token_display()
+					rebuild_list.call()
+				)
+				item_hbox.add_child(del_btn)
+
+				items_container.add_child(item_hbox)
+
+		add_btn.pressed.connect(func():
+			var arr: Array = _character.get(property)
+			arr.append("")
+			_character.emit_changed()
+			rebuild_list.call()
+		)
+
+		rebuild_list.call()
+		add_child(container)
+
+
+	func _add_dictionary_edit(label_text: String, property: String, key_hint: String, value_hint: String) -> void:
+		var container := VBoxContainer.new()
+		container.add_theme_constant_override("separation", 2)
+
+		var header := HBoxContainer.new()
+		var label := Label.new()
+		label.text = label_text + ":"
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		header.add_child(label)
+
+		var add_btn := Button.new()
+		add_btn.text = "+"
+		add_btn.custom_minimum_size.x = 24
+		header.add_child(add_btn)
+		container.add_child(header)
+
+		var items_container := VBoxContainer.new()
+		items_container.add_theme_constant_override("separation", 2)
+		container.add_child(items_container)
+
+		var rebuild_list: Callable
+		rebuild_list = func():
+			for child in items_container.get_children():
+				child.queue_free()
+
+			var dict: Dictionary = _character.get(property)
+			var keys := dict.keys()
+			for key in keys:
+				var item_hbox := HBoxContainer.new()
+
+				var key_edit := LineEdit.new()
+				key_edit.text = key
+				key_edit.placeholder_text = key_hint
+				key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				key_edit.custom_minimum_size.x = 80
+				var old_key: String = key
+				key_edit.text_changed.connect(func(new_key: String):
+					var current_dict: Dictionary = _character.get(property)
+					var value = current_dict.get(old_key, "")
+					current_dict.erase(old_key)
+					current_dict[new_key] = value
+					old_key = new_key
+					_character.emit_changed()
+					_update_token_display()
+				)
+				item_hbox.add_child(key_edit)
+
+				var value_edit := LineEdit.new()
+				value_edit.text = dict[key]
+				value_edit.placeholder_text = value_hint
+				value_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				var k: String = key
+				value_edit.text_changed.connect(func(new_value: String):
+					var current_dict: Dictionary = _character.get(property)
+					current_dict[k] = new_value
+					_character.emit_changed()
+					_update_token_display()
+				)
+				item_hbox.add_child(value_edit)
+
+				var del_btn := Button.new()
+				del_btn.text = "x"
+				del_btn.custom_minimum_size.x = 24
+				var dk: String = key
+				del_btn.pressed.connect(func():
+					var current_dict: Dictionary = _character.get(property)
+					current_dict.erase(dk)
+					_character.emit_changed()
+					_update_token_display()
+					rebuild_list.call()
+				)
+				item_hbox.add_child(del_btn)
+
+				items_container.add_child(item_hbox)
+
+		add_btn.pressed.connect(func():
+			var dict: Dictionary = _character.get(property)
+			var new_key := "new_key_%d" % dict.size()
+			dict[new_key] = ""
+			_character.emit_changed()
+			rebuild_list.call()
+		)
+
+		rebuild_list.call()
+		add_child(container)
+
+
+	func _add_prompt_preview() -> void:
+		var btn := Button.new()
+		btn.text = "Show System Prompt Preview"
+		add_child(btn)
+
+		var preview_container := VBoxContainer.new()
+		preview_container.visible = false
+
+		var preview_panel := PanelContainer.new()
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color(0.1, 0.12, 0.18, 0.9)
-		style.border_color = Color(0.25, 0.35, 0.5, 0.5)
 		style.set_border_width_all(1)
+		style.border_color = Color(0.25, 0.35, 0.5, 0.5)
 		style.set_corner_radius_all(4)
 		style.set_content_margin_all(8)
-		return style
+		preview_panel.add_theme_stylebox_override("panel", style)
+
+		var preview_label := RichTextLabel.new()
+		preview_label.bbcode_enabled = true
+		preview_label.fit_content = true
+		preview_label.scroll_active = false
+		preview_label.selection_enabled = true
+		preview_panel.add_child(preview_label)
+		preview_container.add_child(preview_panel)
+		add_child(preview_container)
+
+		btn.pressed.connect(func():
+			preview_container.visible = not preview_container.visible
+			btn.text = "Hide System Prompt Preview" if preview_container.visible else "Show System Prompt Preview"
+			if preview_container.visible:
+				var prompt := _character.to_system_prompt()
+				prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
+				preview_label.text = "[code]%s[/code]" % prompt
+		)
 
 
-	func _update_info() -> void:
-		if not _info_label or not _character:
+	func _update_token_display() -> void:
+		if not _token_label:
 			return
 
 		var tokens := _character.estimate_tokens()
-		var style_name: String = CharacterIdentity.SpeechStyle.keys()[_character.speech_style]
-		style_name = style_name.to_lower().replace("_", " ")
-
-		var text := ""
-
-		# Name and ID
-		if not _character.character_name.is_empty():
-			text += "[b]%s[/b]" % _character.character_name
-			if not _character.character_id.is_empty():
-				text += " [color=#888](%s)[/color]" % _character.character_id
-			text += "\n"
-
-		# Speech style
-		text += "[color=#aaa]Style:[/color] %s\n" % style_name.capitalize()
-
-		# Knowledge count
-		if not _character.knowledge.is_empty():
-			text += "[color=#aaa]Knowledge:[/color] %d topics\n" % _character.knowledge.size()
-
-		# Secrets count
-		if not _character.secrets.is_empty():
-			text += "[color=#aaa]Secrets:[/color] %d hidden\n" % _character.secrets.size()
-
-		# Goals count
-		if not _character.goals.is_empty():
-			text += "[color=#aaa]Goals:[/color] %d defined\n" % _character.goals.size()
-
-		# Relationships count
-		if not _character.relationships.is_empty():
-			text += "[color=#aaa]Relationships:[/color] %d characters\n" % _character.relationships.size()
-
-		# Example dialogues count
-		if not _character.example_dialogues.is_empty():
-			text += "[color=#aaa]Examples:[/color] %d lines\n" % _character.example_dialogues.size()
-
-		# Token estimation
-		text += "\n"
-		text += _get_token_status(tokens)
-
-		_info_label.text = text
-
-		# Update preview if visible
-		if _preview_visible:
-			_update_preview()
-
-
-	func _get_token_status(tokens: int) -> String:
 		var model_ctx := 4096
 		var model_name := "unknown"
 
@@ -181,36 +422,15 @@ class CharacterIdentitySummaryPanel extends VBoxContainer:
 				model_name = config.display_name
 
 		var usage_percent := (tokens * 100.0) / model_ctx
-
 		var text := "[b]Token Estimate: ~%d[/b]\n" % tokens
 
 		if tokens > model_ctx * 0.5:
-			text += "[color=#ff6b6b]WARNING: Uses %.0f%% of model context (%d tokens)!\n" % [usage_percent, model_ctx]
-			text += "Consider reducing personality/background detail.[/color]"
+			text += "[color=#ff6b6b]WARNING: Uses %.0f%% of model context (%d tokens)[/color]" % [usage_percent, model_ctx]
 		elif tokens > model_ctx * 0.3:
-			text += "[color=#ffd93d]CAUTION: Uses %.0f%% of model context.\n" % usage_percent
-			text += "Model: %s (%d tokens)[/color]" % [model_name, model_ctx]
+			text += "[color=#ffd93d]CAUTION: Uses %.0f%% of context[/color]\n" % usage_percent
+			text += "[color=#888]Model: %s (%d tokens)[/color]" % [model_name, model_ctx]
 		else:
-			text += "[color=#6bcb77]OK: %.0f%% of context\n" % usage_percent
-			text += "Model: %s (%d tokens)[/color]" % [model_name, model_ctx]
+			text += "[color=#6bcb77]OK: %.0f%% of context[/color]\n" % usage_percent
+			text += "[color=#888]Model: %s (%d tokens)[/color]" % [model_name, model_ctx]
 
-		return text
-
-
-	func _toggle_preview() -> void:
-		_preview_visible = not _preview_visible
-		_preview_container.visible = _preview_visible
-		_preview_button.text = "Hide System Prompt Preview" if _preview_visible else "Show System Prompt Preview"
-
-		if _preview_visible:
-			_update_preview()
-
-
-	func _update_preview() -> void:
-		if not _preview_label or not _character:
-			return
-
-		var prompt := _character.to_system_prompt()
-		# Escape BBCode and show as monospace
-		prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
-		_preview_label.text = "[code]%s[/code]" % prompt
+		_token_label.text = text
