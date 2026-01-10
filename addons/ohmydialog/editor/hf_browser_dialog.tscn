@@ -114,12 +114,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Search for models to browse available GGUF files"
 
-[node name="ViewHFBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
-unique_name_in_owner = true
-layout_mode = 2
-disabled = true
-text = "View on HuggingFace"
-
 [node name="AddBtn" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer/BottomRow"]
 unique_name_in_owner = true
 layout_mode = 2

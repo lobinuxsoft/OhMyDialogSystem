@@ -14,7 +14,6 @@ signal model_selected(config: ModelConfig)
 @onready var _results_tree: Tree = %ResultsTree
 @onready var _files_tree: Tree = %FilesTree
 @onready var _status_label: Label = %StatusLabel
-@onready var _view_hf_btn: Button = %ViewHFBtn
 @onready var _add_btn: Button = %AddBtn
 @onready var _close_btn: Button = %CloseBtn
 
@@ -39,12 +38,11 @@ func _ready() -> void:
 	_results_tree.item_selected.connect(_on_result_selected)
 	_results_tree.button_clicked.connect(_on_results_tree_button_clicked)
 	_files_tree.item_selected.connect(_on_file_selected)
-	_view_hf_btn.pressed.connect(_on_view_hf_pressed)
+	_files_tree.button_clicked.connect(_on_files_tree_button_clicked)
 	_add_btn.pressed.connect(_on_add_pressed)
 	_close_btn.pressed.connect(_on_close_pressed)
 	close_requested.connect(_on_close_pressed)
 
-	_view_hf_btn.disabled = true
 	_add_btn.disabled = true
 
 
@@ -109,7 +107,6 @@ func _do_search() -> void:
 	_files_tree.clear()
 	_selected_model_id = ""
 	_selected_file = {}
-	_view_hf_btn.disabled = true
 	_add_btn.disabled = true
 
 	_hf_api.search_models(query, 100)
@@ -176,7 +173,6 @@ func _on_result_selected() -> void:
 
 	_selected_model_id = model_id
 	_selected_file = {}
-	_view_hf_btn.disabled = false
 	_add_btn.disabled = true
 
 	_files_tree.clear()
@@ -205,6 +201,8 @@ func _on_model_details_completed(model_id: String, files: Array[Dictionary]) -> 
 		var filename = file_info.get("filename", "")
 		item.set_text(0, filename)
 		item.set_metadata(0, file_info)
+		# Add link button to open file page on HuggingFace
+		item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open file in HuggingFace")
 
 		var size_mb = file_info.get("size_mb", 0.0)
 		if size_mb >= 1024:
@@ -245,12 +243,13 @@ func _on_results_tree_button_clicked(item: TreeItem, _column: int, id: int, _mou
 			OS.shell_open("https://huggingface.co/%s" % model_id)
 
 
-func _on_view_hf_pressed() -> void:
-	if _selected_model_id.is_empty():
-		return
-
-	var url := "https://huggingface.co/%s" % _selected_model_id
-	OS.shell_open(url)
+func _on_files_tree_button_clicked(item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
+	if id == BUTTON_ID_OPEN_URL:
+		var file_info = item.get_metadata(0) as Dictionary
+		var filename = file_info.get("filename", "")
+		if not _selected_model_id.is_empty() and not filename.is_empty():
+			# URL format: https://huggingface.co/{model_id}/blob/main/{filename}
+			OS.shell_open("https://huggingface.co/%s/blob/main/%s" % [_selected_model_id, filename])
 
 
 func _on_add_pressed() -> void:
