@@ -17,8 +17,6 @@ signal node_selected(node_data: DialogueNodeData)
 ## Emitted when selection is cleared.
 signal selection_cleared
 
-## Emitted when an AI node is added but no model is loaded.
-signal ai_model_required
 
 
 ## The currently edited DialogueGraph resource.
@@ -54,18 +52,10 @@ var _context_menu_position: Vector2
 ## Reference to inspector plugin for context updates.
 var _inspector_plugin: DialogueNodeInspectorPlugin
 
-## Reference to AI service for model status checks.
-var _ai_service: AIService
-
 
 ## Sets the inspector plugin reference for context updates.
 func set_inspector_plugin(plugin: DialogueNodeInspectorPlugin) -> void:
 	_inspector_plugin = plugin
-
-
-## Sets the AI service reference for model status checks.
-func set_ai_service(service: AIService) -> void:
-	_ai_service = service
 
 
 func _ready() -> void:
@@ -288,11 +278,6 @@ func _create_visual_node(node_data: DialogueNodeData) -> BaseDialogueNode:
 func _add_node(type: DialogueNodeData.NodeType, position: Vector2) -> DialogueNodeData:
 	if not current_graph:
 		return null
-
-	# Check if AI node requires a loaded model
-	if type == DialogueNodeData.NodeType.AI_RESPONSE:
-		if _ai_service and not _ai_service.is_model_loaded():
-			ai_model_required.emit()
 
 	# Convert screen position to graph position
 	var graph_pos := (position + graph_edit.scroll_offset) / graph_edit.zoom

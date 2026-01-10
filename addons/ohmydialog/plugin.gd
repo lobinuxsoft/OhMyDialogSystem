@@ -41,9 +41,6 @@ var _last_main_screen: String = "2D"
 ## Flag to track if user clicked the AI button (vs automatic activation).
 var _user_clicked_ai_button: bool = false
 
-## Reference to the model required dialog.
-var _model_required_dialog: ModelRequiredDialog
-
 ## Reference to the model manager window.
 var _model_manager_window: ModelManagerWindow
 
@@ -89,14 +86,6 @@ func _enter_tree() -> void:
 	if _editor_instance.has_method("set_inspector_plugin"):
 		_editor_instance.set_inspector_plugin(_inspector_plugin)
 
-	# Pass AI service reference to editor for model status checks
-	if _editor_instance.has_method("set_ai_service"):
-		_editor_instance.set_ai_service(_ai_service)
-
-	# Connect editor signals
-	if _editor_instance.has_signal("ai_model_required"):
-		_editor_instance.ai_model_required.connect(_on_ai_model_required)
-
 	# Add as bottom panel (more space for graph editing than dock)
 	add_control_to_bottom_panel(_editor_instance, "Dialogue Graph")
 
@@ -110,13 +99,6 @@ func _enter_tree() -> void:
 
 	# Find and update main screen button after editor is ready
 	call_deferred("_find_and_update_main_screen_button")
-
-	# Initialize model required dialog
-	var dialog_scene := preload("res://addons/ohmydialog/editor/model_required_dialog.tscn")
-	_model_required_dialog = dialog_scene.instantiate()
-	_model_required_dialog.open_model_manager_requested.connect(_on_open_model_manager_requested)
-	_model_required_dialog.model_activated.connect(_on_model_activated)
-	EditorInterface.get_base_control().add_child(_model_required_dialog)
 
 	# Initialize model manager window
 	var manager_scene := preload("res://addons/ohmydialog/editor/model_manager_window.tscn")
@@ -162,11 +144,6 @@ func _exit_tree() -> void:
 	if _ai_service:
 		_ai_service.queue_free()
 		_ai_service = null
-
-	# Clean up model required dialog
-	if _model_required_dialog:
-		_model_required_dialog.queue_free()
-		_model_required_dialog = null
 
 	# Clean up model manager window
 	if _model_manager_window:
@@ -238,24 +215,6 @@ func _make_visible(visible: bool) -> void:
 				_model_manager_window.show_window()
 		# Always return to previous main screen (AI has no actual screen)
 		call_deferred("_return_to_last_screen")
-
-
-## Called when an AI node is added but no model is loaded.
-func _on_ai_model_required() -> void:
-	if _model_required_dialog:
-		_model_required_dialog.show_dialog()
-
-
-## Called when user requests to open the Model Manager from the dialog.
-func _on_open_model_manager_requested() -> void:
-	if _model_manager_window:
-		_model_manager_window.show_window()
-
-
-## Called when a model is activated from the dialog.
-func _on_model_activated(config: ModelConfig) -> void:
-	print("OhMyDialogSystem: Model activated - %s" % config.display_name)
-	_update_main_screen_button_text()
 
 
 ## Called when main screen changes (to track where to return).
