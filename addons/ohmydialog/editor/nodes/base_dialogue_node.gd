@@ -51,6 +51,10 @@ func setup(data: DialogueNodeData, graph: DialogueGraph = null) -> void:
 	if not data.changed.is_connected(_on_data_changed):
 		data.changed.connect(_on_data_changed)
 
+	# Listen for DialogueGraph changes (for nodes that display graph-level data like model_path)
+	if graph and not graph.changed.is_connected(_on_data_changed):
+		graph.changed.connect(_on_data_changed)
+
 	_setup_base_appearance()
 	_create_content_container()
 	_configure_slots()

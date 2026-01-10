@@ -37,13 +37,14 @@ func _refresh_info() -> void:
 	else:
 		text += "[b]Trigger:[/b] %s" % start_node.trigger
 
-	# Model info
+	# Model info (read from DialogueGraph, not StartNode - deprecated)
 	text += "\n"
-	if start_node.model_path.is_empty():
+	var model_path: String = _dialogue_graph.model_path if _dialogue_graph else ""
+	if model_path.is_empty():
 		text += "[color=#f97316]⚠ Sin modelo IA configurado[/color]"
 	else:
-		var model_name := start_node.model_path.get_file().get_basename()
-		if FileAccess.file_exists(start_node.model_path):
+		var model_name := model_path.get_file().get_basename()
+		if FileAccess.file_exists(model_path):
 			text += "[color=#10b981]✓ Modelo: %s[/color]" % model_name
 		else:
 			text += "[color=#ef4444]✗ Modelo no encontrado: %s[/color]" % model_name

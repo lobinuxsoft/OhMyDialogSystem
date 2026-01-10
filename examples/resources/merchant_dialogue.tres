@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=37 format=3 uid="uid://i1sbtg72xp43"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=38 format=3 uid="uid://i1sbtg72xp43"]
 
 [ext_resource type="Resource" uid="uid://cmq5w2y3jwple" path="res://examples/resources/merchant_character.tres" id="1_p5lqr"]
 [ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="2_euopo"]
 [ext_resource type="Resource" path="res://examples/resources/fantasy_world.tres" id="4_1mjo3"]
+[ext_resource type="Resource" uid="uid://ctjs4u3e4vrn3" path="res://examples/resources/dialogue_preset.tres" id="5_preset"]
 [ext_resource type="Script" uid="uid://reckn0fl8oqw" path="res://addons/ohmydialog/resources/nodes/start_node_data.gd" id="5_start"]
 [ext_resource type="Script" uid="uid://csx5x0eq6vwvk" path="res://addons/ohmydialog/resources/nodes/end_node_data.gd" id="6_end"]
 [ext_resource type="Script" uid="uid://bwu44xjwalhb1" path="res://addons/ohmydialog/resources/nodes/ai_response_node_data.gd" id="7_ai"]
@@ -169,7 +170,6 @@ editor_position = Vector2(150, 200)
 
 [sub_resource type="Resource" id="node_start"]
 script = ExtResource("5_start")
-model_path = "res://models/qwen2.5-0.5b-instruct-q8_0.gguf"
 node_id = "start_node"
 editor_position = Vector2(-400, 200)
 
@@ -222,6 +222,8 @@ display_name = "Merchant Demo - Complex Test"
 description = "Complex dialogue testing all node types: CHOICE, AI_RESPONSE, STATIC, CONDITION, VARIABLE, EVENT."
 default_character = ExtResource("1_p5lqr")
 world_context = ExtResource("4_1mjo3")
+ai_preset = ExtResource("5_preset")
+model_path = "res://models/qwen2.5-0.5b-instruct-q8_0.gguf"
 local_variables = {
 "merchant_visits": 0,
 "player_reputation": 60,
