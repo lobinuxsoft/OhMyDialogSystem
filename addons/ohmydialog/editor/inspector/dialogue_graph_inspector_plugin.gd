@@ -415,33 +415,43 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 				var k: String = key
 				item_hbox.add_child(value_edit)
 
-				# Confirm button
-				var confirm_btn := Button.new()
-				confirm_btn.text = "✓"
-				confirm_btn.custom_minimum_size = Vector2(28, 28)
-				confirm_btn.add_theme_color_override("font_color", WikiInspectorTheme.AI_GREEN)
-				confirm_btn.pressed.connect(func() -> void:
+				# Auto-save function for this row
+				var save_changes := func() -> void:
 					if _is_updating:
 						return
 					var old_dict: Dictionary = _graph.get(property).duplicate()
-					var new_dict: Dictionary = old_dict.duplicate()
 					var new_key: String = key_edit.text
 					var type_idx: int = type_btn.selected
 					var new_value: Variant = _convert_value(value_edit.text, TYPE_OPTIONS[type_idx])
 
-					# Handle key rename
+					# Check if anything changed
+					if current_key == new_key and str(old_dict.get(current_key, "")) == str(new_value):
+						return
+
+					var new_dict: Dictionary = old_dict.duplicate()
 					if current_key != new_key:
 						new_dict.erase(current_key)
-
 					new_dict[new_key] = new_value
+
 					_undo_redo.create_action("Update variable")
 					_undo_redo.add_do_property(_graph, property, new_dict)
 					_undo_redo.add_undo_property(_graph, property, old_dict)
 					_undo_redo.add_do_method(_graph, "emit_changed")
 					_undo_redo.add_undo_method(_graph, "emit_changed")
 					_undo_redo.commit_action()
+
+				# Connect auto-save to focus lost and Enter
+				key_edit.focus_exited.connect(save_changes)
+				key_edit.text_submitted.connect(func(_t: String): save_changes.call())
+				value_edit.focus_exited.connect(save_changes)
+				value_edit.text_submitted.connect(func(_t: String): save_changes.call())
+				type_btn.item_selected.connect(func(_idx: int): save_changes.call())
+
+				# Update type color when changed
+				type_btn.item_selected.connect(func(idx: int) -> void:
+					var t: String = TYPE_OPTIONS[idx]
+					type_btn.add_theme_color_override("font_color", TYPE_COLORS.get(t, WikiInspectorTheme.TEXT_PRIMARY))
 				)
-				item_hbox.add_child(confirm_btn)
 
 				# Delete button
 				var del_btn := Button.new()
@@ -462,12 +472,6 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 					_undo_redo.commit_action()
 				)
 				item_hbox.add_child(del_btn)
-
-				# Update type color when changed
-				type_btn.item_selected.connect(func(idx: int) -> void:
-					var t: String = TYPE_OPTIONS[idx]
-					type_btn.add_theme_color_override("font_color", TYPE_COLORS.get(t, WikiInspectorTheme.TEXT_PRIMARY))
-				)
 
 				item_panel.add_child(item_hbox)
 				items_container.add_child(item_panel)
