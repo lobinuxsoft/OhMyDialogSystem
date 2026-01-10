@@ -8,8 +8,14 @@ extends EditorPlugin
 const AUTOLOAD_NAME := "AIServiceAutoload"
 const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
 
+## Reference to the toolbar container (HBoxContainer with indicator + menu).
+var _toolbar_container: HBoxContainer
+
 ## Reference to the toolbar menu button.
 var _toolbar_menu: MenuButton
+
+## Reference to the AI status indicator.
+var _status_indicator: Label
 
 ## Reference to the dialogue graph editor window.
 var _dialogue_graph_window: DialogueGraphWindow
@@ -78,7 +84,19 @@ func _enter_tree() -> void:
 	_model_manager_window = manager_scene.instantiate()
 	EditorInterface.get_base_control().add_child(_model_manager_window)
 
-	# Create toolbar menu button
+	# Create toolbar container with status indicator and menu
+	_toolbar_container = HBoxContainer.new()
+	_toolbar_container.add_theme_constant_override("separation", 4)
+
+	# Status indicator (circle that shows AI model status)
+	_status_indicator = Label.new()
+	_status_indicator.text = "●"
+	_status_indicator.add_theme_font_size_override("font_size", 12)
+	_status_indicator.tooltip_text = "No AI model loaded"
+	_update_status_indicator(false, null)
+	_toolbar_container.add_child(_status_indicator)
+
+	# Menu button
 	_toolbar_menu = MenuButton.new()
 	_toolbar_menu.text = "OhMyDialog"
 	_toolbar_menu.flat = true
@@ -88,18 +106,27 @@ func _enter_tree() -> void:
 	popup.add_item("AI Models", 0)
 	popup.add_item("Dialogue Graph", 1)
 	popup.id_pressed.connect(_on_toolbar_menu_id_pressed)
+	_toolbar_container.add_child(_toolbar_menu)
 
-	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_menu)
+	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_container)
+
+	# Connect to ModelManager signals after a frame (needs AIService to be ready)
+	call_deferred("_connect_model_manager_signals")
 
 	print("OhMyDialogSystem: Plugin loaded")
 
 
 func _exit_tree() -> void:
-	# Remove toolbar menu
-	if _toolbar_menu:
-		remove_control_from_container(CONTAINER_TOOLBAR, _toolbar_menu)
-		_toolbar_menu.queue_free()
+	# Disconnect ModelManager signals
+	_disconnect_model_manager_signals()
+
+	# Remove toolbar container
+	if _toolbar_container:
+		remove_control_from_container(CONTAINER_TOOLBAR, _toolbar_container)
+		_toolbar_container.queue_free()
+		_toolbar_container = null
 		_toolbar_menu = null
+		_status_indicator = null
 
 	# Remove inspector plugins
 	if _node_inspector_plugin:
@@ -184,3 +211,60 @@ func _on_toolbar_menu_id_pressed(id: int) -> void:
 		1:  # Dialogue Graph
 			if _dialogue_graph_window:
 				_dialogue_graph_window.show_window()
+
+
+## Connects to ModelManager signals for status updates.
+func _connect_model_manager_signals() -> void:
+	if not _ai_service:
+		return
+
+	var model_manager := _ai_service.get_model_manager()
+	if not model_manager:
+		return
+
+	if not model_manager.model_loaded.is_connected(_on_model_loaded):
+		model_manager.model_loaded.connect(_on_model_loaded)
+	if not model_manager.model_unloaded.is_connected(_on_model_unloaded):
+		model_manager.model_unloaded.connect(_on_model_unloaded)
+
+	# Check current state
+	if model_manager.is_model_loaded() and model_manager.current_config:
+		_update_status_indicator(true, model_manager.current_config)
+
+
+## Disconnects ModelManager signals.
+func _disconnect_model_manager_signals() -> void:
+	if not _ai_service:
+		return
+
+	var model_manager := _ai_service.get_model_manager()
+	if not model_manager:
+		return
+
+	if model_manager.model_loaded.is_connected(_on_model_loaded):
+		model_manager.model_loaded.disconnect(_on_model_loaded)
+	if model_manager.model_unloaded.is_connected(_on_model_unloaded):
+		model_manager.model_unloaded.disconnect(_on_model_unloaded)
+
+
+## Updates the status indicator appearance.
+func _update_status_indicator(is_loaded: bool, config: ModelConfig) -> void:
+	if not _status_indicator:
+		return
+
+	if is_loaded and config:
+		_status_indicator.add_theme_color_override("font_color", Color.GREEN)
+		_status_indicator.tooltip_text = "Model loaded: %s" % config.display_name
+	else:
+		_status_indicator.add_theme_color_override("font_color", Color.GRAY)
+		_status_indicator.tooltip_text = "No AI model loaded"
+
+
+## Called when a model is loaded.
+func _on_model_loaded(config: ModelConfig) -> void:
+	_update_status_indicator(true, config)
+
+
+## Called when a model is unloaded.
+func _on_model_unloaded() -> void:
+	_update_status_indicator(false, null)
