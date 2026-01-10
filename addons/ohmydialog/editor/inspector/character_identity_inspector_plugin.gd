@@ -28,9 +28,11 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 	var _token_label: RichTextLabel
 	var _preview_label: RichTextLabel
 	var _sections: Dictionary = {}
+	var _undo_redo: EditorUndoRedoManager
 
 	func _init(character: CharacterIdentity) -> void:
 		_character = character
+		_undo_redo = EditorInterface.get_editor_undo_redo()
 
 	func _ready() -> void:
 		add_theme_constant_override("separation", 0)
@@ -208,9 +210,25 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		edit.text = _character.get(property)
 		edit.placeholder_text = placeholder
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		edit.text_changed.connect(func(new_text: String):
-			_character.set(property, new_text)
-			_character.emit_changed()
+		edit.text_submitted.connect(func(new_text: String):
+			var old_value: String = _character.get(property)
+			if old_value == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_character, property, new_text)
+			_undo_redo.add_undo_property(_character, property, old_value)
+			_undo_redo.commit_action()
+			_update_token_display()
+		)
+		edit.focus_exited.connect(func():
+			var new_text: String = edit.text
+			var old_value: String = _character.get(property)
+			if old_value == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_character, property, new_text)
+			_undo_redo.add_undo_property(_character, property, old_value)
+			_undo_redo.commit_action()
 			_update_token_display()
 		)
 		hbox.add_child(edit)
@@ -230,9 +248,16 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		edit.custom_minimum_size.y = min_height
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-		edit.text_changed.connect(func():
-			_character.set(property, edit.text)
-			_character.emit_changed()
+		var last_text: String = edit.text
+		edit.focus_exited.connect(func():
+			var new_text: String = edit.text
+			if last_text == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_character, property, new_text)
+			_undo_redo.add_undo_property(_character, property, last_text)
+			_undo_redo.commit_action()
+			last_text = new_text
 			_update_token_display()
 		)
 		parent.add_child(edit)
@@ -254,8 +279,13 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		option.select(_character.speech_style)
 		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		option.item_selected.connect(func(index: int):
-			_character.speech_style = index as CharacterIdentity.SpeechStyle
-			_character.emit_changed()
+			var old_value: int = _character.speech_style
+			if old_value == index:
+				return
+			_undo_redo.create_action("Change speech_style")
+			_undo_redo.add_do_property(_character, "speech_style", index)
+			_undo_redo.add_undo_property(_character, "speech_style", old_value)
+			_undo_redo.commit_action()
 			_update_token_display()
 		)
 		hbox.add_child(option)
@@ -278,8 +308,11 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		picker.edited_resource = _character.get(property)
 		picker.resource_changed.connect(func(res: Resource):
-			_character.set(property, res)
-			_character.emit_changed()
+			var old_value: Resource = _character.get(property)
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_character, property, res)
+			_undo_redo.add_undo_property(_character, property, old_value)
+			_undo_redo.commit_action()
 		)
 		hbox.add_child(picker)
 
@@ -323,11 +356,27 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				item_edit.placeholder_text = placeholder
 				item_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				var idx := i
-				item_edit.text_changed.connect(func(new_text: String) -> void:
-					var current_arr: Array = _character.get(property)
-					current_arr[idx] = new_text
-					_character.emit_changed()
+				item_edit.text_submitted.connect(func(new_text: String) -> void:
+					var old_arr: Array = _character.get(property).duplicate()
+					var new_arr: Array = old_arr.duplicate()
+					new_arr[idx] = new_text
+					_undo_redo.create_action("Edit %s item" % property)
+					_undo_redo.add_do_property(_character, property, new_arr)
+					_undo_redo.add_undo_property(_character, property, old_arr)
+					_undo_redo.commit_action()
 					_update_token_display()
+				)
+				item_edit.focus_exited.connect(func() -> void:
+					var current_arr: Array = _character.get(property)
+					if idx < current_arr.size() and current_arr[idx] != item_edit.text:
+						var old_arr: Array = current_arr.duplicate()
+						var new_arr: Array = old_arr.duplicate()
+						new_arr[idx] = item_edit.text
+						_undo_redo.create_action("Edit %s item" % property)
+						_undo_redo.add_do_property(_character, property, new_arr)
+						_undo_redo.add_undo_property(_character, property, old_arr)
+						_undo_redo.commit_action()
+						_update_token_display()
 				)
 				item_hbox.add_child(item_edit)
 
@@ -335,9 +384,13 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				del_btn.text = "×"
 				del_btn.custom_minimum_size = Vector2(24, 24)
 				del_btn.pressed.connect(func() -> void:
-					var current_arr: Array = _character.get(property)
-					current_arr.remove_at(idx)
-					_character.emit_changed()
+					var old_arr: Array = _character.get(property).duplicate()
+					var new_arr: Array = old_arr.duplicate()
+					new_arr.remove_at(idx)
+					_undo_redo.create_action("Remove %s item" % property)
+					_undo_redo.add_do_property(_character, property, new_arr)
+					_undo_redo.add_undo_property(_character, property, old_arr)
+					_undo_redo.commit_action()
 					_update_token_display()
 					(rebuild_ref[0] as Callable).call()
 				)
@@ -346,9 +399,13 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				items_container.add_child(item_hbox)
 
 		add_btn.pressed.connect(func() -> void:
-			var arr: Array = _character.get(property)
-			arr.append("")
-			_character.emit_changed()
+			var old_arr: Array = _character.get(property).duplicate()
+			var new_arr: Array = old_arr.duplicate()
+			new_arr.append("")
+			_undo_redo.create_action("Add %s item" % property)
+			_undo_redo.add_do_property(_character, property, new_arr)
+			_undo_redo.add_undo_property(_character, property, old_arr)
+			_undo_redo.commit_action()
 			(rebuild_ref[0] as Callable).call()
 		)
 
@@ -393,14 +450,21 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				key_edit.placeholder_text = key_hint
 				key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				key_edit.custom_minimum_size.x = 80
-				var old_key: String = key
-				key_edit.text_changed.connect(func(new_key: String) -> void:
-					var current_dict: Dictionary = _character.get(property)
-					var value: Variant = current_dict.get(old_key, "")
-					current_dict.erase(old_key)
-					current_dict[new_key] = value
-					old_key = new_key
-					_character.emit_changed()
+				var current_key: String = key
+				key_edit.focus_exited.connect(func() -> void:
+					var new_key: String = key_edit.text
+					if current_key == new_key:
+						return
+					var old_dict: Dictionary = _character.get(property).duplicate()
+					var new_dict: Dictionary = old_dict.duplicate()
+					var value: Variant = new_dict.get(current_key, "")
+					new_dict.erase(current_key)
+					new_dict[new_key] = value
+					_undo_redo.create_action("Rename %s key" % property)
+					_undo_redo.add_do_property(_character, property, new_dict)
+					_undo_redo.add_undo_property(_character, property, old_dict)
+					_undo_redo.commit_action()
+					current_key = new_key
 					_update_token_display()
 				)
 				item_hbox.add_child(key_edit)
@@ -410,10 +474,18 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				value_edit.placeholder_text = value_hint
 				value_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				var k: String = key
-				value_edit.text_changed.connect(func(new_value: String) -> void:
+				value_edit.focus_exited.connect(func() -> void:
+					var new_value: String = value_edit.text
 					var current_dict: Dictionary = _character.get(property)
-					current_dict[k] = new_value
-					_character.emit_changed()
+					if current_dict.get(k, "") == new_value:
+						return
+					var old_dict: Dictionary = current_dict.duplicate()
+					var new_dict: Dictionary = old_dict.duplicate()
+					new_dict[k] = new_value
+					_undo_redo.create_action("Edit %s value" % property)
+					_undo_redo.add_do_property(_character, property, new_dict)
+					_undo_redo.add_undo_property(_character, property, old_dict)
+					_undo_redo.commit_action()
 					_update_token_display()
 				)
 				item_hbox.add_child(value_edit)
@@ -422,9 +494,13 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				del_btn.text = "×"
 				del_btn.custom_minimum_size = Vector2(24, 24)
 				del_btn.pressed.connect(func() -> void:
-					var current_dict: Dictionary = _character.get(property)
-					current_dict.erase(k)
-					_character.emit_changed()
+					var old_dict: Dictionary = _character.get(property).duplicate()
+					var new_dict: Dictionary = old_dict.duplicate()
+					new_dict.erase(k)
+					_undo_redo.create_action("Remove %s entry" % property)
+					_undo_redo.add_do_property(_character, property, new_dict)
+					_undo_redo.add_undo_property(_character, property, old_dict)
+					_undo_redo.commit_action()
 					_update_token_display()
 					(rebuild_ref[0] as Callable).call()
 				)
@@ -433,9 +509,13 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				items_container.add_child(item_hbox)
 
 		add_btn.pressed.connect(func() -> void:
-			var dict: Dictionary = _character.get(property)
-			dict["new_%d" % dict.size()] = ""
-			_character.emit_changed()
+			var old_dict: Dictionary = _character.get(property).duplicate()
+			var new_dict: Dictionary = old_dict.duplicate()
+			new_dict["new_%d" % new_dict.size()] = ""
+			_undo_redo.create_action("Add %s entry" % property)
+			_undo_redo.add_do_property(_character, property, new_dict)
+			_undo_redo.add_undo_property(_character, property, old_dict)
+			_undo_redo.commit_action()
 			(rebuild_ref[0] as Callable).call()
 		)
 

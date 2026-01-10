@@ -26,9 +26,11 @@ class ModelConfigEditorPanel extends VBoxContainer:
 
 	var _config: ModelConfig
 	var _sections: Dictionary = {}
+	var _undo_redo: EditorUndoRedoManager
 
 	func _init(config: ModelConfig) -> void:
 		_config = config
+		_undo_redo = EditorInterface.get_editor_undo_redo()
 
 	func _ready() -> void:
 		add_theme_constant_override("separation", 0)
@@ -215,9 +217,24 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		edit.text = _config.get(property)
 		edit.placeholder_text = placeholder
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		edit.text_changed.connect(func(new_text: String):
-			_config.set(property, new_text)
-			_config.emit_changed()
+		edit.text_submitted.connect(func(new_text: String):
+			var old_value: String = _config.get(property)
+			if old_value == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, new_text)
+			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.commit_action()
+		)
+		edit.focus_exited.connect(func():
+			var new_text: String = edit.text
+			var old_value: String = _config.get(property)
+			if old_value == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, new_text)
+			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.commit_action()
 		)
 		hbox.add_child(edit)
 
@@ -236,9 +253,16 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		edit.custom_minimum_size.y = min_height
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-		edit.text_changed.connect(func():
-			_config.set(property, edit.text)
-			_config.emit_changed()
+		var last_text: String = edit.text
+		edit.focus_exited.connect(func():
+			var new_text: String = edit.text
+			if last_text == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, new_text)
+			_undo_redo.add_undo_property(_config, property, last_text)
+			_undo_redo.commit_action()
+			last_text = new_text
 		)
 		parent.add_child(edit)
 
@@ -257,9 +281,15 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		edit.text = _config.get(property)
 		edit.placeholder_text = "res://models/..."
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		edit.text_changed.connect(func(new_text: String):
-			_config.set(property, new_text)
-			_config.emit_changed()
+		edit.focus_exited.connect(func():
+			var new_text: String = edit.text
+			var old_value: String = _config.get(property)
+			if old_value == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, new_text)
+			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.commit_action()
 		)
 		hbox.add_child(edit)
 
@@ -271,9 +301,12 @@ class ModelConfigEditorPanel extends VBoxContainer:
 			dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 			dialog.add_filter(filter)
 			dialog.file_selected.connect(func(path: String):
+				var old_value: String = _config.get(property)
 				edit.text = path
-				_config.set(property, path)
-				_config.emit_changed()
+				_undo_redo.create_action("Change %s" % property)
+				_undo_redo.add_do_property(_config, property, path)
+				_undo_redo.add_undo_property(_config, property, old_value)
+				_undo_redo.commit_action()
 				dialog.queue_free()
 			)
 			dialog.canceled.connect(func():
@@ -303,9 +336,16 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		spin.step = step
 		spin.value = _config.get(property)
 		spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		spin.value_changed.connect(func(new_val: float):
-			_config.set(property, new_val)
-			_config.emit_changed()
+		var last_value: float = spin.value
+		spin.get_line_edit().focus_exited.connect(func():
+			var new_val: float = spin.value
+			if last_value == new_val:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, new_val)
+			_undo_redo.add_undo_property(_config, property, last_value)
+			_undo_redo.commit_action()
+			last_value = new_val
 		)
 		hbox.add_child(spin)
 
@@ -328,9 +368,16 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		spin.step = 1
 		spin.value = _config.get(property)
 		spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		spin.value_changed.connect(func(new_val: float):
-			_config.set(property, int(new_val))
-			_config.emit_changed()
+		var last_value: int = int(spin.value)
+		spin.get_line_edit().focus_exited.connect(func():
+			var new_val: int = int(spin.value)
+			if last_value == new_val:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, new_val)
+			_undo_redo.add_undo_property(_config, property, last_value)
+			_undo_redo.commit_action()
+			last_value = new_val
 		)
 		hbox.add_child(spin)
 
@@ -361,10 +408,21 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		value_label.add_theme_color_override("font_color", ACCENT_COLOR)
 		hbox.add_child(value_label)
 
+		var last_value: float = slider.value
 		slider.value_changed.connect(func(new_val: float):
-			_config.set(property, new_val)
-			_config.emit_changed()
 			value_label.text = "%.2f" % new_val
+		)
+		slider.drag_ended.connect(func(value_changed_flag: bool):
+			if not value_changed_flag:
+				return
+			var new_val: float = slider.value
+			if last_value == new_val:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, new_val)
+			_undo_redo.add_undo_property(_config, property, last_value)
+			_undo_redo.commit_action()
+			last_value = new_val
 		)
 
 		parent.add_child(hbox)
@@ -383,8 +441,11 @@ class ModelConfigEditorPanel extends VBoxContainer:
 		var check := CheckBox.new()
 		check.button_pressed = _config.get(property)
 		check.toggled.connect(func(pressed: bool):
-			_config.set(property, pressed)
-			_config.emit_changed()
+			var old_value: bool = _config.get(property)
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_config, property, pressed)
+			_undo_redo.add_undo_property(_config, property, old_value)
+			_undo_redo.commit_action()
 		)
 		hbox.add_child(check)
 

@@ -26,9 +26,11 @@ class AIPresetEditorPanel extends VBoxContainer:
 
 	var _preset: AIPreset
 	var _sections: Dictionary = {}
+	var _undo_redo: EditorUndoRedoManager
 
 	func _init(preset: AIPreset) -> void:
 		_preset = preset
+		_undo_redo = EditorInterface.get_editor_undo_redo()
 
 	func _ready() -> void:
 		add_theme_constant_override("separation", 0)
@@ -237,9 +239,24 @@ class AIPresetEditorPanel extends VBoxContainer:
 		edit.text = _preset.get(property)
 		edit.placeholder_text = placeholder
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		edit.text_changed.connect(func(new_text: String):
-			_preset.set(property, new_text)
-			_preset.emit_changed()
+		edit.text_submitted.connect(func(new_text: String):
+			var old_value: String = _preset.get(property)
+			if old_value == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_preset, property, new_text)
+			_undo_redo.add_undo_property(_preset, property, old_value)
+			_undo_redo.commit_action()
+		)
+		edit.focus_exited.connect(func():
+			var new_text: String = edit.text
+			var old_value: String = _preset.get(property)
+			if old_value == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_preset, property, new_text)
+			_undo_redo.add_undo_property(_preset, property, old_value)
+			_undo_redo.commit_action()
 		)
 		hbox.add_child(edit)
 
@@ -258,9 +275,16 @@ class AIPresetEditorPanel extends VBoxContainer:
 		edit.custom_minimum_size.y = min_height
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-		edit.text_changed.connect(func():
-			_preset.set(property, edit.text)
-			_preset.emit_changed()
+		var last_text: String = edit.text
+		edit.focus_exited.connect(func():
+			var new_text: String = edit.text
+			if last_text == new_text:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_preset, property, new_text)
+			_undo_redo.add_undo_property(_preset, property, last_text)
+			_undo_redo.commit_action()
+			last_text = new_text
 		)
 		parent.add_child(edit)
 
@@ -281,8 +305,13 @@ class AIPresetEditorPanel extends VBoxContainer:
 		option.select(_preset.preset_type)
 		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		option.item_selected.connect(func(index: int):
-			_preset.preset_type = index as AIPreset.PresetType
-			_preset.emit_changed()
+			var old_value: int = _preset.preset_type
+			if old_value == index:
+				return
+			_undo_redo.create_action("Change preset_type")
+			_undo_redo.add_do_property(_preset, "preset_type", index)
+			_undo_redo.add_undo_property(_preset, "preset_type", old_value)
+			_undo_redo.commit_action()
 		)
 		hbox.add_child(option)
 
@@ -305,9 +334,16 @@ class AIPresetEditorPanel extends VBoxContainer:
 		spin.step = 1
 		spin.value = _preset.get(property)
 		spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		spin.value_changed.connect(func(new_val: float):
-			_preset.set(property, int(new_val))
-			_preset.emit_changed()
+		var last_value: int = int(spin.value)
+		spin.get_line_edit().focus_exited.connect(func():
+			var new_val: int = int(spin.value)
+			if last_value == new_val:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_preset, property, new_val)
+			_undo_redo.add_undo_property(_preset, property, last_value)
+			_undo_redo.commit_action()
+			last_value = new_val
 		)
 		hbox.add_child(spin)
 
@@ -338,10 +374,21 @@ class AIPresetEditorPanel extends VBoxContainer:
 		value_label.add_theme_color_override("font_color", ACCENT_COLOR)
 		hbox.add_child(value_label)
 
+		var last_value: float = slider.value
 		slider.value_changed.connect(func(new_val: float):
-			_preset.set(property, new_val)
-			_preset.emit_changed()
 			value_label.text = "%.2f" % new_val
+		)
+		slider.drag_ended.connect(func(value_changed_flag: bool):
+			if not value_changed_flag:
+				return
+			var new_val: float = slider.value
+			if last_value == new_val:
+				return
+			_undo_redo.create_action("Change %s" % property)
+			_undo_redo.add_do_property(_preset, property, new_val)
+			_undo_redo.add_undo_property(_preset, property, last_value)
+			_undo_redo.commit_action()
+			last_value = new_val
 		)
 
 		parent.add_child(hbox)
@@ -384,10 +431,25 @@ class AIPresetEditorPanel extends VBoxContainer:
 				item_edit.placeholder_text = placeholder
 				item_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				var idx := i
-				item_edit.text_changed.connect(func(new_text: String) -> void:
+				item_edit.text_submitted.connect(func(new_text: String) -> void:
+					var old_arr: Array = _preset.get(property).duplicate()
+					var new_arr: Array = old_arr.duplicate()
+					new_arr[idx] = new_text
+					_undo_redo.create_action("Edit %s item" % property)
+					_undo_redo.add_do_property(_preset, property, new_arr)
+					_undo_redo.add_undo_property(_preset, property, old_arr)
+					_undo_redo.commit_action()
+				)
+				item_edit.focus_exited.connect(func() -> void:
 					var current_arr: Array = _preset.get(property)
-					current_arr[idx] = new_text
-					_preset.emit_changed()
+					if idx < current_arr.size() and current_arr[idx] != item_edit.text:
+						var old_arr: Array = current_arr.duplicate()
+						var new_arr: Array = old_arr.duplicate()
+						new_arr[idx] = item_edit.text
+						_undo_redo.create_action("Edit %s item" % property)
+						_undo_redo.add_do_property(_preset, property, new_arr)
+						_undo_redo.add_undo_property(_preset, property, old_arr)
+						_undo_redo.commit_action()
 				)
 				item_hbox.add_child(item_edit)
 
@@ -395,9 +457,13 @@ class AIPresetEditorPanel extends VBoxContainer:
 				del_btn.text = "×"
 				del_btn.custom_minimum_size = Vector2(24, 24)
 				del_btn.pressed.connect(func() -> void:
-					var current_arr: Array = _preset.get(property)
-					current_arr.remove_at(idx)
-					_preset.emit_changed()
+					var old_arr: Array = _preset.get(property).duplicate()
+					var new_arr: Array = old_arr.duplicate()
+					new_arr.remove_at(idx)
+					_undo_redo.create_action("Remove %s item" % property)
+					_undo_redo.add_do_property(_preset, property, new_arr)
+					_undo_redo.add_undo_property(_preset, property, old_arr)
+					_undo_redo.commit_action()
 					(rebuild_ref[0] as Callable).call()
 				)
 				item_hbox.add_child(del_btn)
@@ -405,9 +471,13 @@ class AIPresetEditorPanel extends VBoxContainer:
 				items_container.add_child(item_hbox)
 
 		add_btn.pressed.connect(func() -> void:
-			var arr: Array = _preset.get(property)
-			arr.append("")
-			_preset.emit_changed()
+			var old_arr: Array = _preset.get(property).duplicate()
+			var new_arr: Array = old_arr.duplicate()
+			new_arr.append("")
+			_undo_redo.create_action("Add %s item" % property)
+			_undo_redo.add_do_property(_preset, property, new_arr)
+			_undo_redo.add_undo_property(_preset, property, old_arr)
+			_undo_redo.commit_action()
 			(rebuild_ref[0] as Callable).call()
 		)
 
