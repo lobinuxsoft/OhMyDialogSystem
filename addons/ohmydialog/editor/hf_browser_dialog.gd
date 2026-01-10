@@ -201,8 +201,8 @@ func _on_model_details_completed(model_id: String, files: Array[Dictionary]) -> 
 		var filename = file_info.get("filename", "")
 		item.set_text(0, filename)
 		item.set_metadata(0, file_info)
-		# Add link button to open file page on HuggingFace
-		item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open file in HuggingFace")
+		# Add link button to open model card on HuggingFace
+		item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open model on HuggingFace")
 
 		var size_mb = file_info.get("size_mb", 0.0)
 		if size_mb >= 1024:
@@ -243,13 +243,11 @@ func _on_results_tree_button_clicked(item: TreeItem, _column: int, id: int, _mou
 			OS.shell_open("https://huggingface.co/%s" % model_id)
 
 
-func _on_files_tree_button_clicked(item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
+func _on_files_tree_button_clicked(_item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
 	if id == BUTTON_ID_OPEN_URL:
-		var file_info = item.get_metadata(0) as Dictionary
-		var filename = file_info.get("filename", "")
-		if not _selected_model_id.is_empty() and not filename.is_empty():
-			# URL format: https://huggingface.co/{model_id}/blob/main/{filename}
-			OS.shell_open("https://huggingface.co/%s/blob/main/%s" % [_selected_model_id, filename])
+		if not _selected_model_id.is_empty():
+			# Open model card (same as results tree)
+			OS.shell_open("https://huggingface.co/%s" % _selected_model_id)
 
 
 func _on_add_pressed() -> void:

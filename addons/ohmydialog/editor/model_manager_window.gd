@@ -295,6 +295,10 @@ func _update_model_details() -> void:
 	if not model.documentation_url.is_empty():
 		text += "\n[color=#3b82f6][url=%s]View on HuggingFace ↗[/url][/color]\n" % model.documentation_url
 
+	# Show file metadata link for custom models (contains chat template, tokenizer info, etc.)
+	if not model.file_metadata_url.is_empty():
+		text += "[color=#10b981][url=%s]View GGUF Metadata ↗[/url][/color]\n" % model.file_metadata_url
+
 	_model_details.text = text
 	_selected_model_id = model.id
 
