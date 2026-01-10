@@ -272,3 +272,9 @@ func get_summary() -> String:
 		world_id if not world_id.is_empty() else "no-id",
 		TimePeriod.keys()[time_period].to_lower().replace("_", " ")
 	]
+
+
+## Estimates the number of tokens this world context will use.
+## Uses ~4 characters per token as approximation.
+func estimate_tokens() -> int:
+	return ceili(to_context_prompt().length() / 4.0)

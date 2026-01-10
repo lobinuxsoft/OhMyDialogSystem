@@ -224,3 +224,9 @@ func get_summary() -> String:
 		character_id if not character_id.is_empty() else "no-id",
 		SpeechStyle.keys()[speech_style].to_lower()
 	]
+
+
+## Estimates the number of tokens this character's prompt will use.
+## Uses ~4 characters per token as approximation.
+func estimate_tokens() -> int:
+	return ceili(to_system_prompt().length() / 4.0)
