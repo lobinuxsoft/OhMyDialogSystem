@@ -277,6 +277,16 @@ func _create_config_from_dict(data: Dictionary) -> ModelConfig:
 	config.is_custom = data.get("is_custom", false)
 	config.include_in_export = data.get("include_in_export", false)
 
+	# Derive documentation_url from download_url if not provided
+	config.documentation_url = data.get("documentation_url", "")
+	if config.documentation_url.is_empty() and not config.download_url.is_empty():
+		config.documentation_url = _extract_repo_url(config.download_url)
+
+	# Derive file_metadata_url from download_url if not provided
+	config.file_metadata_url = data.get("file_metadata_url", "")
+	if config.file_metadata_url.is_empty() and not config.download_url.is_empty():
+		config.file_metadata_url = _extract_file_metadata_url(config.download_url)
+
 	# Sampling params
 	config.default_temperature = data.get("default_temperature", 0.7)
 	config.default_top_p = data.get("default_top_p", 0.95)
@@ -291,6 +301,25 @@ func _create_config_from_dict(data: Dictionary) -> ModelConfig:
 	config.n_batch = data.get("n_batch", 512)
 
 	return config
+
+
+## Extracts repo URL from HuggingFace download URL
+## Example: https://huggingface.co/user/repo/resolve/main/file.gguf -> https://huggingface.co/user/repo
+func _extract_repo_url(download_url: String) -> String:
+	# Pattern: https://huggingface.co/{user}/{repo}/resolve/...
+	var parts = download_url.split("/")
+	if parts.size() >= 5 and "huggingface.co" in download_url:
+		# Reconstruct: https://huggingface.co/user/repo
+		return "%s//%s/%s/%s" % [parts[0], parts[2], parts[3], parts[4]]
+	return ""
+
+
+## Extracts file metadata URL from HuggingFace download URL
+## Example: https://huggingface.co/user/repo/resolve/main/file.gguf -> https://huggingface.co/user/repo/blob/main/file.gguf
+func _extract_file_metadata_url(download_url: String) -> String:
+	if "huggingface.co" in download_url and "/resolve/" in download_url:
+		return download_url.replace("/resolve/", "/blob/")
+	return ""
 
 
 ## Creates a custom ModelConfig from URL (helper for adding custom models)

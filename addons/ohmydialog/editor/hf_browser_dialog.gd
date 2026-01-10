@@ -22,16 +22,23 @@ var _hf_api: HuggingFaceAPI
 var _search_results: Array[Dictionary] = []
 var _selected_model_id: String = ""
 var _selected_file: Dictionary = {}
+var _link_icon: Texture2D
+
+const BUTTON_ID_OPEN_URL := 0
 
 
 func _ready() -> void:
+	_link_icon = EditorInterface.get_editor_theme().get_icon("ExternalLink", "EditorIcons")
+
 	_setup_results_tree()
 	_setup_files_tree()
 
 	_search_btn.pressed.connect(_on_search_pressed)
 	_search_input.text_submitted.connect(_on_search_submitted)
 	_results_tree.item_selected.connect(_on_result_selected)
+	_results_tree.button_clicked.connect(_on_results_tree_button_clicked)
 	_files_tree.item_selected.connect(_on_file_selected)
+	_files_tree.button_clicked.connect(_on_files_tree_button_clicked)
 	_add_btn.pressed.connect(_on_add_pressed)
 	_close_btn.pressed.connect(_on_close_pressed)
 	close_requested.connect(_on_close_pressed)
@@ -139,6 +146,8 @@ func _on_search_completed(results: Array[Dictionary]) -> void:
 		var item = _results_tree.create_item(root)
 		item.set_text(0, result.get("name", ""))
 		item.set_metadata(0, result.get("id", ""))
+		# Add link button in column 0 (next to model name)
+		item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open in HuggingFace")
 
 		var downloads = result.get("downloads", 0)
 		item.set_text(1, _format_number(downloads))
@@ -192,6 +201,8 @@ func _on_model_details_completed(model_id: String, files: Array[Dictionary]) -> 
 		var filename = file_info.get("filename", "")
 		item.set_text(0, filename)
 		item.set_metadata(0, file_info)
+		# Add link button to open model card on HuggingFace
+		item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open model on HuggingFace")
 
 		var size_mb = file_info.get("size_mb", 0.0)
 		if size_mb >= 1024:
@@ -223,6 +234,20 @@ func _on_file_selected() -> void:
 
 	_selected_file = selected.get_metadata(0) as Dictionary
 	_add_btn.disabled = _selected_file.is_empty()
+
+
+func _on_results_tree_button_clicked(item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
+	if id == BUTTON_ID_OPEN_URL:
+		var model_id = item.get_metadata(0) as String
+		if not model_id.is_empty():
+			OS.shell_open("https://huggingface.co/%s" % model_id)
+
+
+func _on_files_tree_button_clicked(_item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
+	if id == BUTTON_ID_OPEN_URL:
+		if not _selected_model_id.is_empty():
+			# Open model card (same as results tree)
+			OS.shell_open("https://huggingface.co/%s" % _selected_model_id)
 
 
 func _on_add_pressed() -> void:

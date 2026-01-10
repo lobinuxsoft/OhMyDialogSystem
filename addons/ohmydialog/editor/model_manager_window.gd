@@ -44,18 +44,23 @@ var _model_manager: ModelManager
 var _current_sort: SortBy = SortBy.NAME
 var _sort_ascending: bool = true
 var _selected_model_id: String = ""
+var _link_icon: Texture2D
+
+const BUTTON_ID_OPEN_URL := 0
 
 
 func _ready() -> void:
 	close_requested.connect(_on_close_requested)
 	call_deferred("_connect_ai_service")
 
+	_link_icon = EditorInterface.get_editor_theme().get_icon("ExternalLink", "EditorIcons")
 	_setup_models_tree()
 
 	# Models Tab signals
 	_models_tree.column_title_clicked.connect(_on_column_title_clicked)
 	_refresh_btn.pressed.connect(_on_refresh_pressed)
 	_models_tree.item_selected.connect(_on_model_tree_selected)
+	_models_tree.button_clicked.connect(_on_models_tree_button_clicked)
 	_download_model_btn.pressed.connect(_on_download_model_pressed)
 	_load_model_btn.pressed.connect(_on_load_model_pressed)
 	_delete_model_btn.pressed.connect(_on_delete_model_pressed)
@@ -65,6 +70,9 @@ func _ready() -> void:
 	# Sub-scene signals
 	_generation_tab.unload_requested.connect(_on_generation_unload_requested)
 	_hf_dialog.model_selected.connect(_on_hf_model_selected)
+
+	# Enable clickable links in model details
+	_model_details.meta_clicked.connect(_on_model_details_link_clicked)
 
 	_download_panel.hide()
 	_update_ui_state()
@@ -152,6 +160,10 @@ func _populate_models_tree() -> void:
 
 		item.set_text(0, model.display_name)
 		item.set_metadata(0, model.id)
+
+		# Add link button in column 0 (if model has documentation_url)
+		if not model.documentation_url.is_empty():
+			item.add_button(0, _link_icon, BUTTON_ID_OPEN_URL, false, "Open documentation")
 
 		item.set_text(1, "%.0f MB" % model.size_mb)
 		item.set_text_alignment(1, HORIZONTAL_ALIGNMENT_RIGHT)
@@ -269,6 +281,24 @@ func _update_model_details() -> void:
 	if model.is_custom:
 		text += "\n[color=#f97316][b]⚠ CUSTOM MODEL[/b][/color]\n"
 
+		# Check for known incompatible architectures
+		var model_name_lower = model.display_name.to_lower()
+		var doc_url_lower = model.documentation_url.to_lower()
+		if "bitnet" in model_name_lower or "bitnet" in doc_url_lower:
+			text += "[color=#ef4444][b]⚠ INCOMPATIBLE:[/b] BitNet models require bitnet.cpp runtime[/color]\n"
+		elif "rwkv" in model_name_lower:
+			text += "[color=#ef4444][b]⚠ INCOMPATIBLE:[/b] RWKV models require specialized runtime[/color]\n"
+		elif "mamba" in model_name_lower:
+			text += "[color=#f97316][b]⚠ WARNING:[/b] Mamba models may have limited support[/color]\n"
+
+	# Show documentation link if available
+	if not model.documentation_url.is_empty():
+		text += "\n[color=#3b82f6][url=%s]View on HuggingFace ↗[/url][/color]\n" % model.documentation_url
+
+	# Show file metadata link for custom models (contains chat template, tokenizer info, etc.)
+	if not model.file_metadata_url.is_empty():
+		text += "[color=#10b981][url=%s]View GGUF Metadata ↗[/url][/color]\n" % model.file_metadata_url
+
 	_model_details.text = text
 	_selected_model_id = model.id
 
@@ -321,6 +351,21 @@ func _on_column_title_clicked(column: int, _mouse_button_index: int) -> void:
 		_current_sort = new_sort
 		_sort_ascending = true
 	_populate_models_tree()
+
+
+func _on_models_tree_button_clicked(item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
+	if id == BUTTON_ID_OPEN_URL:
+		var model_id = item.get_metadata(0) as String
+		if not model_id.is_empty():
+			var model = _model_manager.registry.get_model_by_id(model_id)
+			if model and not model.documentation_url.is_empty():
+				OS.shell_open(model.documentation_url)
+
+
+func _on_model_details_link_clicked(meta: Variant) -> void:
+	var url = str(meta)
+	if url.begins_with("http"):
+		OS.shell_open(url)
 
 
 func _on_refresh_pressed() -> void:

@@ -25,6 +25,12 @@ extends Resource
 ## HuggingFace download URL for development
 @export var download_url: String = ""
 
+## URL to the model's documentation page (usually HuggingFace model card)
+@export var documentation_url: String = ""
+
+## URL to the specific file's metadata page (HuggingFace blob view with GGUF metadata)
+@export var file_metadata_url: String = ""
+
 ## Estimated file size in MB (for download progress)
 @export var size_mb: float = 0.0
 
