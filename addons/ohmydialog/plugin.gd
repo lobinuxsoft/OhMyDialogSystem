@@ -97,7 +97,8 @@ func _enter_tree() -> void:
 	_toolbar_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_toolbar_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_toolbar_icon.custom_minimum_size = Vector2(16, 16)
-	_toolbar_icon.custom_maximum_size = Vector2(16, 16)
+	_toolbar_icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_toolbar_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_toolbar_container.add_child(_toolbar_icon)
 
 	# AI status label
