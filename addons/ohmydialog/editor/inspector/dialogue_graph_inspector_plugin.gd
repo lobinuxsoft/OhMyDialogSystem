@@ -5,17 +5,13 @@ extends EditorInspectorPlugin
 ##
 ## Adds a wiki-styled header with statistics above Godot's default inspector.
 
-## Reference to the main plugin for bottom panel access.
-var _plugin: EditorPlugin
-
-## Reference to the dialogue graph editor.
-var _editor: DialogueGraphEditor
+## Reference to the dialogue graph window.
+var _window: DialogueGraphWindow
 
 
-## Sets the plugin and editor references for opening graphs.
-func setup(plugin: EditorPlugin, editor: DialogueGraphEditor) -> void:
-	_plugin = plugin
-	_editor = editor
+## Sets the window reference for opening graphs.
+func setup(window: DialogueGraphWindow) -> void:
+	_window = window
 
 
 func _can_handle(object: Object) -> bool:
@@ -27,7 +23,7 @@ func _parse_begin(object: Object) -> void:
 	if not graph:
 		return
 
-	var header := DialogueGraphHeader.new(graph, _plugin, _editor)
+	var header := DialogueGraphHeader.new(graph, _window)
 	add_custom_control(header)
 
 
@@ -36,14 +32,12 @@ class DialogueGraphHeader extends PanelContainer:
 	const ACCENT_COLOR := WikiInspectorTheme.AI_PURPLE
 
 	var _graph: DialogueGraph
-	var _plugin: EditorPlugin
-	var _editor: DialogueGraphEditor
+	var _window: DialogueGraphWindow
 	var _stats_label: RichTextLabel
 
-	func _init(graph: DialogueGraph, plugin: EditorPlugin, editor: DialogueGraphEditor) -> void:
+	func _init(graph: DialogueGraph, window: DialogueGraphWindow) -> void:
 		_graph = graph
-		_plugin = plugin
-		_editor = editor
+		_window = window
 
 	func _ready() -> void:
 		add_theme_stylebox_override("panel", WikiInspectorTheme.create_header_style(ACCENT_COLOR))
@@ -127,7 +121,5 @@ class DialogueGraphHeader extends PanelContainer:
 	func _on_open_pressed() -> void:
 		if not _graph:
 			return
-		if _editor:
-			_editor.edit_graph(_graph)
-		if _plugin and _editor:
-			_plugin.make_bottom_panel_item_visible(_editor)
+		if _window:
+			_window.edit_graph(_graph)
