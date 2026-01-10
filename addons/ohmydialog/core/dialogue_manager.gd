@@ -132,6 +132,9 @@ var _pending_confirm_slot: int = 0
 ## Whether the model was loaded by this dialogue (for auto-unload).
 var _model_loaded_for_dialogue: bool = false
 
+## Thread for blocking inference (to avoid freezing main thread).
+var _inference_thread: Thread
+
 
 func _ready() -> void:
 	_initialize_components()
@@ -212,6 +215,10 @@ func end_dialogue(reason: String = "ended") -> void:
 	context_manager.clear_local()
 	_is_active = false
 	_pending_inference.clear()
+
+	# Wait for inference thread to finish before unloading model
+	if _inference_thread != null and _inference_thread.is_started():
+		_inference_thread.wait_to_finish()
 
 	# Always unload model to free memory
 	_unload_model_if_needed()
@@ -411,6 +418,13 @@ func _request_inference(prompt: String) -> void:
 		_emit_error("No LlamaInterface for inference")
 		return
 
+	# Validate prompt size against model context
+	var model_ctx := _get_model_context_size()
+	var estimated_tokens := ceili(prompt.length() / 4.0)  # ~4 chars per token
+	if estimated_tokens > model_ctx:
+		_emit_error("Prompt too long (%d tokens) for model context (%d tokens). Reduce prompt or use larger model." % [estimated_tokens, model_ctx])
+		return
+
 	_pending_inference = {"prompt": prompt}
 
 	var speaker := active_character.character_name if active_character else "NPC"
@@ -420,6 +434,16 @@ func _request_inference(prompt: String) -> void:
 		_start_streaming_inference(prompt)
 	else:
 		_start_blocking_inference(prompt)
+
+
+## Gets the context size of the currently loaded model.
+func _get_model_context_size() -> int:
+	var ai_service := AIService.get_singleton()
+	if ai_service:
+		var config := ai_service.get_current_config()
+		if config:
+			return config.n_ctx
+	return max_context_tokens  # Fallback to configured value
 
 
 ## Starts streaming inference.
@@ -440,13 +464,30 @@ func _start_streaming_inference(prompt: String) -> void:
 		_start_blocking_inference(prompt)
 
 
-## Starts blocking inference.
+## Starts blocking inference in a separate thread.
 func _start_blocking_inference(prompt: String) -> void:
 	if not llama_interface.has_method("generate"):
 		_emit_error("LlamaInterface has no generate method")
 		return
 
+	# Wait for any previous thread to finish
+	if _inference_thread != null and _inference_thread.is_started():
+		_inference_thread.wait_to_finish()
+
+	_inference_thread = Thread.new()
+	_inference_thread.start(_generate_in_thread.bind(prompt))
+
+
+## Runs generation in a background thread.
+func _generate_in_thread(prompt: String) -> void:
 	var result: String = llama_interface.generate(prompt)
+	call_deferred("_on_thread_generation_completed", result)
+
+
+## Called when threaded generation completes.
+func _on_thread_generation_completed(result: String) -> void:
+	if _inference_thread != null and _inference_thread.is_started():
+		_inference_thread.wait_to_finish()
 	_complete_inference(result)
 
 
