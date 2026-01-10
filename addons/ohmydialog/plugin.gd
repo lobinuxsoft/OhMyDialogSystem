@@ -110,6 +110,9 @@ func _enter_tree() -> void:
 
 	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_container)
 
+	# Move to left side of toolbar (after adding, move to first position)
+	call_deferred("_reposition_toolbar_control")
+
 	# Connect to ModelManager signals after a frame (needs AIService to be ready)
 	call_deferred("_connect_model_manager_signals")
 
@@ -211,6 +214,16 @@ func _on_toolbar_menu_id_pressed(id: int) -> void:
 		1:  # Dialogue Graph
 			if _dialogue_graph_window:
 				_dialogue_graph_window.show_window()
+
+
+## Repositions the toolbar control to the left side.
+func _reposition_toolbar_control() -> void:
+	if not _toolbar_container or not is_instance_valid(_toolbar_container):
+		return
+
+	var parent := _toolbar_container.get_parent()
+	if parent:
+		parent.move_child(_toolbar_container, 0)
 
 
 ## Connects to ModelManager signals for status updates.
