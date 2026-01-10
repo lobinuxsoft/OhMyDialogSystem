@@ -295,12 +295,37 @@ func _update_main_screen_button_text() -> void:
 
 	if _ai_service and _ai_service.is_model_loaded():
 		var config := _ai_service.get_current_config()
+		_main_screen_button.text = "AI"
+		_main_screen_button.modulate = Color.WHITE
 		if config:
-			_main_screen_button.text = "AI: %s" % config.display_name
-			_main_screen_button.tooltip_text = "AI Model: %s\nClick to open Model Manager" % config.display_name
+			_main_screen_button.tooltip_text = "Model: %s\nClick to manage AI models" % config.display_name
 		else:
-			_main_screen_button.text = "AI: Active"
-			_main_screen_button.tooltip_text = "AI Model loaded\nClick to open Model Manager"
+			_main_screen_button.tooltip_text = "Model loaded\nClick to manage AI models"
+		# Add green indicator icon
+		_main_screen_button.icon = _create_status_icon(Color("#10b981"))
 	else:
-		_main_screen_button.text = "AI: No Model"
-		_main_screen_button.tooltip_text = "No AI model loaded\nClick to open Model Manager"
+		_main_screen_button.text = "AI"
+		_main_screen_button.modulate = Color(0.7, 0.7, 0.7)
+		_main_screen_button.tooltip_text = "No model loaded\nClick to manage AI models"
+		# Add red/gray indicator icon
+		_main_screen_button.icon = _create_status_icon(Color("#6b7280"))
+
+
+## Creates a small colored circle icon for status indication.
+func _create_status_icon(color: Color) -> ImageTexture:
+	var size := 12
+	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var center := Vector2(size / 2.0, size / 2.0)
+	var radius := size / 2.0 - 1.0
+
+	for x in size:
+		for y in size:
+			var dist := Vector2(x, y).distance_to(center)
+			if dist <= radius:
+				# Anti-aliased edge
+				var alpha := clampf(radius - dist + 0.5, 0.0, 1.0)
+				img.set_pixel(x, y, Color(color.r, color.g, color.b, alpha))
+			else:
+				img.set_pixel(x, y, Color(0, 0, 0, 0))
+
+	return ImageTexture.create_from_image(img)
