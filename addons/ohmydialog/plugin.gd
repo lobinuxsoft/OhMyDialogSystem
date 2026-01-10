@@ -26,6 +26,9 @@ var _model_config_inspector_plugin: ModelConfigInspectorPlugin
 ## Reference to the AIPreset inspector plugin.
 var _ai_preset_inspector_plugin: AIPresetInspectorPlugin
 
+## Reference to the DialogueGraph inspector plugin.
+var _dialogue_graph_inspector_plugin: DialogueGraphInspectorPlugin
+
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
@@ -67,6 +70,10 @@ func _enter_tree() -> void:
 	# Register inspector plugin for AIPreset
 	_ai_preset_inspector_plugin = AIPresetInspectorPlugin.new()
 	add_inspector_plugin(_ai_preset_inspector_plugin)
+
+	# Register inspector plugin for DialogueGraph
+	_dialogue_graph_inspector_plugin = DialogueGraphInspectorPlugin.new()
+	add_inspector_plugin(_dialogue_graph_inspector_plugin)
 
 	# Load and instantiate the dialogue graph editor
 	var editor_scene := preload("res://addons/ohmydialog/editor/dialogue_graph_editor.tscn")
@@ -122,6 +129,10 @@ func _exit_tree() -> void:
 	if _ai_preset_inspector_plugin:
 		remove_inspector_plugin(_ai_preset_inspector_plugin)
 		_ai_preset_inspector_plugin = null
+
+	if _dialogue_graph_inspector_plugin:
+		remove_inspector_plugin(_dialogue_graph_inspector_plugin)
+		_dialogue_graph_inspector_plugin = null
 
 	# Remove and clean up the editor
 	if _editor_instance:
