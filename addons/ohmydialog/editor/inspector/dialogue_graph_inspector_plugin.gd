@@ -335,16 +335,32 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 		items_container.add_theme_constant_override("separation", 4)
 		container.add_child(items_container)
 
-		# Type options matching Godot's metadata types
-		const TYPE_OPTIONS := ["String", "int", "float", "bool", "Vector2", "Vector3", "Color"]
+		# Type options matching Godot's metadata types (same order as Add Metadata)
+		const TYPE_OPTIONS := [
+			"bool", "float", "int",
+			"AABB", "Array", "Basis", "Color", "Dictionary", "NodePath",
+			"PackedByteArray", "PackedColorArray", "PackedFloat32Array", "PackedFloat64Array",
+			"PackedInt32Array", "PackedInt64Array", "PackedStringArray",
+			"PackedVector2Array", "PackedVector3Array", "PackedVector4Array",
+			"Plane", "Projection", "Quaternion", "Rect2", "Rect2i",
+			"String", "StringName", "Transform2D", "Transform3D",
+			"Vector2", "Vector2i", "Vector3", "Vector3i", "Vector4", "Vector4i"
+		]
 		const TYPE_COLORS := {
-			"String": Color("#10b981"),   # Green
-			"int": Color("#3b82f6"),      # Blue
-			"float": Color("#f97316"),    # Orange
-			"bool": Color("#a855f7"),     # Purple
-			"Vector2": Color("#06b6d4"),  # Cyan
-			"Vector3": Color("#ec4899"),  # Pink
-			"Color": Color("#eab308")     # Yellow
+			"bool": Color("#a855f7"),         # Purple
+			"float": Color("#f97316"),        # Orange
+			"int": Color("#3b82f6"),          # Blue
+			"String": Color("#10b981"),       # Green
+			"StringName": Color("#10b981"),   # Green
+			"Color": Color("#eab308"),        # Yellow
+			"Vector2": Color("#06b6d4"),      # Cyan
+			"Vector2i": Color("#06b6d4"),
+			"Vector3": Color("#ec4899"),      # Pink
+			"Vector3i": Color("#ec4899"),
+			"Vector4": Color("#f472b6"),
+			"Vector4i": Color("#f472b6"),
+			"Array": Color("#6b7280"),        # Gray
+			"Dictionary": Color("#6b7280"),
 		}
 
 		# Use Array wrapper for self-referencing callable
@@ -478,49 +494,145 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 
 	func _get_type_name(value: Variant) -> String:
 		match typeof(value):
-			TYPE_INT:
-				return "int"
-			TYPE_FLOAT:
-				return "float"
-			TYPE_BOOL:
-				return "bool"
-			TYPE_VECTOR2:
-				return "Vector2"
-			TYPE_VECTOR3:
-				return "Vector3"
-			TYPE_COLOR:
-				return "Color"
-			_:
-				return "String"
+			TYPE_BOOL: return "bool"
+			TYPE_INT: return "int"
+			TYPE_FLOAT: return "float"
+			TYPE_STRING: return "String"
+			TYPE_STRING_NAME: return "StringName"
+			TYPE_VECTOR2: return "Vector2"
+			TYPE_VECTOR2I: return "Vector2i"
+			TYPE_VECTOR3: return "Vector3"
+			TYPE_VECTOR3I: return "Vector3i"
+			TYPE_VECTOR4: return "Vector4"
+			TYPE_VECTOR4I: return "Vector4i"
+			TYPE_COLOR: return "Color"
+			TYPE_RECT2: return "Rect2"
+			TYPE_RECT2I: return "Rect2i"
+			TYPE_AABB: return "AABB"
+			TYPE_BASIS: return "Basis"
+			TYPE_TRANSFORM2D: return "Transform2D"
+			TYPE_TRANSFORM3D: return "Transform3D"
+			TYPE_PLANE: return "Plane"
+			TYPE_QUATERNION: return "Quaternion"
+			TYPE_PROJECTION: return "Projection"
+			TYPE_NODE_PATH: return "NodePath"
+			TYPE_ARRAY: return "Array"
+			TYPE_DICTIONARY: return "Dictionary"
+			TYPE_PACKED_BYTE_ARRAY: return "PackedByteArray"
+			TYPE_PACKED_INT32_ARRAY: return "PackedInt32Array"
+			TYPE_PACKED_INT64_ARRAY: return "PackedInt64Array"
+			TYPE_PACKED_FLOAT32_ARRAY: return "PackedFloat32Array"
+			TYPE_PACKED_FLOAT64_ARRAY: return "PackedFloat64Array"
+			TYPE_PACKED_STRING_ARRAY: return "PackedStringArray"
+			TYPE_PACKED_VECTOR2_ARRAY: return "PackedVector2Array"
+			TYPE_PACKED_VECTOR3_ARRAY: return "PackedVector3Array"
+			TYPE_PACKED_COLOR_ARRAY: return "PackedColorArray"
+			TYPE_PACKED_VECTOR4_ARRAY: return "PackedVector4Array"
+			_: return "String"
 
 
 	func _convert_value(text: String, type_name: String) -> Variant:
+		var clean := text.replace("(", "").replace(")", "").replace(" ", "")
+		var parts := clean.split(",")
+
 		match type_name:
+			"bool":
+				return text.to_lower() == "true" or text == "1"
 			"int":
 				return text.to_int()
 			"float":
 				return text.to_float()
-			"bool":
-				return text.to_lower() == "true" or text == "1"
+			"String":
+				return text
+			"StringName":
+				return StringName(text)
+			"NodePath":
+				return NodePath(text)
 			"Vector2":
-				# Parse "(x, y)" format
-				var clean := text.replace("(", "").replace(")", "").replace(" ", "")
-				var parts := clean.split(",")
 				if parts.size() >= 2:
 					return Vector2(parts[0].to_float(), parts[1].to_float())
 				return Vector2.ZERO
+			"Vector2i":
+				if parts.size() >= 2:
+					return Vector2i(parts[0].to_int(), parts[1].to_int())
+				return Vector2i.ZERO
 			"Vector3":
-				# Parse "(x, y, z)" format
-				var clean := text.replace("(", "").replace(")", "").replace(" ", "")
-				var parts := clean.split(",")
 				if parts.size() >= 3:
 					return Vector3(parts[0].to_float(), parts[1].to_float(), parts[2].to_float())
 				return Vector3.ZERO
+			"Vector3i":
+				if parts.size() >= 3:
+					return Vector3i(parts[0].to_int(), parts[1].to_int(), parts[2].to_int())
+				return Vector3i.ZERO
+			"Vector4":
+				if parts.size() >= 4:
+					return Vector4(parts[0].to_float(), parts[1].to_float(), parts[2].to_float(), parts[3].to_float())
+				return Vector4.ZERO
+			"Vector4i":
+				if parts.size() >= 4:
+					return Vector4i(parts[0].to_int(), parts[1].to_int(), parts[2].to_int(), parts[3].to_int())
+				return Vector4i.ZERO
 			"Color":
-				# Parse color from hex or name
 				if text.begins_with("#"):
 					return Color.html(text)
-				return Color.from_string(text, Color.WHITE)
+				if parts.size() >= 4:
+					return Color(parts[0].to_float(), parts[1].to_float(), parts[2].to_float(), parts[3].to_float())
+				if parts.size() >= 3:
+					return Color(parts[0].to_float(), parts[1].to_float(), parts[2].to_float())
+				return Color.WHITE
+			"Rect2":
+				if parts.size() >= 4:
+					return Rect2(parts[0].to_float(), parts[1].to_float(), parts[2].to_float(), parts[3].to_float())
+				return Rect2()
+			"Rect2i":
+				if parts.size() >= 4:
+					return Rect2i(parts[0].to_int(), parts[1].to_int(), parts[2].to_int(), parts[3].to_int())
+				return Rect2i()
+			"AABB":
+				if parts.size() >= 6:
+					return AABB(Vector3(parts[0].to_float(), parts[1].to_float(), parts[2].to_float()),
+								Vector3(parts[3].to_float(), parts[4].to_float(), parts[5].to_float()))
+				return AABB()
+			"Plane":
+				if parts.size() >= 4:
+					return Plane(parts[0].to_float(), parts[1].to_float(), parts[2].to_float(), parts[3].to_float())
+				return Plane()
+			"Quaternion":
+				if parts.size() >= 4:
+					return Quaternion(parts[0].to_float(), parts[1].to_float(), parts[2].to_float(), parts[3].to_float())
+				return Quaternion()
+			"Basis":
+				return Basis()  # Complex type, default
+			"Transform2D":
+				return Transform2D()  # Complex type, default
+			"Transform3D":
+				return Transform3D()  # Complex type, default
+			"Projection":
+				return Projection()  # Complex type, default
+			"Array":
+				return []
+			"Dictionary":
+				return {}
+			"PackedByteArray":
+				return PackedByteArray()
+			"PackedInt32Array":
+				return PackedInt32Array()
+			"PackedInt64Array":
+				return PackedInt64Array()
+			"PackedFloat32Array":
+				return PackedFloat32Array()
+			"PackedFloat64Array":
+				return PackedFloat64Array()
+			"PackedStringArray":
+				return PackedStringArray()
+			"PackedVector2Array":
+				return PackedVector2Array()
+			"PackedVector3Array":
+				return PackedVector3Array()
+			"PackedVector4Array":
+				return PackedVector4Array()
+			"PackedColorArray":
+				return PackedColorArray()
 			_:
 				return text
 
