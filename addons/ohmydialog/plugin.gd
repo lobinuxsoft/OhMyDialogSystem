@@ -38,6 +38,9 @@ var _main_screen_button: Button
 ## Last active main screen before opening AI Models.
 var _last_main_screen: String = "2D"
 
+## Flag to track if user clicked the AI button (vs automatic activation).
+var _user_clicked_ai_button: bool = false
+
 ## Reference to the model required dialog.
 var _model_required_dialog: ModelRequiredDialog
 
@@ -227,10 +230,13 @@ func _edit(object: Object) -> void:
 ## Makes the main screen visible. For AI, we open the Model Manager and return.
 func _make_visible(visible: bool) -> void:
 	if visible:
-		# Open Model Manager Window
-		if _model_manager_window:
-			_model_manager_window.show_window()
-		# Return to previous main screen
+		# Only open Model Manager if user explicitly clicked the AI button
+		# (not when Godot auto-activates due to _handles() returning true)
+		if _user_clicked_ai_button:
+			_user_clicked_ai_button = false
+			if _model_manager_window:
+				_model_manager_window.show_window()
+		# Always return to previous main screen (AI has no actual screen)
 		call_deferred("_return_to_last_screen")
 
 
@@ -275,7 +281,17 @@ func _find_and_update_main_screen_button() -> void:
 	# We search for our button by checking the text
 	var base := EditorInterface.get_base_control()
 	_main_screen_button = _find_button_recursive(base, "AI")
+
+	# Connect to button press to track user clicks
+	if _main_screen_button and not _main_screen_button.pressed.is_connected(_on_ai_button_pressed):
+		_main_screen_button.pressed.connect(_on_ai_button_pressed)
+
 	_update_main_screen_button_text()
+
+
+## Called when user clicks the AI main screen button.
+func _on_ai_button_pressed() -> void:
+	_user_clicked_ai_button = true
 
 
 ## Recursively searches for a button with specific text.
