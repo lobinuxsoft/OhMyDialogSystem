@@ -7,27 +7,33 @@ extends BaseNodeEditor
 
 
 var _keywords_container: VBoxContainer
+var _keywords_section: VBoxContainer
+
+
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super(node_data, graph)
+	ACCENT_COLOR = Color("#8b5cf6")  # Free mode purple
 
 
 func _setup_ui() -> void:
-	_add_header("Jump to Free Mode")
-	_add_separator()
-	_add_text_edit("Context Prompt", "context_prompt", 60)
-	_add_line_edit("Return Condition", "return_condition", "Expression that triggers return")
-	_add_spin_box("Max Exchanges", "max_exchanges", 0, 100, 1)
+	_create_main_header("Jump to Free Mode", "🔄")
 
-	_add_separator()
-	_add_header("Return Keywords")
+	var config_section := _create_section("Configuration")
+	_add_text_edit("Context Prompt", "context_prompt", 60, config_section)
+	_add_line_edit("Return Condition", "return_condition", "Expression that triggers return", config_section)
+	_add_spin_box("Max Exchanges", "max_exchanges", 0, 100, 1, config_section)
+
+	_keywords_section = _create_section("Return Keywords")
 
 	# Add keyword button
 	var add_btn := Button.new()
 	add_btn.text = "+ Add Keyword"
 	add_btn.pressed.connect(_on_add_keyword)
-	add_child(add_btn)
+	_keywords_section.add_child(add_btn)
 
 	# Container for keywords
 	_keywords_container = VBoxContainer.new()
-	add_child(_keywords_container)
+	_keywords_section.add_child(_keywords_container)
 
 	_rebuild_keywords_list()
 

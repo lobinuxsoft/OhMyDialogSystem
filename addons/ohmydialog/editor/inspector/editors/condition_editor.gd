@@ -20,35 +20,39 @@ const OPERATOR_NAMES: Array[String] = [
 ]
 
 
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super(node_data, graph)
+	ACCENT_COLOR = Color("#f97316")  # Condition node orange
+
+
 func _setup_ui() -> void:
-	_add_header("Condition Node")
-	_add_separator()
+	_create_main_header("Condition Node", "⚖")
 
 	# Simple condition mode
-	_add_header("Simple Mode")
-	_add_variable_selector("Variable", "variable")
-	_add_operator_selector()
-	_add_line_edit("Value", "value", "compare value")
-
-	_add_separator()
+	var simple_section := _create_section("Simple Mode")
+	_add_variable_selector("Variable", "variable", simple_section)
+	_add_operator_selector(simple_section)
+	_add_line_edit("Value", "value", "compare value", simple_section)
 
 	# Expression mode
-	_add_header("Expression Mode")
-	_add_text_edit("Expression", "expression", 60)
+	var expr_section := _create_section("Expression Mode")
+	_add_text_edit("Expression", "expression", 60, expr_section)
 
 	var note := Label.new()
 	note.text = "Use either simple mode OR expression, not both."
-	note.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	note.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 	note.add_theme_font_size_override("font_size", 11)
-	add_child(note)
+	expr_section.add_child(note)
 
 
-func _add_operator_selector() -> OptionButton:
+func _add_operator_selector(parent: Control = null) -> OptionButton:
+	var target := _get_target(parent)
 	var hbox := HBoxContainer.new()
 
 	var label := Label.new()
 	label.text = "Operator:"
 	label.custom_minimum_size.x = 100
+	label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 	hbox.add_child(label)
 
 	var option := OptionButton.new()
@@ -67,5 +71,5 @@ func _add_operator_selector() -> OptionButton:
 	)
 	hbox.add_child(option)
 
-	add_child(hbox)
+	target.add_child(hbox)
 	return option

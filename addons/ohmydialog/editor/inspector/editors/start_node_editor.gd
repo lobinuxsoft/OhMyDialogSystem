@@ -7,22 +7,30 @@ extends BaseNodeEditor
 ## Also allows selecting which AI model to use for this dialogue.
 
 
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super(node_data, graph)
+	ACCENT_COLOR = Color("#10b981")  # Start node green
+
+
 func _setup_ui() -> void:
-	_add_header("Start Node")
-	_add_separator()
-	_add_line_edit("Trigger", "trigger", "Event name (empty = manual)")
-	_add_separator()
-	_add_header("AI Model")
-	_add_model_selector("Model", "model_path")
+	_create_main_header("Start Node", "▶")
+
+	var trigger_section := _create_section("Trigger Configuration")
+	_add_line_edit("Trigger", "trigger", "Event name (empty = manual)", trigger_section)
+
+	var model_section := _create_section("AI Model")
+	_add_model_selector("Model", "model_path", model_section)
 
 
 ## Creates a model selector dropdown showing only downloaded models.
-func _add_model_selector(label_text: String, data_key: String) -> OptionButton:
+func _add_model_selector(label_text: String, data_key: String, parent: Control = null) -> OptionButton:
+	var target := _get_target(parent)
 	var hbox := HBoxContainer.new()
 
 	var label := Label.new()
 	label.text = label_text + ":"
 	label.custom_minimum_size.x = 100
+	label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 	hbox.add_child(label)
 
 	var option := OptionButton.new()
@@ -63,7 +71,7 @@ func _add_model_selector(label_text: String, data_key: String) -> OptionButton:
 	)
 
 	hbox.add_child(option)
-	add_child(hbox)
+	target.add_child(hbox)
 	return option
 
 

@@ -7,25 +7,31 @@ extends BaseNodeEditor
 
 
 var _choices_container: VBoxContainer
+var _choices_section: VBoxContainer
+
+
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super(node_data, graph)
+	ACCENT_COLOR = Color("#eab308")  # Choice node yellow
 
 
 func _setup_ui() -> void:
-	_add_header("Player Choice")
-	_add_separator()
-	_add_line_edit("Prompt", "prompt", "Question for the player")
+	_create_main_header("Player Choice", "❓")
 
-	_add_separator()
-	_add_header("Choices")
+	var prompt_section := _create_section("Prompt")
+	_add_line_edit("Prompt", "prompt", "Question for the player", prompt_section)
+
+	_choices_section = _create_section("Choices")
 
 	# Add button
 	var add_btn := Button.new()
 	add_btn.text = "+ Add Choice"
 	add_btn.pressed.connect(_on_add_choice)
-	add_child(add_btn)
+	_choices_section.add_child(add_btn)
 
 	# Container for choices
 	_choices_container = VBoxContainer.new()
-	add_child(_choices_container)
+	_choices_section.add_child(_choices_container)
 
 	_rebuild_choices_list()
 
@@ -53,6 +59,7 @@ func _create_choice_row(index: int, choice: Dictionary) -> Control:
 	var idx_label := Label.new()
 	idx_label.text = "Choice %d" % (index + 1)
 	idx_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	idx_label.add_theme_color_override("font_color", ACCENT_COLOR)
 	header.add_child(idx_label)
 
 	var del_btn := Button.new()
@@ -68,6 +75,7 @@ func _create_choice_row(index: int, choice: Dictionary) -> Control:
 	var text_label := Label.new()
 	text_label.text = "Text:"
 	text_label.custom_minimum_size.x = 80
+	text_label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 	text_row.add_child(text_label)
 
 	var text_edit := LineEdit.new()
@@ -83,6 +91,7 @@ func _create_choice_row(index: int, choice: Dictionary) -> Control:
 	var cond_label := Label.new()
 	cond_label.text = "Condition:"
 	cond_label.custom_minimum_size.x = 80
+	cond_label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 	cond_row.add_child(cond_label)
 
 	var cond_edit := LineEdit.new()

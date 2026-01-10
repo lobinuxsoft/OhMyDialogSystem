@@ -6,17 +6,17 @@ extends BaseNodeEditor
 ## Allows selecting a target DialogueGraph and optional node ID.
 
 
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super(node_data, graph)
+	ACCENT_COLOR = Color("#14b8a6")  # Jump node teal
+
+
 func _setup_ui() -> void:
-	_add_header("Jump Node")
-	_add_separator()
+	_create_main_header("Jump Node", "↗")
 
-	# Target graph resource picker
-	_add_resource_picker("Target Graph", "target_graph_id", "DialogueGraph")
+	var target_section := _create_section("Target Configuration")
+	_add_resource_picker("Target Graph", "target_graph_id", "DialogueGraph", target_section)
+	_add_line_edit("Target Node", "target_node_id", "Node ID (empty = start)", target_section)
 
-	# Optional target node ID within the graph
-	_add_line_edit("Target Node", "target_node_id", "Node ID (empty = start)")
-
-	_add_separator()
-
-	# Preserve context checkbox
-	_add_check_box("Preserve Context", "preserve_context", false)
+	var options_section := _create_section("Options")
+	_add_check_box("Preserve Context", "preserve_context", false, options_section)

@@ -11,17 +11,24 @@ const CHATML_BASE_TOKENS: int = 100  # Approximate tokens for ChatML template st
 
 var _context_label: RichTextLabel
 var _prompt_template_edit: TextEdit
+var _context_section: VBoxContainer
+
+
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super(node_data, graph)
+	ACCENT_COLOR = Color("#3b82f6")  # AI response blue
 
 
 func _setup_ui() -> void:
-	_add_header("AI Response")
-	_add_separator()
-	_prompt_template_edit = _add_text_edit("Prompt Template", "prompt_template", 80)
-	_prompt_template_edit.text_changed.connect(_update_context_estimate)
-	_add_option_button("Emotion Hint", "emotion_hint", EMOTIONS)
-	_add_spin_box("Max Tokens", "max_tokens", 32, 2048, 32)
+	_create_main_header("AI Response", "🤖")
 
-	_add_separator()
+	var prompt_section := _create_section("Prompt Configuration")
+	_prompt_template_edit = _add_text_edit("Prompt Template", "prompt_template", 80, prompt_section)
+	_prompt_template_edit.text_changed.connect(_update_context_estimate)
+	_add_option_button("Emotion Hint", "emotion_hint", EMOTIONS, 0, prompt_section)
+	_add_spin_box("Max Tokens", "max_tokens", 32, 2048, 32, prompt_section)
+
+	_context_section = _create_section("Context Usage")
 	_add_context_estimate_ui()
 	_update_context_estimate()
 
@@ -32,7 +39,7 @@ func _add_context_estimate_ui() -> void:
 	_context_label.bbcode_enabled = true
 	_context_label.fit_content = true
 	_context_label.scroll_active = false
-	add_child(_context_label)
+	_context_section.add_child(_context_label)
 
 
 ## Updates the context usage estimation display.
