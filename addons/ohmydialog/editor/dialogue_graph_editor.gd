@@ -266,7 +266,7 @@ func _clear_visual_nodes() -> void:
 
 ## Creates a visual node for the given DialogueNodeData.
 func _create_visual_node(node_data: DialogueNodeData) -> BaseDialogueNode:
-	var visual_node := DialogueNodeFactory.create_node(node_data)
+	var visual_node := DialogueNodeFactory.create_node(node_data, current_graph)
 	if visual_node:
 		graph_edit.add_child(visual_node)
 		_visual_nodes[node_data.node_id] = visual_node
