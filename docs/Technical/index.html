@@ -305,15 +305,36 @@
 
           <li class="section">
             <div class="item">
+              <span class="icon">🤖</span>
+              <span class="name folder">ai/</span>
+              <span class="comment">Servicios de IA</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">model_manager.gd</span><span class="comment">Gestor de modelos GGUF</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">prompt_builder.gd</span><span class="comment">Constructor de prompts</span></div></li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
               <span class="icon">💬</span>
               <span class="name folder">core/</span>
               <span class="comment">Managers principales</span>
             </div>
             <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">ai_service.gd</span><span class="comment">Singleton de acceso a IA</span></div></li>
               <li><div class="item"><span class="icon">📜</span><span class="name file">dialogue_manager.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">graph_runner.gd</span></div></li>
               <li><div class="item"><span class="icon">📜</span><span class="name file">context_manager.gd</span></div></li>
               <li><div class="item"><span class="icon">📜</span><span class="name file">conversation_history.gd</span></div></li>
-              <li><div class="item"><span class="icon">📜</span><span class="name file">prompt_builder.gd</span></div></li>
+              <li>
+                <div class="item"><span class="icon">📁</span><span class="name folder">node_executors/</span></div>
+                <ul>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">ai_response_executor.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">condition_executor.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">...</span><span class="comment">8 ejecutores</span></div></li>
+                </ul>
+              </li>
             </ul>
           </li>
 
@@ -400,19 +421,6 @@
             </ul>
           </li>
 
-          <li class="section">
-            <div class="item">
-              <span class="icon">📚</span>
-              <span class="name folder">examples/</span>
-              <span class="comment">Ejemplos de uso</span>
-            </div>
-            <ul>
-              <li><div class="item"><span class="icon">📁</span><span class="name folder">basic_npc/</span></div></li>
-              <li><div class="item"><span class="icon">📁</span><span class="name folder">branching_dialogue/</span></div></li>
-              <li><div class="item"><span class="icon">📁</span><span class="name folder">persistent_memory/</span></div></li>
-              <li><div class="item"><span class="icon">📁</span><span class="name folder">dynamic_merchant/</span></div></li>
-            </ul>
-          </li>
         </ul>
       </div>
 

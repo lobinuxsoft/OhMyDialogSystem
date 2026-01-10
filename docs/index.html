@@ -153,17 +153,25 @@
 
       <h2>Quick Start</h2>
 
-      <pre data-lang="GDSCRIPT"><code># Obtener referencia al DialogueManager
-@onready var dialogue_manager: DialogueManager = $DialogueManager
+      <pre data-lang="GDSCRIPT"><code># Crear DialogueManager y verificar AIService
+var dialogue_manager: DialogueManager
 
 func _ready() -> void:
-    # Conectar señales de diálogo
+    # Verificar que hay modelo cargado (via Model Manager)
+    var ai_service := AIService.get_singleton()
+    if not ai_service or not ai_service.is_model_loaded():
+        push_warning("No hay modelo cargado - usar Model Manager primero")
+
+    # Crear y configurar DialogueManager
+    dialogue_manager = DialogueManager.new()
+    add_child(dialogue_manager)
+
+    # Conectar señales
     dialogue_manager.npc_response_completed.connect(_on_npc_response)
     dialogue_manager.player_choices_available.connect(_on_choices)
     dialogue_manager.dialogue_ended.connect(_on_dialogue_ended)
 
 func start_conversation() -> void:
-    # Cargar e iniciar un grafo de diálogo (modelo se carga desde StartNode)
     var graph: DialogueGraph = preload("res://dialogues/merchant.tres")
     dialogue_manager.start_dialogue(graph)</code></pre>
 
@@ -315,11 +323,11 @@ func start_conversation() -> void:
       <div class="arch-diagram">
         <div class="arch-title">OhMyDialogSystem</div>
 
-        <!-- Layer 1: Core Components -->
+        <!-- Layer 1: Native Components -->
         <div class="arch-layer">
           <div class="arch-node llm">
-            🦙 LLM
-            <span class="arch-label">llama.cpp</span>
+            🦙 LlamaInterface
+            <span class="arch-label">GDExtension</span>
           </div>
           <div class="arch-node memory">
             🧠 Memory
@@ -331,10 +339,21 @@ func start_conversation() -> void:
           </div>
         </div>
 
-        <!-- Connector: Merge -->
+        <!-- Connector: Merge to AIService -->
         <div class="arch-connector merge"></div>
 
-        <!-- Layer 2: DialogueManager -->
+        <!-- Layer 2: AIService Singleton -->
+        <div class="arch-layer">
+          <div class="arch-node" style="background: rgba(6, 182, 212, 0.15); border-color: #06b6d4; color: #06b6d4; font-weight: 500;">
+            🤖 AIService
+            <span class="arch-label">Singleton</span>
+          </div>
+        </div>
+
+        <!-- Connector: to DialogueManager -->
+        <div class="arch-connector vertical"></div>
+
+        <!-- Layer 3: DialogueManager -->
         <div class="arch-layer">
           <div class="arch-node manager">
             💬 DialogueManager
@@ -344,7 +363,7 @@ func start_conversation() -> void:
         <!-- Connector: Split -->
         <div class="arch-connector split"></div>
 
-        <!-- Layer 3: Resources -->
+        <!-- Layer 4: Resources -->
         <div class="arch-layer">
           <div class="arch-node resource">
             👤 Character<br>Identity
@@ -806,7 +825,7 @@ func start_conversation() -> void:
           <tr>
             <td>Modelo LLM</td>
             <td>GGUF Q4/Q5/Q8</td>
-            <td>Recomendado: Mistral 7B o similar</td>
+            <td>Recomendado: Qwen2.5-0.5B-Instruct (~530MB)</td>
           </tr>
           <tr>
             <td>RAM</td>
