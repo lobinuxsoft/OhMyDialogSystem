@@ -322,24 +322,27 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 
 	func _add_variable_dictionary_edit(parent: Control, label_text: String, property: String) -> void:
 		var container := VBoxContainer.new()
-		container.add_theme_constant_override("separation", 4)
+		container.add_theme_constant_override("separation", 6)
 
-		var header := HBoxContainer.new()
-		var label := Label.new()
-		label.text = label_text
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
-		header.add_child(label)
-
+		# Add button centered at top
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size = Vector2(24, 24)
-		header.add_child(add_btn)
-		container.add_child(header)
+		add_btn.custom_minimum_size = Vector2(32, 28)
+		add_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		container.add_child(add_btn)
 
 		var items_container := VBoxContainer.new()
-		items_container.add_theme_constant_override("separation", 2)
+		items_container.add_theme_constant_override("separation", 4)
 		container.add_child(items_container)
+
+		# Type options
+		const TYPE_OPTIONS := ["str", "int", "flt", "bool"]
+		const TYPE_COLORS := {
+			"str": Color("#10b981"),   # Green
+			"int": Color("#3b82f6"),   # Blue
+			"flt": Color("#f97316"),   # Orange
+			"bool": Color("#a855f7")   # Purple
+		}
 
 		# Use Array wrapper for self-referencing callable
 		var rebuild_ref: Array = [null]
@@ -349,71 +352,83 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 
 			var dict: Dictionary = _graph.get(property)
 			for key in dict.keys():
-				var item_hbox := HBoxContainer.new()
-				item_hbox.add_theme_constant_override("separation", 4)
+				var value: Variant = dict[key]
+				var item_panel := PanelContainer.new()
+				var item_style := StyleBoxFlat.new()
+				item_style.bg_color = WikiInspectorTheme.BG_TERTIARY
+				item_style.corner_radius_top_left = 4
+				item_style.corner_radius_top_right = 4
+				item_style.corner_radius_bottom_left = 4
+				item_style.corner_radius_bottom_right = 4
+				item_style.content_margin_left = 8
+				item_style.content_margin_right = 8
+				item_style.content_margin_top = 4
+				item_style.content_margin_bottom = 4
+				item_panel.add_theme_stylebox_override("panel", item_style)
 
+				var item_hbox := HBoxContainer.new()
+				item_hbox.add_theme_constant_override("separation", 6)
+
+				# Variable name
 				var key_edit := LineEdit.new()
 				key_edit.text = key
-				key_edit.placeholder_text = "var_name"
+				key_edit.placeholder_text = "name"
 				key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				key_edit.custom_minimum_size.x = 100
+				key_edit.custom_minimum_size.x = 60
 				var current_key: String = key
-				key_edit.focus_exited.connect(func() -> void:
-					if _is_updating:
-						return
-					var new_key: String = key_edit.text
-					if current_key == new_key:
-						return
-					var old_dict: Dictionary = _graph.get(property).duplicate()
-					var new_dict: Dictionary = old_dict.duplicate()
-					var value: Variant = new_dict.get(current_key, "")
-					new_dict.erase(current_key)
-					new_dict[new_key] = value
-					_undo_redo.create_action("Rename variable")
-					_undo_redo.add_do_property(_graph, property, new_dict)
-					_undo_redo.add_undo_property(_graph, property, old_dict)
-					_undo_redo.add_do_method(_graph, "emit_changed")
-					_undo_redo.add_undo_method(_graph, "emit_changed")
-					_undo_redo.commit_action()
-					current_key = new_key
-				)
 				item_hbox.add_child(key_edit)
 
-				# Type indicator
-				var type_label := Label.new()
-				type_label.text = "="
-				type_label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_MUTED)
-				item_hbox.add_child(type_label)
+				# Type selector
+				var type_btn := OptionButton.new()
+				type_btn.custom_minimum_size.x = 55
+				for t in TYPE_OPTIONS:
+					type_btn.add_item(t)
+				var current_type := _get_type_name(value)
+				type_btn.select(TYPE_OPTIONS.find(current_type))
+				type_btn.add_theme_color_override("font_color", TYPE_COLORS.get(current_type, WikiInspectorTheme.TEXT_PRIMARY))
+				item_hbox.add_child(type_btn)
 
+				# Value edit
 				var value_edit := LineEdit.new()
-				value_edit.text = str(dict[key])
+				value_edit.text = str(value)
 				value_edit.placeholder_text = "value"
 				value_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 				var k: String = key
-				value_edit.focus_exited.connect(func() -> void:
+				item_hbox.add_child(value_edit)
+
+				# Confirm button
+				var confirm_btn := Button.new()
+				confirm_btn.text = "✓"
+				confirm_btn.custom_minimum_size = Vector2(28, 28)
+				confirm_btn.add_theme_color_override("font_color", WikiInspectorTheme.AI_GREEN)
+				confirm_btn.pressed.connect(func() -> void:
 					if _is_updating:
 						return
-					var new_value_str: String = value_edit.text
-					var current_dict: Dictionary = _graph.get(property)
-					# Try to preserve type
-					var new_value: Variant = _parse_value(new_value_str)
-					if str(current_dict.get(k, "")) == new_value_str:
-						return
-					var old_dict: Dictionary = current_dict.duplicate()
+					var old_dict: Dictionary = _graph.get(property).duplicate()
 					var new_dict: Dictionary = old_dict.duplicate()
-					new_dict[k] = new_value
-					_undo_redo.create_action("Edit variable value")
+					var new_key: String = key_edit.text
+					var type_idx: int = type_btn.selected
+					var new_value: Variant = _convert_value(value_edit.text, TYPE_OPTIONS[type_idx])
+
+					# Handle key rename
+					if current_key != new_key:
+						new_dict.erase(current_key)
+
+					new_dict[new_key] = new_value
+					_undo_redo.create_action("Update variable")
 					_undo_redo.add_do_property(_graph, property, new_dict)
 					_undo_redo.add_undo_property(_graph, property, old_dict)
 					_undo_redo.add_do_method(_graph, "emit_changed")
 					_undo_redo.add_undo_method(_graph, "emit_changed")
 					_undo_redo.commit_action()
 				)
-				item_hbox.add_child(value_edit)
+				item_hbox.add_child(confirm_btn)
 
+				# Delete button
 				var del_btn := Button.new()
-				del_btn.text = "×"
-				del_btn.custom_minimum_size = Vector2(24, 24)
+				del_btn.text = "🗑"
+				del_btn.custom_minimum_size = Vector2(28, 28)
+				del_btn.add_theme_color_override("font_color", WikiInspectorTheme.AI_RED)
 				del_btn.pressed.connect(func() -> void:
 					if _is_updating:
 						return
@@ -429,7 +444,14 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 				)
 				item_hbox.add_child(del_btn)
 
-				items_container.add_child(item_hbox)
+				# Update type color when changed
+				type_btn.item_selected.connect(func(idx: int) -> void:
+					var t: String = TYPE_OPTIONS[idx]
+					type_btn.add_theme_color_override("font_color", TYPE_COLORS.get(t, WikiInspectorTheme.TEXT_PRIMARY))
+				)
+
+				item_panel.add_child(item_hbox)
+				items_container.add_child(item_panel)
 
 		add_btn.pressed.connect(func() -> void:
 			if _is_updating:
@@ -451,17 +473,28 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 		parent.add_child(container)
 
 
-	func _parse_value(text: String) -> Variant:
-		# Try to preserve types
-		if text.to_lower() == "true":
-			return true
-		elif text.to_lower() == "false":
-			return false
-		elif text.is_valid_int():
-			return text.to_int()
-		elif text.is_valid_float():
-			return text.to_float()
-		return text
+	func _get_type_name(value: Variant) -> String:
+		match typeof(value):
+			TYPE_INT:
+				return "int"
+			TYPE_FLOAT:
+				return "flt"
+			TYPE_BOOL:
+				return "bool"
+			_:
+				return "str"
+
+
+	func _convert_value(text: String, type_name: String) -> Variant:
+		match type_name:
+			"int":
+				return text.to_int()
+			"flt":
+				return text.to_float()
+			"bool":
+				return text.to_lower() == "true" or text == "1"
+			_:
+				return text
 
 
 	func _add_stats_display(parent: Control) -> void:
