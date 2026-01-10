@@ -115,9 +115,23 @@
 
       <h2>Descripción</h2>
 
-      <p><code>LlamaInterface</code> proporciona una API de alto nivel para cargar modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
+      <p><code>LlamaInterface</code> proporciona una API de bajo nivel para cargar modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
 
-      <p>Es la base sobre la cual se construyen los componentes de más alto nivel como <code>DialogueManager</code>.</p>
+      <p>Es la base sobre la cual se construyen los componentes de más alto nivel como <code>AIService</code> y <code>DialogueManager</code>.</p>
+
+      <div class="callout-info" style="margin: 1.5rem 0;">
+        <p><strong>Uso Recomendado:</strong> Para la mayoría de casos, usar <code>AIService</code> en lugar de instanciar <code>LlamaInterface</code> directamente:</p>
+        <pre data-lang="GDSCRIPT" style="margin-top: 0.75rem;"><code># Forma recomendada - usar AIService singleton
+var ai_service := AIService.get_singleton()
+if ai_service and ai_service.is_model_loaded():
+    # El modelo ya está disponible globalmente
+    pass
+
+# Forma directa (bajo nivel) - instanciar LlamaInterface
+var llama := LlamaInterface.new()
+llama.load_model("res://models/model.gguf")</code></pre>
+        <p style="margin-top: 0.75rem;"><code>AIService</code> gestiona el ciclo de vida del modelo, integra con <code>ModelManager</code> para descarga de modelos, y proporciona señales para cambios de estado.</p>
+      </div>
 
       <hr>
 
