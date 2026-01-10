@@ -15,7 +15,8 @@ func _configure_slots() -> void:
 
 func _create_content_ui() -> void:
 	_add_hint_label("Enter free conversation")
-	var context_hint: String = node_data.data.get("context_hint", "")
-	if not context_hint.is_empty():
+	var free_node := node_data as JumpToFreeNodeData
+	var context_prompt: String = free_node.context_prompt if free_node else ""
+	if not context_prompt.is_empty():
 		_add_separator()
-		_add_text_preview(context_hint, 2)
+		_add_text_preview(context_prompt, 2)

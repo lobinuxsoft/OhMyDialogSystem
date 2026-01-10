@@ -40,54 +40,39 @@ enum SpeechStyle {
 @export_group("Personality")
 
 ## Core personality traits and behavioral tendencies.
-## Example: "Cheerful and optimistic, but hides deep insecurities."
 @export_multiline var personality: String = ""
 
 ## Character's history, origin, and life experiences.
-## Example: "A former knight who abandoned their oath after witnessing corruption."
 @export_multiline var background: String = ""
 
 ## How the character speaks - affects vocabulary and sentence structure.
 @export var speech_style: SpeechStyle = SpeechStyle.CASUAL
 
 ## Custom speech patterns or verbal tics.
-## Example: "Often says 'by the stars' as an exclamation."
 @export_multiline var speech_patterns: String = ""
 
 
-@export_group("Knowledge & Secrets")
+@export_group("Knowledge & Motivations")
 
 ## Things this character knows about (topics they can discuss).
-## Example: ["blacksmithing", "local politics", "ancient history"]
 @export var knowledge: Array[String] = []
 
-## Information the character hides or reveals only under certain conditions.
-## Example: ["Is actually the missing prince", "Knows where the treasure is"]
-@export var secrets: Array[String] = []
-
-
-@export_group("Motivation")
-
 ## What the character wants to achieve.
-## Example: ["Find their missing sister", "Become the best blacksmith"]
 @export var goals: Array[String] = []
 
 ## What the character fears or avoids.
-## Example: ["Being discovered as a fraud", "Deep water"]
 @export var fears: Array[String] = []
 
+## Information the character hides or reveals only under certain conditions.
+@export var secrets: Array[String] = []
 
-@export_group("Relationships")
+
+@export_group("Social")
 
 ## Dictionary of character_id -> relationship description.
-## Example: {"merchant_bob": "Old friend, trusts completely", "guard_captain": "Suspects of corruption"}
 @export var relationships: Dictionary = {}
 
-
-@export_group("Examples")
-
 ## Example dialogue lines that demonstrate the character's voice.
-## These are included in the prompt to help the AI match the style.
 @export var example_dialogues: Array[String] = []
 
 
@@ -224,3 +209,9 @@ func get_summary() -> String:
 		character_id if not character_id.is_empty() else "no-id",
 		SpeechStyle.keys()[speech_style].to_lower()
 	]
+
+
+## Estimates the number of tokens this character's prompt will use.
+## Uses ~4 characters per token as approximation.
+func estimate_tokens() -> int:
+	return ceili(to_system_prompt().length() / 4.0)

@@ -1,10 +1,14 @@
 @tool
+@icon("res://addons/ohmydialog/icons/model_config.svg")
 class_name ModelConfig
 extends Resource
 ## Configuration resource for a GGUF language model.
 ##
 ## Stores model metadata, download URL, and default sampling parameters.
 ## Can be used for both predefined and custom models.
+
+
+@export_group("Model Info")
 
 ## Unique identifier for this model (e.g., "qwen2.5-0.5b-instruct")
 @export var id: String = ""
@@ -30,7 +34,8 @@ extends Resource
 ## Whether to include this model in exported builds
 @export var include_in_export: bool = false
 
-@export_group("Default Sampling Parameters")
+
+@export_group("Default Sampling")
 
 ## Temperature for sampling (0.0 = greedy, higher = more random)
 @export_range(0.0, 2.0, 0.01) var default_temperature: float = 0.7
@@ -50,7 +55,8 @@ extends Resource
 ## Minimum probability threshold
 @export_range(0.0, 1.0, 0.01) var default_min_p: float = 0.05
 
-@export_group("Context Settings")
+
+@export_group("Context")
 
 ## Context size in tokens
 @export var n_ctx: int = 2048
@@ -104,3 +110,19 @@ func get_effective_path() -> String:
 		return model_path
 
 	return "res://models/" + get_filename()
+
+
+## Returns true if this model config has minimum required data.
+func is_valid() -> bool:
+	return not id.is_empty() and not display_name.is_empty()
+
+
+## Returns a short summary of the model for debugging.
+func get_summary() -> String:
+	var status := "downloaded" if is_downloaded() else "not downloaded"
+	return "%s (%s) - %s, %d ctx" % [
+		display_name if not display_name.is_empty() else "Unnamed Model",
+		id if not id.is_empty() else "no-id",
+		status,
+		n_ctx
+	]

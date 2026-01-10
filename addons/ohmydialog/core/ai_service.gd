@@ -15,6 +15,9 @@ signal model_unloaded()
 ## Emitted when model loading fails
 signal model_load_failed(config: ModelConfig, error: Error)
 
+## Emitted when the list of available models changes
+signal models_changed()
+
 ## Internal singleton instance
 static var _instance: AIService
 
@@ -58,6 +61,7 @@ func _setup_model_manager() -> void:
 	_model_manager.model_loaded.connect(_on_model_loaded)
 	_model_manager.model_unloaded.connect(_on_model_unloaded)
 	_model_manager.model_load_failed.connect(_on_model_load_failed)
+	_model_manager.models_changed.connect(_on_models_changed)
 
 
 ## Ensures a model is loaded before proceeding.
@@ -126,3 +130,7 @@ func _on_model_unloaded() -> void:
 
 func _on_model_load_failed(config: ModelConfig, error: Error) -> void:
 	model_load_failed.emit(config, error)
+
+
+func _on_models_changed() -> void:
+	models_changed.emit()

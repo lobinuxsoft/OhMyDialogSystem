@@ -8,7 +8,7 @@ extends RefCounted
 
 
 ## Creates and returns the appropriate visual node for the given data.
-static func create_node(node_data: DialogueNodeData) -> BaseDialogueNode:
+static func create_node(node_data: DialogueNodeData, graph: DialogueGraph = null) -> BaseDialogueNode:
 	var visual_node: BaseDialogueNode
 
 	match node_data.node_type:
@@ -38,5 +38,5 @@ static func create_node(node_data: DialogueNodeData) -> BaseDialogueNode:
 			push_error("DialogueNodeFactory: Unknown node type %d" % node_data.node_type)
 			return null
 
-	visual_node.setup(node_data)
+	visual_node.setup(node_data, graph)
 	return visual_node

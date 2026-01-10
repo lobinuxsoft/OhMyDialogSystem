@@ -17,7 +17,8 @@ func _create_content_ui() -> void:
 	_add_hint_label("Entry Point")
 
 	# Show AI model info
-	var model_path: String = node_data.data.get("model_path", "")
+	var start_node := node_data as StartNodeData
+	var model_path: String = start_node.model_path if start_node else ""
 	if model_path.is_empty():
 		_add_info("AI", "(ninguno)", Color(0.6, 0.6, 0.6))
 	else:

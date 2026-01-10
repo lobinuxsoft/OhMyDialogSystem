@@ -132,6 +132,9 @@ var _pending_confirm_slot: int = 0
 ## Whether the model was loaded by this dialogue (for auto-unload).
 var _model_loaded_for_dialogue: bool = false
 
+## Thread for blocking inference (to avoid freezing main thread).
+var _inference_thread: Thread
+
 
 func _ready() -> void:
 	_initialize_components()
@@ -179,11 +182,9 @@ func start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = DialogueMo
 
 	# Load model from StartNode if specified
 	if graph:
-		var start_node := graph.get_start_node()
-		if start_node:
-			var model_path: String = start_node.data.get("model_path", "")
-			if not model_path.is_empty():
-				await _load_model_for_dialogue(model_path)
+		var start_node := graph.get_start_node() as StartNodeData
+		if start_node and not start_node.model_path.is_empty():
+			await _load_model_for_dialogue(start_node.model_path)
 
 	# Apply AI preset
 	if ai_preset and llama_interface:
@@ -212,6 +213,10 @@ func end_dialogue(reason: String = "ended") -> void:
 	context_manager.clear_local()
 	_is_active = false
 	_pending_inference.clear()
+
+	# Wait for inference thread to finish before unloading model
+	if _inference_thread != null and _inference_thread.is_started():
+		_inference_thread.wait_to_finish()
 
 	# Always unload model to free memory
 	_unload_model_if_needed()
@@ -411,6 +416,13 @@ func _request_inference(prompt: String) -> void:
 		_emit_error("No LlamaInterface for inference")
 		return
 
+	# Validate prompt size against model context
+	var model_ctx := _get_model_context_size()
+	var estimated_tokens := ceili(prompt.length() / 4.0)  # ~4 chars per token
+	if estimated_tokens > model_ctx:
+		_emit_error("Prompt too long (%d tokens) for model context (%d tokens). Reduce prompt or use larger model." % [estimated_tokens, model_ctx])
+		return
+
 	_pending_inference = {"prompt": prompt}
 
 	var speaker := active_character.character_name if active_character else "NPC"
@@ -420,6 +432,16 @@ func _request_inference(prompt: String) -> void:
 		_start_streaming_inference(prompt)
 	else:
 		_start_blocking_inference(prompt)
+
+
+## Gets the context size of the currently loaded model.
+func _get_model_context_size() -> int:
+	var ai_service := AIService.get_singleton()
+	if ai_service:
+		var config := ai_service.get_current_config()
+		if config:
+			return config.n_ctx
+	return max_context_tokens  # Fallback to configured value
 
 
 ## Starts streaming inference.
@@ -440,13 +462,30 @@ func _start_streaming_inference(prompt: String) -> void:
 		_start_blocking_inference(prompt)
 
 
-## Starts blocking inference.
+## Starts blocking inference in a separate thread.
 func _start_blocking_inference(prompt: String) -> void:
 	if not llama_interface.has_method("generate"):
 		_emit_error("LlamaInterface has no generate method")
 		return
 
+	# Wait for any previous thread to finish
+	if _inference_thread != null and _inference_thread.is_started():
+		_inference_thread.wait_to_finish()
+
+	_inference_thread = Thread.new()
+	_inference_thread.start(_generate_in_thread.bind(prompt))
+
+
+## Runs generation in a background thread.
+func _generate_in_thread(prompt: String) -> void:
 	var result: String = llama_interface.generate(prompt)
+	call_deferred("_on_thread_generation_completed", result)
+
+
+## Called when threaded generation completes.
+func _on_thread_generation_completed(result: String) -> void:
+	if _inference_thread != null and _inference_thread.is_started():
+		_inference_thread.wait_to_finish()
 	_complete_inference(result)
 
 
@@ -515,7 +554,8 @@ func _clean_response(response: String) -> String:
 
 func _on_node_entered(node_data: DialogueNodeData) -> void:
 	# Update active character if node specifies one
-	var node_character: CharacterIdentity = node_data.data.get("character_override")
+	# Note: character_override is an optional property that may be added to specific node types
+	var node_character: CharacterIdentity = node_data.get("character_override")
 	if node_character:
 		active_character = node_character
 

@@ -14,8 +14,9 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var speaker: String = node_data.data.get("speaker", "")
-	var text: String = node_data.data.get("text", "")
+	var static_node := node_data as StaticResponseNodeData
+	var speaker: String = static_node.speaker if static_node else ""
+	var text: String = static_node.text if static_node else ""
 
 	_add_info("Speaker", speaker)
 	_add_separator()

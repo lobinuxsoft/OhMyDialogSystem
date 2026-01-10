@@ -18,6 +18,7 @@ signal node_selected(node_data: DialogueNodeData)
 signal selection_cleared
 
 
+
 ## The currently edited DialogueGraph resource.
 var current_graph: DialogueGraph
 
@@ -266,7 +267,7 @@ func _clear_visual_nodes() -> void:
 
 ## Creates a visual node for the given DialogueNodeData.
 func _create_visual_node(node_data: DialogueNodeData) -> BaseDialogueNode:
-	var visual_node := DialogueNodeFactory.create_node(node_data)
+	var visual_node := DialogueNodeFactory.create_node(node_data, current_graph)
 	if visual_node:
 		graph_edit.add_child(visual_node)
 		_visual_nodes[node_data.node_id] = visual_node
@@ -499,10 +500,10 @@ func _duplicate_selected() -> void:
 		return
 
 	var original := _selected_node.node_data
-	var new_data := DialogueNodeData.new(original.node_type)
+	# Duplicate via serialization to preserve typed properties
+	var new_data := DialogueNodeData.from_dict(original.to_dict())
+	new_data.node_id = new_data._generate_uuid()
 	new_data.editor_position = original.editor_position + Vector2(50, 50)
-	new_data.data = original.data.duplicate(true)
-	new_data.output_count = original.output_count
 
 	current_graph.add_node(new_data)
 	_create_visual_node(new_data)

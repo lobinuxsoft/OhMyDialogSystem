@@ -26,6 +26,9 @@ func _ready() -> void:
 	_action_button.pressed.connect(_on_action_pressed)
 	_config_button.pressed.connect(_on_config_pressed)
 
+	# Set config button icon
+	_config_button.icon = get_theme_icon("Tools", "EditorIcons")
+
 	# Defer connection to AIService to ensure it's initialized
 	call_deferred("_connect_ai_service")
 
@@ -67,8 +70,6 @@ func _set_loaded_state() -> void:
 	_action_button.text = "Unload"
 	_action_button.icon = get_theme_icon("Stop", "EditorIcons")
 
-	_status_icon.modulate = Color.GREEN
-
 
 func _set_unloaded_state() -> void:
 	_status_label.text = "No Model"
@@ -80,8 +81,6 @@ func _set_unloaded_state() -> void:
 	_action_button.text = "Load"
 	_action_button.icon = get_theme_icon("Play", "EditorIcons")
 
-	_status_icon.modulate = Color.GRAY
-
 
 func _set_disconnected_state() -> void:
 	_status_label.text = "Disconnected"
@@ -92,8 +91,6 @@ func _set_disconnected_state() -> void:
 
 	_action_button.text = "Retry"
 	_action_button.icon = get_theme_icon("Reload", "EditorIcons")
-
-	_status_icon.modulate = Color.RED
 
 
 func _on_action_pressed() -> void:

@@ -14,9 +14,10 @@ func _configure_slots() -> void:
 
 
 func _create_content_ui() -> void:
-	var target_graph: String = node_data.data.get("target_graph_id", "")
-	var target_node: String = node_data.data.get("target_node_id", "")
-	var preserve_context: bool = node_data.data.get("preserve_context", false)
+	var jump_node := node_data as JumpNodeData
+	var target_graph: String = jump_node.target_graph_id if jump_node else ""
+	var target_node: String = jump_node.target_node_id if jump_node else ""
+	var preserve_context: bool = jump_node.preserve_context if jump_node else false
 
 	# Show graph name (extract filename from path)
 	var graph_display: String = target_graph

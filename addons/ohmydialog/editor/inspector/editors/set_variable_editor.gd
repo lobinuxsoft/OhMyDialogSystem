@@ -1,45 +1,51 @@
 @tool
 class_name SetVariableEditor
 extends BaseNodeEditor
-## Inspector editor for SET_VARIABLE nodes.
+## Wiki-style info panel for Set Variable nodes.
 ##
-## Shows variable name, operation, and value fields.
+## Shows variable operation summary.
 
 
-const OPERATION_NAMES: Array[String] = ["Set", "Add", "Subtract", "Multiply", "Divide", "Toggle"]
+const OPERATION_SYMBOLS: Array[String] = ["=", "+=", "-=", "*=", "/=", "toggle"]
+
+var _info_label: RichTextLabel
 
 
-func _setup_ui() -> void:
-	_add_header("Set Variable")
-	_add_separator()
-	_add_variable_selector("Variable", "variable")
-	_add_operation_selector()
-	_add_line_edit("Value", "value", "new value")
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super._init(node_data, graph)
+	ACCENT_COLOR = Color("#06b6d4")
+	ICON = "📝"
+	TITLE = "SET VARIABLE"
 
 
-func _add_operation_selector() -> OptionButton:
-	var hbox := HBoxContainer.new()
+func _setup_info() -> void:
+	_info_label = _add_info_label()
+	_refresh_info()
 
-	var label := Label.new()
-	label.text = "Operation:"
-	label.custom_minimum_size.x = 100
-	hbox.add_child(label)
 
-	var option := OptionButton.new()
-	for name in OPERATION_NAMES:
-		option.add_item(name)
+func _refresh_info() -> void:
+	if not _info_label or not _node_data:
+		return
 
-	# Get current value (it's an enum int)
-	var current_value: Variant = _node_data.data.get("operation", 0)
-	if current_value is int:
-		option.select(mini(current_value, OPERATION_NAMES.size() - 1))
+	var var_node := _node_data as SetVariableNodeData
+	if not var_node:
+		return
 
-	option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	option.item_selected.connect(func(index: int):
-		_node_data.data["operation"] = index  # Store as enum int
-		_emit_changed()
-	)
-	hbox.add_child(option)
+	var text := ""
 
-	add_child(hbox)
-	return option
+	# Variable name
+	if var_node.variable.is_empty():
+		text += "[color=#ef4444]✗ Sin variable definida[/color]"
+	else:
+		# Show readable operation
+		var op_idx: int = var_node.operation
+		var op_symbol: String = OPERATION_SYMBOLS[op_idx] if op_idx < OPERATION_SYMBOLS.size() else "?"
+
+		text += "[b]Operación:[/b]\n"
+		if op_symbol == "toggle":
+			text += "[color=#06b6d4]%s = !%s[/color]" % [var_node.variable, var_node.variable]
+		else:
+			var display_value: String = str(var_node.value) if var_node.value != null else "null"
+			text += "[color=#06b6d4]%s %s %s[/color]" % [var_node.variable, op_symbol, display_value]
+
+	_info_label.text = text

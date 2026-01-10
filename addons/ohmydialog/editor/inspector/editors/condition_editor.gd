@@ -1,71 +1,52 @@
 @tool
 class_name ConditionEditor
 extends BaseNodeEditor
-## Inspector editor for CONDITION nodes.
+## Wiki-style info panel for Condition nodes.
 ##
-## Shows variable, operator, value, or raw expression fields.
+## Shows condition summary and validation.
 
 
-const OPERATOR_NAMES: Array[String] = [
-	"== (Equal)",
-	"!= (Not Equal)",
-	"> (Greater)",
-	">= (Greater/Equal)",
-	"< (Less)",
-	"<= (Less/Equal)",
-	"Contains",
-	"Is Empty",
-	"Is True",
-	"Is False"
+const OPERATOR_SYMBOLS: Array[String] = [
+	"==", "!=", ">", ">=", "<", "<=",
+	"contains", "is_empty", "is_true", "is_false"
 ]
 
-
-func _setup_ui() -> void:
-	_add_header("Condition Node")
-	_add_separator()
-
-	# Simple condition mode
-	_add_header("Simple Mode")
-	_add_variable_selector("Variable", "variable")
-	_add_operator_selector()
-	_add_line_edit("Value", "value", "compare value")
-
-	_add_separator()
-
-	# Expression mode
-	_add_header("Expression Mode")
-	_add_text_edit("Expression", "expression", 60)
-
-	var note := Label.new()
-	note.text = "Use either simple mode OR expression, not both."
-	note.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-	note.add_theme_font_size_override("font_size", 11)
-	add_child(note)
+var _info_label: RichTextLabel
 
 
-func _add_operator_selector() -> OptionButton:
-	var hbox := HBoxContainer.new()
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super._init(node_data, graph)
+	ACCENT_COLOR = Color("#f97316")
+	ICON = "⚖"
+	TITLE = "CONDITION"
 
-	var label := Label.new()
-	label.text = "Operator:"
-	label.custom_minimum_size.x = 100
-	hbox.add_child(label)
 
-	var option := OptionButton.new()
-	for name in OPERATOR_NAMES:
-		option.add_item(name)
+func _setup_info() -> void:
+	_info_label = _add_info_label()
+	_refresh_info()
 
-	# Get current value (it's an enum int)
-	var current_value: Variant = _node_data.data.get("operator", 0)
-	if current_value is int:
-		option.select(mini(current_value, OPERATOR_NAMES.size() - 1))
 
-	option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	option.item_selected.connect(func(index: int):
-		_node_data.data["operator"] = index  # Store as enum int
-		_emit_changed()
-	)
-	hbox.add_child(option)
+func _refresh_info() -> void:
+	if not _info_label or not _node_data:
+		return
 
-	add_child(hbox)
-	return option
+	var cond_node := _node_data as ConditionNodeData
+	if not cond_node:
+		return
+
+	var text := ""
+
+	if cond_node.variable.is_empty():
+		text += "[color=#ef4444]✗ Sin variable definida[/color]"
+	else:
+		# Show readable condition
+		var op_idx: int = cond_node.operator
+		var op_symbol: String = OPERATOR_SYMBOLS[op_idx] if op_idx < OPERATOR_SYMBOLS.size() else "?"
+		text += "[b]Condición:[/b]\n"
+		var display_value: String = str(cond_node.value) if cond_node.value != null else "null"
+		text += "[color=#06b6d4]%s %s %s[/color]" % [cond_node.variable, op_symbol, display_value]
+
+	# Branches info
+	text += "\n\n[color=#484f58]Salida 0: TRUE\nSalida 1: FALSE[/color]"
+
+	_info_label.text = text

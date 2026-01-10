@@ -26,7 +26,7 @@ enum TimePeriod {
 }
 
 
-@export_group("World Identity")
+@export_group("Identity")
 
 ## Unique identifier for this world context.
 @export var world_id: String = ""
@@ -34,69 +34,52 @@ enum TimePeriod {
 ## Display name of the world/setting.
 @export var world_name: String = ""
 
+
+@export_group("Setting")
+
 ## Brief description of the setting.
-## Example: "A war-torn kingdom struggling to rebuild after dragon attacks."
 @export_multiline var setting: String = ""
 
 ## The technological and cultural era of this world.
 @export var time_period: TimePeriod = TimePeriod.FANTASY
 
-
-@export_group("Lore & History")
+## The overall tone of the world.
+@export var tone: String = ""
 
 ## Deep background lore and history of the world.
-## Example: "The First War ended 500 years ago when the gods departed..."
 @export_multiline var lore: String = ""
 
+
+@export_group("World Data")
+
 ## Major factions, nations, or groups in the world.
-## Key: faction_id, Value: description
-## Example: {"iron_guild": "Powerful merchant consortium controlling trade routes"}
 @export var factions: Dictionary = {}
 
-
-@export_group("Geography")
-
 ## Known locations in the world.
-## Key: location_id, Value: description
-## Example: {"silverpine_forest": "Ancient woods said to be haunted by spirits"}
 @export var locations: Dictionary = {}
+
+## Important NPCs the player might hear about.
+@export var important_npcs: Dictionary = {}
+
+
+@export_group("Dynamic State")
 
 ## The current location context (can be updated dynamically).
 @export var current_location: String = ""
 
-
-@export_group("Characters")
-
-## Important NPCs the player might hear about.
-## Key: character_id, Value: brief description
-## Example: {"king_aldric": "The aging king, beloved but seen as weak"}
-@export var important_npcs: Dictionary = {}
-
-
-@export_group("Current State")
-
 ## Current events happening in the world (can be updated dynamically).
-## Example: ["The harvest festival begins tomorrow", "Bandits spotted on the north road"]
 @export var current_events: Array[String] = []
 
-## World rules and constraints for the AI.
-## Example: ["Magic is rare and feared", "Dragons are extinct", "No modern technology"]
-@export var rules: Array[String] = []
-
 ## Dynamic state variables that can change during gameplay.
-## Key: variable_name, Value: current value
-## Example: {"war_status": "ongoing", "season": "winter", "player_reputation": 50}
 @export var dynamic_state: Dictionary = {}
 
 
-@export_group("Tone & Style")
+@export_group("Rules")
 
-## The overall tone of the world.
-## Example: "Dark and gritty with moments of hope"
-@export_multiline var tone: String = ""
+## World rules and constraints for the AI.
+@export var rules: Array[String] = []
 
 ## Topics or themes to avoid in this world.
-## Example: ["modern technology references", "fourth wall breaking"]
 @export var forbidden_topics: Array[String] = []
 
 
@@ -272,3 +255,9 @@ func get_summary() -> String:
 		world_id if not world_id.is_empty() else "no-id",
 		TimePeriod.keys()[time_period].to_lower().replace("_", " ")
 	]
+
+
+## Estimates the number of tokens this world context will use.
+## Uses ~4 characters per token as approximation.
+func estimate_tokens() -> int:
+	return ceili(to_context_prompt().length() / 4.0)

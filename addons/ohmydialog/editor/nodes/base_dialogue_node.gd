@@ -10,6 +10,9 @@ extends GraphNode
 ## Reference to the underlying data resource.
 var node_data: DialogueNodeData
 
+## Reference to the parent DialogueGraph (for context-aware nodes).
+var dialogue_graph: DialogueGraph
+
 ## Names for VariableOperation enum display.
 const OPERATION_NAMES := ["Set", "Add", "Subtract", "Multiply", "Divide", "Toggle"]
 
@@ -35,8 +38,9 @@ var _content_container: VBoxContainer
 
 
 ## Sets up the visual node from DialogueNodeData.
-func setup(data: DialogueNodeData) -> void:
+func setup(data: DialogueNodeData, graph: DialogueGraph = null) -> void:
 	node_data = data
+	dialogue_graph = graph
 	name = data.node_id
 	position_offset = data.editor_position
 

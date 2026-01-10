@@ -8,17 +8,18 @@ extends BaseNodeExecutor
 
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
-	var return_node_id: String = node_data.data.get("return_node_id", "")
-	var max_exchanges: int = node_data.data.get("max_exchanges", 0)
-	var timeout: float = node_data.data.get("timeout_seconds", 0.0)
-	var return_conditions: Array = node_data.data.get("return_conditions", [])
+	var free_node := node_data as JumpToFreeNodeData
+	var context_prompt: String = free_node.context_prompt if free_node else ""
+	var return_keywords: PackedStringArray = free_node.return_keywords if free_node else PackedStringArray()
+	var return_condition: String = free_node.return_condition if free_node else ""
+	var max_exchanges: int = free_node.max_exchanges if free_node else 0
 
 	# The GraphRunner will handle entering free mode
 	return {
 		RESULT_NEXT_NODE: "",
 		RESULT_ENTER_FREE: true,
-		"return_node_id": return_node_id,
-		"max_exchanges": max_exchanges,
-		"timeout_seconds": timeout,
-		"return_conditions": return_conditions
+		"context_prompt": context_prompt,
+		"return_keywords": Array(return_keywords),
+		"return_condition": return_condition,
+		"max_exchanges": max_exchanges
 	}

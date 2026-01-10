@@ -11,9 +11,10 @@ const OPERATION_NAMES := ["set", "add", "subtract", "multiply", "divide", "toggl
 
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
-	var variable_name: String = node_data.data.get("variable", "")
-	var value: Variant = node_data.data.get("value", null)
-	var operation: String = _normalize_operation(node_data.data.get("operation", "set"))
+	var setvar_node := node_data as SetVariableNodeData
+	var variable_name: String = setvar_node.variable if setvar_node else ""
+	var value: Variant = setvar_node.value if setvar_node else null
+	var operation: String = _normalize_operation(setvar_node.operation if setvar_node else 0)
 
 	if variable_name.is_empty():
 		return error("SetVariableExecutor: No variable name specified")

@@ -1,19 +1,33 @@
 @tool
 class_name EndNodeEditor
 extends BaseNodeEditor
-## Inspector editor for END nodes.
+## Wiki-style info panel for End nodes.
 ##
-## The END node has no configurable properties.
-## When reached, the dialogue ends and any loaded AI model is unloaded.
+## Shows what happens when dialogue ends.
 
 
-func _setup_ui() -> void:
-	_add_header("End Node")
-	_add_separator()
+var _info_label: RichTextLabel
 
-	# Info text
-	var info := Label.new()
-	info.text = "When this node is reached:\n• Dialogue session ends\n• AI model is unloaded (if loaded)\n\nUse JumpTo node if you want to\nchain dialogues without unloading."
-	info.add_theme_font_size_override("font_size", 11)
-	info.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-	add_child(info)
+
+func _init(node_data: DialogueNodeData, graph: DialogueGraph = null) -> void:
+	super._init(node_data, graph)
+	ACCENT_COLOR = Color("#ef4444")
+	ICON = "■"
+	TITLE = "END NODE"
+
+
+func _setup_info() -> void:
+	_info_label = _add_info_label()
+	_refresh_info()
+
+
+func _refresh_info() -> void:
+	if not _info_label:
+		return
+
+	var text := "[color=#484f58]Al llegar a este nodo:[/color]\n"
+	text += "• Sesión de diálogo termina\n"
+	text += "• Modelo IA se descarga\n"
+	text += "\n[color=#484f58]Usa JumpNode para encadenar\ndiálogos sin descargar el modelo.[/color]"
+
+	_info_label.text = text

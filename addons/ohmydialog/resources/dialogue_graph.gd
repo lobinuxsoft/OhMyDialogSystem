@@ -48,20 +48,6 @@ signal connection_removed(from_node: String, from_slot: int, to_node: String, to
 @export var world_context: WorldContext = null
 
 
-@export_group("Graph Data")
-
-## Dictionary of node_id -> DialogueNodeData.
-## Contains all nodes in this graph.
-@export var nodes: Dictionary = {}
-
-## Array of connection dictionaries.
-## Each connection: {from_node: String, from_slot: int, to_node: String, to_slot: int}
-@export var connections: Array[Dictionary] = []
-
-## The node_id of the start node (entry point of the dialogue).
-@export var start_node_id: String = ""
-
-
 @export_group("Variables")
 
 ## Local variables scoped to this dialogue graph.
@@ -70,11 +56,22 @@ signal connection_removed(from_node: String, from_slot: int, to_node: String, to
 @export var local_variables: Dictionary = {}
 
 
-@export_group("Editor")
+# ==================== Internal Data (not shown in inspector) ====================
+
+## Dictionary of node_id -> DialogueNodeData.
+## Contains all nodes in this graph.
+@export_storage var nodes: Dictionary = {}
+
+## Array of connection dictionaries.
+## Each connection: {from_node: String, from_slot: int, to_node: String, to_slot: int}
+@export_storage var connections: Array[Dictionary] = []
+
+## The node_id of the start node (entry point of the dialogue).
+@export_storage var start_node_id: String = ""
 
 ## Metadata for the visual editor (zoom, scroll position, etc.)
 ## Not used at runtime, only for editor state persistence.
-@export var editor_metadata: Dictionary = {}
+@export_storage var editor_metadata: Dictionary = {}
 
 
 # ==================== Node Management ====================
@@ -103,7 +100,7 @@ func add_node(node: DialogueNodeData) -> String:
 ## Creates and adds a new node of the specified type.
 ## Returns the created node.
 func create_node(type: DialogueNodeData.NodeType, position: Vector2 = Vector2.ZERO) -> DialogueNodeData:
-	var node := DialogueNodeData.new(type)
+	var node := DialogueNodeData.create(type)
 	node.editor_position = position
 	add_node(node)
 	return node
@@ -413,13 +410,12 @@ func duplicate_graph() -> DialogueGraph:
 	# Create mapping of old IDs to new IDs
 	var id_map: Dictionary = {}
 
-	# Duplicate nodes with new IDs
+	# Duplicate nodes with new IDs (via serialization to preserve typed properties)
 	for old_id in nodes:
 		var old_node: DialogueNodeData = nodes[old_id]
-		var new_node := DialogueNodeData.new(old_node.node_type)
-		new_node.editor_position = old_node.editor_position
-		new_node.data = old_node.data.duplicate(true)
-		new_node.output_count = old_node.output_count
+		var new_node := DialogueNodeData.from_dict(old_node.to_dict())
+		# Generate a new node_id for the duplicate
+		new_node.node_id = new_node._generate_uuid()
 
 		id_map[old_id] = new_node.node_id
 		new_graph.nodes[new_node.node_id] = new_node

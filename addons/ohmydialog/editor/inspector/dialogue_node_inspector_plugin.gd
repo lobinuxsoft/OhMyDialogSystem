@@ -31,21 +31,6 @@ func _parse_begin(object: Object) -> void:
 		add_custom_control(editor)
 
 
-func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
-	# Hide "data" dictionary - we show it with custom editors
-	if name == "data":
-		return true  # true = hide default editor
-
-	# Hide internal properties that users shouldn't edit directly
-	if name in ["node_id", "output_count", "editor_position", "editor_size"]:
-		return true
-
-	# Let Godot handle metadata natively
-	# (properties starting with "metadata/" are not intercepted)
-
-	return false  # false = use default editor
-
-
 func _create_editor_for_type(node_data: DialogueNodeData) -> Control:
 	# Pass current_graph to editors that need variable access
 	match node_data.node_type:

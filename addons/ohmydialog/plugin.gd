@@ -3,25 +3,40 @@ extends EditorPlugin
 ## OhMyDialogSystem - AI-powered dialogue system for Godot
 ##
 ## Main plugin entry point. Handles initialization and cleanup of
-## editor components, custom types, and dock panels.
+## editor components, custom types, and windows.
 
 const AUTOLOAD_NAME := "AIServiceAutoload"
 const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
 
-## Reference to the dialogue graph editor instance.
-var _editor_instance: Control
+## Reference to the toolbar menu button with icon.
+var _toolbar_menu: MenuButton
 
-## Reference to the custom inspector plugin.
-var _inspector_plugin: DialogueNodeInspectorPlugin
+## Reference to the dialogue graph editor window.
+var _dialogue_graph_window: DialogueGraphWindow
+
+## Reference to the DialogueNodeData inspector plugin.
+var _node_inspector_plugin: DialogueNodeInspectorPlugin
+
+## Reference to the DialogueGraph inspector plugin.
+var _dialogue_graph_inspector_plugin: DialogueGraphInspectorPlugin
+
+## Reference to the CharacterIdentity inspector plugin.
+var _character_inspector_plugin: CharacterIdentityInspectorPlugin
+
+## Reference to the WorldContext inspector plugin.
+var _world_inspector_plugin: WorldContextInspectorPlugin
+
+## Reference to the ModelConfig inspector plugin.
+var _model_config_inspector_plugin: ModelConfigInspectorPlugin
+
+## Reference to the AIPreset inspector plugin.
+var _ai_preset_inspector_plugin: AIPresetInspectorPlugin
 
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
-## Reference to the AI dock panel.
-var _ai_dock: AIDock
-
-## Reference to the model required dialog.
-var _model_required_dialog: ModelRequiredDialog
+## Reference to the model manager window.
+var _model_manager_window: ModelManagerWindow
 
 
 func _enter_tree() -> void:
@@ -33,80 +48,116 @@ func _enter_tree() -> void:
 	_ai_service.name = "AIService"
 	add_child(_ai_service)
 
-	# Register inspector plugin for DialogueNodeData
-	_inspector_plugin = DialogueNodeInspectorPlugin.new()
-	add_inspector_plugin(_inspector_plugin)
+	# Register inspector plugins
+	_node_inspector_plugin = DialogueNodeInspectorPlugin.new()
+	add_inspector_plugin(_node_inspector_plugin)
 
-	# Load and instantiate the dialogue graph editor
-	var editor_scene := preload("res://addons/ohmydialog/editor/dialogue_graph_editor.tscn")
-	_editor_instance = editor_scene.instantiate()
+	_character_inspector_plugin = CharacterIdentityInspectorPlugin.new()
+	add_inspector_plugin(_character_inspector_plugin)
 
-	# Pass inspector plugin reference to editor for context updates
-	if _editor_instance.has_method("set_inspector_plugin"):
-		_editor_instance.set_inspector_plugin(_inspector_plugin)
+	_world_inspector_plugin = WorldContextInspectorPlugin.new()
+	add_inspector_plugin(_world_inspector_plugin)
 
-	# Add as bottom panel (more space for graph editing than dock)
-	add_control_to_bottom_panel(_editor_instance, "Dialogue Graph")
+	_model_config_inspector_plugin = ModelConfigInspectorPlugin.new()
+	add_inspector_plugin(_model_config_inspector_plugin)
 
-	# Initialize AI dock panel
-	var dock_scene := preload("res://addons/ohmydialog/editor/ai_dock.tscn")
-	_ai_dock = dock_scene.instantiate()
-	_ai_dock.config_requested.connect(_on_ai_config_requested)
-	_ai_dock.load_requested.connect(_on_ai_load_requested)
-	add_control_to_dock(DOCK_SLOT_RIGHT_UL, _ai_dock)
+	_ai_preset_inspector_plugin = AIPresetInspectorPlugin.new()
+	add_inspector_plugin(_ai_preset_inspector_plugin)
 
-	# Initialize model required dialog
-	var dialog_scene := preload("res://addons/ohmydialog/editor/model_required_dialog.tscn")
-	_model_required_dialog = dialog_scene.instantiate()
-	_model_required_dialog.open_model_manager_requested.connect(_on_open_model_manager_requested)
-	_model_required_dialog.model_activated.connect(_on_model_activated)
-	EditorInterface.get_base_control().add_child(_model_required_dialog)
+	# Initialize dialogue graph editor window
+	_dialogue_graph_window = DialogueGraphWindow.new()
+	EditorInterface.get_base_control().add_child(_dialogue_graph_window)
+	_dialogue_graph_window.ready.connect(_on_dialogue_graph_window_ready)
+
+	# Register inspector plugin for DialogueGraph
+	_dialogue_graph_inspector_plugin = DialogueGraphInspectorPlugin.new()
+	add_inspector_plugin(_dialogue_graph_inspector_plugin)
+
+	# Initialize model manager window
+	var manager_scene := preload("res://addons/ohmydialog/editor/model_manager_window.tscn")
+	_model_manager_window = manager_scene.instantiate()
+	EditorInterface.get_base_control().add_child(_model_manager_window)
+
+	# Create toolbar MenuButton with icon and text
+	_toolbar_menu = MenuButton.new()
+	_toolbar_menu.text = "AI"
+	_toolbar_menu.icon = preload("res://addons/ohmydialog/icon.png")
+	_toolbar_menu.flat = true
+	_toolbar_menu.focus_mode = Control.FOCUS_NONE
+	_toolbar_menu.add_theme_constant_override("icon_max_width", 32)
+
+	var popup := _toolbar_menu.get_popup()
+	popup.add_item("AI Models", 0)
+	popup.add_item("Dialogue Graph", 1)
+	popup.id_pressed.connect(_on_toolbar_menu_id_pressed)
+
+	_update_status_indicator(false, null)
+	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_menu)
+
+	# Connect to ModelManager signals after a frame (needs AIService to be ready)
+	call_deferred("_connect_model_manager_signals")
 
 	print("OhMyDialogSystem: Plugin loaded")
 
 
 func _exit_tree() -> void:
-	# Remove inspector plugin
-	if _inspector_plugin:
-		remove_inspector_plugin(_inspector_plugin)
-		_inspector_plugin = null
+	# Disconnect ModelManager signals
+	_disconnect_model_manager_signals()
 
-	# Remove and clean up the editor
-	if _editor_instance:
-		remove_control_from_bottom_panel(_editor_instance)
-		_editor_instance.queue_free()
-		_editor_instance = null
+	# Remove toolbar menu
+	if _toolbar_menu:
+		remove_control_from_container(CONTAINER_TOOLBAR, _toolbar_menu)
+		_toolbar_menu.queue_free()
+		_toolbar_menu = null
 
-	# Clean up AI dock
-	if _ai_dock:
-		remove_control_from_docks(_ai_dock)
-		_ai_dock.queue_free()
-		_ai_dock = null
+	# Remove inspector plugins
+	if _node_inspector_plugin:
+		remove_inspector_plugin(_node_inspector_plugin)
+		_node_inspector_plugin = null
+
+	if _dialogue_graph_inspector_plugin:
+		remove_inspector_plugin(_dialogue_graph_inspector_plugin)
+		_dialogue_graph_inspector_plugin = null
+
+	if _character_inspector_plugin:
+		remove_inspector_plugin(_character_inspector_plugin)
+		_character_inspector_plugin = null
+
+	if _world_inspector_plugin:
+		remove_inspector_plugin(_world_inspector_plugin)
+		_world_inspector_plugin = null
+
+	if _model_config_inspector_plugin:
+		remove_inspector_plugin(_model_config_inspector_plugin)
+		_model_config_inspector_plugin = null
+
+	if _ai_preset_inspector_plugin:
+		remove_inspector_plugin(_ai_preset_inspector_plugin)
+		_ai_preset_inspector_plugin = null
+
+	# Clean up dialogue graph window
+	if _dialogue_graph_window:
+		_dialogue_graph_window.queue_free()
+		_dialogue_graph_window = null
 
 	# Clean up AI service
 	if _ai_service:
 		_ai_service.queue_free()
 		_ai_service = null
 
-	# Clean up model required dialog
-	if _model_required_dialog:
-		_model_required_dialog.queue_free()
-		_model_required_dialog = null
-
-	# Note: We don't unregister the autoload here because:
-	# 1. It would break running games if user disables plugin while testing
-	# 2. User can manually remove it from Project Settings if needed
+	# Clean up model manager window
+	if _model_manager_window:
+		_model_manager_window.queue_free()
+		_model_manager_window = null
 
 	print("OhMyDialogSystem: Plugin unloaded")
 
 
 ## Registers the AIService AutoLoad if not already registered.
 func _register_autoload() -> void:
-	# Check if already registered
 	if ProjectSettings.has_setting("autoload/" + AUTOLOAD_NAME):
 		return
 
-	# Register the autoload
 	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
 	print("OhMyDialogSystem: Registered AIService AutoLoad")
 
@@ -118,42 +169,119 @@ func _handles(object: Object) -> bool:
 
 ## Called when the user selects an object this plugin handles.
 func _edit(object: Object) -> void:
-	if object is DialogueGraph and _editor_instance:
-		# Update inspector plugin with current graph for variable lookups
-		if _inspector_plugin:
-			_inspector_plugin.set_current_graph(object)
-
-		# Make panel visible FIRST, then load the graph
-		make_bottom_panel_item_visible(_editor_instance)
-		# Use call_deferred to ensure panel is visible before loading
-		_editor_instance.call_deferred("edit_graph", object)
+	if object is DialogueGraph and _dialogue_graph_window:
+		if _node_inspector_plugin:
+			_node_inspector_plugin.set_current_graph(object)
+		_dialogue_graph_window.edit_graph(object)
 
 
-## Makes the dialogue graph editor visible when editing.
-func _make_visible(visible: bool) -> void:
-	if _editor_instance:
-		if visible:
-			make_bottom_panel_item_visible(_editor_instance)
+## Called when the dialogue graph window is ready.
+func _on_dialogue_graph_window_ready() -> void:
+	var editor := _dialogue_graph_window.get_editor()
+	if editor and _node_inspector_plugin:
+		editor.set_inspector_plugin(_node_inspector_plugin)
+	if _dialogue_graph_inspector_plugin:
+		_dialogue_graph_inspector_plugin.setup(_dialogue_graph_window)
 
 
-## Called when user requests AI configuration from dock.
-func _on_ai_config_requested() -> void:
-	# TODO: Open AI Config Dialog (issue #167)
-	print("OhMyDialogSystem: Config requested - dialog not implemented yet")
+## Called when a toolbar menu item is pressed.
+func _on_toolbar_menu_id_pressed(id: int) -> void:
+	match id:
+		0:  # AI Models
+			if _model_manager_window:
+				_model_manager_window.show_window()
+		1:  # Dialogue Graph
+			if _dialogue_graph_window:
+				_dialogue_graph_window.show_window()
 
 
-## Called when user requests to load a model from dock.
-func _on_ai_load_requested() -> void:
-	if _model_required_dialog:
-		_model_required_dialog.show_dialog()
+## Connects to ModelManager signals for status updates.
+func _connect_model_manager_signals() -> void:
+	if not _ai_service:
+		return
+
+	var model_manager := _ai_service.get_model_manager()
+	if not model_manager:
+		return
+
+	if not model_manager.model_loaded.is_connected(_on_model_loaded):
+		model_manager.model_loaded.connect(_on_model_loaded)
+	if not model_manager.model_unloaded.is_connected(_on_model_unloaded):
+		model_manager.model_unloaded.connect(_on_model_unloaded)
+	if not model_manager.models_changed.is_connected(_on_models_changed):
+		model_manager.models_changed.connect(_on_models_changed)
+
+	# Check current state and update tooltip
+	if model_manager.is_model_loaded() and model_manager.current_config:
+		_update_status_indicator(true, model_manager.current_config)
+	else:
+		_update_status_indicator(false, null)
 
 
-## Called when user requests to open the Model Manager from the dialog.
-func _on_open_model_manager_requested() -> void:
-	# TODO: Open Model Manager window (future implementation)
-	print("OhMyDialogSystem: Model Manager not implemented yet")
+## Disconnects ModelManager signals.
+func _disconnect_model_manager_signals() -> void:
+	if not _ai_service:
+		return
+
+	var model_manager := _ai_service.get_model_manager()
+	if not model_manager:
+		return
+
+	if model_manager.model_loaded.is_connected(_on_model_loaded):
+		model_manager.model_loaded.disconnect(_on_model_loaded)
+	if model_manager.model_unloaded.is_connected(_on_model_unloaded):
+		model_manager.model_unloaded.disconnect(_on_model_unloaded)
+	if model_manager.models_changed.is_connected(_on_models_changed):
+		model_manager.models_changed.disconnect(_on_models_changed)
 
 
-## Called when a model is activated from the dialog.
-func _on_model_activated(config: ModelConfig) -> void:
-	print("OhMyDialogSystem: Model activated - %s" % config.display_name)
+## Updates the toolbar button appearance and tooltip.
+func _update_status_indicator(is_loaded: bool, config: ModelConfig) -> void:
+	if not _toolbar_menu:
+		return
+
+	# Build tooltip with model info
+	var tooltip := ""
+	var downloaded_count := 0
+
+	if _ai_service:
+		var model_manager := _ai_service.get_model_manager()
+		if model_manager and model_manager.registry:
+			var models := model_manager.get_available_models()
+			if models:
+				for model in models:
+					if model and model.is_downloaded():
+						downloaded_count += 1
+
+	if is_loaded and config:
+		_toolbar_menu.add_theme_color_override("font_color", Color.GREEN)
+		tooltip = "Active: %s\nAvailable models: %d" % [config.display_name, downloaded_count]
+	else:
+		_toolbar_menu.remove_theme_color_override("font_color")
+		if downloaded_count > 0:
+			tooltip = "No model loaded\nAvailable models: %d" % downloaded_count
+		else:
+			tooltip = "No model loaded\nDownload a model from AI Models"
+
+	_toolbar_menu.tooltip_text = tooltip
+
+
+## Called when a model is loaded.
+func _on_model_loaded(config: ModelConfig) -> void:
+	_update_status_indicator(true, config)
+
+
+## Called when a model is unloaded.
+func _on_model_unloaded() -> void:
+	_update_status_indicator(false, null)
+
+
+## Called when available models change (download/delete).
+func _on_models_changed() -> void:
+	# Refresh tooltip with updated model count
+	if _ai_service:
+		var model_manager := _ai_service.get_model_manager()
+		if model_manager and model_manager.is_model_loaded() and model_manager.current_config:
+			_update_status_indicator(true, model_manager.current_config)
+		else:
+			_update_status_indicator(false, null)

@@ -7,7 +7,8 @@ extends BaseNodeExecutor
 
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
-	var return_node_override: String = node_data.data.get("return_node_id", "")
+	var return_node := node_data as ReturnToGraphNodeData
+	var return_node_override: String = return_node.return_node_id if return_node else ""
 
 	# The GraphRunner will handle exiting free mode
 	return {

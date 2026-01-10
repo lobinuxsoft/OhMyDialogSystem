@@ -7,8 +7,9 @@ extends BaseNodeExecutor
 
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
-	var text: String = node_data.data.get("text", "")
-	var speaker: String = node_data.data.get("speaker", "")
+	var static_node := node_data as StaticResponseNodeData
+	var text: String = static_node.text if static_node else ""
+	var speaker: String = static_node.speaker if static_node else ""
 
 	# Support for simple variable substitution {var_name}
 	if context and context.has_method("get_variable"):
