@@ -386,6 +386,9 @@ func _on_delete_model_pressed() -> void:
 
 	if model.is_custom:
 		_model_manager.remove_custom_model(model.id)
+	else:
+		# Notify that a built-in model file was deleted
+		_model_manager.notify_models_changed()
 
 	_populate_models_tree()
 	_update_model_details()

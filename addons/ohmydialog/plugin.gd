@@ -100,6 +100,7 @@ func _enter_tree() -> void:
 	# Connect to AI service signals for main screen button updates
 	_ai_service.model_loaded.connect(_on_model_status_changed)
 	_ai_service.model_unloaded.connect(_on_model_status_changed)
+	_ai_service.models_changed.connect(_on_model_status_changed)
 
 	# Track main screen changes to know where to return
 	main_screen_changed.connect(_on_main_screen_changed)
