@@ -8,19 +8,14 @@ extends BaseNodeExecutor
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	var cond_node := node_data as ConditionNodeData
-	var condition: String = cond_node.expression if cond_node else ""
 	var variable_name: String = cond_node.variable if cond_node else ""
 	var operator_raw: Variant = cond_node.operator if cond_node else DialogueNodeData.ComparisonOperator.EQUAL
 	var compare_value: Variant = cond_node.value if cond_node else null
 
 	var result: bool = false
 
-	# Method 1: Expression-based condition
-	if not condition.is_empty():
-		result = _evaluate_expression(condition, context)
-
-	# Method 2: Variable comparison
-	elif not variable_name.is_empty():
+	# Evaluate variable comparison
+	if not variable_name.is_empty():
 		var operator := _normalize_operator(operator_raw)
 		result = _evaluate_comparison(variable_name, operator, compare_value, context)
 
@@ -64,13 +59,6 @@ func _normalize_operator(operator_raw: Variant) -> DialogueNodeData.ComparisonOp
 			return DialogueNodeData.ComparisonOperator.IS_FALSE
 
 	return DialogueNodeData.ComparisonOperator.EQUAL
-
-
-## Evaluates an expression string.
-func _evaluate_expression(expression: String, context: Object) -> bool:
-	if context and context.has_method("evaluate_condition"):
-		return context.evaluate_condition(expression)
-	return false
 
 
 ## Evaluates a variable comparison using the enum operator.
