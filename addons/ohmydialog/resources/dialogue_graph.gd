@@ -53,7 +53,10 @@ signal connection_removed(from_node: String, from_slot: int, to_node: String, to
 
 ## Path to the GGUF model file for AI responses in this dialogue.
 ## If empty, uses the currently loaded model from AIService.
-@export_file("*.gguf") var model_path: String = ""
+@export_file("*.gguf") var model_path: String = "":
+	set(value):
+		model_path = value
+		emit_changed()
 
 
 @export_group("Variables")
