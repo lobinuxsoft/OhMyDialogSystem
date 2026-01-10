@@ -324,24 +324,27 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 		var container := VBoxContainer.new()
 		container.add_theme_constant_override("separation", 6)
 
-		# Add button centered at top
+		# Add button full width at top
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size = Vector2(32, 28)
-		add_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		add_btn.custom_minimum_size.y = 28
+		add_btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		container.add_child(add_btn)
 
 		var items_container := VBoxContainer.new()
 		items_container.add_theme_constant_override("separation", 4)
 		container.add_child(items_container)
 
-		# Type options
-		const TYPE_OPTIONS := ["str", "int", "flt", "bool"]
+		# Type options matching Godot's metadata types
+		const TYPE_OPTIONS := ["String", "int", "float", "bool", "Vector2", "Vector3", "Color"]
 		const TYPE_COLORS := {
-			"str": Color("#10b981"),   # Green
-			"int": Color("#3b82f6"),   # Blue
-			"flt": Color("#f97316"),   # Orange
-			"bool": Color("#a855f7")   # Purple
+			"String": Color("#10b981"),   # Green
+			"int": Color("#3b82f6"),      # Blue
+			"float": Color("#f97316"),    # Orange
+			"bool": Color("#a855f7"),     # Purple
+			"Vector2": Color("#06b6d4"),  # Cyan
+			"Vector3": Color("#ec4899"),  # Pink
+			"Color": Color("#eab308")     # Yellow
 		}
 
 		# Use Array wrapper for self-referencing callable
@@ -478,21 +481,46 @@ class DialogueGraphEditorPanel extends VBoxContainer:
 			TYPE_INT:
 				return "int"
 			TYPE_FLOAT:
-				return "flt"
+				return "float"
 			TYPE_BOOL:
 				return "bool"
+			TYPE_VECTOR2:
+				return "Vector2"
+			TYPE_VECTOR3:
+				return "Vector3"
+			TYPE_COLOR:
+				return "Color"
 			_:
-				return "str"
+				return "String"
 
 
 	func _convert_value(text: String, type_name: String) -> Variant:
 		match type_name:
 			"int":
 				return text.to_int()
-			"flt":
+			"float":
 				return text.to_float()
 			"bool":
 				return text.to_lower() == "true" or text == "1"
+			"Vector2":
+				# Parse "(x, y)" format
+				var clean := text.replace("(", "").replace(")", "").replace(" ", "")
+				var parts := clean.split(",")
+				if parts.size() >= 2:
+					return Vector2(parts[0].to_float(), parts[1].to_float())
+				return Vector2.ZERO
+			"Vector3":
+				# Parse "(x, y, z)" format
+				var clean := text.replace("(", "").replace(")", "").replace(" ", "")
+				var parts := clean.split(",")
+				if parts.size() >= 3:
+					return Vector3(parts[0].to_float(), parts[1].to_float(), parts[2].to_float())
+				return Vector3.ZERO
+			"Color":
+				# Parse color from hex or name
+				if text.begins_with("#"):
+					return Color.html(text)
+				return Color.from_string(text, Color.WHITE)
 			_:
 				return text
 
