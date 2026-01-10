@@ -93,6 +93,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		title.bbcode_enabled = true
 		title.fit_content = true
 		title.scroll_active = false
+		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		title.text = "[b]CHARACTER IDENTITY[/b]"
 		title.add_theme_font_size_override("normal_font_size", 13)
 		title.add_theme_color_override("default_color", ACCENT_COLOR)
@@ -140,6 +141,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		title_label.bbcode_enabled = true
 		title_label.fit_content = true
 		title_label.scroll_active = false
+		title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		title_label.text = "[b]%s[/b]" % title
 		title_label.add_theme_font_size_override("normal_font_size", 12)
 		title_label.add_theme_color_override("default_color", WikiInspectorTheme.TEXT_PRIMARY)
