@@ -48,20 +48,6 @@ signal connection_removed(from_node: String, from_slot: int, to_node: String, to
 @export var world_context: WorldContext = null
 
 
-@export_group("Graph Data")
-
-## Dictionary of node_id -> DialogueNodeData.
-## Contains all nodes in this graph.
-@export var nodes: Dictionary = {}
-
-## Array of connection dictionaries.
-## Each connection: {from_node: String, from_slot: int, to_node: String, to_slot: int}
-@export var connections: Array[Dictionary] = []
-
-## The node_id of the start node (entry point of the dialogue).
-@export var start_node_id: String = ""
-
-
 @export_group("Variables")
 
 ## Local variables scoped to this dialogue graph.
@@ -70,11 +56,22 @@ signal connection_removed(from_node: String, from_slot: int, to_node: String, to
 @export var local_variables: Dictionary = {}
 
 
-@export_group("Editor")
+# ==================== Internal Data (not shown in inspector) ====================
+
+## Dictionary of node_id -> DialogueNodeData.
+## Contains all nodes in this graph.
+@export_storage var nodes: Dictionary = {}
+
+## Array of connection dictionaries.
+## Each connection: {from_node: String, from_slot: int, to_node: String, to_slot: int}
+@export_storage var connections: Array[Dictionary] = []
+
+## The node_id of the start node (entry point of the dialogue).
+@export_storage var start_node_id: String = ""
 
 ## Metadata for the visual editor (zoom, scroll position, etc.)
 ## Not used at runtime, only for editor state persistence.
-@export var editor_metadata: Dictionary = {}
+@export_storage var editor_metadata: Dictionary = {}
 
 
 # ==================== Node Management ====================
