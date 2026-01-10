@@ -6,6 +6,14 @@ extends EditorInspectorPlugin
 ## Replaces default property editors with a custom panel showing
 ## character info, token estimation, and organized editing fields.
 
+# Wiki color palette
+const COLOR_AI_BLUE := Color("#3b82f6")
+const COLOR_AI_BLUE_DIM := Color("#2563eb")
+const COLOR_AI_BLUE_DARK := Color("#1e3a5f")
+const COLOR_BG_DARK := Color("#1a1d24")
+const COLOR_BG_SECTION := Color("#252830")
+const COLOR_TEXT_DIM := Color("#9ca3af")
+const COLOR_TEXT := Color("#e5e7eb")
 
 ## Properties to hide (we show them in custom panel instead).
 const HIDDEN_PROPERTIES: Array[String] = [
@@ -22,17 +30,10 @@ func _can_handle(object: Object) -> bool:
 	return object is CharacterIdentity
 
 
-func _parse_category(object: Object, category: String) -> void:
-	# Hide the CharacterIdentity category - we show everything in custom panel
-	if category == "CharacterIdentity":
-		return
-
-
 func _parse_property(object: Object, type: Variant.Type, name: String, hint_type: PropertyHint, hint_string: String, usage_flags: int, wide: bool) -> bool:
-	# Hide our custom properties - we display them in the custom panel
 	if name in HIDDEN_PROPERTIES:
-		return true  # true = hide default editor
-	return false  # false = use default editor
+		return true
+	return false
 
 
 func _parse_begin(object: Object) -> void:
@@ -48,27 +49,27 @@ func _parse_begin(object: Object) -> void:
 class CharacterIdentityEditorPanel extends VBoxContainer:
 	var _character: CharacterIdentity
 	var _token_label: RichTextLabel
-	var _sections: Dictionary = {}  # section_name -> {header, content, expanded}
+	var _sections: Dictionary = {}
 
 	func _init(character: CharacterIdentity) -> void:
 		_character = character
 
 	func _ready() -> void:
-		add_theme_constant_override("separation", 4)
+		add_theme_constant_override("separation", 0)
 		_setup_ui()
 
 	func _setup_ui() -> void:
-		# === HEADER WITH TOKEN INFO ===
+		# === MAIN HEADER ===
 		var header_panel := PanelContainer.new()
-		header_panel.add_theme_stylebox_override("panel", _create_header_style())
+		header_panel.add_theme_stylebox_override("panel", _create_main_header_style())
 
 		var header_vbox := VBoxContainer.new()
 		header_vbox.add_theme_constant_override("separation", 4)
 
 		var title := Label.new()
 		title.text = "Character Identity"
-		title.add_theme_font_size_override("font_size", 14)
-		title.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		title.add_theme_font_size_override("font_size", 13)
+		title.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_AI_BLUE)
 		header_vbox.add_child(title)
 
 		_token_label = RichTextLabel.new()
@@ -80,94 +81,128 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 		header_panel.add_child(header_vbox)
 		add_child(header_panel)
 
-		# === IDENTITY SECTION ===
+		# === SECTIONS ===
 		var identity_content := _create_section("Identity", true)
 		_add_line_edit(identity_content, "ID", "character_id", "unique_id")
 		_add_line_edit(identity_content, "Name", "character_name", "Display Name")
 		_add_resource_picker(identity_content, "Portrait", "portrait", "Texture2D")
 
-		# === PERSONALITY SECTION ===
 		var personality_content := _create_section("Personality", true)
 		_add_text_edit(personality_content, "Personality", "personality", "Core traits and behavior...", 80)
 		_add_text_edit(personality_content, "Background", "background", "History and origin...", 80)
 		_add_speech_style_picker(personality_content)
 		_add_text_edit(personality_content, "Speech Patterns", "speech_patterns", "Verbal tics, catchphrases...", 60)
 
-		# === KNOWLEDGE SECTION ===
 		var knowledge_content := _create_section("Knowledge & Secrets", true)
-		_add_string_array_edit(knowledge_content, "Knowledge", "knowledge", "Topics they know about")
-		_add_string_array_edit(knowledge_content, "Secrets", "secrets", "Hidden information")
+		_add_string_array_edit(knowledge_content, "Knowledge", "knowledge", "Topic...")
+		_add_string_array_edit(knowledge_content, "Secrets", "secrets", "Secret...")
 
-		# === MOTIVATION SECTION ===
-		var motivation_content := _create_section("Motivation", true)
-		_add_string_array_edit(motivation_content, "Goals", "goals", "What they want to achieve")
-		_add_string_array_edit(motivation_content, "Fears", "fears", "What they avoid or dread")
+		var motivation_content := _create_section("Motivation", false)
+		_add_string_array_edit(motivation_content, "Goals", "goals", "Goal...")
+		_add_string_array_edit(motivation_content, "Fears", "fears", "Fear...")
 
-		# === RELATIONSHIPS SECTION ===
 		var relationships_content := _create_section("Relationships", false)
-		_add_dictionary_edit(relationships_content, "Relationships", "relationships", "character_id", "description")
+		_add_dictionary_edit(relationships_content, "Relationships", "relationships", "character_id", "relationship")
 
-		# === EXAMPLES SECTION ===
 		var examples_content := _create_section("Examples", false)
-		_add_string_array_edit(examples_content, "Example Dialogues", "example_dialogues", "Sample lines showing their voice")
+		_add_string_array_edit(examples_content, "Example Dialogues", "example_dialogues", "Example line...")
 
-		# === PREVIEW SECTION ===
 		var preview_content := _create_section("Preview", false)
 		_add_prompt_preview(preview_content)
-
-		add_child(HSeparator.new())
 
 		_update_token_display()
 
 
-	func _create_header_style() -> StyleBoxFlat:
+	func _create_main_header_style() -> StyleBoxFlat:
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.15, 0.18, 0.25, 0.9)
-		style.border_color = Color(0.3, 0.5, 0.8, 0.5)
+		style.bg_color = CharacterIdentityInspectorPlugin.COLOR_AI_BLUE_DARK
+		style.border_color = CharacterIdentityInspectorPlugin.COLOR_AI_BLUE
 		style.set_border_width_all(1)
-		style.set_corner_radius_all(4)
-		style.set_content_margin_all(12)
+		style.border_width_left = 3
+		style.set_corner_radius_all(2)
+		style.set_content_margin_all(10)
+		return style
+
+
+	func _create_section_header_style(is_hovered: bool = false) -> StyleBoxFlat:
+		var style := StyleBoxFlat.new()
+		style.bg_color = CharacterIdentityInspectorPlugin.COLOR_BG_SECTION if not is_hovered else CharacterIdentityInspectorPlugin.COLOR_BG_SECTION.lightened(0.1)
+		style.set_corner_radius_all(0)
+		style.set_content_margin_all(0)
+		style.content_margin_left = 4
+		style.content_margin_right = 4
+		style.content_margin_top = 6
+		style.content_margin_bottom = 6
 		return style
 
 
 	func _create_section(title: String, expanded: bool = true) -> VBoxContainer:
 		var section_container := VBoxContainer.new()
-		section_container.add_theme_constant_override("separation", 4)
+		section_container.add_theme_constant_override("separation", 0)
 
-		# Header button (clickable to expand/collapse)
-		var header_btn := Button.new()
-		header_btn.text = ("▼ " if expanded else "▶ ") + title
-		header_btn.flat = true
-		header_btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		header_btn.add_theme_font_size_override("font_size", 12)
-		header_btn.add_theme_color_override("font_color", Color(0.6, 0.75, 0.9))
-		header_btn.add_theme_color_override("font_hover_color", Color(0.8, 0.9, 1.0))
-		section_container.add_child(header_btn)
+		# Section header (looks like Godot's foldable sections)
+		var header_panel := PanelContainer.new()
+		header_panel.add_theme_stylebox_override("panel", _create_section_header_style())
 
-		# Content container
+		var header_hbox := HBoxContainer.new()
+		header_hbox.add_theme_constant_override("separation", 6)
+
+		# Arrow indicator
+		var arrow := Label.new()
+		arrow.text = "▼" if expanded else "▶"
+		arrow.add_theme_font_size_override("font_size", 10)
+		arrow.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
+		header_hbox.add_child(arrow)
+
+		# Title
+		var title_label := Label.new()
+		title_label.text = title
+		title_label.add_theme_font_size_override("font_size", 13)
+		title_label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT)
+		header_hbox.add_child(title_label)
+
+		header_panel.add_child(header_hbox)
+		section_container.add_child(header_panel)
+
+		# Content container with indent
+		var content_panel := PanelContainer.new()
+		var content_style := StyleBoxFlat.new()
+		content_style.bg_color = CharacterIdentityInspectorPlugin.COLOR_BG_DARK
+		content_style.set_content_margin_all(0)
+		content_style.content_margin_left = 16
+		content_style.content_margin_right = 8
+		content_style.content_margin_top = 8
+		content_style.content_margin_bottom = 8
+		content_panel.add_theme_stylebox_override("panel", content_style)
+		content_panel.visible = expanded
+
 		var content := VBoxContainer.new()
-		content.add_theme_constant_override("separation", 6)
-		content.visible = expanded
+		content.add_theme_constant_override("separation", 8)
+		content_panel.add_child(content)
+		section_container.add_child(content_panel)
 
-		# Indent content slightly
-		var margin := MarginContainer.new()
-		margin.add_theme_constant_override("margin_left", 12)
-		margin.add_child(content)
-		section_container.add_child(margin)
-
-		# Store references
 		_sections[title] = {
-			"header": header_btn,
-			"content": content,
+			"arrow": arrow,
+			"content_panel": content_panel,
+			"header_panel": header_panel,
 			"expanded": expanded
 		}
 
-		# Toggle on click
-		header_btn.pressed.connect(func():
-			var section: Dictionary = _sections[title]
-			section.expanded = not section.expanded
-			section.content.visible = section.expanded
-			section.header.text = ("▼ " if section.expanded else "▶ ") + title
+		# Make header clickable
+		header_panel.gui_input.connect(func(event: InputEvent):
+			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+				var section: Dictionary = _sections[title]
+				section.expanded = not section.expanded
+				section.content_panel.visible = section.expanded
+				section.arrow.text = "▼" if section.expanded else "▶"
+		)
+
+		# Hover effect
+		header_panel.mouse_entered.connect(func():
+			header_panel.add_theme_stylebox_override("panel", _create_section_header_style(true))
+		)
+		header_panel.mouse_exited.connect(func():
+			header_panel.add_theme_stylebox_override("panel", _create_section_header_style(false))
 		)
 
 		add_child(section_container)
@@ -176,10 +211,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 	func _add_line_edit(parent: Control, label_text: String, property: String, placeholder: String = "") -> void:
 		var hbox := HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 8)
 
 		var label := Label.new()
-		label.text = label_text + ":"
-		label.custom_minimum_size.x = 100
+		label.text = label_text
+		label.custom_minimum_size.x = 90
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
 		hbox.add_child(label)
 
 		var edit := LineEdit.new()
@@ -198,7 +235,8 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 	func _add_text_edit(parent: Control, label_text: String, property: String, placeholder: String = "", min_height: int = 80) -> void:
 		var label := Label.new()
-		label.text = label_text + ":"
+		label.text = label_text
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
 		parent.add_child(label)
 
 		var edit := TextEdit.new()
@@ -217,10 +255,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 	func _add_speech_style_picker(parent: Control) -> void:
 		var hbox := HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 8)
 
 		var label := Label.new()
-		label.text = "Speech Style:"
-		label.custom_minimum_size.x = 100
+		label.text = "Speech Style"
+		label.custom_minimum_size.x = 90
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
 		hbox.add_child(label)
 
 		var option := OptionButton.new()
@@ -240,10 +280,12 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 	func _add_resource_picker(parent: Control, label_text: String, property: String, base_type: String) -> void:
 		var hbox := HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 8)
 
 		var label := Label.new()
-		label.text = label_text + ":"
-		label.custom_minimum_size.x = 100
+		label.text = label_text
+		label.custom_minimum_size.x = 90
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
 		hbox.add_child(label)
 
 		var picker := EditorResourcePicker.new()
@@ -265,18 +307,19 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		var header := HBoxContainer.new()
 		var label := Label.new()
-		label.text = label_text + ":"
+		label.text = label_text
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
 		header.add_child(label)
 
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size.x = 28
+		add_btn.custom_minimum_size = Vector2(24, 24)
 		header.add_child(add_btn)
 		container.add_child(header)
 
 		var items_container := VBoxContainer.new()
-		items_container.add_theme_constant_override("separation", 4)
+		items_container.add_theme_constant_override("separation", 2)
 		container.add_child(items_container)
 
 		var rebuild_list: Callable
@@ -287,6 +330,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 			var arr: Array = _character.get(property)
 			for i in arr.size():
 				var item_hbox := HBoxContainer.new()
+				item_hbox.add_theme_constant_override("separation", 4)
 
 				var item_edit := LineEdit.new()
 				item_edit.text = arr[i]
@@ -302,8 +346,8 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				item_hbox.add_child(item_edit)
 
 				var del_btn := Button.new()
-				del_btn.text = "x"
-				del_btn.custom_minimum_size.x = 28
+				del_btn.text = "×"
+				del_btn.custom_minimum_size = Vector2(24, 24)
 				del_btn.pressed.connect(func():
 					var current_arr: Array = _character.get(property)
 					current_arr.remove_at(idx)
@@ -332,18 +376,19 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		var header := HBoxContainer.new()
 		var label := Label.new()
-		label.text = label_text + ":"
+		label.text = label_text
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.add_theme_color_override("font_color", CharacterIdentityInspectorPlugin.COLOR_TEXT_DIM)
 		header.add_child(label)
 
 		var add_btn := Button.new()
 		add_btn.text = "+"
-		add_btn.custom_minimum_size.x = 28
+		add_btn.custom_minimum_size = Vector2(24, 24)
 		header.add_child(add_btn)
 		container.add_child(header)
 
 		var items_container := VBoxContainer.new()
-		items_container.add_theme_constant_override("separation", 4)
+		items_container.add_theme_constant_override("separation", 2)
 		container.add_child(items_container)
 
 		var rebuild_list: Callable
@@ -352,15 +397,15 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				child.queue_free()
 
 			var dict: Dictionary = _character.get(property)
-			var keys := dict.keys()
-			for key in keys:
+			for key in dict.keys():
 				var item_hbox := HBoxContainer.new()
+				item_hbox.add_theme_constant_override("separation", 4)
 
 				var key_edit := LineEdit.new()
 				key_edit.text = key
 				key_edit.placeholder_text = key_hint
 				key_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				key_edit.custom_minimum_size.x = 100
+				key_edit.custom_minimum_size.x = 80
 				var old_key: String = key
 				key_edit.text_changed.connect(func(new_key: String):
 					var current_dict: Dictionary = _character.get(property)
@@ -387,12 +432,11 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				item_hbox.add_child(value_edit)
 
 				var del_btn := Button.new()
-				del_btn.text = "x"
-				del_btn.custom_minimum_size.x = 28
-				var dk: String = key
+				del_btn.text = "×"
+				del_btn.custom_minimum_size = Vector2(24, 24)
 				del_btn.pressed.connect(func():
 					var current_dict: Dictionary = _character.get(property)
-					current_dict.erase(dk)
+					current_dict.erase(k)
 					_character.emit_changed()
 					_update_token_display()
 					rebuild_list.call()
@@ -403,8 +447,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		add_btn.pressed.connect(func():
 			var dict: Dictionary = _character.get(property)
-			var new_key := "new_%d" % dict.size()
-			dict[new_key] = ""
+			dict["new_%d" % dict.size()] = ""
 			_character.emit_changed()
 			rebuild_list.call()
 		)
@@ -415,15 +458,15 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 	func _add_prompt_preview(parent: Control) -> void:
 		var btn := Button.new()
-		btn.text = "Show System Prompt Preview"
+		btn.text = "Show System Prompt"
 		parent.add_child(btn)
 
 		var preview_panel := PanelContainer.new()
 		preview_panel.visible = false
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.1, 0.12, 0.18, 0.9)
+		style.bg_color = Color(0.08, 0.09, 0.12)
 		style.set_border_width_all(1)
-		style.border_color = Color(0.25, 0.35, 0.5, 0.5)
+		style.border_color = CharacterIdentityInspectorPlugin.COLOR_AI_BLUE_DIM
 		style.set_corner_radius_all(4)
 		style.set_content_margin_all(8)
 		preview_panel.add_theme_stylebox_override("panel", style)
@@ -438,7 +481,7 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 
 		btn.pressed.connect(func():
 			preview_panel.visible = not preview_panel.visible
-			btn.text = "Hide System Prompt Preview" if preview_panel.visible else "Show System Prompt Preview"
+			btn.text = "Hide System Prompt" if preview_panel.visible else "Show System Prompt"
 			if preview_panel.visible:
 				var prompt := _character.to_system_prompt()
 				prompt = prompt.replace("[", "[lb]").replace("]", "[rb]")
@@ -462,15 +505,15 @@ class CharacterIdentityEditorPanel extends VBoxContainer:
 				model_name = config.display_name
 
 		var usage_percent := (tokens * 100.0) / model_ctx
-		var text := "[b]Token Estimate: ~%d[/b]\n" % tokens
+		var text := "[b]~%d tokens[/b] " % tokens
 
 		if tokens > model_ctx * 0.5:
-			text += "[color=#ff6b6b]WARNING: Uses %.0f%% of model context (%d tokens)[/color]" % [usage_percent, model_ctx]
+			text += "[color=#ef4444](%.0f%% - WARNING)[/color]" % usage_percent
 		elif tokens > model_ctx * 0.3:
-			text += "[color=#ffd93d]CAUTION: Uses %.0f%% of context[/color]\n" % usage_percent
-			text += "[color=#888]Model: %s (%d tokens)[/color]" % [model_name, model_ctx]
+			text += "[color=#eab308](%.0f%% - caution)[/color]" % usage_percent
 		else:
-			text += "[color=#6bcb77]OK: %.0f%% of context[/color]\n" % usage_percent
-			text += "[color=#888]Model: %s (%d tokens)[/color]" % [model_name, model_ctx]
+			text += "[color=#10b981](%.0f%% OK)[/color]" % usage_percent
+
+		text += "\n[color=#6b7280]Model: %s (%d ctx)[/color]" % [model_name, model_ctx]
 
 		_token_label.text = text
