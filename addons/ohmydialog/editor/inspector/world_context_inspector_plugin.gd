@@ -4,30 +4,7 @@ extends EditorInspectorPlugin
 ## Custom inspector plugin for WorldContext resources.
 ##
 ## Provides a wiki-styled editor panel with neural network aesthetic.
-## Properties are stored via _get_property_list() with STORAGE only,
-## so no native Godot properties appear in the inspector.
-
-# === WIKI COLOR PALETTE (Neural Network Theme - Green Variant) ===
-# Backgrounds
-const COLOR_BG_PRIMARY := Color("#0a0d12")
-const COLOR_BG_SECONDARY := Color("#0f1419")
-const COLOR_BG_TERTIARY := Color("#161d26")
-const COLOR_BG_CARD := Color("#121921")
-
-# Text
-const COLOR_TEXT_PRIMARY := Color("#e6edf3")
-const COLOR_TEXT_SECONDARY := Color("#8b949e")
-const COLOR_TEXT_MUTED := Color("#484f58")
-
-# AI Accent Colors (Green theme for World)
-const COLOR_AI_GREEN := Color("#10b981")
-const COLOR_AI_GREEN_DIM := Color("#059669")
-const COLOR_AI_PURPLE := Color("#a855f7")
-const COLOR_AI_CYAN := Color("#00d4ff")
-const COLOR_AI_ORANGE := Color("#f97316")
-
-# Borders
-const COLOR_BORDER := Color("#21262d")
+## Uses WikiInspectorTheme for consistent styling across all inspectors.
 
 
 func _can_handle(object: Object) -> bool:
@@ -45,6 +22,8 @@ func _parse_begin(object: Object) -> void:
 
 ## Full editor panel for WorldContext with wiki-style aesthetics.
 class WorldContextEditorPanel extends VBoxContainer:
+	const ACCENT_COLOR := WikiInspectorTheme.AI_GREEN
+
 	var _world: WorldContext
 	var _token_label: RichTextLabel
 	var _sections: Dictionary = {}
@@ -58,29 +37,70 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 	func _setup_ui() -> void:
 		# === MAIN HEADER ===
+		var header := _create_main_header()
+		add_child(header)
+
+		# === SECTIONS ===
+		var identity_content := _create_section("World Identity", WikiInspectorTheme.ICON_DIAMOND_EMPTY, true)
+		_add_line_edit(identity_content, "ID", "world_id", "unique_world_id")
+		_add_line_edit(identity_content, "Name", "world_name", "World Name")
+		_add_text_edit(identity_content, "Setting", "setting", "Brief description of the setting...", 80)
+		_add_time_period_picker(identity_content)
+
+		var lore_content := _create_section("Lore & History", WikiInspectorTheme.ICON_DIAMOND_DOT, true)
+		_add_text_edit(lore_content, "Lore", "lore", "Deep background lore and history...", 100)
+		_add_dictionary_edit(lore_content, "Factions", "factions", "faction_id", "description")
+
+		var geography_content := _create_section("Geography", WikiInspectorTheme.ICON_CIRCLE_DOT, true)
+		_add_dictionary_edit(geography_content, "Locations", "locations", "location_id", "description")
+		_add_line_edit(geography_content, "Current Location", "current_location", "location_id or description")
+
+		var characters_content := _create_section("Characters", WikiInspectorTheme.ICON_CIRCLE_TARGET, false)
+		_add_dictionary_edit(characters_content, "Important NPCs", "important_npcs", "character_id", "brief description")
+
+		var state_content := _create_section("Current State", WikiInspectorTheme.ICON_CIRCLE_HALF_LEFT, true)
+		_add_string_array_edit(state_content, "Current Events", "current_events", "Event happening now...")
+		_add_string_array_edit(state_content, "Rules", "rules", "World constraint or rule...")
+		_add_dictionary_edit(state_content, "Dynamic State", "dynamic_state", "variable_name", "value")
+
+		var tone_content := _create_section("Tone & Style", WikiInspectorTheme.ICON_CIRCLE_HALF_RIGHT, false)
+		_add_text_edit(tone_content, "Tone", "tone", "Overall tone of the world...", 60)
+		_add_string_array_edit(tone_content, "Forbidden Topics", "forbidden_topics", "Topic to avoid...")
+
+		var preview_content := _create_section("Preview", WikiInspectorTheme.ICON_CIRCLE_HALF_BOTTOM, false)
+		_add_prompt_preview(preview_content)
+
+		_update_token_display()
+
+
+	func _create_main_header() -> PanelContainer:
 		var header_panel := PanelContainer.new()
-		header_panel.add_theme_stylebox_override("panel", _create_header_style())
+		header_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_header_style(ACCENT_COLOR))
 
 		var header_vbox := VBoxContainer.new()
 		header_vbox.add_theme_constant_override("separation", 6)
 
-		# Title with icon-like prefix
+		# Title with large icon
 		var title_hbox := HBoxContainer.new()
-		title_hbox.add_theme_constant_override("separation", 8)
+		title_hbox.add_theme_constant_override("separation", 10)
 
 		var icon_label := Label.new()
-		icon_label.text = "◆"
-		icon_label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_AI_GREEN)
+		icon_label.text = WikiInspectorTheme.ICON_DIAMOND
+		icon_label.add_theme_font_size_override("font_size", 18)
+		icon_label.add_theme_color_override("font_color", ACCENT_COLOR)
 		title_hbox.add_child(icon_label)
 
-		var title := Label.new()
-		title.text = "WORLD CONTEXT"
-		title.add_theme_font_size_override("font_size", 12)
-		title.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_AI_GREEN)
+		var title := RichTextLabel.new()
+		title.bbcode_enabled = true
+		title.fit_content = true
+		title.scroll_active = false
+		title.text = "[b]WORLD CONTEXT[/b]"
+		title.add_theme_font_size_override("normal_font_size", 13)
+		title.add_theme_color_override("default_color", ACCENT_COLOR)
 		title_hbox.add_child(title)
+
 		header_vbox.add_child(title_hbox)
 
-		# Token display
 		_token_label = RichTextLabel.new()
 		_token_label.bbcode_enabled = true
 		_token_label.fit_content = true
@@ -88,69 +108,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 		header_vbox.add_child(_token_label)
 
 		header_panel.add_child(header_vbox)
-		add_child(header_panel)
-
-		# === SECTIONS ===
-		var identity_content := _create_section("World Identity", "◇", true)
-		_add_line_edit(identity_content, "ID", "world_id", "unique_world_id")
-		_add_line_edit(identity_content, "Name", "world_name", "World Name")
-		_add_text_edit(identity_content, "Setting", "setting", "Brief description of the setting...", 80)
-		_add_time_period_picker(identity_content)
-
-		var lore_content := _create_section("Lore & History", "◈", true)
-		_add_text_edit(lore_content, "Lore", "lore", "Deep background lore and history...", 100)
-		_add_dictionary_edit(lore_content, "Factions", "factions", "faction_id", "description")
-
-		var geography_content := _create_section("Geography", "◉", true)
-		_add_dictionary_edit(geography_content, "Locations", "locations", "location_id", "description")
-		_add_line_edit(geography_content, "Current Location", "current_location", "location_id or description")
-
-		var characters_content := _create_section("Characters", "◎", false)
-		_add_dictionary_edit(characters_content, "Important NPCs", "important_npcs", "character_id", "brief description")
-
-		var state_content := _create_section("Current State", "◐", true)
-		_add_string_array_edit(state_content, "Current Events", "current_events", "Event happening now...")
-		_add_string_array_edit(state_content, "Rules", "rules", "World constraint or rule...")
-		_add_dictionary_edit(state_content, "Dynamic State", "dynamic_state", "variable_name", "value")
-
-		var tone_content := _create_section("Tone & Style", "◑", false)
-		_add_text_edit(tone_content, "Tone", "tone", "Overall tone of the world...", 60)
-		_add_string_array_edit(tone_content, "Forbidden Topics", "forbidden_topics", "Topic to avoid...")
-
-		var preview_content := _create_section("Preview", "◒", false)
-		_add_prompt_preview(preview_content)
-
-		_update_token_display()
-
-
-	func _create_header_style() -> StyleBoxFlat:
-		var style := StyleBoxFlat.new()
-		style.bg_color = WorldContextInspectorPlugin.COLOR_BG_CARD
-		style.border_color = WorldContextInspectorPlugin.COLOR_AI_GREEN
-		style.set_border_width_all(1)
-		style.border_width_left = 3
-		style.border_width_top = 2
-		style.set_corner_radius_all(4)
-		style.corner_radius_top_left = 6
-		style.corner_radius_top_right = 6
-		style.set_content_margin_all(12)
-		return style
-
-
-	func _create_section_header_style(is_hovered: bool = false) -> StyleBoxFlat:
-		var style := StyleBoxFlat.new()
-		var base_color := WorldContextInspectorPlugin.COLOR_BG_TERTIARY
-		style.bg_color = base_color if not is_hovered else base_color.lightened(0.08)
-		style.border_color = WorldContextInspectorPlugin.COLOR_BORDER
-		style.set_border_width_all(0)
-		style.border_width_bottom = 1
-		style.set_corner_radius_all(0)
-		style.set_content_margin_all(0)
-		style.content_margin_left = 8
-		style.content_margin_right = 8
-		style.content_margin_top = 8
-		style.content_margin_bottom = 8
-		return style
+		return header_panel
 
 
 	func _create_section(title: String, icon: String, expanded: bool = true) -> VBoxContainer:
@@ -159,30 +117,33 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 		# Section header
 		var header_panel := PanelContainer.new()
-		header_panel.add_theme_stylebox_override("panel", _create_section_header_style())
+		header_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_section_header_style())
 
 		var header_hbox := HBoxContainer.new()
-		header_hbox.add_theme_constant_override("separation", 8)
+		header_hbox.add_theme_constant_override("separation", 10)
 
 		# Arrow indicator
 		var arrow := Label.new()
 		arrow.text = "▼" if expanded else "▶"
 		arrow.add_theme_font_size_override("font_size", 10)
-		arrow.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_AI_PURPLE)
+		arrow.add_theme_color_override("font_color", WikiInspectorTheme.AI_PURPLE)
 		header_hbox.add_child(arrow)
 
-		# Icon
+		# Large icon
 		var icon_label := Label.new()
 		icon_label.text = icon
-		icon_label.add_theme_font_size_override("font_size", 12)
-		icon_label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_AI_GREEN)
+		icon_label.add_theme_font_size_override("font_size", 16)
+		icon_label.add_theme_color_override("font_color", ACCENT_COLOR)
 		header_hbox.add_child(icon_label)
 
-		# Title
-		var title_label := Label.new()
-		title_label.text = title
-		title_label.add_theme_font_size_override("font_size", 12)
-		title_label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_TEXT_PRIMARY)
+		# Bold title
+		var title_label := RichTextLabel.new()
+		title_label.bbcode_enabled = true
+		title_label.fit_content = true
+		title_label.scroll_active = false
+		title_label.text = "[b]%s[/b]" % title
+		title_label.add_theme_font_size_override("normal_font_size", 12)
+		title_label.add_theme_color_override("default_color", WikiInspectorTheme.TEXT_PRIMARY)
 		header_hbox.add_child(title_label)
 
 		header_panel.add_child(header_hbox)
@@ -190,14 +151,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 		# Content container
 		var content_panel := PanelContainer.new()
-		var content_style := StyleBoxFlat.new()
-		content_style.bg_color = WorldContextInspectorPlugin.COLOR_BG_SECONDARY
-		content_style.set_content_margin_all(0)
-		content_style.content_margin_left = 20
-		content_style.content_margin_right = 10
-		content_style.content_margin_top = 10
-		content_style.content_margin_bottom = 10
-		content_panel.add_theme_stylebox_override("panel", content_style)
+		content_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_content_style())
 		content_panel.visible = expanded
 
 		var content := VBoxContainer.new()
@@ -223,10 +177,10 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 		# Hover effect
 		header_panel.mouse_entered.connect(func():
-			header_panel.add_theme_stylebox_override("panel", _create_section_header_style(true))
+			header_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_section_header_style(true))
 		)
 		header_panel.mouse_exited.connect(func():
-			header_panel.add_theme_stylebox_override("panel", _create_section_header_style(false))
+			header_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_section_header_style(false))
 		)
 
 		add_child(section_container)
@@ -240,7 +194,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 		var label := Label.new()
 		label.text = label_text
 		label.custom_minimum_size.x = 100
-		label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_TEXT_SECONDARY)
+		label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 		hbox.add_child(label)
 
 		var edit := LineEdit.new()
@@ -260,7 +214,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 	func _add_text_edit(parent: Control, label_text: String, property: String, placeholder: String = "", min_height: int = 80) -> void:
 		var label := Label.new()
 		label.text = label_text
-		label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_TEXT_SECONDARY)
+		label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 		parent.add_child(label)
 
 		var edit := TextEdit.new()
@@ -284,7 +238,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 		var label := Label.new()
 		label.text = "Time Period"
 		label.custom_minimum_size.x = 100
-		label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_TEXT_SECONDARY)
+		label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 		hbox.add_child(label)
 
 		var option := OptionButton.new()
@@ -310,7 +264,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 		var label := Label.new()
 		label.text = label_text
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_TEXT_SECONDARY)
+		label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 		header.add_child(label)
 
 		var add_btn := Button.new()
@@ -379,7 +333,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 		var label := Label.new()
 		label.text = label_text
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.add_theme_color_override("font_color", WorldContextInspectorPlugin.COLOR_TEXT_SECONDARY)
+		label.add_theme_color_override("font_color", WikiInspectorTheme.TEXT_SECONDARY)
 		header.add_child(label)
 
 		var add_btn := Button.new()
@@ -464,13 +418,7 @@ class WorldContextEditorPanel extends VBoxContainer:
 
 		var preview_panel := PanelContainer.new()
 		preview_panel.visible = false
-		var style := StyleBoxFlat.new()
-		style.bg_color = WorldContextInspectorPlugin.COLOR_BG_PRIMARY
-		style.set_border_width_all(1)
-		style.border_color = WorldContextInspectorPlugin.COLOR_AI_GREEN_DIM
-		style.set_corner_radius_all(4)
-		style.set_content_margin_all(10)
-		preview_panel.add_theme_stylebox_override("panel", style)
+		preview_panel.add_theme_stylebox_override("panel", WikiInspectorTheme.create_preview_style(WikiInspectorTheme.AI_GREEN_DIM))
 
 		var preview_label := RichTextLabel.new()
 		preview_label.bbcode_enabled = true
@@ -505,16 +453,4 @@ class WorldContextEditorPanel extends VBoxContainer:
 				model_ctx = config.n_ctx
 				model_name = config.display_name
 
-		var usage_percent := (tokens * 100.0) / model_ctx
-		var text := "[b]~%d tokens[/b] " % tokens
-
-		if tokens > model_ctx * 0.5:
-			text += "[color=#ef4444](%.0f%% - WARNING)[/color]" % usage_percent
-		elif tokens > model_ctx * 0.3:
-			text += "[color=#f97316](%.0f%% - caution)[/color]" % usage_percent
-		else:
-			text += "[color=#10b981](%.0f%% OK)[/color]" % usage_percent
-
-		text += "\n[color=#484f58]Model: %s (%d ctx)[/color]" % [model_name, model_ctx]
-
-		_token_label.text = text
+		_token_label.text = WikiInspectorTheme.format_token_display(tokens, model_ctx, model_name)
