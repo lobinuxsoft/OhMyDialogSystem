@@ -97,6 +97,30 @@ enum PresetType {
 @export_range(0.0, 1.0, 0.01) var mirostat_eta: float = 0.1
 
 
+@export_group("Model Metadata")
+
+## Original chat template from GGUF metadata (Jinja2 format, read-only reference).
+@export_multiline var source_chat_template: String = ""
+
+## Detected chat template format (chatml, llama2, llama3, mistral, vicuna, phi, gemma, or unknown).
+@export var chat_template_format: String = ""
+
+## Model architecture from GGUF (llama, qwen2, phi, gemma, etc.).
+@export var model_architecture: String = ""
+
+## BOS (Beginning of Sequence) token ID from model metadata. -1 if not found.
+@export var bos_token_id: int = -1
+
+## EOS (End of Sequence) token ID from model metadata. -1 if not found.
+@export var eos_token_id: int = -1
+
+## Recommended context length from model metadata. 0 if not found.
+@export var recommended_context_length: int = 0
+
+## Stop sequences derived from special tokens (populated from chat template format).
+@export var derived_stop_sequences: Array[String] = []
+
+
 ## Applies this preset's settings to a LlamaInterface instance.
 func apply_to(llama: Object) -> void:
 	if not llama:
@@ -294,3 +318,98 @@ static func get_preset(type: PresetType) -> AIPreset:
 			return create_technical()
 		_:
 			return create_balanced()
+
+
+# ==================== GGUF Metadata Factory ====================
+
+
+## Creates an AIPreset from GGUF metadata dictionary.
+## [param metadata]: Dictionary from GGUFParser or HuggingFaceAPI metadata fetch
+## [param base_type]: Base preset type to start from (defaults to BALANCED)
+## [param model_name]: Optional model name for the preset
+static func create_from_gguf_metadata(
+	metadata: Dictionary,
+	base_type: PresetType = PresetType.BALANCED,
+	model_name: String = ""
+) -> AIPreset:
+	# Start from a base preset
+	var preset := get_preset(base_type)
+	preset.preset_type = PresetType.CUSTOM
+
+	# Set preset name
+	if not model_name.is_empty():
+		preset.preset_name = "%s Preset" % model_name
+	else:
+		var name = metadata.get("_model_name", metadata.get("general.name", ""))
+		if not name.is_empty():
+			preset.preset_name = "%s Preset" % name
+		else:
+			preset.preset_name = "GGUF Custom Preset"
+
+	# Extract metadata fields
+	preset.source_chat_template = metadata.get("_chat_template", metadata.get("tokenizer.chat_template", ""))
+	preset.chat_template_format = metadata.get("_chat_template_format", "")
+	preset.model_architecture = metadata.get("_architecture", metadata.get("general.architecture", ""))
+	preset.bos_token_id = metadata.get("_bos_token_id", metadata.get("tokenizer.ggml.bos_token_id", -1))
+	preset.eos_token_id = metadata.get("_eos_token_id", metadata.get("tokenizer.ggml.eos_token_id", -1))
+
+	# Get context length (check architecture-specific key first)
+	var ctx_len = metadata.get("_context_length", 0)
+	if ctx_len == 0 and not preset.model_architecture.is_empty():
+		ctx_len = metadata.get("%s.context_length" % preset.model_architecture, 0)
+	if ctx_len > 0:
+		preset.recommended_context_length = ctx_len
+		preset.context_size = mini(ctx_len, 32768)  # Clamp to reasonable max
+
+	# Derive stop sequences from chat template format
+	preset.derived_stop_sequences = _derive_stop_sequences_from_format(preset.chat_template_format)
+
+	# Merge derived stop sequences with existing ones
+	for seq in preset.derived_stop_sequences:
+		if seq not in preset.stop_sequences:
+			preset.stop_sequences.append(seq)
+
+	# Generate description
+	preset.description = _generate_metadata_description(preset)
+
+	return preset
+
+
+## Derives stop sequences from a known chat template format.
+static func _derive_stop_sequences_from_format(format: String) -> Array[String]:
+	var sequences: Array[String] = []
+
+	match format:
+		"chatml":
+			sequences = ["<|im_end|>", "<|im_start|>"]
+		"llama2", "llama3":
+			sequences = ["[/INST]", "</s>"]
+		"mistral":
+			sequences = ["[/INST]", "</s>"]
+		"vicuna":
+			sequences = ["USER:", "ASSISTANT:"]
+		"phi":
+			sequences = ["<|end|>", "<|user|>"]
+		"gemma":
+			sequences = ["<end_of_turn>", "<start_of_turn>"]
+
+	return sequences
+
+
+## Generates a description string from preset metadata.
+static func _generate_metadata_description(preset: AIPreset) -> String:
+	var parts: Array[String] = []
+
+	if not preset.model_architecture.is_empty():
+		parts.append("Architecture: %s" % preset.model_architecture)
+
+	if not preset.chat_template_format.is_empty() and preset.chat_template_format != "unknown":
+		parts.append("Template: %s" % preset.chat_template_format)
+
+	if preset.recommended_context_length > 0:
+		parts.append("Context: %d tokens" % preset.recommended_context_length)
+
+	if parts.is_empty():
+		return "Generated from GGUF metadata"
+
+	return "Generated from GGUF metadata. " + ", ".join(parts) + "."

@@ -3,6 +3,7 @@
 
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/classes/worker_thread_pool.hpp>
+#include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/variant/packed_string_array.hpp>
 #include <godot_cpp/variant/string.hpp>
@@ -94,6 +95,23 @@ public:
 	/// Get the path of the currently loaded model.
 	/// @return Model path or empty string if no model is loaded
 	String get_model_path() const;
+
+	/// Get the chat template string from the model metadata.
+	/// @return Chat template (Jinja2 format) or empty string if not available
+	String get_chat_template() const;
+
+	/// Apply chat template to format messages for the model.
+	/// Uses llama.cpp's native template parser (minja).
+	/// @param messages Array of {role: String, content: String} dictionaries
+	/// @param add_generation_prompt If true, adds the assistant prompt prefix
+	/// @return Formatted prompt string ready for generation
+	String apply_chat_template(const Array &messages, bool add_generation_prompt = true) const;
+
+	/// Count tokens in text using the model's tokenizer.
+	/// Provides exact token count for the loaded model's vocabulary.
+	/// @param text The text to tokenize
+	/// @return Number of tokens, or -1 if no model is loaded
+	int32_t count_tokens(const String &text) const;
 
 	// ==================== Text Generation ====================
 

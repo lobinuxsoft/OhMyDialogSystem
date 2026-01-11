@@ -29,6 +29,7 @@ signal model_unloaded()
 @onready var _download_model_btn: Button = %DownloadModelBtn
 @onready var _load_model_btn: Button = %LoadModelBtn
 @onready var _delete_model_btn: Button = %DeleteModelBtn
+@onready var _generate_preset_btn: Button = %GeneratePresetBtn
 @onready var _browse_hf_btn: Button = %BrowseHFBtn
 
 # Sub-scenes
@@ -45,8 +46,10 @@ var _current_sort: SortBy = SortBy.NAME
 var _sort_ascending: bool = true
 var _selected_model_id: String = ""
 var _link_icon: Texture2D
+var _hf_api: HuggingFaceAPI  # For fetching GGUF metadata
 
 const BUTTON_ID_OPEN_URL := 0
+const BUTTON_ID_GENERATE_PRESET := 1
 
 
 func _ready() -> void:
@@ -64,6 +67,7 @@ func _ready() -> void:
 	_download_model_btn.pressed.connect(_on_download_model_pressed)
 	_load_model_btn.pressed.connect(_on_load_model_pressed)
 	_delete_model_btn.pressed.connect(_on_delete_model_pressed)
+	_generate_preset_btn.pressed.connect(_on_generate_preset_pressed)
 	_browse_hf_btn.pressed.connect(_on_browse_hf_pressed)
 	_cancel_download_btn.pressed.connect(_on_cancel_download_pressed)
 
@@ -299,6 +303,19 @@ func _update_model_details() -> void:
 	if not model.file_metadata_url.is_empty():
 		text += "[color=#10b981][url=%s]View GGUF Metadata ↗[/url][/color]\n" % model.file_metadata_url
 
+	# Show generate preset link
+	text += "[color=#a855f7][url=generate_preset]Generate AI Preset ↗[/url][/color]\n"
+
+	# Show metadata info if available
+	if model.has_metadata():
+		text += "\n[color=#f97316][b]GGUF Metadata[/b][/color]\n"
+		if not model.architecture.is_empty():
+			text += "[color=#8b949e]Architecture:[/color] %s\n" % model.architecture
+		if not model.chat_template_format.is_empty():
+			text += "[color=#8b949e]Template Format:[/color] %s\n" % model.chat_template_format
+		if model.ai_preset != null:
+			text += "[color=#8b949e]Preset:[/color] [color=#10b981]%s[/color]\n" % model.ai_preset.preset_name
+
 	_model_details.text = text
 	_selected_model_id = model.id
 
@@ -308,6 +325,7 @@ func _update_ui_state() -> void:
 		_download_model_btn.disabled = true
 		_load_model_btn.disabled = true
 		_delete_model_btn.disabled = true
+		_generate_preset_btn.disabled = true
 		return
 
 	var model = _get_selected_model()
@@ -321,10 +339,13 @@ func _update_ui_state() -> void:
 		_download_model_btn.disabled = model_downloaded or is_downloading
 		_load_model_btn.disabled = not model_downloaded or model_is_loaded or is_downloading
 		_delete_model_btn.disabled = not model_downloaded and not model.is_custom
+		# Generate preset is always available for selected models with download URL
+		_generate_preset_btn.disabled = model.download_url.is_empty() and not model_is_loaded
 	else:
 		_download_model_btn.disabled = true
 		_load_model_btn.disabled = true
 		_delete_model_btn.disabled = true
+		_generate_preset_btn.disabled = true
 
 	if is_loaded and _model_manager.current_config != null:
 		_status_label.text = "Loaded: %s" % _model_manager.current_config.display_name
@@ -364,7 +385,9 @@ func _on_models_tree_button_clicked(item: TreeItem, _column: int, id: int, _mous
 
 func _on_model_details_link_clicked(meta: Variant) -> void:
 	var url = str(meta)
-	if url.begins_with("http"):
+	if url == "generate_preset":
+		_on_generate_preset_pressed()
+	elif url.begins_with("http"):
 		OS.shell_open(url)
 
 
@@ -438,6 +461,106 @@ func _on_delete_model_pressed() -> void:
 	_populate_models_tree()
 	_update_model_details()
 	_update_ui_state()
+
+
+func _on_generate_preset_pressed() -> void:
+	var model = _get_selected_model()
+	if model == null:
+		return
+
+	_status_label.text = "Generating AI Preset for %s..." % model.display_name
+	_status_label.add_theme_color_override("font_color", Color.YELLOW)
+	_generate_preset_btn.disabled = true
+
+	# Check if model is loaded - use LlamaInterface metadata if available
+	if _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id:
+		# Model is loaded, get metadata from llama.cpp
+		var info = _model_manager.get_model_info()
+		var metadata := {
+			"_architecture": info.get("architecture", ""),
+			"_chat_template": info.get("chat_template", ""),
+			"_context_length": info.get("n_ctx_train", info.get("n_ctx", 0))
+		}
+		# Detect template format if we have a chat template
+		if not metadata["_chat_template"].is_empty():
+			var parser = GGUFParser.new()
+			parser.metadata["tokenizer.chat_template"] = metadata["_chat_template"]
+			metadata["_chat_template_format"] = parser.detect_chat_template_format()
+		_finish_preset_generation(model, metadata)
+	elif not model.download_url.is_empty():
+		# Model not loaded, fetch metadata via HTTP Range request
+		_ensure_hf_api()
+		# Disconnect any existing connections first to avoid duplicates
+		if _hf_api.metadata_fetched.is_connected(_on_preset_metadata_fetched):
+			_hf_api.metadata_fetched.disconnect(_on_preset_metadata_fetched)
+		if _hf_api.metadata_fetch_failed.is_connected(_on_preset_metadata_failed):
+			_hf_api.metadata_fetch_failed.disconnect(_on_preset_metadata_failed)
+		_hf_api.metadata_fetched.connect(_on_preset_metadata_fetched.bind(model), CONNECT_ONE_SHOT)
+		_hf_api.metadata_fetch_failed.connect(_on_preset_metadata_failed.bind(model), CONNECT_ONE_SHOT)
+
+		# Extract model_id and filename from download_url
+		# URL format: https://huggingface.co/{model_id}/resolve/main/{filename}
+		var url_parts = model.download_url.replace("https://huggingface.co/", "").split("/resolve/main/")
+		if url_parts.size() == 2:
+			var model_id = url_parts[0]
+			var filename = url_parts[1]
+			_hf_api.fetch_gguf_metadata(model_id, filename)
+		else:
+			_on_preset_metadata_failed("", "", "Invalid download URL format", model)
+	else:
+		# No way to get metadata, create default preset
+		var metadata: Dictionary = {}
+		_finish_preset_generation(model, metadata)
+
+
+func _on_preset_metadata_fetched(model_id: String, filename: String, metadata: Dictionary, model: ModelConfig) -> void:
+	_finish_preset_generation(model, metadata)
+
+
+func _on_preset_metadata_failed(model_id: String, filename: String, error: String, model: ModelConfig) -> void:
+	push_warning("ModelManagerWindow: Failed to fetch metadata for %s: %s" % [model.display_name, error])
+	# Create preset without metadata
+	var metadata: Dictionary = {}
+	_finish_preset_generation(model, metadata)
+
+
+func _finish_preset_generation(model: ModelConfig, metadata: Dictionary) -> void:
+	# Populate model config with metadata
+	if not metadata.is_empty():
+		model.populate_from_metadata(metadata)
+
+	# Create AI Preset
+	var preset = model.create_ai_preset()
+
+	# Save preset to res://presets/ directory BEFORE assigning to model
+	var presets_dir = "res://presets"
+	if not DirAccess.dir_exists_absolute(presets_dir):
+		DirAccess.make_dir_absolute(presets_dir)
+
+	var preset_path = "%s/%s_preset.tres" % [presets_dir, model.id.replace("-", "_")]
+	var err = ResourceSaver.save(preset, preset_path)
+
+	_generate_preset_btn.disabled = false
+
+	if err == OK:
+		# Load the saved preset to get a proper resource with path
+		var saved_preset = load(preset_path) as AIPreset
+		if saved_preset:
+			model.ai_preset = saved_preset
+		else:
+			model.ai_preset = preset
+			preset.resource_path = preset_path
+		_status_label.text = "AI Preset generated: %s" % preset.preset_name
+		_status_label.add_theme_color_override("font_color", Color.GREEN)
+		_update_model_details()
+	else:
+		_status_label.text = "Failed to save preset: %s" % error_string(err)
+		_status_label.add_theme_color_override("font_color", Color.RED)
+
+
+func _ensure_hf_api() -> void:
+	if _hf_api == null:
+		_hf_api = HuggingFaceAPI.new()
 
 
 func _on_browse_hf_pressed() -> void:

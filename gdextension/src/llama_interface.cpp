@@ -96,6 +96,9 @@ void LlamaInterface::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_model_loaded"), &LlamaInterface::is_model_loaded);
 	ClassDB::bind_method(D_METHOD("get_model_info"), &LlamaInterface::get_model_info);
 	ClassDB::bind_method(D_METHOD("get_model_path"), &LlamaInterface::get_model_path);
+	ClassDB::bind_method(D_METHOD("get_chat_template"), &LlamaInterface::get_chat_template);
+	ClassDB::bind_method(D_METHOD("apply_chat_template", "messages", "add_generation_prompt"), &LlamaInterface::apply_chat_template, DEFVAL(true));
+	ClassDB::bind_method(D_METHOD("count_tokens", "text"), &LlamaInterface::count_tokens);
 
 	// Text generation
 	ClassDB::bind_method(D_METHOD("generate", "prompt"), &LlamaInterface::generate);
@@ -309,11 +312,142 @@ Dictionary LlamaInterface::get_model_info() const {
 	// Rope type
 	info["rope_type"] = static_cast<int>(llama_model_rope_type(m_model));
 
+	// Chat template from model metadata
+	const char *chat_template = llama_model_chat_template(m_model, nullptr);
+	if (chat_template != nullptr) {
+		info["chat_template"] = String::utf8(chat_template);
+	}
+
 	return info;
 }
 
 String LlamaInterface::get_model_path() const {
 	return m_model_path;
+}
+
+String LlamaInterface::get_chat_template() const {
+	if (!is_model_loaded()) {
+		return String();
+	}
+
+	const char *chat_template = llama_model_chat_template(m_model, nullptr);
+	if (chat_template != nullptr) {
+		return String::utf8(chat_template);
+	}
+	return String();
+}
+
+String LlamaInterface::apply_chat_template(const Array &messages, bool add_generation_prompt) const {
+	if (!is_model_loaded()) {
+		UtilityFunctions::push_error("LlamaInterface: No model loaded");
+		return String();
+	}
+
+	if (messages.is_empty()) {
+		return String();
+	}
+
+	// Build vector of llama_chat_message from Godot Array
+	std::vector<llama_chat_message> chat_messages;
+	std::vector<std::string> role_storage;     // Keep strings alive
+	std::vector<std::string> content_storage;
+
+	for (int i = 0; i < messages.size(); i++) {
+		Dictionary msg = messages[i];
+		if (!msg.has("role") || !msg.has("content")) {
+			UtilityFunctions::push_warning("LlamaInterface: Message missing role or content at index ", i);
+			continue;
+		}
+
+		String role = msg["role"];
+		String content = msg["content"];
+
+		role_storage.push_back(role.utf8().get_data());
+		content_storage.push_back(content.utf8().get_data());
+
+		llama_chat_message chat_msg;
+		chat_msg.role = role_storage.back().c_str();
+		chat_msg.content = content_storage.back().c_str();
+		chat_messages.push_back(chat_msg);
+	}
+
+	if (chat_messages.empty()) {
+		return String();
+	}
+
+	// Get the chat template from the model (or use nullptr for default)
+	const char *tmpl = nullptr;  // Use model's built-in template
+
+	// Allocate buffer for result - start with reasonable size and resize if needed
+	std::vector<char> buf(4096);
+	int32_t result_len = llama_chat_apply_template(
+		tmpl,
+		chat_messages.data(),
+		chat_messages.size(),
+		add_generation_prompt,
+		buf.data(),
+		static_cast<int32_t>(buf.size())
+	);
+
+	// If buffer was too small, resize and try again
+	if (result_len > static_cast<int32_t>(buf.size())) {
+		buf.resize(result_len + 1);
+		result_len = llama_chat_apply_template(
+			tmpl,
+			chat_messages.data(),
+			chat_messages.size(),
+			add_generation_prompt,
+			buf.data(),
+			static_cast<int32_t>(buf.size())
+		);
+	}
+
+	if (result_len < 0) {
+		UtilityFunctions::push_error("LlamaInterface: Failed to apply chat template");
+		return String();
+	}
+
+	return String::utf8(buf.data(), result_len);
+}
+
+int32_t LlamaInterface::count_tokens(const String &text) const {
+	if (!is_model_loaded()) {
+		return -1;
+	}
+
+	const llama_vocab *vocab = llama_model_get_vocab(m_model);
+	if (vocab == nullptr) {
+		UtilityFunctions::push_error("LlamaInterface: Failed to get vocabulary");
+		return -1;
+	}
+
+	// Convert text to UTF-8
+	CharString utf8_text = text.utf8();
+	const char *text_cstr = utf8_text.get_data();
+	int32_t text_len = static_cast<int32_t>(utf8_text.length());
+
+	if (text_len == 0) {
+		return 0;
+	}
+
+	// First call with nullptr to get required token count
+	int32_t n_tokens = llama_tokenize(
+		vocab,
+		text_cstr,
+		text_len,
+		nullptr,  // No output buffer - just count
+		0,        // Max tokens = 0 for counting mode
+		false,    // Don't add BOS token
+		true      // Parse special tokens
+	);
+
+	// llama_tokenize returns negative value as -n_tokens when buffer is too small
+	// With nullptr/0, it returns the negative count
+	if (n_tokens < 0) {
+		return -n_tokens;
+	}
+
+	return n_tokens;
 }
 
 // ==================== Text Generation ====================
@@ -354,8 +488,22 @@ String LlamaInterface::generate(const String &prompt) {
 
 	// Check context size
 	int n_ctx = llama_n_ctx(m_context);
-	if ((int)tokens.size() + m_max_tokens > n_ctx) {
-		UtilityFunctions::push_warning("LlamaInterface: Prompt + max_tokens exceeds context size, truncating");
+	int n_batch = llama_n_batch(m_context);
+
+	UtilityFunctions::print("LlamaInterface: Prompt tokens: ", (int)tokens.size(),
+		", max_tokens: ", m_max_tokens,
+		", n_ctx: ", n_ctx,
+		", n_batch: ", n_batch);
+
+	// Truncate prompt if it exceeds context
+	if ((int)tokens.size() >= n_ctx) {
+		int max_prompt_tokens = n_ctx - m_max_tokens - 16; // Reserve space for response + safety margin
+		if (max_prompt_tokens < 1) {
+			UtilityFunctions::push_error("LlamaInterface: Context too small for generation. n_ctx=", n_ctx, " max_tokens=", m_max_tokens);
+			return String();
+		}
+		UtilityFunctions::push_warning("LlamaInterface: Prompt truncated from ", (int)tokens.size(), " to ", max_prompt_tokens, " tokens");
+		tokens.resize(max_prompt_tokens);
 	}
 
 	// Clear the memory/KV cache for fresh generation
@@ -364,14 +512,31 @@ String LlamaInterface::generate(const String &prompt) {
 	// Create sampler
 	llama_sampler *smpl = _create_sampler();
 
-	// Create batch for prompt
-	llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
+	// Process prompt in chunks if it exceeds batch size
+	if ((int)tokens.size() > n_batch) {
+		UtilityFunctions::print("LlamaInterface: Processing prompt in chunks (", (int)tokens.size(), " tokens, batch=", n_batch, ")");
 
-	// Decode prompt
-	if (llama_decode(m_context, batch) != 0) {
-		UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt");
-		llama_sampler_free(smpl);
-		return String();
+		int pos = 0;
+		while (pos < (int)tokens.size()) {
+			int chunk_size = std::min(n_batch, (int)tokens.size() - pos);
+			llama_batch batch = llama_batch_get_one(tokens.data() + pos, chunk_size);
+
+			if (llama_decode(m_context, batch) != 0) {
+				UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt chunk at position ", pos);
+				llama_sampler_free(smpl);
+				return String();
+			}
+			pos += chunk_size;
+		}
+	} else {
+		// Single batch decode
+		llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
+
+		if (llama_decode(m_context, batch) != 0) {
+			UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt");
+			llama_sampler_free(smpl);
+			return String();
+		}
 	}
 
 	// Generation loop
@@ -426,11 +591,9 @@ String LlamaInterface::generate(const String &prompt) {
 			break;
 		}
 
-		// Prepare batch for next token
-		batch = llama_batch_get_one(&new_token, 1);
-
-		// Decode
-		if (llama_decode(m_context, batch) != 0) {
+		// Prepare batch for next token and decode
+		llama_batch next_batch = llama_batch_get_one(&new_token, 1);
+		if (llama_decode(m_context, next_batch) != 0) {
 			UtilityFunctions::push_error("LlamaInterface: Failed to decode token");
 			break;
 		}
@@ -703,11 +866,9 @@ void LlamaInterface::_async_generate_task(const String &prompt) {
 			break;
 		}
 
-		// Prepare batch for next token
-		batch = llama_batch_get_one(&new_token, 1);
-
-		// Decode
-		if (llama_decode(m_context, batch) != 0) {
+		// Prepare batch for next token and decode
+		llama_batch next_batch = llama_batch_get_one(&new_token, 1);
+		if (llama_decode(m_context, next_batch) != 0) {
 			call_deferred("emit_signal", "generation_error", String("Failed to decode token"));
 			break;
 		}
@@ -893,11 +1054,9 @@ void LlamaInterface::_streaming_generate_task(const String &prompt) {
 			break;
 		}
 
-		// Prepare batch for next token
-		batch = llama_batch_get_one(&new_token, 1);
-
-		// Decode
-		if (llama_decode(m_context, batch) != 0) {
+		// Prepare batch for next token and decode
+		llama_batch next_batch = llama_batch_get_one(&new_token, 1);
+		if (llama_decode(m_context, next_batch) != 0) {
 			call_deferred("emit_signal", "generation_error", String("Failed to decode token"));
 			break;
 		}
