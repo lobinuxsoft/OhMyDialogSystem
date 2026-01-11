@@ -1,0 +1,702 @@
+[gd_scene load_steps=2 format=3 uid="uid://generation_tab"]
+
+[ext_resource type="Script" path="res://addons/ohmydialog/editor/generation_tab.gd" id="1_script"]
+
+[node name="GenerationTab" type="VBoxContainer"]
+theme_override_constants/separation = 12
+script = ExtResource("1_script")
+
+[node name="StatusRow" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="GenStatusLabel" type="Label" parent="StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "No model loaded"
+
+[node name="UnloadBtn" type="Button" parent="StatusRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Unload Model"
+
+[node name="MainSplit" type="HSplitContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 400
+
+[node name="LeftPanel" type="VSplitContainer" parent="MainSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PromptSection" type="VBoxContainer" parent="MainSplit/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PromptHeader" type="HBoxContainer" parent="MainSplit/LeftPanel/PromptSection"]
+layout_mode = 2
+
+[node name="PromptLabel" type="Label" parent="MainSplit/LeftPanel/PromptSection/PromptHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "Prompt"
+
+[node name="PromptInput" type="TextEdit" parent="MainSplit/LeftPanel/PromptSection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_vertical = 3
+placeholder_text = "Enter your prompt here..."
+wrap_mode = 1
+scroll_smooth = true
+
+[node name="GenerateRow" type="HBoxContainer" parent="MainSplit/LeftPanel/PromptSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GenerateBtn" type="Button" parent="MainSplit/LeftPanel/PromptSection/GenerateRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Generate"
+
+[node name="ClearBtn" type="Button" parent="MainSplit/LeftPanel/PromptSection/GenerateRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear"
+
+[node name="Spacer" type="Control" parent="MainSplit/LeftPanel/PromptSection/GenerateRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TimeLabel" type="Label" parent="MainSplit/LeftPanel/PromptSection/GenerateRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.063, 0.725, 0.506, 1)
+
+[node name="OutputSection" type="VBoxContainer" parent="MainSplit/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="OutputHeader" type="HBoxContainer" parent="MainSplit/LeftPanel/OutputSection"]
+layout_mode = 2
+
+[node name="OutputLabel" type="Label" parent="MainSplit/LeftPanel/OutputSection/OutputHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "Output"
+
+[node name="OutputDisplay" type="TextEdit" parent="MainSplit/LeftPanel/OutputSection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_vertical = 3
+editable = false
+wrap_mode = 1
+scroll_smooth = true
+
+[node name="RightSplit" type="HSplitContainer" parent="MainSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+split_offset = 350
+
+[node name="CenterPanel" type="VSplitContainer" parent="MainSplit/RightSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ParamsSection" type="VBoxContainer" parent="MainSplit/RightSplit/CenterPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ParamsHeader" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection"]
+layout_mode = 2
+
+[node name="ParamsLabel" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+theme_override_font_sizes/font_size = 16
+text = "Sampling Parameters"
+
+[node name="ParamsPanel" type="PanelContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ParamsContainer" type="VBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="TempRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TempRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Temperature"
+
+[node name="TemperatureSlider" type="HSlider" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TempRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 2.0
+step = 0.01
+value = 0.7
+
+[node name="TemperatureValue" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TempRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "0.70"
+horizontal_alignment = 2
+
+[node name="TopPRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopPRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Top P"
+
+[node name="TopPSlider" type="HSlider" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopPRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.95
+
+[node name="TopPValue" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopPRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "0.95"
+horizontal_alignment = 2
+
+[node name="TopKRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopKRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Top K"
+
+[node name="TopKSpinBox" type="SpinBox" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/TopKRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+value = 40.0
+
+[node name="MaxTokensRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MaxTokensRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Max Tokens"
+
+[node name="MaxTokensSpinBox" type="SpinBox" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MaxTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 4096.0
+value = 256.0
+
+[node name="RepeatPenaltyRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/RepeatPenaltyRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Repeat Penalty"
+
+[node name="RepeatPenaltySlider" type="HSlider" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/RepeatPenaltyRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 2.0
+step = 0.01
+value = 1.1
+
+[node name="RepeatPenaltyValue" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/RepeatPenaltyRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "1.10"
+horizontal_alignment = 2
+
+[node name="MinPRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MinPRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Min P"
+
+[node name="MinPSlider" type="HSlider" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MinPRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 0.05
+
+[node name="MinPValue" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/MinPRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "0.05"
+horizontal_alignment = 2
+
+[node name="SeedRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/SeedRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Seed"
+
+[node name="SeedSpinBox" type="SpinBox" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer/SeedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -1.0
+max_value = 999999.0
+value = -1.0
+suffix = "(-1=random)"
+
+[node name="HSeparator" type="HSeparator" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+
+[node name="StopLabel" type="Label" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Stop Sequences (one per line):"
+
+[node name="StopSequencesInput" type="TextEdit" parent="MainSplit/RightSplit/CenterPanel/ParamsSection/ParamsPanel/ScrollContainer/MarginContainer/ParamsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+placeholder_text = "
+User:"
+scroll_smooth = true
+
+[node name="PresetSection" type="VBoxContainer" parent="MainSplit/RightSplit/CenterPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="PresetHeader" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/PresetSection"]
+layout_mode = 2
+
+[node name="PresetLabel" type="Label" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+theme_override_font_sizes/font_size = 16
+text = "Active Preset"
+
+[node name="PresetPanel" type="PanelContainer" parent="MainSplit/RightSplit/CenterPanel/PresetSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="PresetNameRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer/PresetNameRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Preset:"
+
+[node name="PresetNameLabel" type="Label" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer/PresetNameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.063, 0.725, 0.506, 1)
+text = "None"
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="TemplateLabel" type="Label" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Chat Template Format:"
+
+[node name="ChatTemplatePreview" type="TextEdit" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+editable = false
+wrap_mode = 1
+scroll_smooth = true
+
+[node name="PresetButtonsRow" type="HBoxContainer" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LoadPresetBtn" type="Button" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer/PresetButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Load..."
+
+[node name="SavePresetBtn" type="Button" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer/PresetButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save"
+
+[node name="SaveAsPresetBtn" type="Button" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer/PresetButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save As..."
+
+[node name="ResetPresetBtn" type="Button" parent="MainSplit/RightSplit/CenterPanel/PresetSection/PresetPanel/ScrollContainer/MarginContainer/VBoxContainer/PresetButtonsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset"
+
+[node name="RightPanel" type="VSplitContainer" parent="MainSplit/RightSplit"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
+[node name="ModelInfoSection" type="VBoxContainer" parent="MainSplit/RightSplit/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ModelInfoHeader" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/ModelInfoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/ModelInfoSection/ModelInfoHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Loaded Model"
+
+[node name="ModelInfoPanel" type="PanelContainer" parent="MainSplit/RightSplit/RightPanel/ModelInfoSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainSplit/RightSplit/RightPanel/ModelInfoSection/ModelInfoPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MainSplit/RightSplit/RightPanel/ModelInfoSection/ModelInfoPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="LoadedModelInfo" type="RichTextLabel" parent="MainSplit/RightSplit/RightPanel/ModelInfoSection/ModelInfoPanel/ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "No model loaded.
+Go to Models tab to load one."
+fit_content = true
+
+[node name="TestContextSection" type="VBoxContainer" parent="MainSplit/RightSplit/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="TestContextHeader" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.918, 0.675, 0.22, 1)
+theme_override_font_sizes/font_size = 16
+text = "Test Context"
+
+[node name="TestContextPanel" type="PanelContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CharacterRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/CharacterRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Character:"
+
+[node name="CharacterLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/CharacterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "None"
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="LoadCharacterBtn" type="Button" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/CharacterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "..."
+tooltip_text = "Load Character Identity"
+
+[node name="ClearCharacterBtn" type="Button" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/CharacterRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "X"
+tooltip_text = "Clear Character"
+
+[node name="WorldRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/WorldRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "World:"
+
+[node name="WorldLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/WorldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.063, 0.725, 0.506, 1)
+text = "None"
+text_overrun_behavior = 3
+clip_text = true
+
+[node name="LoadWorldBtn" type="Button" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/WorldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "..."
+tooltip_text = "Load World Context"
+
+[node name="ClearWorldBtn" type="Button" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/WorldRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "X"
+tooltip_text = "Clear World"
+
+[node name="HSeparator" type="HSeparator" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="UseContextCheck" type="CheckBox" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Use context in generation"
+
+[node name="HSeparator2" type="HSeparator" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ContextUsageLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.918, 0.675, 0.22, 1)
+theme_override_font_sizes/font_size = 14
+text = "Context Usage"
+
+[node name="CharacterTokensRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/CharacterTokensRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Character:"
+
+[node name="CharacterTokensLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/CharacterTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "0 tokens"
+horizontal_alignment = 2
+
+[node name="WorldTokensRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/WorldTokensRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "World:"
+
+[node name="WorldTokensLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/WorldTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.063, 0.725, 0.506, 1)
+text = "0 tokens"
+horizontal_alignment = 2
+
+[node name="PromptTokensRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/PromptTokensRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Prompt:"
+
+[node name="PromptTokensLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/PromptTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+text = "0 tokens"
+horizontal_alignment = 2
+
+[node name="TemplateTokensRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/TemplateTokensRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Template:"
+
+[node name="TemplateTokensLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/TemplateTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.659, 0.333, 0.969, 1)
+text = "~30 tokens"
+horizontal_alignment = 2
+
+[node name="ReserveTokensRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/ReserveTokensRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "Response Reserve:"
+
+[node name="ReserveTokensLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/ReserveTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.976, 0.592, 0.133, 1)
+text = "256 tokens"
+horizontal_alignment = 2
+
+[node name="HSeparator3" type="HSeparator" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TotalTokensRow" type="HBoxContainer" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/TotalTokensRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Total:"
+
+[node name="TotalTokensLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer/TotalTokensRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "0 / 8192"
+horizontal_alignment = 2
+
+[node name="ContextProgressBar" type="ProgressBar" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="ContextPercentLabel" type="Label" parent="MainSplit/RightSplit/RightPanel/TestContextSection/TestContextPanel/ScrollContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.545, 0.58, 0.624, 1)
+text = "0% of context used"
+horizontal_alignment = 1
+
+[node name="SavePresetDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+title = "Save AI Preset As..."
+initial_position = 2
+size = Vector2i(600, 400)
+ok_button_text = "Save"
+file_mode = 4
+access = 2
+filters = PackedStringArray("*.tres ; Godot Resources")
+
+[node name="LoadPresetDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+title = "Load AI Preset"
+initial_position = 2
+size = Vector2i(600, 400)
+ok_button_text = "Load"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.tres ; Godot Resources")
+
+[node name="LoadCharacterDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+title = "Load Character Identity"
+initial_position = 2
+size = Vector2i(600, 400)
+ok_button_text = "Load"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.tres ; Character Identity Resources")
+
+[node name="LoadWorldDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+title = "Load World Context"
+initial_position = 2
+size = Vector2i(600, 400)
+ok_button_text = "Load"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.tres ; World Context Resources")

@@ -9,6 +9,18 @@
 
 namespace godot {
 
+// Structure to pass data to async generation task
+struct AsyncGenerateData {
+	LlamaInterface *instance;
+	String prompt;
+};
+
+// Structure to pass data to streaming generation task
+struct StreamingGenerateData {
+	LlamaInterface *instance;
+	String prompt;
+};
+
 LlamaInterface::LlamaInterface() {
 }
 
@@ -84,9 +96,14 @@ void LlamaInterface::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_model_loaded"), &LlamaInterface::is_model_loaded);
 	ClassDB::bind_method(D_METHOD("get_model_info"), &LlamaInterface::get_model_info);
 	ClassDB::bind_method(D_METHOD("get_model_path"), &LlamaInterface::get_model_path);
+	ClassDB::bind_method(D_METHOD("get_chat_template"), &LlamaInterface::get_chat_template);
+	ClassDB::bind_method(D_METHOD("apply_chat_template", "messages", "add_generation_prompt"), &LlamaInterface::apply_chat_template, DEFVAL(true));
+	ClassDB::bind_method(D_METHOD("count_tokens", "text"), &LlamaInterface::count_tokens);
 
 	// Text generation
 	ClassDB::bind_method(D_METHOD("generate", "prompt"), &LlamaInterface::generate);
+	ClassDB::bind_method(D_METHOD("generate_async", "prompt"), &LlamaInterface::generate_async);
+	ClassDB::bind_method(D_METHOD("generate_streaming", "prompt"), &LlamaInterface::generate_streaming);
 
 	// Sampling parameters
 	ClassDB::bind_method(D_METHOD("set_temperature", "temperature"), &LlamaInterface::set_temperature);
@@ -120,8 +137,19 @@ void LlamaInterface::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_timeout"), &LlamaInterface::get_timeout);
 	ClassDB::bind_method(D_METHOD("has_generation_timed_out"), &LlamaInterface::has_generation_timed_out);
 
+	// Async generation status
+	ClassDB::bind_method(D_METHOD("is_generating"), &LlamaInterface::is_generating);
+	ClassDB::bind_method(D_METHOD("get_generation_progress"), &LlamaInterface::get_generation_progress);
+	ClassDB::bind_method(D_METHOD("cancel_generation"), &LlamaInterface::cancel_generation);
+
 	// Signals
 	ADD_SIGNAL(MethodInfo("generation_timeout"));
+	ADD_SIGNAL(MethodInfo("generation_started"));
+	ADD_SIGNAL(MethodInfo("token_generated", PropertyInfo(Variant::STRING, "token")));
+	ADD_SIGNAL(MethodInfo("generation_completed", PropertyInfo(Variant::STRING, "response")));
+	ADD_SIGNAL(MethodInfo("generation_error", PropertyInfo(Variant::STRING, "error")));
+	ADD_SIGNAL(MethodInfo("generation_progress", PropertyInfo(Variant::FLOAT, "progress")));
+	ADD_SIGNAL(MethodInfo("generation_cancelled"));
 
 	// Properties
 	ADD_GROUP("Sampling", "");
@@ -284,11 +312,142 @@ Dictionary LlamaInterface::get_model_info() const {
 	// Rope type
 	info["rope_type"] = static_cast<int>(llama_model_rope_type(m_model));
 
+	// Chat template from model metadata
+	const char *chat_template = llama_model_chat_template(m_model, nullptr);
+	if (chat_template != nullptr) {
+		info["chat_template"] = String::utf8(chat_template);
+	}
+
 	return info;
 }
 
 String LlamaInterface::get_model_path() const {
 	return m_model_path;
+}
+
+String LlamaInterface::get_chat_template() const {
+	if (!is_model_loaded()) {
+		return String();
+	}
+
+	const char *chat_template = llama_model_chat_template(m_model, nullptr);
+	if (chat_template != nullptr) {
+		return String::utf8(chat_template);
+	}
+	return String();
+}
+
+String LlamaInterface::apply_chat_template(const Array &messages, bool add_generation_prompt) const {
+	if (!is_model_loaded()) {
+		UtilityFunctions::push_error("LlamaInterface: No model loaded");
+		return String();
+	}
+
+	if (messages.is_empty()) {
+		return String();
+	}
+
+	// Build vector of llama_chat_message from Godot Array
+	std::vector<llama_chat_message> chat_messages;
+	std::vector<std::string> role_storage;     // Keep strings alive
+	std::vector<std::string> content_storage;
+
+	for (int i = 0; i < messages.size(); i++) {
+		Dictionary msg = messages[i];
+		if (!msg.has("role") || !msg.has("content")) {
+			UtilityFunctions::push_warning("LlamaInterface: Message missing role or content at index ", i);
+			continue;
+		}
+
+		String role = msg["role"];
+		String content = msg["content"];
+
+		role_storage.push_back(role.utf8().get_data());
+		content_storage.push_back(content.utf8().get_data());
+
+		llama_chat_message chat_msg;
+		chat_msg.role = role_storage.back().c_str();
+		chat_msg.content = content_storage.back().c_str();
+		chat_messages.push_back(chat_msg);
+	}
+
+	if (chat_messages.empty()) {
+		return String();
+	}
+
+	// Get the chat template from the model (or use nullptr for default)
+	const char *tmpl = nullptr;  // Use model's built-in template
+
+	// Allocate buffer for result - start with reasonable size and resize if needed
+	std::vector<char> buf(4096);
+	int32_t result_len = llama_chat_apply_template(
+		tmpl,
+		chat_messages.data(),
+		chat_messages.size(),
+		add_generation_prompt,
+		buf.data(),
+		static_cast<int32_t>(buf.size())
+	);
+
+	// If buffer was too small, resize and try again
+	if (result_len > static_cast<int32_t>(buf.size())) {
+		buf.resize(result_len + 1);
+		result_len = llama_chat_apply_template(
+			tmpl,
+			chat_messages.data(),
+			chat_messages.size(),
+			add_generation_prompt,
+			buf.data(),
+			static_cast<int32_t>(buf.size())
+		);
+	}
+
+	if (result_len < 0) {
+		UtilityFunctions::push_error("LlamaInterface: Failed to apply chat template");
+		return String();
+	}
+
+	return String::utf8(buf.data(), result_len);
+}
+
+int32_t LlamaInterface::count_tokens(const String &text) const {
+	if (!is_model_loaded()) {
+		return -1;
+	}
+
+	const llama_vocab *vocab = llama_model_get_vocab(m_model);
+	if (vocab == nullptr) {
+		UtilityFunctions::push_error("LlamaInterface: Failed to get vocabulary");
+		return -1;
+	}
+
+	// Convert text to UTF-8
+	CharString utf8_text = text.utf8();
+	const char *text_cstr = utf8_text.get_data();
+	int32_t text_len = static_cast<int32_t>(utf8_text.length());
+
+	if (text_len == 0) {
+		return 0;
+	}
+
+	// First call with nullptr to get required token count
+	int32_t n_tokens = llama_tokenize(
+		vocab,
+		text_cstr,
+		text_len,
+		nullptr,  // No output buffer - just count
+		0,        // Max tokens = 0 for counting mode
+		false,    // Don't add BOS token
+		true      // Parse special tokens
+	);
+
+	// llama_tokenize returns negative value as -n_tokens when buffer is too small
+	// With nullptr/0, it returns the negative count
+	if (n_tokens < 0) {
+		return -n_tokens;
+	}
+
+	return n_tokens;
 }
 
 // ==================== Text Generation ====================
@@ -329,8 +488,22 @@ String LlamaInterface::generate(const String &prompt) {
 
 	// Check context size
 	int n_ctx = llama_n_ctx(m_context);
-	if ((int)tokens.size() + m_max_tokens > n_ctx) {
-		UtilityFunctions::push_warning("LlamaInterface: Prompt + max_tokens exceeds context size, truncating");
+	int n_batch = llama_n_batch(m_context);
+
+	UtilityFunctions::print("LlamaInterface: Prompt tokens: ", (int)tokens.size(),
+		", max_tokens: ", m_max_tokens,
+		", n_ctx: ", n_ctx,
+		", n_batch: ", n_batch);
+
+	// Truncate prompt if it exceeds context
+	if ((int)tokens.size() >= n_ctx) {
+		int max_prompt_tokens = n_ctx - m_max_tokens - 16; // Reserve space for response + safety margin
+		if (max_prompt_tokens < 1) {
+			UtilityFunctions::push_error("LlamaInterface: Context too small for generation. n_ctx=", n_ctx, " max_tokens=", m_max_tokens);
+			return String();
+		}
+		UtilityFunctions::push_warning("LlamaInterface: Prompt truncated from ", (int)tokens.size(), " to ", max_prompt_tokens, " tokens");
+		tokens.resize(max_prompt_tokens);
 	}
 
 	// Clear the memory/KV cache for fresh generation
@@ -339,14 +512,31 @@ String LlamaInterface::generate(const String &prompt) {
 	// Create sampler
 	llama_sampler *smpl = _create_sampler();
 
-	// Create batch for prompt
-	llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
+	// Process prompt in chunks if it exceeds batch size
+	if ((int)tokens.size() > n_batch) {
+		UtilityFunctions::print("LlamaInterface: Processing prompt in chunks (", (int)tokens.size(), " tokens, batch=", n_batch, ")");
 
-	// Decode prompt
-	if (llama_decode(m_context, batch) != 0) {
-		UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt");
-		llama_sampler_free(smpl);
-		return String();
+		int pos = 0;
+		while (pos < (int)tokens.size()) {
+			int chunk_size = std::min(n_batch, (int)tokens.size() - pos);
+			llama_batch batch = llama_batch_get_one(tokens.data() + pos, chunk_size);
+
+			if (llama_decode(m_context, batch) != 0) {
+				UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt chunk at position ", pos);
+				llama_sampler_free(smpl);
+				return String();
+			}
+			pos += chunk_size;
+		}
+	} else {
+		// Single batch decode
+		llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
+
+		if (llama_decode(m_context, batch) != 0) {
+			UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt");
+			llama_sampler_free(smpl);
+			return String();
+		}
 	}
 
 	// Generation loop
@@ -401,11 +591,9 @@ String LlamaInterface::generate(const String &prompt) {
 			break;
 		}
 
-		// Prepare batch for next token
-		batch = llama_batch_get_one(&new_token, 1);
-
-		// Decode
-		if (llama_decode(m_context, batch) != 0) {
+		// Prepare batch for next token and decode
+		llama_batch next_batch = llama_batch_get_one(&new_token, 1);
+		if (llama_decode(m_context, next_batch) != 0) {
 			UtilityFunctions::push_error("LlamaInterface: Failed to decode token");
 			break;
 		}
@@ -535,6 +723,406 @@ int64_t LlamaInterface::get_timeout() const {
 
 bool LlamaInterface::has_generation_timed_out() const {
 	return m_generation_timed_out;
+}
+
+// ==================== Async Generation Status ====================
+
+bool LlamaInterface::is_generating() const {
+	return m_is_generating.load();
+}
+
+float LlamaInterface::get_generation_progress() const {
+	if (!m_is_generating.load() || m_max_tokens <= 0) {
+		return 0.0f;
+	}
+	int tokens = m_tokens_generated.load();
+	return static_cast<float>(tokens) / static_cast<float>(m_max_tokens);
+}
+
+// ==================== Async Generation ====================
+
+void LlamaInterface::_async_generate_callback(void *userdata) {
+	AsyncGenerateData *data = static_cast<AsyncGenerateData *>(userdata);
+	if (data && data->instance) {
+		data->instance->_async_generate_task(data->prompt);
+	}
+	delete data;
+}
+
+void LlamaInterface::_async_generate_task(const String &prompt) {
+	// Reset state
+	m_generation_timed_out = false;
+	m_tokens_generated.store(0);
+	m_cancel_requested.store(false);
+
+	if (!is_model_loaded()) {
+		call_deferred("emit_signal", "generation_error", String("No model loaded"));
+		m_is_generating.store(false);
+		return;
+	}
+
+	const llama_vocab *vocab = llama_model_get_vocab(m_model);
+	if (vocab == nullptr) {
+		call_deferred("emit_signal", "generation_error", String("Failed to get vocabulary"));
+		m_is_generating.store(false);
+		return;
+	}
+
+	// Convert prompt to UTF-8
+	CharString prompt_utf8 = prompt.utf8();
+	const char *prompt_cstr = prompt_utf8.get_data();
+	int prompt_len = prompt_utf8.length();
+
+	// Tokenize the prompt
+	int n_tokens = -llama_tokenize(vocab, prompt_cstr, prompt_len, nullptr, 0, true, true);
+	if (n_tokens < 0) {
+		n_tokens = -n_tokens;
+	}
+
+	std::vector<llama_token> tokens(n_tokens);
+	int tokenized = llama_tokenize(vocab, prompt_cstr, prompt_len, tokens.data(), tokens.size(), true, true);
+	if (tokenized < 0) {
+		call_deferred("emit_signal", "generation_error", String("Failed to tokenize prompt"));
+		m_is_generating.store(false);
+		return;
+	}
+	tokens.resize(tokenized);
+
+	// Clear the memory/KV cache for fresh generation
+	llama_memory_clear(llama_get_memory(m_context), true);
+
+	// Create sampler
+	llama_sampler *smpl = _create_sampler();
+
+	// Create batch for prompt
+	llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
+
+	// Decode prompt
+	if (llama_decode(m_context, batch) != 0) {
+		call_deferred("emit_signal", "generation_error", String("Failed to decode prompt"));
+		llama_sampler_free(smpl);
+		m_is_generating.store(false);
+		return;
+	}
+
+	// Generation loop
+	std::string generated_text;
+	int n_decoded = 0;
+
+	// Start time for timeout check
+	auto start_time = std::chrono::steady_clock::now();
+
+	while (n_decoded < m_max_tokens) {
+		// Check for cancellation
+		if (m_cancel_requested.load()) {
+			call_deferred("emit_signal", "generation_cancelled");
+			break;
+		}
+
+		// Check timeout
+		if (m_timeout_ms > 0) {
+			auto current_time = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+			if (elapsed_ms >= m_timeout_ms) {
+				m_generation_timed_out = true;
+				call_deferred("emit_signal", "generation_timeout");
+				break;
+			}
+		}
+
+		// Sample next token
+		llama_token new_token = llama_sampler_sample(smpl, m_context, -1);
+
+		// Check for end of generation
+		if (llama_vocab_is_eog(vocab, new_token)) {
+			break;
+		}
+
+		// Convert token to text
+		char buf[256];
+		int n = llama_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
+		if (n < 0) {
+			call_deferred("emit_signal", "generation_error", String("Failed to convert token to text"));
+			break;
+		}
+
+		std::string piece(buf, n);
+		generated_text += piece;
+
+		// Update progress
+		n_decoded++;
+		m_tokens_generated.store(n_decoded);
+
+		// Check for stop sequences
+		if (_check_stop_sequence(generated_text)) {
+			// Remove the stop sequence from output
+			for (const auto &stop : m_stop_sequences) {
+				size_t pos = generated_text.rfind(stop);
+				if (pos != std::string::npos && pos == generated_text.length() - stop.length()) {
+					generated_text = generated_text.substr(0, pos);
+					break;
+				}
+			}
+			break;
+		}
+
+		// Prepare batch for next token and decode
+		llama_batch next_batch = llama_batch_get_one(&new_token, 1);
+		if (llama_decode(m_context, next_batch) != 0) {
+			call_deferred("emit_signal", "generation_error", String("Failed to decode token"));
+			break;
+		}
+	}
+
+	// Cleanup
+	llama_sampler_free(smpl);
+
+	// Emit completion if not cancelled
+	if (!m_cancel_requested.load()) {
+		call_deferred("emit_signal", "generation_completed", String::utf8(generated_text.c_str()));
+	}
+
+	m_is_generating.store(false);
+}
+
+void LlamaInterface::generate_async(const String &prompt) {
+	// Check if already generating
+	if (m_is_generating.load()) {
+		UtilityFunctions::push_warning("LlamaInterface: Generation already in progress");
+		return;
+	}
+
+	// Check if model is loaded
+	if (!is_model_loaded()) {
+		call_deferred("emit_signal", "generation_error", String("No model loaded"));
+		return;
+	}
+
+	// Set generating flag
+	m_is_generating.store(true);
+	m_cancel_requested.store(false);
+	m_tokens_generated.store(0);
+
+	// Emit started signal
+	emit_signal("generation_started");
+
+	// Create task data
+	AsyncGenerateData *data = new AsyncGenerateData();
+	data->instance = this;
+	data->prompt = prompt;
+
+	// Add task to WorkerThreadPool
+	m_current_task_id = WorkerThreadPool::get_singleton()->add_native_task(
+		&LlamaInterface::_async_generate_callback,
+		data,
+		true,  // high priority
+		"LlamaInterface::generate_async"
+	);
+}
+
+// ==================== Streaming Generation ====================
+
+void LlamaInterface::_streaming_generate_callback(void *userdata) {
+	StreamingGenerateData *data = static_cast<StreamingGenerateData *>(userdata);
+	if (data && data->instance) {
+		data->instance->_streaming_generate_task(data->prompt);
+	}
+	delete data;
+}
+
+void LlamaInterface::_streaming_generate_task(const String &prompt) {
+	// Reset state
+	m_generation_timed_out = false;
+	m_tokens_generated.store(0);
+	m_cancel_requested.store(false);
+
+	if (!is_model_loaded()) {
+		call_deferred("emit_signal", "generation_error", String("No model loaded"));
+		m_is_generating.store(false);
+		return;
+	}
+
+	const llama_vocab *vocab = llama_model_get_vocab(m_model);
+	if (vocab == nullptr) {
+		call_deferred("emit_signal", "generation_error", String("Failed to get vocabulary"));
+		m_is_generating.store(false);
+		return;
+	}
+
+	// Convert prompt to UTF-8
+	CharString prompt_utf8 = prompt.utf8();
+	const char *prompt_cstr = prompt_utf8.get_data();
+	int prompt_len = prompt_utf8.length();
+
+	// Tokenize the prompt
+	int n_tokens = -llama_tokenize(vocab, prompt_cstr, prompt_len, nullptr, 0, true, true);
+	if (n_tokens < 0) {
+		n_tokens = -n_tokens;
+	}
+
+	std::vector<llama_token> tokens(n_tokens);
+	int tokenized = llama_tokenize(vocab, prompt_cstr, prompt_len, tokens.data(), tokens.size(), true, true);
+	if (tokenized < 0) {
+		call_deferred("emit_signal", "generation_error", String("Failed to tokenize prompt"));
+		m_is_generating.store(false);
+		return;
+	}
+	tokens.resize(tokenized);
+
+	// Clear the memory/KV cache for fresh generation
+	llama_memory_clear(llama_get_memory(m_context), true);
+
+	// Create sampler
+	llama_sampler *smpl = _create_sampler();
+
+	// Create batch for prompt
+	llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
+
+	// Decode prompt
+	if (llama_decode(m_context, batch) != 0) {
+		call_deferred("emit_signal", "generation_error", String("Failed to decode prompt"));
+		llama_sampler_free(smpl);
+		m_is_generating.store(false);
+		return;
+	}
+
+	// Generation loop
+	std::string generated_text;
+	int n_decoded = 0;
+
+	// Start time for timeout check
+	auto start_time = std::chrono::steady_clock::now();
+
+	while (n_decoded < m_max_tokens) {
+		// Check for cancellation
+		if (m_cancel_requested.load()) {
+			call_deferred("emit_signal", "generation_cancelled");
+			break;
+		}
+
+		// Check timeout
+		if (m_timeout_ms > 0) {
+			auto current_time = std::chrono::steady_clock::now();
+			auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+			if (elapsed_ms >= m_timeout_ms) {
+				m_generation_timed_out = true;
+				call_deferred("emit_signal", "generation_timeout");
+				break;
+			}
+		}
+
+		// Sample next token
+		llama_token new_token = llama_sampler_sample(smpl, m_context, -1);
+
+		// Check for end of generation
+		if (llama_vocab_is_eog(vocab, new_token)) {
+			break;
+		}
+
+		// Convert token to text
+		char buf[256];
+		int n = llama_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
+		if (n < 0) {
+			call_deferred("emit_signal", "generation_error", String("Failed to convert token to text"));
+			break;
+		}
+
+		std::string piece(buf, n);
+		generated_text += piece;
+
+		// Update progress
+		n_decoded++;
+		m_tokens_generated.store(n_decoded);
+
+		// Emit token_generated signal for streaming
+		call_deferred("emit_signal", "token_generated", String::utf8(piece.c_str()));
+
+		// Emit progress signal
+		float progress = static_cast<float>(n_decoded) / static_cast<float>(m_max_tokens);
+		call_deferred("emit_signal", "generation_progress", progress);
+
+		// Check for stop sequences
+		if (_check_stop_sequence(generated_text)) {
+			// Remove the stop sequence from output
+			for (const auto &stop : m_stop_sequences) {
+				size_t pos = generated_text.rfind(stop);
+				if (pos != std::string::npos && pos == generated_text.length() - stop.length()) {
+					generated_text = generated_text.substr(0, pos);
+					break;
+				}
+			}
+			break;
+		}
+
+		// Prepare batch for next token and decode
+		llama_batch next_batch = llama_batch_get_one(&new_token, 1);
+		if (llama_decode(m_context, next_batch) != 0) {
+			call_deferred("emit_signal", "generation_error", String("Failed to decode token"));
+			break;
+		}
+	}
+
+	// Cleanup
+	llama_sampler_free(smpl);
+
+	// Emit completion if not cancelled
+	if (!m_cancel_requested.load()) {
+		call_deferred("emit_signal", "generation_completed", String::utf8(generated_text.c_str()));
+	}
+
+	m_is_generating.store(false);
+}
+
+void LlamaInterface::generate_streaming(const String &prompt) {
+	// Check if already generating
+	if (m_is_generating.load()) {
+		UtilityFunctions::push_warning("LlamaInterface: Generation already in progress");
+		return;
+	}
+
+	// Check if model is loaded
+	if (!is_model_loaded()) {
+		call_deferred("emit_signal", "generation_error", String("No model loaded"));
+		return;
+	}
+
+	// Set generating flag
+	m_is_generating.store(true);
+	m_cancel_requested.store(false);
+	m_tokens_generated.store(0);
+
+	// Emit started signal
+	emit_signal("generation_started");
+
+	// Create task data
+	StreamingGenerateData *data = new StreamingGenerateData();
+	data->instance = this;
+	data->prompt = prompt;
+
+	// Add task to WorkerThreadPool
+	m_current_task_id = WorkerThreadPool::get_singleton()->add_native_task(
+		&LlamaInterface::_streaming_generate_callback,
+		data,
+		true,  // high priority
+		"LlamaInterface::generate_streaming"
+	);
+}
+
+// ==================== Generation Control ====================
+
+void LlamaInterface::cancel_generation() {
+	if (!m_is_generating.load()) {
+		return;
+	}
+
+	m_cancel_requested.store(true);
+	UtilityFunctions::print("LlamaInterface: Cancellation requested");
+
+	// Wait for the task to complete if we have a valid task ID
+	if (m_current_task_id != WorkerThreadPool::INVALID_TASK_ID) {
+		WorkerThreadPool::get_singleton()->wait_for_task_completion(m_current_task_id);
+		m_current_task_id = WorkerThreadPool::INVALID_TASK_ID;
+	}
 }
 
 } // namespace godot

@@ -15,7 +15,7 @@
   <div class="wiki-container">
     <nav class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo-icon">🧠</div>
+        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
         <div class="sidebar-logo">OhMyDialogSystem</div>
         <div class="sidebar-subtitle">AI-Powered Dialogues</div>
       </div>
@@ -32,6 +32,7 @@
         <ul class="nav-links">
           <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
           <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
+          <li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
         </ul>
       </div>
 
@@ -41,6 +42,9 @@
           <li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li>
           <li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
           <li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
+          <li><a href="../API/memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
+          <li><a href="../API/tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
+          <li><a href="../API/resources.html"><span class="icon">📄</span> Resources</a></li>
         </ul>
       </div>
 
@@ -49,9 +53,30 @@
         <ul class="nav-links">
           <li><a href="index.html" class="active"><span class="icon">⚙️</span> Overview</a></li>
           <li><a href="architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
+          <li><a href="dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
           <li><a href="gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
           <li><a href="memory-system.html"><span class="icon">💾</span> Memory System</a></li>
           <li><a href="localization.html"><span class="icon">🌐</span> Localization</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Guides</div>
+        <ul class="nav-links">
+          <li><a href="../Guides/index.html"><span class="icon">📖</span> Overview</a></li>
+          <li><a href="../Guides/visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
+          <li><a href="../Guides/character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
+          <li><a href="../Guides/tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
+          <li><a href="../Guides/csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Examples</div>
+        <ul class="nav-links">
+          <li><a href="../Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
+          <li><a href="../Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
+          <li><a href="../Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
         </ul>
       </div>
 
@@ -60,6 +85,7 @@
         <ul class="nav-links">
           <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
           <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
+          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li>
         </ul>
       </div>
     </nav>
@@ -82,6 +108,12 @@
           <span class="icon">🏗️</span>
           <h3><a href="architecture.html">Architecture</a></h3>
           <p>Visión general de la arquitectura del sistema, diagramas de clases y flujos de datos.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="icon">🔷</span>
+          <h3><a href="dialogue-nodes.html">Dialogue Nodes</a></h3>
+          <p>Catálogo visual de nodos del editor. Sistema híbrido grafo + IA.</p>
         </div>
 
         <div class="feature-card">
@@ -148,71 +180,249 @@
 
       <h2>Estructura del Proyecto</h2>
 
-      <pre data-lang="TREE"><code>addons/ohmydialog/
-├── plugin.cfg                    # Metadata del addon
-├── plugin.gd                     # EditorPlugin principal
-│
-├── gdextension/                  # Código C++ nativo
-│   ├── godot-cpp/               # Submodule
-│   ├── thirdparty/
-│   │   ├── llama.cpp/           # Submodule
-│   │   └── piper/               # Submodule
-│   ├── src/
-│   │   ├── llama_interface.h/.cpp
-│   │   ├── piper_interface.h/.cpp
-│   │   └── register_types.h/.cpp
-│   ├── SConstruct
-│   └── ohmydialog.gdextension
-│
-├── core/                         # Managers principales (GDScript)
-│   ├── dialogue_manager.gd
-│   ├── context_manager.gd
-│   ├── conversation_history.gd
-│   └── prompt_builder.gd
-│
-├── resources/                    # Custom Resources
-│   ├── character_identity.gd
-│   ├── world_context.gd
-│   ├── dialogue_graph.gd
-│   ├── ai_preset.gd
-│   └── voice_profile.gd
-│
-├── editor/                       # Editor visual
-│   ├── dialogue_graph_editor.gd
-│   ├── dialogue_graph_editor.tscn
-│   └── nodes/
-│       ├── base_dialogue_node.gd
-│       ├── start_node.gd
-│       ├── ai_response_node.gd
-│       ├── player_choice_node.gd
-│       ├── condition_node.gd
-│       └── event_node.gd
-│
-├── memory/                       # Sistema de memorias
-│   ├── memory_manager.gd
-│   ├── memory_store.gd
-│   └── memory_embeddings.gd
-│
-├── tts/                          # Text-to-Speech
-│   ├── tts_manager.gd
-│   └── tts_cache.gd
-│
-├── localization/                 # Sistema de idiomas
-│   ├── locale_manager.gd
-│   ├── prompt_translator.gd
-│   └── templates/
-│       ├── es.txt
-│       ├── en.txt
-│       └── pt.txt
-│
-├── examples/                     # Ejemplos de uso
-│   ├── basic_npc/
-│   ├── branching_dialogue/
-│   ├── persistent_memory/
-│   └── dynamic_merchant/
-│
-└── docs/                         # Esta wiki
-    └── wiki/</code></pre>
+      <style>
+        .file-tree {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 1.5rem;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+        }
+        .file-tree ul {
+          list-style: none;
+          padding-left: 0;
+          margin: 0;
+        }
+        .file-tree ul ul {
+          padding-left: 1.5rem;
+          border-left: 1px dashed var(--border-color);
+          margin-left: 0.5rem;
+        }
+        .file-tree li {
+          padding: 0.3rem 0;
+          position: relative;
+        }
+        .file-tree .item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .file-tree .icon {
+          font-size: 1rem;
+        }
+        .file-tree .name {
+          color: var(--text-primary);
+        }
+        .file-tree .name.folder {
+          color: var(--ai-cyan);
+          font-weight: 500;
+        }
+        .file-tree .name.file {
+          color: var(--text-secondary);
+        }
+        .file-tree .comment {
+          color: var(--text-muted);
+          font-size: 0.75rem;
+          margin-left: auto;
+          font-style: italic;
+        }
+        .file-tree .section {
+          margin-top: 0.75rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid var(--border-color);
+        }
+        .file-tree .section:first-child {
+          margin-top: 0;
+          padding-top: 0;
+          border-top: none;
+        }
+        .tree-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding-bottom: 1rem;
+          margin-bottom: 1rem;
+          border-bottom: 1px solid var(--border-color);
+        }
+        .tree-header .icon {
+          font-size: 1.5rem;
+        }
+        .tree-header .title {
+          color: var(--ai-purple);
+          font-weight: 600;
+        }
+      </style>
+
+      <div class="file-tree">
+        <div class="tree-header">
+          <span class="icon">📦</span>
+          <span class="title">addons/ohmydialog/</span>
+        </div>
+        <ul>
+          <li>
+            <div class="item">
+              <span class="icon">📄</span>
+              <span class="name file">plugin.cfg</span>
+              <span class="comment">Metadata del addon</span>
+            </div>
+          </li>
+          <li>
+            <div class="item">
+              <span class="icon">📜</span>
+              <span class="name file">plugin.gd</span>
+              <span class="comment">EditorPlugin principal</span>
+            </div>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">⚙️</span>
+              <span class="name folder">gdextension/</span>
+              <span class="comment">Codigo C++ nativo</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📁</span><span class="name folder">godot-cpp/</span><span class="comment">Submodule</span></div></li>
+              <li>
+                <div class="item"><span class="icon">📁</span><span class="name folder">thirdparty/</span></div>
+                <ul>
+                  <li><div class="item"><span class="icon">🦙</span><span class="name folder">llama.cpp/</span><span class="comment">Submodule</span></div></li>
+                  <li><div class="item"><span class="icon">🔊</span><span class="name folder">piper/</span><span class="comment">Submodule</span></div></li>
+                </ul>
+              </li>
+              <li>
+                <div class="item"><span class="icon">📁</span><span class="name folder">src/</span></div>
+                <ul>
+                  <li><div class="item"><span class="icon">📄</span><span class="name file">llama_interface.h/.cpp</span></div></li>
+                  <li><div class="item"><span class="icon">📄</span><span class="name file">piper_interface.h/.cpp</span></div></li>
+                  <li><div class="item"><span class="icon">📄</span><span class="name file">register_types.h/.cpp</span></div></li>
+                </ul>
+              </li>
+              <li><div class="item"><span class="icon">🔧</span><span class="name file">SConstruct</span></div></li>
+              <li><div class="item"><span class="icon">📄</span><span class="name file">ohmydialog.gdextension</span></div></li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">🤖</span>
+              <span class="name folder">ai/</span>
+              <span class="comment">Servicios de IA</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">model_manager.gd</span><span class="comment">Gestor de modelos GGUF</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">prompt_builder.gd</span><span class="comment">Constructor de prompts</span></div></li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">💬</span>
+              <span class="name folder">core/</span>
+              <span class="comment">Managers principales</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">ai_service.gd</span><span class="comment">Singleton de acceso a IA</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">dialogue_manager.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">graph_runner.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">context_manager.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">conversation_history.gd</span></div></li>
+              <li>
+                <div class="item"><span class="icon">📁</span><span class="name folder">node_executors/</span></div>
+                <ul>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">ai_response_executor.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">condition_executor.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">...</span><span class="comment">8 ejecutores</span></div></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">📦</span>
+              <span class="name folder">resources/</span>
+              <span class="comment">Custom Resources</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">👤</span><span class="name file">character_identity.gd</span></div></li>
+              <li><div class="item"><span class="icon">🌍</span><span class="name file">world_context.gd</span></div></li>
+              <li><div class="item"><span class="icon">🔷</span><span class="name file">dialogue_graph.gd</span></div></li>
+              <li><div class="item"><span class="icon">🤖</span><span class="name file">ai_preset.gd</span></div></li>
+              <li><div class="item"><span class="icon">🎤</span><span class="name file">voice_profile.gd</span></div></li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">🎨</span>
+              <span class="name folder">editor/</span>
+              <span class="comment">Editor visual</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">dialogue_graph_editor.gd</span></div></li>
+              <li><div class="item"><span class="icon">🎬</span><span class="name file">dialogue_graph_editor.tscn</span></div></li>
+              <li>
+                <div class="item"><span class="icon">📁</span><span class="name folder">nodes/</span></div>
+                <ul>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">base_dialogue_node.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">start_node.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">ai_response_node.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">player_choice_node.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">condition_node.gd</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">event_node.gd</span></div></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">🧠</span>
+              <span class="name folder">memory/</span>
+              <span class="comment">Sistema de memorias</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">memory_manager.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">memory_store.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">memory_embeddings.gd</span></div></li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">🔊</span>
+              <span class="name folder">tts/</span>
+              <span class="comment">Text-to-Speech</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">tts_manager.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">tts_cache.gd</span></div></li>
+            </ul>
+          </li>
+
+          <li class="section">
+            <div class="item">
+              <span class="icon">🌐</span>
+              <span class="name folder">localization/</span>
+              <span class="comment">Sistema de idiomas</span>
+            </div>
+            <ul>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">locale_manager.gd</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">prompt_translator.gd</span></div></li>
+              <li>
+                <div class="item"><span class="icon">📁</span><span class="name folder">templates/</span></div>
+                <ul>
+                  <li><div class="item"><span class="icon">🇪🇸</span><span class="name file">es.txt</span></div></li>
+                  <li><div class="item"><span class="icon">🇺🇸</span><span class="name file">en.txt</span></div></li>
+                  <li><div class="item"><span class="icon">🇧🇷</span><span class="name file">pt.txt</span></div></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+        </ul>
+      </div>
 
       <hr>
 

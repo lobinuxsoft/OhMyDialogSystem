@@ -2,17 +2,23 @@
 #define LLAMA_INTERFACE_H
 
 #include <godot_cpp/classes/ref_counted.hpp>
+#include <godot_cpp/classes/worker_thread_pool.hpp>
+#include <godot_cpp/variant/array.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
 #include <godot_cpp/variant/packed_string_array.hpp>
 #include <godot_cpp/variant/string.hpp>
 
 #include "llama.h"
 
+#include <atomic>
 #include <chrono>
 #include <string>
 #include <vector>
 
 namespace godot {
+
+// Forward declaration for async task data
+struct AsyncGenerateData;
 
 /// LlamaInterface: Wrapper for llama.cpp model loading and inference.
 /// Exposes llama.cpp functionality to GDScript and C#.
@@ -45,10 +51,20 @@ private:
 	int64_t m_timeout_ms = 0; // 0 = no timeout
 	bool m_generation_timed_out = false;
 
+	// Async generation state
+	std::atomic<bool> m_is_generating{false};
+	std::atomic<bool> m_cancel_requested{false};
+	std::atomic<int> m_tokens_generated{0};
+	WorkerThreadPool::TaskID m_current_task_id = WorkerThreadPool::INVALID_TASK_ID;
+
 	// Internal methods
 	void _cleanup();
 	llama_sampler *_create_sampler() const;
 	bool _check_stop_sequence(const std::string &text) const;
+	void _async_generate_task(const String &prompt);
+	static void _async_generate_callback(void *userdata);
+	void _streaming_generate_task(const String &prompt);
+	static void _streaming_generate_callback(void *userdata);
 
 protected:
 	static void _bind_methods();
@@ -80,12 +96,40 @@ public:
 	/// @return Model path or empty string if no model is loaded
 	String get_model_path() const;
 
+	/// Get the chat template string from the model metadata.
+	/// @return Chat template (Jinja2 format) or empty string if not available
+	String get_chat_template() const;
+
+	/// Apply chat template to format messages for the model.
+	/// Uses llama.cpp's native template parser (minja).
+	/// @param messages Array of {role: String, content: String} dictionaries
+	/// @param add_generation_prompt If true, adds the assistant prompt prefix
+	/// @return Formatted prompt string ready for generation
+	String apply_chat_template(const Array &messages, bool add_generation_prompt = true) const;
+
+	/// Count tokens in text using the model's tokenizer.
+	/// Provides exact token count for the loaded model's vocabulary.
+	/// @param text The text to tokenize
+	/// @return Number of tokens, or -1 if no model is loaded
+	int32_t count_tokens(const String &text) const;
+
 	// ==================== Text Generation ====================
 
 	/// Generate text synchronously from a prompt.
 	/// @param prompt The input text to continue from
 	/// @return Generated text, or empty string on error
 	String generate(const String &prompt);
+
+	/// Generate text asynchronously from a prompt.
+	/// Emits generation_started, generation_completed or generation_error.
+	/// @param prompt The input text to continue from
+	void generate_async(const String &prompt);
+
+	/// Generate text with streaming (emits each token as generated).
+	/// Emits generation_started, token_generated for each token,
+	/// generation_progress, and generation_completed at the end.
+	/// @param prompt The input text to continue from
+	void generate_streaming(const String &prompt);
 
 	// ==================== Sampling Parameters ====================
 
@@ -146,6 +190,20 @@ public:
 
 	/// Check if the last generation timed out
 	bool has_generation_timed_out() const;
+
+	// ==================== Async Generation Status ====================
+
+	/// Check if generation is currently in progress
+	/// @return true if generating, false otherwise
+	bool is_generating() const;
+
+	/// Get the progress of current generation (0.0 to 1.0)
+	/// @return tokens_generated / max_tokens
+	float get_generation_progress() const;
+
+	/// Cancel an in-progress generation.
+	/// Emits generation_cancelled when the generation stops.
+	void cancel_generation();
 };
 
 } // namespace godot

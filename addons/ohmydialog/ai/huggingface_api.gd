@@ -8,6 +8,8 @@ signal search_completed(results: Array[Dictionary])
 signal search_failed(error: String)
 signal model_details_completed(model_id: String, files: Array[Dictionary])
 signal model_details_failed(model_id: String, error: String)
+signal metadata_fetched(model_id: String, filename: String, metadata: Dictionary)
+signal metadata_fetch_failed(model_id: String, filename: String, error: String)
 
 const API_BASE = "https://huggingface.co/api"
 const DOWNLOAD_BASE = "https://huggingface.co"
@@ -20,7 +22,16 @@ var preferred_quantizations: Array[String] = ["Q8_0", "Q4_K_M", "Q4_0", "Q5_K_M"
 
 var _http_search: HTTPRequest
 var _http_details: HTTPRequest
+var _http_metadata: HTTPRequest
 var _pending_model_id: String = ""
+var _pending_metadata_model_id: String = ""
+var _pending_metadata_filename: String = ""
+
+## GGUF parser for extracting metadata from file headers
+var _gguf_parser: GGUFParser
+
+## Size of GGUF header to fetch (10MB should cover all metadata)
+const METADATA_FETCH_SIZE := 10 * 1024 * 1024
 
 
 ## Search for GGUF models on HuggingFace
@@ -55,6 +66,39 @@ func get_model_files(model_id: String) -> void:
 	_pending_model_id = model_id
 	var url = "%s/models/%s/tree/main" % [API_BASE, model_id]
 	_do_request(_get_or_create_details_http(), url, "_on_details_completed")
+
+
+## Fetch GGUF metadata from a remote file using HTTP Range request.
+## Only downloads the first 10MB of the file (enough for metadata).
+## Returns results via metadata_fetched signal.
+## [param model_id]: HuggingFace model ID (e.g., "Qwen/Qwen2.5-3B-Instruct-GGUF")
+## [param filename]: GGUF filename (e.g., "qwen2.5-3b-instruct-q4_k_m.gguf")
+func fetch_gguf_metadata(model_id: String, filename: String) -> void:
+	if _http_metadata != null and _http_metadata.get_http_client_status() != HTTPClient.STATUS_DISCONNECTED:
+		push_warning("HuggingFaceAPI: Metadata request already in progress")
+		return
+
+	_pending_metadata_model_id = model_id
+	_pending_metadata_filename = filename
+
+	var url = get_download_url(model_id, filename)
+	var http = _get_or_create_metadata_http()
+
+	# Disconnect previous signals
+	if http.request_completed.is_connected(Callable(self, "_on_metadata_completed")):
+		http.request_completed.disconnect(Callable(self, "_on_metadata_completed"))
+
+	http.request_completed.connect(Callable(self, "_on_metadata_completed"), CONNECT_ONE_SHOT)
+
+	# Use Range header to only fetch the first 10MB (header + metadata)
+	var headers = [
+		"User-Agent: OhMyDialogSystem/1.0",
+		"Range: bytes=0-%d" % (METADATA_FETCH_SIZE - 1)
+	]
+
+	var err = http.request(url, headers)
+	if err != OK:
+		metadata_fetch_failed.emit(model_id, filename, "Failed to start request: %s" % error_string(err))
 
 
 ## Parse search results and filter for valid GGUF repos
@@ -165,6 +209,8 @@ func create_model_config(model_id: String, file_info: Dictionary) -> ModelConfig
 	config.description = "Downloaded from HuggingFace: %s" % model_id
 	config.size_mb = file_info.get("size_mb", 0.0)
 	config.download_url = get_download_url(model_id, file_info.get("filename", ""))
+	config.documentation_url = "%s/%s" % [DOWNLOAD_BASE, model_id]
+	config.file_metadata_url = "%s/%s/blob/main/%s" % [DOWNLOAD_BASE, model_id, file_info.get("filename", "")]
 	config.is_custom = true
 
 	# Set reasonable defaults based on size
@@ -216,6 +262,16 @@ func _get_or_create_details_http() -> HTTPRequest:
 		_http_details.use_threads = true
 		Engine.get_main_loop().root.add_child(_http_details)
 	return _http_details
+
+
+func _get_or_create_metadata_http() -> HTTPRequest:
+	if _http_metadata == null:
+		_http_metadata = HTTPRequest.new()
+		_http_metadata.use_threads = true
+		# Allow larger download buffer for the 10MB range request
+		_http_metadata.download_chunk_size = 65536
+		Engine.get_main_loop().root.add_child(_http_metadata)
+	return _http_metadata
 
 
 func _do_request(http: HTTPRequest, url: String, callback: String) -> void:
@@ -288,6 +344,47 @@ func _on_details_completed(result: int, response_code: int, _headers: PackedStri
 		model_details_failed.emit(model_id, "Unexpected response format")
 
 
+func _on_metadata_completed(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	var model_id = _pending_metadata_model_id
+	var filename = _pending_metadata_filename
+	_pending_metadata_model_id = ""
+	_pending_metadata_filename = ""
+
+	if result != HTTPRequest.RESULT_SUCCESS:
+		metadata_fetch_failed.emit(model_id, filename, "Request failed: %s" % _get_result_error(result))
+		return
+
+	# Accept both 200 (full file) and 206 (partial content from Range request)
+	if response_code != 200 and response_code != 206:
+		metadata_fetch_failed.emit(model_id, filename, "HTTP error: %d" % response_code)
+		return
+
+	if body.size() < 24:
+		metadata_fetch_failed.emit(model_id, filename, "Response too small to be a valid GGUF file")
+		return
+
+	# Parse GGUF header
+	if _gguf_parser == null:
+		_gguf_parser = GGUFParser.new()
+
+	if _gguf_parser.parse(body):
+		var metadata = _gguf_parser.get_all_metadata()
+		# Add convenience fields
+		metadata["_architecture"] = _gguf_parser.get_architecture()
+		metadata["_model_name"] = _gguf_parser.get_model_name()
+		metadata["_chat_template"] = _gguf_parser.get_chat_template()
+		metadata["_chat_template_format"] = _gguf_parser.detect_chat_template_format()
+		metadata["_bos_token_id"] = _gguf_parser.get_bos_token_id()
+		metadata["_eos_token_id"] = _gguf_parser.get_eos_token_id()
+		metadata["_context_length"] = _gguf_parser.get_context_length()
+		metadata_fetched.emit(model_id, filename, metadata)
+	else:
+		var error_msg = "Failed to parse GGUF metadata"
+		if not _gguf_parser.errors.is_empty():
+			error_msg += ": " + ", ".join(_gguf_parser.errors)
+		metadata_fetch_failed.emit(model_id, filename, error_msg)
+
+
 func _get_result_error(result: int) -> String:
 	match result:
 		HTTPRequest.RESULT_CANT_CONNECT: return "Cannot connect"
@@ -308,3 +405,7 @@ func cleanup() -> void:
 	if _http_details != null and is_instance_valid(_http_details):
 		_http_details.queue_free()
 		_http_details = null
+	if _http_metadata != null and is_instance_valid(_http_metadata):
+		_http_metadata.queue_free()
+		_http_metadata = null
+	_gguf_parser = null

@@ -23,6 +23,9 @@ signal download_completed(model_id: String)
 ## Emitted when download fails
 signal download_failed(model_id: String, error: String)
 
+## Emitted when the list of available models changes (added, removed, downloaded)
+signal models_changed()
+
 ## The LlamaInterface instance for inference
 var llama: LlamaInterface
 
@@ -174,6 +177,7 @@ func get_download_progress() -> float:
 func add_custom_model(config: ModelConfig) -> void:
 	registry.add_custom_model(config)
 	save_registry()
+	models_changed.emit()
 
 
 ## Removes a custom model from the registry
@@ -181,7 +185,13 @@ func remove_custom_model(id: String) -> bool:
 	var result = registry.remove_custom_model(id)
 	if result:
 		save_registry()
+		models_changed.emit()
 	return result
+
+
+## Notifies that the model files have changed (e.g., file deleted externally)
+func notify_models_changed() -> void:
+	models_changed.emit()
 
 
 ## Gets model info dictionary (from loaded model)
@@ -200,6 +210,7 @@ func _on_download_progress(model_id: String, downloaded_bytes: int, total_bytes:
 
 func _on_download_completed(model_id: String, _local_path: String) -> void:
 	download_completed.emit(model_id)
+	models_changed.emit()
 
 
 func _on_download_failed(model_id: String, error_message: String) -> void:

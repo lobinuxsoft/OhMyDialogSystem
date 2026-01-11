@@ -15,7 +15,7 @@
   <div class="wiki-container">
     <nav class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo-icon">🧠</div>
+        <div class="sidebar-logo-icon"><img src="logo-eldritch.png" alt="OhMyDialogSystem"></div>
         <div class="sidebar-logo">OhMyDialogSystem</div>
         <div class="sidebar-subtitle">AI-Powered Dialogues</div>
       </div>
@@ -53,6 +53,7 @@
         <ul class="nav-links">
           <li><a href="Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
           <li><a href="Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
+          <li><a href="Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
           <li><a href="Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
           <li><a href="Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li>
           <li><a href="Technical/localization.html"><span class="icon">🌐</span> Localization</a></li>
@@ -152,18 +153,27 @@
 
       <h2>Quick Start</h2>
 
-      <pre data-lang="GDSCRIPT"><code># 1. Cargar el modelo
-var llama = LlamaInterface.new()
-llama.load_model("user://models/mistral-7b-q4.gguf")
+      <pre data-lang="GDSCRIPT"><code># Crear DialogueManager y verificar AIService
+var dialogue_manager: DialogueManager
 
-# 2. Configurar el DialogueManager
-var dm = DialogueManager.new()
-dm.set_llama_interface(llama)
-dm.set_character(preload("res://npcs/merchant.tres"))
+func _ready() -> void:
+    # Verificar que hay modelo cargado (via Model Manager)
+    var ai_service := AIService.get_singleton()
+    if not ai_service or not ai_service.is_model_loaded():
+        push_warning("No hay modelo cargado - usar Model Manager primero")
 
-# 3. Iniciar conversación
-dm.npc_response_completed.connect(_on_npc_response)
-dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
+    # Crear y configurar DialogueManager
+    dialogue_manager = DialogueManager.new()
+    add_child(dialogue_manager)
+
+    # Conectar señales
+    dialogue_manager.npc_response_completed.connect(_on_npc_response)
+    dialogue_manager.player_choices_available.connect(_on_choices)
+    dialogue_manager.dialogue_ended.connect(_on_dialogue_ended)
+
+func start_conversation() -> void:
+    var graph: DialogueGraph = preload("res://dialogues/merchant.tres")
+    dialogue_manager.start_dialogue(graph)</code></pre>
 
       <div class="callout-info">
         <p>Para una guía completa de instalación y configuración, visita <a href="Guides/quickstart.html">Quick Start Guide</a>.</p>
@@ -173,110 +183,602 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
 
       <h2>Arquitectura del Sistema</h2>
 
-      <pre data-lang="DIAGRAM"><code>┌─────────────────────────────────────────────────────────────────┐
-│                      OhMyDialogSystem                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
-│  │   LLM       │    │   Memory    │    │    TTS      │         │
-│  │ (llama.cpp) │    │   System    │    │  (Piper)    │         │
-│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘         │
-│         │                  │                  │                 │
-│         └──────────────────┼──────────────────┘                 │
-│                            │                                    │
-│                    ┌───────┴───────┐                           │
-│                    │   Dialogue    │                           │
-│                    │    Manager    │                           │
-│                    └───────┬───────┘                           │
-│                            │                                    │
-│              ┌─────────────┼─────────────┐                     │
-│              │             │             │                     │
-│        ┌─────┴─────┐ ┌─────┴─────┐ ┌─────┴─────┐             │
-│        │ Character │ │   World   │ │  Dialogue │             │
-│        │ Identity  │ │  Context  │ │   Graph   │             │
-│        └───────────┘ └───────────┘ └───────────┘             │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘</code></pre>
+      <style>
+        .arch-diagram {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 2rem;
+          margin: 1.5rem 0;
+        }
+        .arch-title {
+          text-align: center;
+          font-family: var(--font-mono);
+          font-size: 1.1rem;
+          color: var(--ai-cyan);
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border-color);
+        }
+        .arch-layer {
+          display: flex;
+          justify-content: center;
+          gap: 1.5rem;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+        }
+        .arch-node {
+          padding: 0.75rem 1.25rem;
+          border-radius: 8px;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          text-align: center;
+          border: 1px solid;
+          min-width: 120px;
+          transition: all 0.3s ease;
+        }
+        .arch-node:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .arch-node.llm {
+          background: rgba(59, 130, 246, 0.1);
+          border-color: #3b82f6;
+          color: #3b82f6;
+        }
+        .arch-node.memory {
+          background: rgba(168, 85, 247, 0.1);
+          border-color: #a855f7;
+          color: #a855f7;
+        }
+        .arch-node.tts {
+          background: rgba(16, 185, 129, 0.1);
+          border-color: #10b981;
+          color: #10b981;
+        }
+        .arch-node.manager {
+          background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
+          border-color: var(--ai-cyan);
+          color: var(--ai-cyan);
+          font-weight: 600;
+          padding: 1rem 2rem;
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        .arch-node.resource {
+          background: rgba(107, 114, 128, 0.1);
+          border-color: #6b7280;
+          color: #9ca3af;
+          font-size: 0.8rem;
+          min-width: 100px;
+        }
+        .arch-connector {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 0.5rem 0;
+          color: var(--text-muted);
+        }
+        .arch-connector.vertical::before {
+          content: '│';
+          font-size: 1.5rem;
+        }
+        .arch-connector.merge {
+          position: relative;
+          height: 30px;
+        }
+        .arch-connector.merge::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 60%;
+          height: 15px;
+          border-left: 1px solid var(--text-muted);
+          border-right: 1px solid var(--text-muted);
+          border-bottom: 1px solid var(--text-muted);
+          border-radius: 0 0 8px 8px;
+        }
+        .arch-connector.merge::after {
+          content: '│';
+          position: absolute;
+          bottom: -5px;
+          left: 50%;
+          transform: translateX(-50%);
+          color: var(--text-muted);
+        }
+        .arch-connector.split {
+          position: relative;
+          height: 30px;
+        }
+        .arch-connector.split::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 70%;
+          height: 15px;
+          border-left: 1px solid var(--text-muted);
+          border-right: 1px solid var(--text-muted);
+          border-top: 1px solid var(--text-muted);
+          border-radius: 8px 8px 0 0;
+        }
+        .arch-connector.split::after {
+          content: '│';
+          position: absolute;
+          top: -5px;
+          left: 50%;
+          transform: translateX(-50%);
+          color: var(--text-muted);
+        }
+        .arch-label {
+          font-size: 0.65rem;
+          color: var(--text-muted);
+          display: block;
+          margin-top: 0.25rem;
+        }
+      </style>
+
+      <div class="arch-diagram">
+        <div class="arch-title">OhMyDialogSystem</div>
+
+        <!-- Layer 1: Native Components -->
+        <div class="arch-layer">
+          <div class="arch-node llm">
+            🦙 LlamaInterface
+            <span class="arch-label">GDExtension</span>
+          </div>
+          <div class="arch-node memory">
+            🧠 Memory
+            <span class="arch-label">System</span>
+          </div>
+          <div class="arch-node tts">
+            🔊 TTS
+            <span class="arch-label">Piper</span>
+          </div>
+        </div>
+
+        <!-- Connector: Merge to AIService -->
+        <div class="arch-connector merge"></div>
+
+        <!-- Layer 2: AIService Singleton -->
+        <div class="arch-layer">
+          <div class="arch-node" style="background: rgba(6, 182, 212, 0.15); border-color: #06b6d4; color: #06b6d4; font-weight: 500;">
+            🤖 AIService
+            <span class="arch-label">Singleton</span>
+          </div>
+        </div>
+
+        <!-- Connector: to DialogueManager -->
+        <div class="arch-connector vertical"></div>
+
+        <!-- Layer 3: DialogueManager -->
+        <div class="arch-layer">
+          <div class="arch-node manager">
+            💬 DialogueManager
+          </div>
+        </div>
+
+        <!-- Connector: Split -->
+        <div class="arch-connector split"></div>
+
+        <!-- Layer 4: Resources -->
+        <div class="arch-layer">
+          <div class="arch-node resource">
+            👤 Character<br>Identity
+          </div>
+          <div class="arch-node resource">
+            🌍 World<br>Context
+          </div>
+          <div class="arch-node resource">
+            🔷 Dialogue<br>Graph
+          </div>
+        </div>
+      </div>
 
       <hr>
 
       <h2>Roadmap</h2>
 
-      <div class="milestone-progress">
-        <div class="header">
-          <strong>M1: GDExtension Core</strong>
-          <span class="badge badge-cyan">0%</span>
+      <style>
+        .milestone-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 1rem;
+          margin: 1.5rem 0;
+        }
+        .milestone-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 1rem;
+          transition: all 0.3s;
+          cursor: pointer;
+        }
+        .milestone-card:hover {
+          border-color: var(--ai-cyan);
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+          transform: translateY(-2px);
+        }
+        .milestone-card .name {
+          font-weight: 600;
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .milestone-card .progress-bar {
+          height: 6px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 3px;
+          overflow: hidden;
+          margin-bottom: 0.5rem;
+        }
+        .milestone-card .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, var(--ai-cyan), var(--ai-purple));
+          border-radius: 3px;
+          transition: width 0.5s ease;
+        }
+        .milestone-card .desc {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+        }
+        /* Milestone Lightbox */
+        .milestone-lightbox {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.9);
+          z-index: 9999;
+          justify-content: center;
+          align-items: center;
+          padding: 2rem;
+        }
+        .milestone-lightbox.active {
+          display: flex;
+        }
+        .milestone-lightbox-content {
+          background: var(--bg-card);
+          border: 1px solid var(--ai-cyan);
+          border-radius: 12px;
+          max-width: 600px;
+          width: 100%;
+          max-height: 80vh;
+          overflow: hidden;
+          box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+        }
+        .milestone-lightbox-header {
+          padding: 1.25rem 1.5rem;
+          background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(168, 85, 247, 0.15));
+          border-bottom: 1px solid var(--border-color);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .milestone-lightbox-title {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--ai-cyan);
+        }
+        .milestone-lightbox-close {
+          background: none;
+          border: none;
+          color: var(--text-muted);
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0;
+          line-height: 1;
+          transition: color 0.2s;
+        }
+        .milestone-lightbox-close:hover {
+          color: var(--ai-cyan);
+        }
+        .milestone-lightbox-body {
+          padding: 1rem 1.5rem;
+          max-height: 60vh;
+          overflow-y: auto;
+        }
+        .milestone-lightbox-desc {
+          color: var(--text-muted);
+          font-size: 0.9rem;
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border-color);
+        }
+        .milestone-lightbox-progress {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+        .milestone-lightbox-progress .progress-bar {
+          flex: 1;
+          height: 8px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        .milestone-lightbox-progress .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, var(--ai-cyan), var(--ai-purple));
+          border-radius: 4px;
+        }
+        .milestone-lightbox-progress .progress-text {
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          color: var(--ai-cyan);
+          min-width: 45px;
+        }
+        .task-section-title {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          margin: 1rem 0 0.5rem 0;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .task-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 0;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+          font-size: 0.85rem;
+        }
+        .task-item:last-child {
+          border-bottom: none;
+        }
+        .task-item.done {
+          opacity: 0.5;
+        }
+        .task-item.done .task-text {
+          text-decoration: line-through;
+        }
+        .task-status {
+          width: 18px;
+          height: 18px;
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.7rem;
+          flex-shrink: 0;
+        }
+        .task-status.pending {
+          background: rgba(234, 179, 8, 0.2);
+          color: #eab308;
+        }
+        .task-status.done {
+          background: rgba(16, 185, 129, 0.2);
+          color: #10b981;
+        }
+        .task-text {
+          flex: 1;
+          color: var(--text-body);
+        }
+        .task-link {
+          font-family: var(--font-mono);
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+        .task-link:hover {
+          color: var(--ai-cyan);
+        }
+        .no-tasks {
+          color: var(--text-muted);
+          font-style: italic;
+          padding: 0.5rem 0;
+        }
+      </style>
+
+      <p id="roadmap-summary" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+        Cargando datos del roadmap...
+      </p>
+
+      <div id="milestone-grid" class="milestone-grid">
+        <div class="milestone-card" style="opacity: 0.5;">
+          <div class="name"><span>Cargando...</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>
         </div>
-        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
       </div>
 
-      <div class="milestone-progress">
-        <div class="header">
-          <strong>M2: Core del Sistema</strong>
-          <span class="badge badge-purple">0%</span>
-        </div>
-        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
+      <div class="callout-info">
+        <p>Datos actualizados desde el <a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank">Project Board en GitHub</a>.
+        <span id="roadmap-updated" style="font-size: 0.8rem; opacity: 0.7;"></span></p>
       </div>
 
-      <div class="milestone-progress">
-        <div class="header">
-          <strong>M3: Editor Visual</strong>
-          <span class="badge badge-purple">0%</span>
+      <!-- Milestone Lightbox -->
+      <div class="milestone-lightbox" id="milestoneLightbox">
+        <div class="milestone-lightbox-content">
+          <div class="milestone-lightbox-header">
+            <span class="milestone-lightbox-title" id="lightboxMilestoneTitle">Milestone</span>
+            <button class="milestone-lightbox-close" onclick="closeMilestoneLightbox()">&times;</button>
+          </div>
+          <div class="milestone-lightbox-body">
+            <div class="milestone-lightbox-desc" id="lightboxMilestoneDesc"></div>
+            <div class="milestone-lightbox-progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="lightboxProgressFill" style="width: 0%;"></div>
+              </div>
+              <span class="progress-text" id="lightboxProgressText">0%</span>
+            </div>
+            <div id="lightboxTasksContainer"></div>
+          </div>
         </div>
-        <div class="bar"><div class="bar-fill" style="width: 0%;"></div></div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Milestone</th>
-            <th>Descripción</th>
-            <th>Issues</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>M1</strong></td>
-            <td>GDExtension Core (llama.cpp, godot-cpp)</td>
-            <td>#1-#6</td>
-          </tr>
-          <tr>
-            <td><strong>M2</strong></td>
-            <td>Core del Sistema (Resources, Managers)</td>
-            <td>#7-#14</td>
-          </tr>
-          <tr>
-            <td><strong>M3</strong></td>
-            <td>Editor Visual de Diálogos</td>
-            <td>#15-#22</td>
-          </tr>
-          <tr>
-            <td><strong>M4</strong></td>
-            <td>Memorias Persistentes</td>
-            <td>#23-#28</td>
-          </tr>
-          <tr>
-            <td><strong>M5</strong></td>
-            <td>Localización</td>
-            <td>#29-#32</td>
-          </tr>
-          <tr>
-            <td><strong>M6</strong></td>
-            <td>Text-to-Speech (Piper)</td>
-            <td>#33-#38</td>
-          </tr>
-          <tr>
-            <td><strong>M7</strong></td>
-            <td>Bindings C#</td>
-            <td>#39-#43</td>
-          </tr>
-          <tr>
-            <td><strong>M8</strong></td>
-            <td>Ejemplos y Documentación</td>
-            <td>#44-#50</td>
-          </tr>
-        </tbody>
-      </table>
+      <script>
+        // Roadmap data loader
+        (function() {
+          const REPO_URL = 'https://github.com/lobinuxsoft/OhMyDialogSystem';
+          const DATA_URL = 'roadmap-data.json';
+          let roadmapData = null;
+
+          // Clean title (remove [Component] prefix)
+          function cleanTitle(title) {
+            return title.replace(/^\[(Core|Editor|AI|GDExtension|Memory|TTS|CSharp|Localization|Infra|QA|Docs|Examples|Wiki)\]\s*/i, '').replace(/^(feat|fix|docs|refactor):\s*/i, '');
+          }
+
+          // Extract milestone number from title
+          function getMilestoneNum(title) {
+            const match = title.match(/^M(\d+)/i);
+            return match ? match[1] : '?';
+          }
+
+          // Get clean milestone name
+          function getMilestoneName(title) {
+            return title.replace(/^M\d+[:\s-]*/i, '');
+          }
+
+          // Sort milestones by number
+          let sortedMilestones = [];
+
+          // Render milestones
+          function renderMilestones(milestones) {
+            const container = document.getElementById('milestone-grid');
+            if (!milestones || milestones.length === 0) {
+              container.innerHTML = '<p style="color: var(--text-muted);">No hay milestones configurados.</p>';
+              return;
+            }
+
+            // Sort milestones by number extracted from title (M1, M2, M3...)
+            sortedMilestones = [...milestones].sort((a, b) => {
+              const numA = parseInt(getMilestoneNum(a.title)) || 999;
+              const numB = parseInt(getMilestoneNum(b.title)) || 999;
+              return numA - numB;
+            });
+
+            const totalTasks = sortedMilestones.reduce((acc, m) => acc + m.open + m.closed, 0);
+            const completedTasks = sortedMilestones.reduce((acc, m) => acc + m.closed, 0);
+            document.getElementById('roadmap-summary').textContent =
+              `${completedTasks}/${totalTasks} tareas completadas en ${sortedMilestones.length} milestones.`;
+
+            container.innerHTML = sortedMilestones.map((m, index) => {
+              const milestoneNum = getMilestoneNum(m.title);
+              const cleanName = getMilestoneName(m.title);
+              return `
+                <div class="milestone-card" onclick="openMilestoneLightbox(${index})">
+                  <div class="name">
+                    <span>M${milestoneNum}: ${cleanName}</span>
+                    <span class="badge ${m.progress > 50 ? 'badge-cyan' : 'badge-purple'}">${m.progress}%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${m.progress}%;"></div>
+                  </div>
+                  <div class="desc">${m.description || `${m.closed}/${m.open + m.closed} completadas`}</div>
+                </div>
+              `;
+            }).join('');
+          }
+
+          // Open milestone lightbox
+          window.openMilestoneLightbox = function(index) {
+            if (!roadmapData || sortedMilestones.length === 0) return;
+            const milestone = sortedMilestones[index];
+            if (!milestone) return;
+
+            const milestoneNum = getMilestoneNum(milestone.title);
+            const cleanName = getMilestoneName(milestone.title);
+
+            document.getElementById('lightboxMilestoneTitle').textContent = `M${milestoneNum}: ${cleanName}`;
+            document.getElementById('lightboxMilestoneDesc').textContent = milestone.description || '';
+            document.getElementById('lightboxProgressFill').style.width = `${milestone.progress}%`;
+            document.getElementById('lightboxProgressText').textContent = `${milestone.progress}%`;
+
+            // Get issues for this milestone
+            const milestoneIssues = (roadmapData.issues || []).filter(issue => {
+              const issueMilestone = issue.milestone || '';
+              return issueMilestone.includes(milestone.title) || issueMilestone.includes(`M${milestoneNum}`);
+            });
+
+            const pendingIssues = milestoneIssues.filter(i => i.state !== 'CLOSED');
+            const doneIssues = milestoneIssues.filter(i => i.state === 'CLOSED');
+
+            let tasksHtml = '';
+
+            if (pendingIssues.length > 0) {
+              tasksHtml += `<div class="task-section-title">Pendientes (${pendingIssues.length})</div>`;
+              tasksHtml += pendingIssues.map(issue => `
+                <div class="task-item">
+                  <span class="task-status pending">○</span>
+                  <span class="task-text">${cleanTitle(issue.title)}</span>
+                  <a href="${REPO_URL}/issues/${issue.number}" target="_blank" class="task-link">#${issue.number}</a>
+                </div>
+              `).join('');
+            }
+
+            if (doneIssues.length > 0) {
+              tasksHtml += `<div class="task-section-title">Completadas (${doneIssues.length})</div>`;
+              tasksHtml += doneIssues.map(issue => `
+                <div class="task-item done">
+                  <span class="task-status done">✓</span>
+                  <span class="task-text">${cleanTitle(issue.title)}</span>
+                  <a href="${REPO_URL}/issues/${issue.number}" target="_blank" class="task-link">#${issue.number}</a>
+                </div>
+              `).join('');
+            }
+
+            if (milestoneIssues.length === 0) {
+              tasksHtml = '<p class="no-tasks">No hay tareas registradas para este milestone.</p>';
+            }
+
+            document.getElementById('lightboxTasksContainer').innerHTML = tasksHtml;
+            document.getElementById('milestoneLightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+          };
+
+          // Close milestone lightbox
+          window.closeMilestoneLightbox = function() {
+            document.getElementById('milestoneLightbox').classList.remove('active');
+            document.body.style.overflow = '';
+          };
+
+          // Close on background click
+          document.getElementById('milestoneLightbox').addEventListener('click', function(e) {
+            if (e.target === this) closeMilestoneLightbox();
+          });
+
+          // Close on Escape
+          document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeMilestoneLightbox();
+          });
+
+          // Format date
+          function formatDate(isoDate) {
+            if (!isoDate) return '';
+            const date = new Date(isoDate);
+            return `Actualizado: ${date.toLocaleDateString('es-ES', {
+              day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            })}`;
+          }
+
+          // Load data
+          fetch(DATA_URL)
+            .then(res => {
+              if (!res.ok) throw new Error('No roadmap data available');
+              return res.json();
+            })
+            .then(data => {
+              roadmapData = data;
+              renderMilestones(data.milestones);
+              document.getElementById('roadmap-updated').textContent = formatDate(data.updated_at);
+            })
+            .catch(err => {
+              console.warn('Roadmap data not available:', err);
+              document.getElementById('roadmap-summary').innerHTML =
+                'No se pudieron cargar los datos. <a href="' + REPO_URL + '/issues" target="_blank">Ver issues en GitHub</a>';
+              document.getElementById('milestone-grid').innerHTML = '';
+            });
+        })();
+      </script>
 
       <hr>
 
@@ -323,7 +825,7 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
           <tr>
             <td>Modelo LLM</td>
             <td>GGUF Q4/Q5/Q8</td>
-            <td>Recomendado: Mistral 7B o similar</td>
+            <td>Recomendado: Qwen2.5-0.5B-Instruct (~530MB)</td>
           </tr>
           <tr>
             <td>RAM</td>
@@ -340,7 +842,155 @@ dm.send_player_message("Hola, ¿qué tienes para vender?")</code></pre>
 
       <hr>
 
-      <em>Última actualización: Diciembre 2025</em>
+      <h2>Support the Project</h2>
+
+      <p>If you find this project useful, consider supporting its development:</p>
+
+      <style>
+        .donate-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+        .donate-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 1.5rem;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+        .donate-card:hover {
+          border-color: var(--ai-cyan);
+          box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        .donate-card img {
+          width: 150px;
+          height: 150px;
+          margin-bottom: 1rem;
+          border-radius: 8px;
+          background: white;
+          padding: 8px;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        .donate-card img:hover {
+          transform: scale(1.05);
+        }
+        .donate-card h4 {
+          margin: 0 0 0.5rem 0;
+          color: var(--ai-cyan);
+        }
+        .donate-card code {
+          font-size: 0.7rem;
+          word-break: break-all;
+          display: block;
+          padding: 0.5rem;
+          background: rgba(0,0,0,0.3);
+          border-radius: 4px;
+        }
+        /* Lightbox */
+        .lightbox {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.9);
+          z-index: 9999;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          cursor: pointer;
+        }
+        .lightbox.active {
+          display: flex;
+        }
+        .lightbox img {
+          max-width: 90%;
+          max-height: 70%;
+          background: white;
+          padding: 20px;
+          border-radius: 12px;
+          box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+        }
+        .lightbox-title {
+          color: var(--ai-cyan);
+          font-size: 1.5rem;
+          margin-top: 1.5rem;
+          font-weight: 600;
+        }
+        .lightbox-address {
+          color: white;
+          font-family: var(--font-mono);
+          font-size: 1rem;
+          margin-top: 0.75rem;
+          padding: 0.75rem 1.5rem;
+          background: rgba(255,255,255,0.1);
+          border-radius: 8px;
+          user-select: all;
+        }
+        .lightbox-hint {
+          color: var(--text-muted);
+          font-size: 0.8rem;
+          margin-top: 1rem;
+        }
+      </style>
+
+      <div class="donate-grid">
+        <div class="donate-card">
+          <img src="donate/usdt-trc20.png" alt="USDT TRC20 QR" onclick="openLightbox(this, 'USDT (TRC20)', 'TF6AXBP3LKBCcbJkLG6RqyMsrPNs2JCpdQ')">
+          <h4>USDT (TRC20)</h4>
+          <code>TF6AXBP3LKBCcbJkLG6RqyMsrPNs2JCpdQ</code>
+        </div>
+        <div class="donate-card">
+          <img src="donate/usdt-bep20.png" alt="USDT BEP20 QR" onclick="openLightbox(this, 'USDT (BEP20)', '0xd8d2Ed67C567CB3Af437f4638d3531e560575A20')">
+          <h4>USDT (BEP20)</h4>
+          <code>0xd8d2Ed67C567CB3Af437f4638d3531e560575A20</code>
+        </div>
+        <div class="donate-card">
+          <img src="donate/btc.png" alt="BTC QR" onclick="openLightbox(this, 'Bitcoin (BTC)', 'bc1qkxy898wa6mz04c9hrjekx6p0yht2ukz56e9xxq')">
+          <h4>BTC</h4>
+          <code>bc1qkxy898wa6mz04c9hrjekx6p0yht2ukz56e9xxq</code>
+        </div>
+        <div class="donate-card">
+          <img src="donate/binance-pay.jpeg" alt="Binance Pay QR" onclick="openLightbox(this, 'Binance Pay', '78328894')">
+          <h4>Binance Pay</h4>
+          <code>78328894</code>
+        </div>
+      </div>
+
+      <!-- Lightbox -->
+      <div class="lightbox" id="qrLightbox" onclick="closeLightbox()">
+        <img id="lightboxImg" src="" alt="QR Code">
+        <div class="lightbox-title" id="lightboxTitle"></div>
+        <div class="lightbox-address" id="lightboxAddress"></div>
+        <div class="lightbox-hint">Click anywhere to close</div>
+      </div>
+
+      <script>
+        function openLightbox(img, title, address) {
+          const lightbox = document.getElementById('qrLightbox');
+          document.getElementById('lightboxImg').src = img.src;
+          document.getElementById('lightboxTitle').textContent = title;
+          document.getElementById('lightboxAddress').textContent = address;
+          lightbox.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+          document.getElementById('qrLightbox').classList.remove('active');
+          document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') closeLightbox();
+        });
+      </script>
+
+      <hr>
+
+      <em>Última actualización: Enero 2026</em>
 
       <footer class="wiki-footer">
         <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>

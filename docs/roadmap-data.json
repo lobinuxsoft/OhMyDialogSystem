@@ -1,0 +1,2723 @@
+{
+  "updated_at": "2026-01-11T02:04:33Z",
+  "repository": "lobinuxsoft/OhMyDialogSystem",
+  "milestones": [
+    {
+      "number": 1,
+      "title": "M1: Fundación - GDExtension Core",
+      "description": "Setup inicial, GDExtension con llama.cpp, LlamaInterface",
+      "open": 7,
+      "closed": 12,
+      "progress": 63,
+      "state": "open"
+    },
+    {
+      "number": 2,
+      "title": "M2: Core del Sistema",
+      "description": "Resources, PromptBuilder, DialogueManager",
+      "open": 0,
+      "closed": 14,
+      "progress": 100,
+      "state": "open"
+    },
+    {
+      "number": 10,
+      "title": "M3: Editor Visual",
+      "description": "DialogueGraphEditor completo con todos los nodos",
+      "open": 13,
+      "closed": 7,
+      "progress": 35,
+      "state": "open"
+    },
+    {
+      "number": 11,
+      "title": "M4: Memorias Persistentes",
+      "description": "Sistema de memorias con búsqueda semántica",
+      "open": 6,
+      "closed": 0,
+      "progress": 0,
+      "state": "open"
+    },
+    {
+      "number": 12,
+      "title": "M5: Localización",
+      "description": "LocaleManager, PromptTranslator, templates multi-idioma",
+      "open": 3,
+      "closed": 0,
+      "progress": 0,
+      "state": "open"
+    },
+    {
+      "number": 13,
+      "title": "M6: Text-to-Speech",
+      "description": "Piper TTS, pack de voces, cache de audio",
+      "open": 5,
+      "closed": 0,
+      "progress": 0,
+      "state": "open"
+    },
+    {
+      "number": 14,
+      "title": "M7: Bindings C#",
+      "description": "Wrappers idiomáticos con async/await",
+      "open": 5,
+      "closed": 0,
+      "progress": 0,
+      "state": "open"
+    },
+    {
+      "number": 8,
+      "title": "M8: Ejemplos y Documentación",
+      "description": "Ejemplos, API docs, guía de inicio rápido, CI/CD",
+      "open": 9,
+      "closed": 7,
+      "progress": 43,
+      "state": "open"
+    },
+    {
+      "number": 15,
+      "title": "M9: LoRA & Asistentes IA",
+      "description": "Soporte LoRA, asistentes, fine-tuning",
+      "open": 5,
+      "closed": 0,
+      "progress": 0,
+      "state": "open"
+    }
+  ],
+  "sprints": [
+    {
+      "sprint": "Backlog",
+      "issues": [
+        {
+          "number": 6,
+          "title": "[GDExtension] Implementar generación asíncrona con streaming",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:hard",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "In Progress",
+            "Priority": "Critical",
+            "Order": 1.0
+          }
+        },
+        {
+          "number": 160,
+          "title": "[GDExtension] Implementar signals async en LlamaInterface",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 2.0
+          }
+        },
+        {
+          "number": 161,
+          "title": "[GDExtension] Implementar generate_async con WorkerThreadPool",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:hard",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 3.0
+          }
+        },
+        {
+          "number": 162,
+          "title": "[GDExtension] Implementar generate_streaming con emisión de tokens",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:hard",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 4.0
+          }
+        },
+        {
+          "number": 163,
+          "title": "[GDExtension] Implementar cancel_generation con abort_callback",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 5.0
+          }
+        },
+        {
+          "number": 164,
+          "title": "[Core] Implementar AIService singleton",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 6.0
+          }
+        },
+        {
+          "number": 165,
+          "title": "[Editor] Implementar AI Dock (panel lateral)",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 7.0
+          }
+        },
+        {
+          "number": 166,
+          "title": "[Editor] Implementar ModelRequiredDialog",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "difficulty:easy",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 8.0
+          }
+        },
+        {
+          "number": 167,
+          "title": "[Editor] Model Manager Dialog",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:medium",
+            "difficulty:hard",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Order": 9.0
+          }
+        },
+        {
+          "number": 168,
+          "title": "[Editor] Integrar AI con DialogueGraphEditor",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:medium",
+            "difficulty:medium",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Order": 10.0
+          }
+        },
+        {
+          "number": 53,
+          "title": "[GDExtension] Soporte Vulkan para aceleracion GPU",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:medium",
+            "difficulty:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 11.0
+          }
+        },
+        {
+          "number": 57,
+          "title": "[QA] Implementar integration tests para GDExtension",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "infrastructure"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 12.0
+          }
+        },
+        {
+          "number": 54,
+          "title": "[GDExtension] Soporte NPU para inferencia acelerada",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:low",
+            "difficulty:hard",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 13.0
+          }
+        },
+        {
+          "number": 121,
+          "title": "[Memory] Diseñar arquitectura del sistema de memorias",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 41.0
+          }
+        },
+        {
+          "number": 122,
+          "title": "[Memory] Implementar almacenamiento persistente de memorias",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 42.0
+          }
+        },
+        {
+          "number": 123,
+          "title": "[Memory] Implementar MemoryManager",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 43.0
+          }
+        },
+        {
+          "number": 124,
+          "title": "[Memory] Implementar búsqueda de memorias por similitud",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 44.0
+          }
+        },
+        {
+          "number": 125,
+          "title": "[Memory] Integrar sistema de memorias con PromptBuilder",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 45.0
+          }
+        },
+        {
+          "number": 126,
+          "title": "[Memory] Implementar recordado automático de conversaciones",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 46.0
+          }
+        },
+        {
+          "number": 127,
+          "title": "[Localization] Disenar integracion con TranslationServer",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 51.0
+          }
+        },
+        {
+          "number": 128,
+          "title": "[Localization] Implementar LocaleManager",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 52.0
+          }
+        },
+        {
+          "number": 129,
+          "title": "[Localization] Crear plantillas de prompts por idioma",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 53.0
+          }
+        },
+        {
+          "number": 130,
+          "title": "[Localization] Implementar PromptTranslator",
+          "state": "OPEN",
+          "milestone": "M5: Localización",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 54.0
+          }
+        },
+        {
+          "number": 131,
+          "title": "[TTS] Integrar Piper TTS en GDExtension",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 61.0
+          }
+        },
+        {
+          "number": 132,
+          "title": "[TTS] Implementar VoiceProfile Resource",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 62.0
+          }
+        },
+        {
+          "number": 133,
+          "title": "[TTS] Implementar TTSManager",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 63.0
+          }
+        },
+        {
+          "number": 134,
+          "title": "[TTS] Implementar cache de audio",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 64.0
+          }
+        },
+        {
+          "number": 135,
+          "title": "[TTS] Integrar TTS con DialogueManager",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 65.0
+          }
+        },
+        {
+          "number": 136,
+          "title": "[TTS] Herramienta para descargar voces Piper",
+          "state": "OPEN",
+          "milestone": "M6: Text-to-Speech",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 66.0
+          }
+        },
+        {
+          "number": 137,
+          "title": "[CSharp] Implementar wrapper para DialogueManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 71.0
+          }
+        },
+        {
+          "number": 138,
+          "title": "[CSharp] Implementar wrapper para ContextManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 72.0
+          }
+        },
+        {
+          "number": 139,
+          "title": "[CSharp] Implementar wrapper para MemoryManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 73.0
+          }
+        },
+        {
+          "number": 140,
+          "title": "[CSharp] Implementar wrapper para TTSManager",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 74.0
+          }
+        },
+        {
+          "number": 141,
+          "title": "[CSharp] Tests unitarios para wrappers",
+          "state": "OPEN",
+          "milestone": "M7: Bindings C#",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 75.0
+          }
+        },
+        {
+          "number": 44,
+          "title": "[Examples] Ejemplo basico NPC con IA",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:high",
+            "difficulty:easy"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 81.0
+          }
+        },
+        {
+          "number": 48,
+          "title": "[Docs] Documentacion API completa",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:high",
+            "difficulty:medium"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 82.0
+          }
+        },
+        {
+          "number": 49,
+          "title": "[Docs] Guia de inicio rapido",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:high",
+            "difficulty:easy"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 83.0
+          }
+        },
+        {
+          "number": 50,
+          "title": "[Infra] GitHub Actions para builds y releases",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "infrastructure"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 84.0
+          }
+        },
+        {
+          "number": 63,
+          "title": "docs: documentar parametros de sampling en la wiki",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:medium",
+            "difficulty:easy"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 85.0
+          }
+        },
+        {
+          "number": 153,
+          "title": "[Examples] Ejemplo dialogo ramificado",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 86.0
+          }
+        },
+        {
+          "number": 154,
+          "title": "[Examples] Ejemplo NPC con memoria",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 87.0
+          }
+        },
+        {
+          "number": 155,
+          "title": "[Examples] Ejemplo mercader con regateo",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 88.0
+          }
+        },
+        {
+          "number": 78,
+          "title": "[Wiki] Rediseño estilo Eldritch/Lovecraftiano",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:low"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Low",
+            "Order": 89.0
+          }
+        },
+        {
+          "number": 177,
+          "title": "[Core] DialogueManager: Carga/descarga automática de modelo AI",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:critical",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 90.0,
+            "Priority": "Critical"
+          }
+        },
+        {
+          "number": 176,
+          "title": "[Editor] StartNode: Agregar selector de modelo AI",
+          "state": "CLOSED",
+          "milestone": "M3: Editor Visual",
+          "labels": [
+            "priority:critical",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Order": 91.0,
+            "Priority": "Critical"
+          }
+        },
+        {
+          "number": 149,
+          "title": "feat: soporte de adaptadores LoRA en LlamaInterface",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 101.0
+          }
+        },
+        {
+          "number": 144,
+          "title": "feat: sistema de modos Assistant/Immersive",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 102.0
+          }
+        },
+        {
+          "number": 150,
+          "title": "feat: crear asistente LoRA para guia de la herramienta",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Order": 103.0
+          }
+        },
+        {
+          "number": 151,
+          "title": "docs: guia de fine-tuning y LoRA para desarrolladores",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [
+            "documentation"
+          ],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 104.0
+          }
+        },
+        {
+          "number": 152,
+          "title": "feat: crear LoRA base para NPCs inmersivos",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Order": 105.0
+          }
+        },
+        {
+          "number": 2,
+          "title": "[GDExtension] Configurar proyecto con godot-cpp y sistema de build",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:medium",
+            "gdextension",
+            "infrastructure"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "Critical"
+          }
+        },
+        {
+          "number": 1,
+          "title": "[Infra] Crear estructura de directorios y archivos base del addon",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:easy",
+            "infrastructure"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "Critical"
+          }
+        },
+        {
+          "number": 3,
+          "title": "[GDExtension] Integrar llama.cpp para inferencia LLM",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:hard",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "Critical"
+          }
+        },
+        {
+          "number": 4,
+          "title": "[GDExtension] Implementar LlamaInterface - carga y descarga de modelos",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "Critical"
+          }
+        },
+        {
+          "number": 5,
+          "title": "[GDExtension] Implementar generación de texto síncrona",
+          "state": "CLOSED",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:critical",
+            "difficulty:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "Critical"
+          }
+        },
+        {
+          "number": 190,
+          "title": "[Core] AI_RESPONSE debe usar contexto del DialogueGraph, no character_id propio",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "core"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
+        },
+        {
+          "number": 193,
+          "title": "[Editor] Implementar Model Manager Window",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 195,
+          "title": "GDExtension: Crash when prompt exceeds model context size",
+          "state": "CLOSED",
+          "milestone": null,
+          "labels": [
+            "bug",
+            "priority:high",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
+        },
+        {
+          "number": 196,
+          "title": "GDExtension: Exponer funciones útiles del tokenizador de llama.cpp",
+          "state": "OPEN",
+          "milestone": null,
+          "labels": [
+            "enhancement",
+            "priority:medium",
+            "gdextension"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 198,
+          "title": "refactor(core): mover AIPreset de DialogueManager a DialogueGraph",
+          "state": "CLOSED",
+          "milestone": "M3: Editor Visual",
+          "labels": [
+            "enhancement",
+            "priority:medium",
+            "difficulty:easy",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
+        },
+        {
+          "number": 200,
+          "title": "feat(editor): mejorar UX del browser de HuggingFace con advertencias de compatibilidad",
+          "state": "CLOSED",
+          "milestone": "M3: Editor Visual",
+          "labels": [
+            "enhancement",
+            "priority:medium",
+            "difficulty:easy",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
+        },
+        {
+          "number": 202,
+          "title": "feat(ai): Extraer metadata de archivos GGUF para auto-configurar chat templates y parámetros",
+          "state": "CLOSED",
+          "milestone": null,
+          "labels": [
+            "enhancement",
+            "priority:high",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
+        },
+        {
+          "number": 204,
+          "title": "feat(editor): Editor de chat templates y preview de formato",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [
+            "editor",
+            "next-session"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 1: Fundamentos",
+      "issues": [
+        {
+          "number": 145,
+          "title": "[Core] Implementar DialogueNodeData Resource",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 1.0
+          }
+        },
+        {
+          "number": 7,
+          "title": "[Core] Implementar CharacterIdentity Resource",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:critical",
+            "priority:high",
+            "difficulty:easy",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 2.0
+          }
+        },
+        {
+          "number": 8,
+          "title": "[Core] Implementar WorldContext Resource",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:critical",
+            "priority:high",
+            "difficulty:easy",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 3.0
+          }
+        },
+        {
+          "number": 142,
+          "title": "[Core] Implementar DialogueGraph Resource",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 4.0
+          }
+        },
+        {
+          "number": 105,
+          "title": "[Editor] Crear DialogueGraphEditor base con GraphEdit",
+          "state": "CLOSED",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 5.0
+          }
+        },
+        {
+          "number": 106,
+          "title": "[Editor] Crear clase base para nodos visuales",
+          "state": "CLOSED",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 6.0
+          }
+        },
+        {
+          "number": 107,
+          "title": "[Editor] Implementar nodo de inicio",
+          "state": "CLOSED",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 7.0
+          }
+        },
+        {
+          "number": 113,
+          "title": "[Editor] Implementar nodo de respuesta estática",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 25.0
+          }
+        },
+        {
+          "number": 116,
+          "title": "[Editor] Implementar nodo de fin (EndNode)",
+          "state": "CLOSED",
+          "milestone": "M3: Editor Visual",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "editor"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 1: Fundamentos",
+            "Order": 28.0
+          }
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 2: IA + Decisiones",
+      "issues": [
+        {
+          "number": 146,
+          "title": "[Core] Implementar ConversationState",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 2: IA + Decisiones",
+            "Order": 10.0
+          }
+        },
+        {
+          "number": 11,
+          "title": "[AI] Implementar sistema de construcción de prompts",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 2: IA + Decisiones",
+            "Order": 11.0
+          }
+        },
+        {
+          "number": 148,
+          "title": "[Core] Implementar sistema de NodeExecutors",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 2: IA + Decisiones",
+            "Order": 12.0
+          }
+        },
+        {
+          "number": 108,
+          "title": "[Editor] Implementar nodo de respuesta con IA",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Sprint": "Sprint 2: IA + Decisiones",
+            "Order": 13.0
+          }
+        },
+        {
+          "number": 147,
+          "title": "[Core] Implementar GraphRunner",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 2: IA + Decisiones",
+            "Order": 15.0
+          }
+        },
+        {
+          "number": 109,
+          "title": "[Editor] Implementar nodo de opciones del jugador",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Sprint": "Sprint 2: IA + Decisiones",
+            "Order": 21.0
+          }
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 3: Lógica",
+      "issues": [
+        {
+          "number": 12,
+          "title": "[Core] Implementar gestión de historial de conversación",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:high",
+            "difficulty:easy",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 3: Lógica",
+            "Order": 16.0
+          }
+        },
+        {
+          "number": 143,
+          "title": "[Core] Implementar ContextManager para estado dinámico",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [],
+          "fields": {
+            "Status": "Done",
+            "Priority": "High",
+            "Sprint": "Sprint 3: Lógica",
+            "Order": 17.0
+          }
+        },
+        {
+          "number": 14,
+          "title": "[Core] Implementar DialogueManager principal",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:critical",
+            "difficulty:hard",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "Critical",
+            "Sprint": "Sprint 3: Lógica",
+            "Order": 22.0
+          }
+        },
+        {
+          "number": 110,
+          "title": "[Editor] Implementar nodo de condición",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Sprint": "Sprint 3: Lógica",
+            "Order": 22.0
+          }
+        },
+        {
+          "number": 111,
+          "title": "[Editor] Implementar nodo de evento",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Sprint": "Sprint 3: Lógica",
+            "Order": 23.0
+          }
+        },
+        {
+          "number": 117,
+          "title": "[Editor] Implementar nodo SetVariable",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Sprint": "Sprint 3: Lógica",
+            "Order": 29.0
+          }
+        },
+        {
+          "number": 118,
+          "title": "[Editor] Implementar nodo Jump",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Sprint": "Sprint 3: Lógica",
+            "Order": 30.0
+          }
+        }
+      ]
+    },
+    {
+      "sprint": "Sprint 4: Polish",
+      "issues": [
+        {
+          "number": 9,
+          "title": "[Core] Implementar AIPreset Resource",
+          "state": "CLOSED",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:medium",
+            "difficulty:easy",
+            "core"
+          ],
+          "fields": {
+            "Status": "Done",
+            "Priority": "Medium",
+            "Sprint": "Sprint 4: Polish",
+            "Order": 23.0
+          }
+        },
+        {
+          "number": 112,
+          "title": "[Editor] Integrar editor como dock/panel del editor",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Sprint": "Sprint 4: Polish",
+            "Order": 24.0
+          }
+        },
+        {
+          "number": 114,
+          "title": "[Editor] Implementar panel asistente IA para generación de texto",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Sprint": "Sprint 4: Polish",
+            "Order": 26.0
+          }
+        },
+        {
+          "number": 115,
+          "title": "[Editor] Implementar panel de traducción automática",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "Medium",
+            "Sprint": "Sprint 4: Polish",
+            "Order": 27.0
+          }
+        },
+        {
+          "number": 119,
+          "title": "[Editor] Implementar nodo JumpToFree (NUEVO)",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Sprint": "Sprint 4: Polish",
+            "Order": 31.0
+          }
+        },
+        {
+          "number": 120,
+          "title": "[Editor] Implementar nodo ReturnToGraph (NUEVO)",
+          "state": "OPEN",
+          "milestone": "M3: Editor Visual",
+          "labels": [],
+          "fields": {
+            "Status": "Todo",
+            "Priority": "High",
+            "Sprint": "Sprint 4: Polish",
+            "Order": 32.0
+          }
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "number": 116,
+      "title": "[Editor] Implementar nodo de fin (EndNode)",
+      "state": "CLOSED",
+      "milestone": "M3: Editor Visual",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 28.0
+      }
+    },
+    {
+      "number": 166,
+      "title": "[Editor] Implementar ModelRequiredDialog",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:high",
+        "difficulty:easy",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 8.0
+      }
+    },
+    {
+      "number": 6,
+      "title": "[GDExtension] Implementar generación asíncrona con streaming",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:hard",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "In Progress",
+        "Priority": "Critical",
+        "Order": 1.0
+      }
+    },
+    {
+      "number": 2,
+      "title": "[GDExtension] Configurar proyecto con godot-cpp y sistema de build",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:medium",
+        "gdextension",
+        "infrastructure"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "Critical"
+      }
+    },
+    {
+      "number": 1,
+      "title": "[Infra] Crear estructura de directorios y archivos base del addon",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:easy",
+        "infrastructure"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "Critical"
+      }
+    },
+    {
+      "number": 3,
+      "title": "[GDExtension] Integrar llama.cpp para inferencia LLM",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:hard",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "Critical"
+      }
+    },
+    {
+      "number": 4,
+      "title": "[GDExtension] Implementar LlamaInterface - carga y descarga de modelos",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:medium",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "Critical"
+      }
+    },
+    {
+      "number": 5,
+      "title": "[GDExtension] Implementar generación de texto síncrona",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:medium",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "Critical"
+      }
+    },
+    {
+      "number": 7,
+      "title": "[Core] Implementar CharacterIdentity Resource",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:critical",
+        "priority:high",
+        "difficulty:easy",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 2.0
+      }
+    },
+    {
+      "number": 8,
+      "title": "[Core] Implementar WorldContext Resource",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:critical",
+        "priority:high",
+        "difficulty:easy",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 3.0
+      }
+    },
+    {
+      "number": 9,
+      "title": "[Core] Implementar AIPreset Resource",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:medium",
+        "difficulty:easy",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "Medium",
+        "Sprint": "Sprint 4: Polish",
+        "Order": 23.0
+      }
+    },
+    {
+      "number": 142,
+      "title": "[Core] Implementar DialogueGraph Resource",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 4.0
+      }
+    },
+    {
+      "number": 11,
+      "title": "[AI] Implementar sistema de construcción de prompts",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 2: IA + Decisiones",
+        "Order": 11.0
+      }
+    },
+    {
+      "number": 12,
+      "title": "[Core] Implementar gestión de historial de conversación",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:high",
+        "difficulty:easy",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 3: Lógica",
+        "Order": 16.0
+      }
+    },
+    {
+      "number": 143,
+      "title": "[Core] Implementar ContextManager para estado dinámico",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 3: Lógica",
+        "Order": 17.0
+      }
+    },
+    {
+      "number": 14,
+      "title": "[Core] Implementar DialogueManager principal",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:critical",
+        "difficulty:hard",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Priority": "Critical",
+        "Sprint": "Sprint 3: Lógica",
+        "Order": 22.0
+      }
+    },
+    {
+      "number": 105,
+      "title": "[Editor] Crear DialogueGraphEditor base con GraphEdit",
+      "state": "CLOSED",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 5.0
+      }
+    },
+    {
+      "number": 106,
+      "title": "[Editor] Crear clase base para nodos visuales",
+      "state": "CLOSED",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 6.0
+      }
+    },
+    {
+      "number": 107,
+      "title": "[Editor] Implementar nodo de inicio",
+      "state": "CLOSED",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 7.0
+      }
+    },
+    {
+      "number": 108,
+      "title": "[Editor] Implementar nodo de respuesta con IA",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Sprint": "Sprint 2: IA + Decisiones",
+        "Order": 13.0
+      }
+    },
+    {
+      "number": 109,
+      "title": "[Editor] Implementar nodo de opciones del jugador",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Sprint": "Sprint 2: IA + Decisiones",
+        "Order": 21.0
+      }
+    },
+    {
+      "number": 110,
+      "title": "[Editor] Implementar nodo de condición",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Sprint": "Sprint 3: Lógica",
+        "Order": 22.0
+      }
+    },
+    {
+      "number": 111,
+      "title": "[Editor] Implementar nodo de evento",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Sprint": "Sprint 3: Lógica",
+        "Order": 23.0
+      }
+    },
+    {
+      "number": 112,
+      "title": "[Editor] Integrar editor como dock/panel del editor",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Sprint": "Sprint 4: Polish",
+        "Order": 24.0
+      }
+    },
+    {
+      "number": 121,
+      "title": "[Memory] Diseñar arquitectura del sistema de memorias",
+      "state": "OPEN",
+      "milestone": "M4: Memorias Persistentes",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 41.0
+      }
+    },
+    {
+      "number": 122,
+      "title": "[Memory] Implementar almacenamiento persistente de memorias",
+      "state": "OPEN",
+      "milestone": "M4: Memorias Persistentes",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 42.0
+      }
+    },
+    {
+      "number": 123,
+      "title": "[Memory] Implementar MemoryManager",
+      "state": "OPEN",
+      "milestone": "M4: Memorias Persistentes",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 43.0
+      }
+    },
+    {
+      "number": 124,
+      "title": "[Memory] Implementar búsqueda de memorias por similitud",
+      "state": "OPEN",
+      "milestone": "M4: Memorias Persistentes",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 44.0
+      }
+    },
+    {
+      "number": 125,
+      "title": "[Memory] Integrar sistema de memorias con PromptBuilder",
+      "state": "OPEN",
+      "milestone": "M4: Memorias Persistentes",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 45.0
+      }
+    },
+    {
+      "number": 126,
+      "title": "[Memory] Implementar recordado automático de conversaciones",
+      "state": "OPEN",
+      "milestone": "M4: Memorias Persistentes",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 46.0
+      }
+    },
+    {
+      "number": 137,
+      "title": "[CSharp] Implementar wrapper para DialogueManager",
+      "state": "OPEN",
+      "milestone": "M7: Bindings C#",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 71.0
+      }
+    },
+    {
+      "number": 138,
+      "title": "[CSharp] Implementar wrapper para ContextManager",
+      "state": "OPEN",
+      "milestone": "M7: Bindings C#",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 72.0
+      }
+    },
+    {
+      "number": 139,
+      "title": "[CSharp] Implementar wrapper para MemoryManager",
+      "state": "OPEN",
+      "milestone": "M7: Bindings C#",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 73.0
+      }
+    },
+    {
+      "number": 140,
+      "title": "[CSharp] Implementar wrapper para TTSManager",
+      "state": "OPEN",
+      "milestone": "M7: Bindings C#",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 74.0
+      }
+    },
+    {
+      "number": 127,
+      "title": "[Localization] Disenar integracion con TranslationServer",
+      "state": "OPEN",
+      "milestone": "M5: Localización",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 51.0
+      }
+    },
+    {
+      "number": 128,
+      "title": "[Localization] Implementar LocaleManager",
+      "state": "OPEN",
+      "milestone": "M5: Localización",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 52.0
+      }
+    },
+    {
+      "number": 129,
+      "title": "[Localization] Crear plantillas de prompts por idioma",
+      "state": "OPEN",
+      "milestone": "M5: Localización",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 53.0
+      }
+    },
+    {
+      "number": 130,
+      "title": "[Localization] Implementar PromptTranslator",
+      "state": "OPEN",
+      "milestone": "M5: Localización",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 54.0
+      }
+    },
+    {
+      "number": 131,
+      "title": "[TTS] Integrar Piper TTS en GDExtension",
+      "state": "OPEN",
+      "milestone": "M6: Text-to-Speech",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 61.0
+      }
+    },
+    {
+      "number": 132,
+      "title": "[TTS] Implementar VoiceProfile Resource",
+      "state": "OPEN",
+      "milestone": "M6: Text-to-Speech",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 62.0
+      }
+    },
+    {
+      "number": 133,
+      "title": "[TTS] Implementar TTSManager",
+      "state": "OPEN",
+      "milestone": "M6: Text-to-Speech",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 63.0
+      }
+    },
+    {
+      "number": 134,
+      "title": "[TTS] Implementar cache de audio",
+      "state": "OPEN",
+      "milestone": "M6: Text-to-Speech",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Low",
+        "Order": 64.0
+      }
+    },
+    {
+      "number": 135,
+      "title": "[TTS] Integrar TTS con DialogueManager",
+      "state": "OPEN",
+      "milestone": "M6: Text-to-Speech",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 65.0
+      }
+    },
+    {
+      "number": 136,
+      "title": "[TTS] Herramienta para descargar voces Piper",
+      "state": "OPEN",
+      "milestone": "M6: Text-to-Speech",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Low",
+        "Order": 66.0
+      }
+    },
+    {
+      "number": 141,
+      "title": "[CSharp] Tests unitarios para wrappers",
+      "state": "OPEN",
+      "milestone": "M7: Bindings C#",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 75.0
+      }
+    },
+    {
+      "number": 44,
+      "title": "[Examples] Ejemplo basico NPC con IA",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:easy"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 81.0
+      }
+    },
+    {
+      "number": 153,
+      "title": "[Examples] Ejemplo dialogo ramificado",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 86.0
+      }
+    },
+    {
+      "number": 154,
+      "title": "[Examples] Ejemplo NPC con memoria",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 87.0
+      }
+    },
+    {
+      "number": 155,
+      "title": "[Examples] Ejemplo mercader con regateo",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 88.0
+      }
+    },
+    {
+      "number": 48,
+      "title": "[Docs] Documentacion API completa",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:medium"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 82.0
+      }
+    },
+    {
+      "number": 49,
+      "title": "[Docs] Guia de inicio rapido",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:easy"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 83.0
+      }
+    },
+    {
+      "number": 50,
+      "title": "[Infra] GitHub Actions para builds y releases",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "infrastructure"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 84.0
+      }
+    },
+    {
+      "number": 53,
+      "title": "[GDExtension] Soporte Vulkan para aceleracion GPU",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:medium",
+        "difficulty:medium",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 11.0
+      }
+    },
+    {
+      "number": 54,
+      "title": "[GDExtension] Soporte NPU para inferencia acelerada",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:low",
+        "difficulty:hard",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Low",
+        "Order": 13.0
+      }
+    },
+    {
+      "number": 57,
+      "title": "[QA] Implementar integration tests para GDExtension",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:high",
+        "infrastructure"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 12.0
+      }
+    },
+    {
+      "number": 113,
+      "title": "[Editor] Implementar nodo de respuesta estática",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 25.0
+      }
+    },
+    {
+      "number": 114,
+      "title": "[Editor] Implementar panel asistente IA para generación de texto",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Sprint": "Sprint 4: Polish",
+        "Order": 26.0
+      }
+    },
+    {
+      "number": 115,
+      "title": "[Editor] Implementar panel de traducción automática",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Sprint": "Sprint 4: Polish",
+        "Order": 27.0
+      }
+    },
+    {
+      "number": 63,
+      "title": "docs: documentar parametros de sampling en la wiki",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:easy"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 85.0
+      }
+    },
+    {
+      "number": 149,
+      "title": "feat: soporte de adaptadores LoRA en LlamaInterface",
+      "state": "OPEN",
+      "milestone": "M9: LoRA & Asistentes IA",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 101.0
+      }
+    },
+    {
+      "number": 150,
+      "title": "feat: crear asistente LoRA para guia de la herramienta",
+      "state": "OPEN",
+      "milestone": "M9: LoRA & Asistentes IA",
+      "labels": [
+        "documentation"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 103.0
+      }
+    },
+    {
+      "number": 144,
+      "title": "feat: sistema de modos Assistant/Immersive",
+      "state": "OPEN",
+      "milestone": "M9: LoRA & Asistentes IA",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Order": 102.0
+      }
+    },
+    {
+      "number": 151,
+      "title": "docs: guia de fine-tuning y LoRA para desarrolladores",
+      "state": "OPEN",
+      "milestone": "M9: LoRA & Asistentes IA",
+      "labels": [
+        "documentation"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 104.0
+      }
+    },
+    {
+      "number": 152,
+      "title": "feat: crear LoRA base para NPCs inmersivos",
+      "state": "OPEN",
+      "milestone": "M9: LoRA & Asistentes IA",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Order": 105.0
+      }
+    },
+    {
+      "number": 145,
+      "title": "[Core] Implementar DialogueNodeData Resource",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 1: Fundamentos",
+        "Order": 1.0
+      }
+    },
+    {
+      "number": 146,
+      "title": "[Core] Implementar ConversationState",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 2: IA + Decisiones",
+        "Order": 10.0
+      }
+    },
+    {
+      "number": 147,
+      "title": "[Core] Implementar GraphRunner",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 2: IA + Decisiones",
+        "Order": 15.0
+      }
+    },
+    {
+      "number": 148,
+      "title": "[Core] Implementar sistema de NodeExecutors",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [],
+      "fields": {
+        "Status": "Done",
+        "Priority": "High",
+        "Sprint": "Sprint 2: IA + Decisiones",
+        "Order": 12.0
+      }
+    },
+    {
+      "number": 117,
+      "title": "[Editor] Implementar nodo SetVariable",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Sprint": "Sprint 3: Lógica",
+        "Order": 29.0
+      }
+    },
+    {
+      "number": 118,
+      "title": "[Editor] Implementar nodo Jump",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Medium",
+        "Sprint": "Sprint 3: Lógica",
+        "Order": 30.0
+      }
+    },
+    {
+      "number": 119,
+      "title": "[Editor] Implementar nodo JumpToFree (NUEVO)",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Sprint": "Sprint 4: Polish",
+        "Order": 31.0
+      }
+    },
+    {
+      "number": 120,
+      "title": "[Editor] Implementar nodo ReturnToGraph (NUEVO)",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "High",
+        "Sprint": "Sprint 4: Polish",
+        "Order": 32.0
+      }
+    },
+    {
+      "number": 78,
+      "title": "[Wiki] Rediseño estilo Eldritch/Lovecraftiano",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:low"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Priority": "Low",
+        "Order": 89.0
+      }
+    },
+    {
+      "number": 160,
+      "title": "[GDExtension] Implementar signals async en LlamaInterface",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:medium",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 2.0
+      }
+    },
+    {
+      "number": 161,
+      "title": "[GDExtension] Implementar generate_async con WorkerThreadPool",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:hard",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 3.0
+      }
+    },
+    {
+      "number": 162,
+      "title": "[GDExtension] Implementar generate_streaming con emisión de tokens",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:hard",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 4.0
+      }
+    },
+    {
+      "number": 163,
+      "title": "[GDExtension] Implementar cancel_generation con abort_callback",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:critical",
+        "difficulty:medium",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 5.0
+      }
+    },
+    {
+      "number": 164,
+      "title": "[Core] Implementar AIService singleton",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 6.0
+      }
+    },
+    {
+      "number": 165,
+      "title": "[Editor] Implementar AI Dock (panel lateral)",
+      "state": "CLOSED",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 7.0
+      }
+    },
+    {
+      "number": 167,
+      "title": "[Editor] Model Manager Dialog",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:medium",
+        "difficulty:hard",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Order": 9.0
+      }
+    },
+    {
+      "number": 168,
+      "title": "[Editor] Integrar AI con DialogueGraphEditor",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:medium",
+        "difficulty:medium",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Todo",
+        "Order": 10.0
+      }
+    },
+    {
+      "number": 176,
+      "title": "[Editor] StartNode: Agregar selector de modelo AI",
+      "state": "CLOSED",
+      "milestone": "M3: Editor Visual",
+      "labels": [
+        "priority:critical",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 91.0,
+        "Priority": "Critical"
+      }
+    },
+    {
+      "number": 177,
+      "title": "[Core] DialogueManager: Carga/descarga automática de modelo AI",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:critical",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done",
+        "Order": 90.0,
+        "Priority": "Critical"
+      }
+    },
+    {
+      "number": 190,
+      "title": "[Core] AI_RESPONSE debe usar contexto del DialogueGraph, no character_id propio",
+      "state": "CLOSED",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "core"
+      ],
+      "fields": {
+        "Status": "Done"
+      }
+    },
+    {
+      "number": 193,
+      "title": "[Editor] Implementar Model Manager Window",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 195,
+      "title": "GDExtension: Crash when prompt exceeds model context size",
+      "state": "CLOSED",
+      "milestone": null,
+      "labels": [
+        "bug",
+        "priority:high",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done"
+      }
+    },
+    {
+      "number": 196,
+      "title": "GDExtension: Exponer funciones útiles del tokenizador de llama.cpp",
+      "state": "OPEN",
+      "milestone": null,
+      "labels": [
+        "enhancement",
+        "priority:medium",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 198,
+      "title": "refactor(core): mover AIPreset de DialogueManager a DialogueGraph",
+      "state": "CLOSED",
+      "milestone": "M3: Editor Visual",
+      "labels": [
+        "enhancement",
+        "priority:medium",
+        "difficulty:easy",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done"
+      }
+    },
+    {
+      "number": 200,
+      "title": "feat(editor): mejorar UX del browser de HuggingFace con advertencias de compatibilidad",
+      "state": "CLOSED",
+      "milestone": "M3: Editor Visual",
+      "labels": [
+        "enhancement",
+        "priority:medium",
+        "difficulty:easy",
+        "editor"
+      ],
+      "fields": {
+        "Status": "Done"
+      }
+    },
+    {
+      "number": 202,
+      "title": "feat(ai): Extraer metadata de archivos GGUF para auto-configurar chat templates y parámetros",
+      "state": "CLOSED",
+      "milestone": null,
+      "labels": [
+        "enhancement",
+        "priority:high",
+        "core"
+      ],
+      "fields": {
+        "Status": "Done"
+      }
+    },
+    {
+      "number": 204,
+      "title": "feat(editor): Editor de chat templates y preview de formato",
+      "state": "OPEN",
+      "milestone": "M3: Editor Visual",
+      "labels": [
+        "editor",
+        "next-session"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 188,
+      "title": "[Docs] Limpiar sidebar - remover links a milestones no implementados",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:easy"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 187,
+      "title": "[Docs] Crear páginas de Examples",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:easy"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 186,
+      "title": "[Docs] Crear páginas Guides faltantes",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 185,
+      "title": "[Docs] Crear página Technical/architecture.html",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 184,
+      "title": "[Docs] Crear páginas API Reference faltantes",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 183,
+      "title": "[Docs] Crear páginas Getting Started",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high",
+        "difficulty:medium"
+      ],
+      "fields": {}
+    },
+    {
+      "number": 181,
+      "title": "[Docs] Actualizar README.md con estado real del proyecto",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high"
+      ],
+      "fields": {}
+    }
+  ]
+}

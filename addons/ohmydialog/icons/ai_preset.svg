@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- AI Preset icon - sliders/config with AI spark -->
+  <!-- Slider 1 -->
+  <rect x="2" y="3" width="10" height="2" rx="1" fill="#e0e0e0" stroke="#8da5f3" stroke-width="0.5"/>
+  <circle cx="9" cy="4" r="1.5" fill="#8da5f3"/>
+  <!-- Slider 2 -->
+  <rect x="2" y="7" width="10" height="2" rx="1" fill="#e0e0e0" stroke="#8da5f3" stroke-width="0.5"/>
+  <circle cx="5" cy="8" r="1.5" fill="#8da5f3"/>
+  <!-- Slider 3 -->
+  <rect x="2" y="11" width="10" height="2" rx="1" fill="#e0e0e0" stroke="#8da5f3" stroke-width="0.5"/>
+  <circle cx="7" cy="12" r="1.5" fill="#8da5f3"/>
+  <!-- AI spark -->
+  <circle cx="14" cy="3" r="1.5" fill="#f6c358"/>
+</svg>
