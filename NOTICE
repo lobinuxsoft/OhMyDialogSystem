@@ -1,0 +1,24 @@
+OhMyDialogSystem
+Copyright 2025 Matias Galarza
+
+Licensed under the Apache License, Version 2.0.
+
+This product includes software developed by third parties:
+
+--------------------------------------------------------------------------------
+llama.cpp
+https://github.com/ggerganov/llama.cpp
+Licensed under the MIT License
+Copyright (c) 2023-2025 The ggml authors
+
+--------------------------------------------------------------------------------
+godot-cpp
+https://github.com/godotengine/godot-cpp
+Licensed under the MIT License
+Copyright (c) 2017-2025 Godot Engine contributors
+
+--------------------------------------------------------------------------------
+Godot Engine
+https://godotengine.org
+Licensed under the MIT License
+Copyright (c) 2014-2025 Godot Engine contributors
