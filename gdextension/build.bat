@@ -180,7 +180,11 @@ if defined NEED_LLAMA_BUILD (
 )
 
 echo [INFO] Building GDExtension...
-scons platform=%PLATFORM% target=%TARGET% llama_backend=%LLAMA_BACKEND% llama_native=%LLAMA_NATIVE% llama_avx2=%LLAMA_AVX2% llama_rebuild=%LLAMA_REBUILD% -j%JOBS%
+set SCONS_ARGS=platform=%PLATFORM% target=%TARGET% llama_backend=%LLAMA_BACKEND%
+set SCONS_ARGS=%SCONS_ARGS% llama_native=%LLAMA_NATIVE% llama_avx2=%LLAMA_AVX2% llama_rebuild=%LLAMA_REBUILD%
+if "%LLAMA_ALL_BACKENDS%"=="yes" set SCONS_ARGS=%SCONS_ARGS% llama_all_backends=yes
+if "%LLAMA_DYNAMIC%"=="yes" set SCONS_ARGS=%SCONS_ARGS% llama_dynamic=yes
+scons %SCONS_ARGS% -j%JOBS%
 
 if %ERRORLEVEL% neq 0 (
     echo.

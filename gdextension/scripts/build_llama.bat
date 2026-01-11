@@ -187,10 +187,10 @@ set CMAKE_FLAGS=%CMAKE_FLAGS% -DGGML_NATIVE=%NATIVE% -DGGML_AVX2=%AVX2%
 REM Configure dynamic backend loading
 if %DYNAMIC_BACKENDS%==1 (
     echo [INFO] Enabling dynamic backend loading ^(GGML_BACKEND_DL^)...
-    set CMAKE_FLAGS=%CMAKE_FLAGS% -DBUILD_SHARED_LIBS=ON -DGGML_BACKEND_DL=ON
-    set CMAKE_FLAGS=%CMAKE_FLAGS% -DGGML_CPU_ALL_VARIANTS=ON
+    set CMAKE_FLAGS=!CMAKE_FLAGS! -DBUILD_SHARED_LIBS=ON -DGGML_BACKEND_DL=ON
+    set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CPU_ALL_VARIANTS=ON
 ) else (
-    set CMAKE_FLAGS=%CMAKE_FLAGS% -DBUILD_SHARED_LIBS=OFF
+    set CMAKE_FLAGS=!CMAKE_FLAGS! -DBUILD_SHARED_LIBS=OFF
 )
 
 REM Use static CRT to match godot-cpp (/MT instead of /MD)
@@ -220,9 +220,21 @@ if %ALL_BACKENDS%==1 (
         set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CUDA=OFF
     )
 
-    REM Enable Vulkan
-    echo [INFO]   - Vulkan backend: enabled
-    set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_VULKAN=ON
+    REM Check and enable Vulkan if available (check VULKAN_SDK env or glslc in PATH)
+    set VULKAN_AVAILABLE=0
+    if defined VULKAN_SDK (
+        set VULKAN_AVAILABLE=1
+    ) else (
+        where glslc >nul 2>&1
+        if not errorlevel 1 set VULKAN_AVAILABLE=1
+    )
+    if !VULKAN_AVAILABLE!==1 (
+        echo [INFO]   - Vulkan backend: enabled
+        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_VULKAN=ON
+    ) else (
+        echo [INFO]   - Vulkan backend: skipped ^(Vulkan SDK not found^)
+        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_VULKAN=OFF
+    )
 
     REM Disable SYCL by default (requires special setup)
     set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_SYCL=OFF

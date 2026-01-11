@@ -40,6 +40,20 @@ def options(opts):
             default=False,
         )
     )
+    opts.Add(
+        BoolVariable(
+            key="llama_all_backends",
+            help="Build all available backends (CPU, CUDA, Vulkan)",
+            default=False,
+        )
+    )
+    opts.Add(
+        BoolVariable(
+            key="llama_dynamic",
+            help="Enable dynamic backend loading (runtime detection)",
+            default=False,
+        )
+    )
 
 
 def exists(env):
@@ -132,6 +146,8 @@ def _build_llama(env, llama_dir, build_dir):
     backend = env.get("llama_backend", "cpu")
     native = env.get("llama_native", True)
     avx2 = env.get("llama_avx2", True)
+    all_backends = env.get("llama_all_backends", False)
+    dynamic = env.get("llama_dynamic", False)
 
     # Determine script to run
     script_dir = os.path.join(os.path.dirname(llama_dir), "..", "scripts")
@@ -146,7 +162,17 @@ def _build_llama(env, llama_dir, build_dir):
         Exit(1)
 
     # Build command arguments
-    args = [script, f"--{backend}"]
+    args = [script]
+
+    # Backend selection
+    if all_backends:
+        args.append("--all-backends")
+    else:
+        args.append(f"--{backend}")
+
+    # Dynamic backend loading
+    if dynamic:
+        args.append("--dynamic")
 
     if native:
         args.append("--native")
@@ -184,6 +210,7 @@ def _configure_linking(env, build_dir):
     """Configure library linking for llama.cpp."""
     platform = env.get("platform", sys.platform)
     backend = env.get("llama_backend", "cpu")
+    dynamic = env.get("llama_dynamic", False)
 
     # Add all library directories
     lib_dirs = _find_all_library_dirs(build_dir, platform)
@@ -191,32 +218,41 @@ def _configure_linking(env, build_dir):
     for lib_dir in lib_dirs:
         env.Append(LIBPATH=[lib_dir])
 
-    # Core libraries (order matters for static linking)
-    core_libs = ["llama", "common", "ggml", "ggml-cpu", "ggml-base"]
-    env.Append(LIBS=core_libs)
+    # When using dynamic backend loading (GGML_BACKEND_DL), backends are loaded
+    # at runtime via ggml_backend_load_all(), so we only link core libraries
+    if dynamic:
+        print("[llama.py] Dynamic backend loading enabled - linking core libs only")
+        # ggml contains backend registry functions (ggml_backend_load_all, etc.)
+        # ggml-base contains base tensor operations
+        core_libs = ["llama", "common", "ggml", "ggml-base"]
+        env.Append(LIBS=core_libs)
+    else:
+        # Static linking: Core libraries (order matters for static linking)
+        core_libs = ["llama", "common", "ggml", "ggml-cpu", "ggml-base"]
+        env.Append(LIBS=core_libs)
 
-    # Backend-specific libraries
-    if backend == "cuda":
-        if platform == "windows":
-            env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
-        else:
-            env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
+        # Backend-specific libraries (static linking only)
+        if backend == "cuda":
+            if platform == "windows":
+                env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
+            else:
+                env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
 
-    elif backend == "vulkan":
-        env.Append(LIBS=["ggml-vulkan"])
-        if platform == "windows":
-            env.Append(LIBS=["vulkan-1"])
-        else:
-            env.Append(LIBS=["vulkan"])
+        elif backend == "vulkan":
+            env.Append(LIBS=["ggml-vulkan"])
+            if platform == "windows":
+                env.Append(LIBS=["vulkan-1"])
+            else:
+                env.Append(LIBS=["vulkan"])
 
-    elif backend == "metal":
-        env.Append(LIBS=["ggml-metal"])
-        env.Append(FRAMEWORKS=["Metal", "Foundation", "MetalPerformanceShaders"])
+        elif backend == "metal":
+            env.Append(LIBS=["ggml-metal"])
+            env.Append(FRAMEWORKS=["Metal", "Foundation", "MetalPerformanceShaders"])
 
-    elif backend == "sycl":
-        env.Append(LIBS=["ggml-sycl", "sycl"])
+        elif backend == "sycl":
+            env.Append(LIBS=["ggml-sycl", "sycl"])
 
-    # Platform-specific system libraries
+    # Platform-specific system libraries (always needed)
     if platform == "linux":
         env.Append(LIBS=["pthread", "dl", "m", "gomp"])
         env.Append(CCFLAGS=["-fopenmp"])
@@ -246,6 +282,11 @@ def _find_all_library_dirs(build_dir, platform):
                 os.path.join(build_dir, "ggml", "src", "Release"),
                 os.path.join(build_dir, "ggml", "src"),
             ],
+            "ggml-base.lib": [
+                os.path.join(build_dir, "bin", "Release"),
+                os.path.join(build_dir, "bin"),
+                os.path.join(build_dir, "ggml", "src", "Release"),
+            ],
             "common.lib": [
                 os.path.join(build_dir, "common", "Release"),
                 os.path.join(build_dir, "common"),
@@ -261,6 +302,10 @@ def _find_all_library_dirs(build_dir, platform):
             "libggml.a": [
                 os.path.join(build_dir, "ggml", "src"),
                 os.path.join(build_dir, "ggml"),
+            ],
+            "libggml-base.a": [
+                os.path.join(build_dir, "bin"),
+                os.path.join(build_dir, "ggml", "src"),
             ],
             "libcommon.a": [
                 os.path.join(build_dir, "common"),

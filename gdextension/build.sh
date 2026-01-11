@@ -173,12 +173,14 @@ if [ ! -d "$LLAMA_BUILD_DIR" ] || [ "$LLAMA_REBUILD" = "yes" ]; then
 fi
 
 echo "[INFO] Building GDExtension..."
-scons platform="$PLATFORM" target="$TARGET" \
-    llama_backend="$LLAMA_BACKEND" \
-    llama_native="$LLAMA_NATIVE" \
-    llama_avx2="$LLAMA_AVX2" \
-    llama_rebuild="$LLAMA_REBUILD" \
-    -j"$JOBS"
+SCONS_ARGS="platform=$PLATFORM target=$TARGET"
+SCONS_ARGS="$SCONS_ARGS llama_backend=$LLAMA_BACKEND"
+SCONS_ARGS="$SCONS_ARGS llama_native=$LLAMA_NATIVE"
+SCONS_ARGS="$SCONS_ARGS llama_avx2=$LLAMA_AVX2"
+SCONS_ARGS="$SCONS_ARGS llama_rebuild=$LLAMA_REBUILD"
+[ "$LLAMA_ALL_BACKENDS" = "yes" ] && SCONS_ARGS="$SCONS_ARGS llama_all_backends=yes"
+[ "$LLAMA_DYNAMIC" = "yes" ] && SCONS_ARGS="$SCONS_ARGS llama_dynamic=yes"
+scons $SCONS_ARGS -j"$JOBS"
 
 echo ""
 echo "[SUCCESS] Build completed!"
