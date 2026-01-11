@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AIPreset" load_steps=2 format=3 uid="uid://bshj0qu7h6k2p"]
+
+[ext_resource type="Script" uid="uid://dgi6tt3rvrbfm" path="res://addons/ohmydialog/resources/ai_preset.gd" id="1_5ow3k"]
+
+[resource]
+script = ExtResource("1_5ow3k")
+preset_name = "SmolLM2 360M Instruct Preset"
+description = "Generated from GGUF metadata. Architecture: llama, Template: chatml, Context: 8192 tokens."
+stop_sequences = Array[String](["<|im_end|>", "<|im_start|>"])
+context_size = 8192
+source_chat_template = "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system
+You are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|>
+' }}{% endif %}{{'<|im_start|>' + message['role'] + '
+' + message['content'] + '<|im_end|>' + '
+'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant
+' }}{% endif %}"
+chat_template_format = "chatml"
+model_architecture = "llama"
+bos_token_id = 1
+eos_token_id = 2
+recommended_context_length = 8192
+derived_stop_sequences = Array[String](["<|im_end|>", "<|im_start|>"])
