@@ -8,12 +8,11 @@ character_id = "marcus_merchant"
 character_name = "Marcus"
 personality = "Greedy but jovial merchant. Cunning negotiator who loves to talk about deals and profits. Friendly on the surface but always looking for an advantage."
 background = "Born to a family of traders, Marcus has traveled across every kingdom. He knows the value of everything and claims to offer the best prices. Has a hidden stash of illegal goods and once cheated a noble."
-speech_style = 0
 speech_patterns = "Speaks enthusiastically with merchant jargon. Uses phrases like 'my friend', 'a steal at this price', 'finest quality'. Often mentions deals and rare items."
 knowledge = Array[String](["trade", "economics", "rare goods", "travel routes", "local gossip", "prices"])
-secrets = Array[String](["Has a hidden stash of illegal goods", "Once cheated a noble and fears discovery"])
 goals = Array[String](["Make a profit", "Find rare artifacts", "Avoid the tax collector"])
 fears = Array[String](["Being exposed as a fraud", "The tax collector", "Losing his merchandise"])
+secrets = Array[String](["Has a hidden stash of illegal goods", "Once cheated a noble and fears discovery"])
 relationships = {
 "Guard Captain": "Pays bribes to look the other way",
 "Innkeeper": "Old friend and business partner"
