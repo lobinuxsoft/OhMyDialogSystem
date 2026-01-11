@@ -115,6 +115,13 @@ func to_context_prompt() -> String:
 			faction_list.append("%s: %s" % [faction_id, factions[faction_id]])
 		prompt_parts.append("Major factions: %s" % "; ".join(faction_list))
 
+	# Important NPCs
+	if not important_npcs.is_empty():
+		var npc_list: Array[String] = []
+		for npc_name in important_npcs:
+			npc_list.append("%s: %s" % [npc_name, important_npcs[npc_name]])
+		prompt_parts.append("Important characters: %s" % "; ".join(npc_list))
+
 	# Current events
 	if not current_events.is_empty():
 		prompt_parts.append("Current events: %s" % ", ".join(current_events))

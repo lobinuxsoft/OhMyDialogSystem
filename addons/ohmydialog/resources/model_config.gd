@@ -74,6 +74,27 @@ extends Resource
 @export var n_batch: int = 512
 
 
+@export_group("GGUF Metadata")
+
+## Model architecture from GGUF metadata (llama, qwen2, phi, etc.)
+@export var architecture: String = ""
+
+## Raw chat template from GGUF metadata (Jinja2 format)
+@export_multiline var raw_chat_template: String = ""
+
+## Detected chat template format identifier (chatml, llama2, llama3, mistral, etc.)
+@export var chat_template_format: String = ""
+
+## BOS token ID from model metadata. -1 if not found.
+@export var bos_token_id: int = -1
+
+## EOS token ID from model metadata. -1 if not found.
+@export var eos_token_id: int = -1
+
+## Associated AIPreset resource generated from this model's metadata
+@export var ai_preset: AIPreset = null
+
+
 ## Returns parameters dictionary for LlamaInterface.load_model()
 func get_load_params() -> Dictionary:
 	return {
@@ -132,3 +153,47 @@ func get_summary() -> String:
 		status,
 		n_ctx
 	]
+
+
+## Populates GGUF metadata fields from a metadata dictionary.
+## [param metadata]: Dictionary from GGUFParser or HuggingFaceAPI.metadata_fetched
+func populate_from_metadata(metadata: Dictionary) -> void:
+	architecture = metadata.get("_architecture", metadata.get("general.architecture", ""))
+	raw_chat_template = metadata.get("_chat_template", metadata.get("tokenizer.chat_template", ""))
+	chat_template_format = metadata.get("_chat_template_format", "")
+	bos_token_id = metadata.get("_bos_token_id", metadata.get("tokenizer.ggml.bos_token_id", -1))
+	eos_token_id = metadata.get("_eos_token_id", metadata.get("tokenizer.ggml.eos_token_id", -1))
+
+	# Update context size if metadata provides it
+	var ctx_len = metadata.get("_context_length", 0)
+	if ctx_len == 0 and not architecture.is_empty():
+		ctx_len = metadata.get("%s.context_length" % architecture, 0)
+	if ctx_len > 0:
+		n_ctx = mini(ctx_len, 32768)  # Clamp to reasonable max
+
+
+## Creates an AIPreset from this model's metadata.
+## If metadata hasn't been populated yet, returns a default preset.
+func create_ai_preset() -> AIPreset:
+	if architecture.is_empty() and raw_chat_template.is_empty():
+		# No metadata available, return default preset
+		var preset = AIPreset.create_balanced()
+		preset.preset_name = "%s Preset" % display_name
+		return preset
+
+	# Build metadata dictionary from stored fields
+	var metadata := {
+		"_architecture": architecture,
+		"_chat_template": raw_chat_template,
+		"_chat_template_format": chat_template_format,
+		"_bos_token_id": bos_token_id,
+		"_eos_token_id": eos_token_id,
+		"_context_length": n_ctx
+	}
+
+	return AIPreset.create_from_gguf_metadata(metadata, AIPreset.PresetType.BALANCED, display_name)
+
+
+## Returns true if this model has GGUF metadata populated.
+func has_metadata() -> bool:
+	return not architecture.is_empty() or not raw_chat_template.is_empty()
