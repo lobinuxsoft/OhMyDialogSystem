@@ -28,13 +28,469 @@
     </nav>
     <main class="main-content">
       <div class="breadcrumbs"><a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">Guides</a> <span>/</span> <span>Dynamic Merchant Example</span></div>
+
       <h1>Dynamic Merchant Example</h1>
-      <div class="ai-box" style="text-align: center; padding: 3rem;">
-        <p style="font-size: 3rem; margin-bottom: 1rem;">🚧</p>
-        <h2 style="color: var(--ai-cyan); margin-bottom: 1rem;">Coming Soon</h2>
-        <p style="color: var(--text-muted);">Esta seccion esta en desarrollo.</p>
-        <p style="margin-top: 1.5rem;"><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/187" target="_blank" class="badge badge-cyan">Ver issue #187</a></p>
+
+      <p>
+        <span class="badge badge-cyan">Testing</span>
+        <span class="badge badge-purple">Marcus the Merchant</span>
+      </p>
+
+      <div class="ai-box">
+        <p>Esta guia contiene prompts de prueba para el personaje <strong>Marcus</strong>, un mercader codicioso pero jovial del mundo de Eldoria. Usalo para probar diferentes modelos LLM y verificar que el sistema genera respuestas coherentes.</p>
       </div>
+
+      <hr>
+
+      <h2>Character Profile: Marcus</h2>
+
+      <style>
+        .profile-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 12px;
+          padding: 1.5rem;
+          margin: 1.5rem 0;
+        }
+        .profile-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border-color);
+        }
+        .profile-avatar {
+          width: 60px;
+          height: 60px;
+          background: linear-gradient(135deg, #eab308, #ca8a04);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 2rem;
+        }
+        .profile-name {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: var(--ai-cyan);
+        }
+        .profile-title {
+          color: var(--text-muted);
+          font-size: 0.9rem;
+        }
+        .profile-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1rem;
+        }
+        .profile-section {
+          background: rgba(0,0,0,0.2);
+          border-radius: 8px;
+          padding: 1rem;
+        }
+        .profile-section h4 {
+          color: var(--ai-purple);
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 0.5rem;
+        }
+        .profile-section ul {
+          margin: 0;
+          padding-left: 1.25rem;
+        }
+        .profile-section li {
+          font-size: 0.9rem;
+          margin-bottom: 0.25rem;
+        }
+        .prompt-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          margin: 1rem 0;
+          overflow: hidden;
+        }
+        .prompt-header {
+          background: rgba(0, 212, 255, 0.1);
+          padding: 0.75rem 1rem;
+          border-bottom: 1px solid var(--border-color);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .prompt-category {
+          font-weight: 600;
+          color: var(--ai-cyan);
+          font-size: 0.9rem;
+        }
+        .prompt-lang {
+          font-size: 0.75rem;
+          padding: 0.25rem 0.5rem;
+          background: rgba(168, 85, 247, 0.2);
+          border-radius: 4px;
+          color: var(--ai-purple);
+        }
+        .prompt-body {
+          padding: 1rem;
+        }
+        .prompt-item {
+          background: rgba(0,0,0,0.3);
+          border-radius: 6px;
+          padding: 0.75rem 1rem;
+          margin-bottom: 0.5rem;
+          font-family: var(--font-mono);
+          font-size: 0.85rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+        }
+        .prompt-item:hover {
+          background: rgba(0, 212, 255, 0.1);
+          border-color: var(--ai-cyan);
+        }
+        .prompt-item:last-child {
+          margin-bottom: 0;
+        }
+        .prompt-item::after {
+          content: 'Click to copy';
+          position: absolute;
+          right: 0.75rem;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 0.7rem;
+          color: var(--text-muted);
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+        .prompt-item:hover::after {
+          opacity: 1;
+        }
+        .prompt-item.copied::after {
+          content: 'Copied!';
+          color: var(--ai-cyan);
+          opacity: 1;
+        }
+        .prompt-note {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          font-style: italic;
+          margin-top: 0.5rem;
+        }
+        .model-table {
+          width: 100%;
+          margin: 1rem 0;
+        }
+        .model-table th {
+          text-align: left;
+          background: rgba(0, 212, 255, 0.1);
+        }
+        .model-rec {
+          background: rgba(16, 185, 129, 0.1);
+          border: 1px solid #10b981;
+        }
+        .stars {
+          color: #eab308;
+        }
+      </style>
+
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar">🛒</div>
+          <div>
+            <div class="profile-name">Marcus</div>
+            <div class="profile-title">Greedy but jovial merchant in Riverside Market, Eldoria</div>
+          </div>
+        </div>
+        <div class="profile-grid">
+          <div class="profile-section">
+            <h4>Personality</h4>
+            <p style="font-size: 0.9rem; margin: 0;">Greedy but jovial merchant. Cunning negotiator who loves to talk about deals and profits. Friendly on the surface but always looking for an advantage.</p>
+          </div>
+          <div class="profile-section">
+            <h4>Speech Patterns</h4>
+            <ul>
+              <li>"my friend"</li>
+              <li>"a steal at this price"</li>
+              <li>"finest quality"</li>
+              <li>Enthusiastic merchant jargon</li>
+            </ul>
+          </div>
+          <div class="profile-section">
+            <h4>Knowledge</h4>
+            <ul>
+              <li>Trade &amp; economics</li>
+              <li>Rare goods</li>
+              <li>Travel routes</li>
+              <li>Local gossip &amp; prices</li>
+            </ul>
+          </div>
+          <div class="profile-section">
+            <h4>Goals</h4>
+            <ul>
+              <li>Make a profit</li>
+              <li>Find rare artifacts</li>
+              <li>Avoid the tax collector</li>
+            </ul>
+          </div>
+          <div class="profile-section">
+            <h4>Fears</h4>
+            <ul>
+              <li>Being exposed as a fraud</li>
+              <li>The tax collector</li>
+              <li>Losing merchandise</li>
+            </ul>
+          </div>
+          <div class="profile-section">
+            <h4>Secrets</h4>
+            <ul>
+              <li>Hidden stash of illegal goods</li>
+              <li>Once cheated a noble</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2>Test Prompts</h2>
+
+      <div class="callout-info">
+        <p>Click en cualquier prompt para copiarlo al portapapeles. Luego pegalo en el Generation Tab del editor.</p>
+      </div>
+
+      <!-- Basic Interactions -->
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span class="prompt-category">Basic Interactions</span>
+          <span class="prompt-lang">English</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-item" onclick="copyPrompt(this)">Hello, what do you have for sale today?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">I'm looking for something special, what's your best item?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">How's business going?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Tell me about yourself.</div>
+          <p class="prompt-note">Deberia responder de forma amigable usando frases como "my friend", "finest quality", etc.</p>
+        </div>
+      </div>
+
+      <!-- Personality Tests -->
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span class="prompt-category">Personality Tests (Greedy/Cunning)</span>
+          <span class="prompt-lang">English</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-item" onclick="copyPrompt(this)">This price is too high, can you lower it?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">I only have half the gold you're asking for.</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">I'll buy everything you have. Name your price.</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">My friend recommended a cheaper merchant down the road.</div>
+          <p class="prompt-note">Deberia mostrar su lado negociador y codicioso, pero sin ser hostil.</p>
+        </div>
+      </div>
+
+      <!-- Secret Knowledge -->
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span class="prompt-category">Secret Knowledge (Illegal Goods)</span>
+          <span class="prompt-lang">English</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-item" onclick="copyPrompt(this)">I heard you sell... special goods. Things the guards wouldn't approve of.</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">I need something that's not exactly legal. Can you help?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">The Thieves Guild sent me. They said you have what I need.</div>
+          <p class="prompt-note">Deberia ser cauteloso, posiblemente evasivo al principio, pero podria abrirse si el jugador insiste.</p>
+        </div>
+      </div>
+
+      <!-- Fear Triggers -->
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span class="prompt-category">Fear Triggers</span>
+          <span class="prompt-lang">English</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-item" onclick="copyPrompt(this)">A noble was asking about you earlier. Said you owe him something.</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">The tax collector is coming this way.</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Someone told me you're a fraud. Is that true?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">I work for Lord Aldric. He wants to audit your accounts.</div>
+          <p class="prompt-note">Deberia mostrar nerviosismo o intentar cambiar de tema rapidamente.</p>
+        </div>
+      </div>
+
+      <!-- World Knowledge -->
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span class="prompt-category">World Knowledge (Eldoria)</span>
+          <span class="prompt-lang">English</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-item" onclick="copyPrompt(this)">What do you know about the bandits on the northern road?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Tell me about the Merchant Guild.</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">What's happening at the Harvest Festival tomorrow?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Do you know anything about King Aldric?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Who is the High Priestess Vera?</div>
+          <p class="prompt-note">Deberia demostrar conocimiento del mundo, especialmente sobre comercio y rumores locales.</p>
+        </div>
+      </div>
+
+      <!-- Relationships -->
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span class="prompt-category">Relationships</span>
+          <span class="prompt-lang">English</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-item" onclick="copyPrompt(this)">Do you know the Guard Captain?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">The innkeeper sent me. Said you might have a deal for me.</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">I heard you have connections with the Royal Guard.</div>
+          <p class="prompt-note">Deberia reaccionar segun sus relaciones definidas (soborna al capitan, amigo del tabernero).</p>
+        </div>
+      </div>
+
+      <!-- Multilingual -->
+      <div class="prompt-card">
+        <div class="prompt-header">
+          <span class="prompt-category">Multilingual Tests</span>
+          <span class="prompt-lang">ES / FR / DE</span>
+        </div>
+        <div class="prompt-body">
+          <div class="prompt-item" onclick="copyPrompt(this)">Hola Marcus, que me recomiendas comprar?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Tienes algo especial para un aventurero como yo?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Bonjour, avez-vous des objets rares?</div>
+          <div class="prompt-item" onclick="copyPrompt(this)">Guten Tag, was verkaufen Sie heute?</div>
+          <p class="prompt-note">Requiere modelo con buen soporte multilingue (Qwen recomendado).</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <h2>Recommended Models</h2>
+
+      <p>Para probar a Marcus con diferentes capacidades:</p>
+
+      <table class="model-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Size (Q4)</th>
+            <th>Multilingual</th>
+            <th>Coherence</th>
+            <th>Speed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>SmolLM2-360M-Instruct</code></td>
+            <td>~250MB</td>
+            <td><span class="stars">★★☆☆☆</span></td>
+            <td><span class="stars">★★★☆☆</span></td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr>
+            <td><code>Qwen2.5-0.5B-Instruct</code></td>
+            <td>~400MB</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★☆</span></td>
+            <td><span class="stars">★★★★★</span></td>
+          </tr>
+          <tr class="model-rec">
+            <td><strong><code>Qwen2.5-1.5B-Instruct</code></strong></td>
+            <td>~900MB</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★☆</span></td>
+          </tr>
+          <tr>
+            <td><code>Qwen2.5-3B-Instruct</code></td>
+            <td>~1.8GB</td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★★★</span></td>
+            <td><span class="stars">★★★☆☆</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout-info">
+        <p><strong>Recomendacion:</strong> Para modelos &lt;1GB con buen soporte multilingue, usa <code>Qwen2.5-1.5B-Instruct-Q4_K_M</code>. Es el mejor balance entre calidad y velocidad.</p>
+      </div>
+
+      <hr>
+
+      <h2>Testing Tips</h2>
+
+      <h3>Sampling Parameters</h3>
+      <ul>
+        <li><strong>Temperature:</strong> 0.7-0.9 para respuestas variadas, 0.3-0.5 para consistencia</li>
+        <li><strong>Top-P:</strong> 0.9 funciona bien para la mayoria de casos</li>
+        <li><strong>Max Tokens:</strong> 128-256 para dialogos cortos</li>
+        <li><strong>Repeat Penalty:</strong> 1.1-1.2 para evitar repeticiones</li>
+      </ul>
+
+      <h3>What to Look For</h3>
+      <ul>
+        <li>Usa las frases caracteristicas ("my friend", "finest quality")?</li>
+        <li>Mantiene la personalidad codicioso-pero-amigable?</li>
+        <li>Respeta los secretos (no los revela inmediatamente)?</li>
+        <li>Muestra conocimiento del mundo de Eldoria?</li>
+        <li>Reacciona apropiadamente a los triggers de miedo?</li>
+      </ul>
+
+      <h3>Common Issues</h3>
+      <table>
+        <thead>
+          <tr><th>Issue</th><th>Possible Cause</th><th>Solution</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Respuestas muy cortas</td>
+            <td>Max tokens muy bajo</td>
+            <td>Aumentar a 256+</td>
+          </tr>
+          <tr>
+            <td>Respuestas repetitivas</td>
+            <td>Repeat penalty muy bajo</td>
+            <td>Aumentar a 1.2</td>
+          </tr>
+          <tr>
+            <td>Rompe el personaje</td>
+            <td>Modelo muy pequeno</td>
+            <td>Usar Qwen2.5-1.5B+</td>
+          </tr>
+          <tr>
+            <td>No responde en espanol</td>
+            <td>Modelo no multilingue</td>
+            <td>Usar Qwen en vez de SmolLM</td>
+          </tr>
+          <tr>
+            <td>Crash silencioso</td>
+            <td>Prompt muy largo</td>
+            <td>Reducir contexto o usar modelo con mas n_ctx</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <hr>
+
+      <h2>Resource Files</h2>
+
+      <p>Los archivos de ejemplo estan en:</p>
+
+      <pre data-lang="PATHS"><code>examples/resources/merchant_character.tres  # CharacterIdentity de Marcus
+examples/resources/fantasy_world.tres       # WorldContext de Eldoria</code></pre>
+
+      <p>Puedes cargarlos desde el Generation Tab seleccionando los recursos en los campos Character y World.</p>
+
+      <script>
+        function copyPrompt(element) {
+          const text = element.textContent;
+          navigator.clipboard.writeText(text).then(() => {
+            element.classList.add('copied');
+            setTimeout(() => element.classList.remove('copied'), 1500);
+          });
+        }
+      </script>
+
       <footer class="wiki-footer"><p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p></footer>
     </main>
   </div>
