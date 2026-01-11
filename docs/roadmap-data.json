@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-11T02:04:33Z",
+  "updated_at": "2026-01-11T04:43:45Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -7,17 +7,17 @@
       "title": "M1: Fundación - GDExtension Core",
       "description": "Setup inicial, GDExtension con llama.cpp, LlamaInterface",
       "open": 7,
-      "closed": 12,
-      "progress": 63,
+      "closed": 13,
+      "progress": 65,
       "state": "open"
     },
     {
       "number": 2,
       "title": "M2: Core del Sistema",
       "description": "Resources, PromptBuilder, DialogueManager",
-      "open": 0,
+      "open": 2,
       "closed": 14,
-      "progress": 100,
+      "progress": 87,
       "state": "open"
     },
     {
@@ -33,7 +33,7 @@
       "number": 11,
       "title": "M4: Memorias Persistentes",
       "description": "Sistema de memorias con búsqueda semántica",
-      "open": 6,
+      "open": 7,
       "closed": 0,
       "progress": 0,
       "state": "open"
@@ -69,16 +69,16 @@
       "number": 8,
       "title": "M8: Ejemplos y Documentación",
       "description": "Ejemplos, API docs, guía de inicio rápido, CI/CD",
-      "open": 9,
-      "closed": 7,
-      "progress": 43,
+      "open": 10,
+      "closed": 8,
+      "progress": 44,
       "state": "open"
     },
     {
       "number": 15,
       "title": "M9: LoRA & Asistentes IA",
       "description": "Soporte LoRA, asistentes, fine-tuning",
-      "open": 5,
+      "open": 6,
       "closed": 0,
       "progress": 0,
       "state": "open"
@@ -247,7 +247,8 @@
           "labels": [
             "priority:medium",
             "difficulty:medium",
-            "gdextension"
+            "gdextension",
+            "research"
           ],
           "fields": {
             "Status": "Todo",
@@ -272,13 +273,13 @@
         },
         {
           "number": 54,
-          "title": "[GDExtension] Soporte NPU para inferencia acelerada",
+          "title": "[GDExtension] Soporte NPU (BACKLOG - ecosistema inmaduro)",
           "state": "OPEN",
           "milestone": "M1: Fundación - GDExtension Core",
           "labels": [
-            "priority:low",
             "difficulty:hard",
-            "gdextension"
+            "gdextension",
+            "research"
           ],
           "fields": {
             "Status": "Todo",
@@ -860,7 +861,7 @@
         {
           "number": 193,
           "title": "[Editor] Implementar Model Manager Window",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M1: Fundación - GDExtension Core",
           "labels": [
             "priority:high",
@@ -868,7 +869,7 @@
             "editor"
           ],
           "fields": {
-            "Status": "Todo"
+            "Status": "Done"
           }
         },
         {
@@ -954,6 +955,128 @@
           ],
           "fields": {
             "Status": "Todo"
+          }
+        },
+        {
+          "number": 205,
+          "title": "[Research] Embeddings API para búsqueda semántica y memorias de NPC",
+          "state": "OPEN",
+          "milestone": "M4: Memorias Persistentes",
+          "labels": [
+            "priority:high",
+            "difficulty:easy",
+            "gdextension",
+            "memory",
+            "research"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 206,
+          "title": "[Research] BitNet support para dispositivos de bajo recurso",
+          "state": "OPEN",
+          "milestone": "M9: LoRA & Asistentes IA",
+          "labels": [
+            "priority:medium",
+            "difficulty:hard",
+            "gdextension",
+            "research"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 207,
+          "title": "[Research] KV Cache management para conversaciones multi-turno",
+          "state": "OPEN",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "gdextension",
+            "core",
+            "research"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 208,
+          "title": "[Docs] Guía de selección de modelos LLM para videojuegos",
+          "state": "OPEN",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:medium",
+            "difficulty:easy",
+            "research"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 209,
+          "title": "[Research] Batch inference para múltiples NPCs simultáneos",
+          "state": "OPEN",
+          "milestone": "M2: Core del Sistema",
+          "labels": [
+            "priority:low",
+            "difficulty:hard",
+            "gdextension",
+            "core",
+            "research"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 210,
+          "title": "[Architecture] Abstraer backends de inferencia con Strategy Pattern",
+          "state": "OPEN",
+          "milestone": "M1: Fundación - GDExtension Core",
+          "labels": [
+            "priority:high",
+            "difficulty:medium",
+            "gdextension",
+            "core",
+            "next-session",
+            "research",
+            "architecture"
+          ],
+          "fields": {
+            "Status": "Todo"
+          }
+        },
+        {
+          "number": 211,
+          "title": "[Docs] Cambiar licencia del proyecto de MIT a Apache 2.0",
+          "state": "CLOSED",
+          "milestone": null,
+          "labels": [
+            "documentation",
+            "priority:high"
+          ],
+          "fields": {
+            "Status": "In Progress"
+          }
+        },
+        {
+          "number": 213,
+          "title": "[Docs] Actualizar README.md con estado real y formato vendedor",
+          "state": "CLOSED",
+          "milestone": "M8: Ejemplos y Documentación",
+          "labels": [
+            "documentation",
+            "priority:high"
+          ],
+          "fields": {
+            "Status": "Done"
           }
         }
       ]
@@ -2098,7 +2221,8 @@
       "labels": [
         "priority:medium",
         "difficulty:medium",
-        "gdextension"
+        "gdextension",
+        "research"
       ],
       "fields": {
         "Status": "Todo",
@@ -2108,13 +2232,13 @@
     },
     {
       "number": 54,
-      "title": "[GDExtension] Soporte NPU para inferencia acelerada",
+      "title": "[GDExtension] Soporte NPU (BACKLOG - ecosistema inmaduro)",
       "state": "OPEN",
       "milestone": "M1: Fundación - GDExtension Core",
       "labels": [
-        "priority:low",
         "difficulty:hard",
-        "gdextension"
+        "gdextension",
+        "research"
       ],
       "fields": {
         "Status": "Todo",
@@ -2540,7 +2664,7 @@
     {
       "number": 193,
       "title": "[Editor] Implementar Model Manager Window",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M1: Fundación - GDExtension Core",
       "labels": [
         "priority:high",
@@ -2548,7 +2672,7 @@
         "editor"
       ],
       "fields": {
-        "Status": "Todo"
+        "Status": "Done"
       }
     },
     {
@@ -2634,6 +2758,128 @@
       ],
       "fields": {
         "Status": "Todo"
+      }
+    },
+    {
+      "number": 205,
+      "title": "[Research] Embeddings API para búsqueda semántica y memorias de NPC",
+      "state": "OPEN",
+      "milestone": "M4: Memorias Persistentes",
+      "labels": [
+        "priority:high",
+        "difficulty:easy",
+        "gdextension",
+        "memory",
+        "research"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 206,
+      "title": "[Research] BitNet support para dispositivos de bajo recurso",
+      "state": "OPEN",
+      "milestone": "M9: LoRA & Asistentes IA",
+      "labels": [
+        "priority:medium",
+        "difficulty:hard",
+        "gdextension",
+        "research"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 207,
+      "title": "[Research] KV Cache management para conversaciones multi-turno",
+      "state": "OPEN",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "gdextension",
+        "core",
+        "research"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 208,
+      "title": "[Docs] Guía de selección de modelos LLM para videojuegos",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:medium",
+        "difficulty:easy",
+        "research"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 209,
+      "title": "[Research] Batch inference para múltiples NPCs simultáneos",
+      "state": "OPEN",
+      "milestone": "M2: Core del Sistema",
+      "labels": [
+        "priority:low",
+        "difficulty:hard",
+        "gdextension",
+        "core",
+        "research"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 210,
+      "title": "[Architecture] Abstraer backends de inferencia con Strategy Pattern",
+      "state": "OPEN",
+      "milestone": "M1: Fundación - GDExtension Core",
+      "labels": [
+        "priority:high",
+        "difficulty:medium",
+        "gdextension",
+        "core",
+        "next-session",
+        "research",
+        "architecture"
+      ],
+      "fields": {
+        "Status": "Todo"
+      }
+    },
+    {
+      "number": 211,
+      "title": "[Docs] Cambiar licencia del proyecto de MIT a Apache 2.0",
+      "state": "CLOSED",
+      "milestone": null,
+      "labels": [
+        "documentation",
+        "priority:high"
+      ],
+      "fields": {
+        "Status": "In Progress"
+      }
+    },
+    {
+      "number": 213,
+      "title": "[Docs] Actualizar README.md con estado real y formato vendedor",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "priority:high"
+      ],
+      "fields": {
+        "Status": "Done"
       }
     },
     {
