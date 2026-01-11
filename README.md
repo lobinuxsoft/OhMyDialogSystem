@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Godot 4.5+](https://img.shields.io/badge/Godot-4.5%2B-blue?logo=godot-engine)
-![License MIT](https://img.shields.io/badge/License-MIT-green)
+![License Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue)
 ![Status](https://img.shields.io/badge/Status-In%20Development-orange)
 
 **AI-powered dialogue system for Godot with local LLM inference, persistent memories, and text-to-speech.**
@@ -103,7 +103,7 @@ Contributions are welcome! Please check the [Issues](https://github.com/lobinuxs
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ---
 
