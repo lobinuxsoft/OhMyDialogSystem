@@ -34,6 +34,8 @@ set LLAMA_BACKEND=cpu
 set LLAMA_NATIVE=yes
 set LLAMA_AVX2=yes
 set LLAMA_REBUILD=no
+set LLAMA_ALL_BACKENDS=no
+set LLAMA_DYNAMIC=no
 
 REM Parse arguments
 :parse_args
@@ -79,6 +81,16 @@ if /i "%~1"=="--sycl" (
     shift
     goto :parse_args
 )
+if /i "%~1"=="--all-backends" (
+    set LLAMA_ALL_BACKENDS=yes
+    shift
+    goto :parse_args
+)
+if /i "%~1"=="--dynamic" (
+    set LLAMA_DYNAMIC=yes
+    shift
+    goto :parse_args
+)
 if /i "%~1"=="--no-native" (
     set LLAMA_NATIVE=no
     shift
@@ -117,6 +129,8 @@ echo   --cpu         Use CPU backend (default)
 echo   --cuda        Use CUDA backend (requires CUDA Toolkit)
 echo   --vulkan      Use Vulkan backend (requires Vulkan SDK)
 echo   --sycl        Use SYCL backend (requires Intel oneAPI)
+echo   --all-backends  Build ALL available backends (CPU, CUDA, Vulkan)
+echo   --dynamic     Enable dynamic backend loading (runtime detection)
 echo.
 echo llama.cpp Build Options:
 echo   --no-native   Disable native CPU optimizations
@@ -124,19 +138,21 @@ echo   --no-avx2     Disable AVX2 instructions
 echo   --rebuild-llama  Force rebuild of llama.cpp
 echo.
 echo Examples:
-echo   %~nx0 release                    # Release build, CPU backend
-echo   %~nx0 debug --cuda -j 8          # Debug build, CUDA backend
-echo   %~nx0 release --vulkan           # Release build, Vulkan backend
+echo   %~nx0 release                         # Release build, CPU backend
+echo   %~nx0 debug --cuda -j 8               # Debug build, CUDA backend
+echo   %~nx0 release --all-backends --dynamic  # All backends, runtime detection
 exit /b 0
 
 :done_parsing
 echo.
-echo Platform:       %PLATFORM%
-echo Target:         %TARGET%
-echo Jobs:           %JOBS%
-echo llama backend:  %LLAMA_BACKEND%
-echo llama native:   %LLAMA_NATIVE%
-echo llama AVX2:     %LLAMA_AVX2%
+echo Platform:        %PLATFORM%
+echo Target:          %TARGET%
+echo Jobs:            %JOBS%
+echo llama backend:   %LLAMA_BACKEND%
+echo llama all:       %LLAMA_ALL_BACKENDS%
+echo llama dynamic:   %LLAMA_DYNAMIC%
+echo llama native:    %LLAMA_NATIVE%
+echo llama AVX2:      %LLAMA_AVX2%
 echo.
 
 REM Build llama.cpp first if needed
@@ -146,7 +162,13 @@ if "%LLAMA_REBUILD%"=="yes" set NEED_LLAMA_BUILD=1
 
 if defined NEED_LLAMA_BUILD (
     echo [INFO] Building llama.cpp...
-    set LLAMA_ARGS=--%LLAMA_BACKEND%
+    set LLAMA_ARGS=
+    if "%LLAMA_ALL_BACKENDS%"=="yes" (
+        set LLAMA_ARGS=!LLAMA_ARGS! --all-backends
+    ) else (
+        set LLAMA_ARGS=!LLAMA_ARGS! --%LLAMA_BACKEND%
+    )
+    if "%LLAMA_DYNAMIC%"=="yes" set LLAMA_ARGS=!LLAMA_ARGS! --dynamic
     if "%LLAMA_NATIVE%"=="no" set LLAMA_ARGS=!LLAMA_ARGS! --no-native
     if "%LLAMA_AVX2%"=="no" set LLAMA_ARGS=!LLAMA_ARGS! --no-avx2
     if "%LLAMA_REBUILD%"=="yes" set LLAMA_ARGS=!LLAMA_ARGS! --rebuild

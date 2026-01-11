@@ -5,6 +5,9 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
+// For dynamic backend loading (GGML_BACKEND_DL)
+#include "ggml-backend.h"
+
 #include <string>
 
 namespace godot {
@@ -181,6 +184,21 @@ Error LlamaInterface::load_model(const String &path, const Dictionary &params) {
 	if (!FileAccess::file_exists(path)) {
 		UtilityFunctions::push_error("LlamaInterface: Model file not found: ", path);
 		return ERR_FILE_NOT_FOUND;
+	}
+
+	// Load dynamic backends (GGML_BACKEND_DL)
+	// This will scan for and load backend libraries (ggml-cuda.dll, ggml-vulkan.dll, etc.)
+	// and automatically select the best available backend at runtime
+	ggml_backend_load_all();
+
+	// Log available backends for debugging
+	size_t n_backends = ggml_backend_dev_count();
+	UtilityFunctions::print(vformat("LlamaInterface: %d backend device(s) available", n_backends));
+	for (size_t i = 0; i < n_backends; i++) {
+		ggml_backend_dev_t dev = ggml_backend_dev_get(i);
+		const char* name = ggml_backend_dev_name(dev);
+		const char* desc = ggml_backend_dev_description(dev);
+		UtilityFunctions::print(vformat("  - %s: %s", name, desc));
 	}
 
 	// Initialize backend

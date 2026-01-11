@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI/CD y Releases - OhMyDialogSystem</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .release-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .flow-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+        .flow-content {
+            flex: 1;
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-primary);
+        }
+        .flow-arrow {
+            width: 40px;
+            text-align: center;
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+        }
+
+        .backend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .backend-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .backend-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .backend-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .backend-name {
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .backend-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .backend-score {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+        }
+
+        .platform-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        .platform-table th,
+        .platform-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .platform-table th {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+        }
+        .platform-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .code-block {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        .code-block code {
+            color: var(--text-primary);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .detection-diagram {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .detection-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .detection-box {
+            background: var(--bg-tertiary);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 200px;
+        }
+        .detection-box.start {
+            border: 2px solid #10b981;
+        }
+        .detection-box.decision {
+            border: 2px solid #eab308;
+            transform: rotate(0deg);
+        }
+        .detection-box.backend {
+            border: 2px solid var(--accent-primary);
+        }
+        .detection-arrow {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+        }
+        .detection-branches {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+        }
+        .detection-branch {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .detection-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <h2>OhMyDialog</h2>
+            <span class="version">v0.3.0-dev</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="../index.html">Inicio</a></li>
+            <li><a href="../Guides/index.html">Guias</a></li>
+            <li><a href="../API/index.html">API</a></li>
+            <li class="active"><a href="index.html">Tecnico</a></li>
+            <li><a href="../roadmap.html">Roadmap</a></li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <div class="breadcrumbs">
+            <a href="../index.html">Inicio</a> &gt;
+            <a href="index.html">Tecnico</a> &gt;
+            <span>CI/CD y Releases</span>
+        </div>
+
+        <h1>CI/CD y Sistema de Releases</h1>
+
+        <p>OhMyDialogSystem utiliza GitHub Actions para automatizar la compilacion y publicacion de releases. El sistema soporta <strong>deteccion automatica de backends</strong> en runtime, permitiendo que un solo paquete funcione en diferentes configuraciones de hardware.</p>
+
+        <h2>Flujo de Release</h2>
+
+        <div class="release-flow">
+            <div class="flow-step">
+                <div class="flow-number">1</div>
+                <div class="flow-content">
+                    <strong>Crear Tag</strong>
+                    <p>El desarrollador crea un tag de version siguiendo SemVer</p>
+                    <div class="code-block">
+                        <code>git tag v1.0.0 && git push origin v1.0.0</code>
+                    </div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+                <div class="flow-number">2</div>
+                <div class="flow-content">
+                    <strong>GitHub Actions Detecta</strong>
+                    <p>El workflow <code>release-gdextension.yml</code> se dispara automaticamente</p>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+                <div class="flow-number">3</div>
+                <div class="flow-content">
+                    <strong>Compilacion Paralela</strong>
+                    <p>Se compila para Windows, Linux y macOS en paralelo con todos los backends</p>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+                <div class="flow-number">4</div>
+                <div class="flow-content">
+                    <strong>GitHub Release</strong>
+                    <p>Se crea automaticamente un Release con los paquetes para cada plataforma</p>
+                </div>
+            </div>
+        </div>
+
+        <h2>Backends Disponibles</h2>
+
+        <p>El addon detecta automaticamente el mejor backend disponible en el sistema del usuario:</p>
+
+        <div class="backend-grid">
+            <div class="backend-card">
+                <div class="backend-icon">🖥️</div>
+                <div class="backend-name">CPU</div>
+                <div class="backend-desc">Funciona en cualquier sistema. Usa instrucciones SIMD (AVX2, AVX512) si estan disponibles.</div>
+                <div class="backend-score">Score base: 10-170</div>
+            </div>
+            <div class="backend-card">
+                <div class="backend-icon">🟢</div>
+                <div class="backend-name">CUDA</div>
+                <div class="backend-desc">Para GPUs NVIDIA. Requiere driver NVIDIA instalado.</div>
+                <div class="backend-score">Score: 100+</div>
+            </div>
+            <div class="backend-card">
+                <div class="backend-icon">🔴</div>
+                <div class="backend-name">Vulkan</div>
+                <div class="backend-desc">Para GPUs AMD, Intel y NVIDIA. Requiere driver Vulkan.</div>
+                <div class="backend-score">Score: 80</div>
+            </div>
+            <div class="backend-card">
+                <div class="backend-icon">🍎</div>
+                <div class="backend-name">Metal</div>
+                <div class="backend-desc">Para Apple Silicon (M1/M2/M3). Nativo en macOS.</div>
+                <div class="backend-score">Score: 90</div>
+            </div>
+        </div>
+
+        <h2>Deteccion Automatica</h2>
+
+        <p>Cuando se carga un modelo, el sistema ejecuta el siguiente proceso:</p>
+
+        <div class="detection-diagram">
+            <div class="detection-flow">
+                <div class="detection-box start">ggml_backend_load_all()</div>
+                <div class="detection-arrow">↓</div>
+                <div class="detection-box">Escanea DLLs de backend</div>
+                <div class="detection-arrow">↓</div>
+                <div class="detection-branches">
+                    <div class="detection-branch">
+                        <div class="detection-box backend">ggml-cuda.dll</div>
+                        <div class="detection-label">cudaGetDeviceCount()</div>
+                    </div>
+                    <div class="detection-branch">
+                        <div class="detection-box backend">ggml-vulkan.dll</div>
+                        <div class="detection-label">vkEnumerateDevices()</div>
+                    </div>
+                    <div class="detection-branch">
+                        <div class="detection-box backend">ggml-cpu.dll</div>
+                        <div class="detection-label">Siempre disponible</div>
+                    </div>
+                </div>
+                <div class="detection-arrow">↓</div>
+                <div class="detection-box decision">Selecciona mayor score</div>
+            </div>
+        </div>
+
+        <h2>Paquetes por Plataforma</h2>
+
+        <table class="platform-table">
+            <thead>
+                <tr>
+                    <th>Plataforma</th>
+                    <th>Archivo</th>
+                    <th>Backends Incluidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Windows x64</td>
+                    <td><code>OhMyDialogSystem-vX.X.X-windows-x64.zip</code></td>
+                    <td>CPU, CUDA, Vulkan</td>
+                </tr>
+                <tr>
+                    <td>Linux x64</td>
+                    <td><code>OhMyDialogSystem-vX.X.X-linux-x64.tar.gz</code></td>
+                    <td>CPU, CUDA, Vulkan</td>
+                </tr>
+                <tr>
+                    <td>macOS ARM64</td>
+                    <td><code>OhMyDialogSystem-vX.X.X-macos-arm64.tar.gz</code></td>
+                    <td>CPU, Metal</td>
+                </tr>
+                <tr>
+                    <td>macOS x64</td>
+                    <td><code>OhMyDialogSystem-vX.X.X-macos-x64.tar.gz</code></td>
+                    <td>CPU</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>Compilacion Local</h2>
+
+        <p>Para compilar localmente con todos los backends:</p>
+
+        <h3>Windows</h3>
+        <div class="code-block">
+            <code>cd gdextension
+build.bat release --all-backends --dynamic</code>
+        </div>
+
+        <h3>Linux/macOS</h3>
+        <div class="code-block">
+            <code>cd gdextension
+./build.sh release --all-backends --dynamic</code>
+        </div>
+
+        <h2>Estructura del Workflow</h2>
+
+        <p>El workflow de GitHub Actions (<code>.github/workflows/release-gdextension.yml</code>) consta de:</p>
+
+        <ul>
+            <li><strong>build-windows</strong>: Compila para Windows x64 con CUDA y Vulkan</li>
+            <li><strong>build-linux</strong>: Compila para Linux x64 con CUDA y Vulkan</li>
+            <li><strong>build-macos-arm64</strong>: Compila para Apple Silicon con Metal</li>
+            <li><strong>build-macos-x64</strong>: Compila para Intel Mac (solo CPU)</li>
+            <li><strong>create-release</strong>: Empaqueta y publica el Release</li>
+        </ul>
+
+        <h2>Actions Reutilizables</h2>
+
+        <p>El proyecto incluye GitHub Actions personalizadas en <code>.github/actions/</code>:</p>
+
+        <ul>
+            <li><code>setup-cuda-windows</code>: Instala CUDA Toolkit en Windows</li>
+            <li><code>setup-cuda-linux</code>: Instala CUDA Toolkit en Linux</li>
+            <li><code>setup-vulkan-windows</code>: Instala Vulkan SDK en Windows</li>
+            <li><code>setup-vulkan-linux</code>: Instala Vulkan SDK en Linux</li>
+        </ul>
+
+    </main>
+</body>
+</html>
