@@ -1,0 +1,92 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of OhMyDialogSystem is affected? (label will be added during triage)
+      options:
+        - gdextension (C++ GDExtension code)
+        - core (Core GDScript functionality)
+        - editor (Visual editor components)
+        - memory (Memory/persistence system)
+        - tts (Text-to-speech features)
+        - csharp (C# bindings)
+        - localization (Localization/i18n)
+        - infrastructure (Build, CI/CD, project setup)
+        - documentation
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear description of what the bug is
+      placeholder: What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Open the dialogue editor
+        2. Create a new AI Response node
+        3. Connect to...
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide your environment details
+      value: |
+        - OS: [e.g., Windows 11, Ubuntu 22.04]
+        - Godot version: [e.g., 4.5]
+        - OhMyDialogSystem version: [e.g., 0.3.0-dev]
+        - LLM Model: [e.g., Qwen2.5-0.5B-Q4]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Paste any error messages or logs here
+      render: shell
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have tested with the latest development version
+          required: false
+        - label: I am willing to submit a PR to fix this issue
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Want to contribute a fix?** Great! Please:
+        1. Wait for the issue to be triaged and assigned to you
+        2. Create a branch: `fix/issue-XX-short-description`
+        3. Submit a PR targeting `development` (never `main`)
+
+        See [CONTRIBUTING.md](https://github.com/lobinuxsoft/OhMyDialogSystem/blob/development/CONTRIBUTING.md) for details.

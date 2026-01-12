@@ -6,6 +6,7 @@
 script = ExtResource("1_k0mv3")
 preset_name = "Qwen2.5 1.5B Instruct Q4 (Recommended <1GB) Preset"
 description = "Generated from GGUF metadata. Template: chatml, Context: 32768 tokens."
+preset_type = 4
 stop_sequences = Array[String](["<|im_end|>", "<|im_start|>"])
 context_size = 32768
 source_chat_template = "{%- if tools %}
