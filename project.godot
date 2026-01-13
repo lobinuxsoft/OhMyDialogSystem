@@ -13,6 +13,7 @@ config_version=5
 config/name="OhMyDialogSystem"
 config/description="AI-powered dialogue system for Godot with local LLM inference, persistent memories, and text-to-speech."
 config/version="0.1.0"
+run/main_scene="uid://bvirxw54wgi03"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="uid://f0hyuiidpuyj"
 
@@ -27,3 +28,13 @@ project/assembly_name="OhMyDialogSystem"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/ohmydialog/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://addons/": "red",
+"res://docs/": "orange",
+"res://examples/": "yellow",
+"res://models/": "green",
+"res://presets/": "teal"
+}

@@ -89,6 +89,36 @@ bool LlamaInterface::_check_stop_sequence(const std::string &text) const {
 	return false;
 }
 
+bool LlamaInterface::_decode_prompt_chunked(const std::vector<llama_token> &tokens) {
+	int n_batch = llama_n_batch(m_context);
+	// llama_batch_get_one requires non-const pointer but doesn't modify the data
+	llama_token *tokens_ptr = const_cast<llama_token *>(tokens.data());
+
+	if ((int)tokens.size() > n_batch) {
+		UtilityFunctions::print("LlamaInterface: Processing prompt in chunks (", (int)tokens.size(), " tokens, batch=", n_batch, ")");
+
+		int pos = 0;
+		while (pos < (int)tokens.size()) {
+			int chunk_size = std::min(n_batch, (int)tokens.size() - pos);
+			llama_batch batch = llama_batch_get_one(tokens_ptr + pos, chunk_size);
+
+			if (llama_decode(m_context, batch) != 0) {
+				UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt chunk at position ", pos);
+				return false;
+			}
+			pos += chunk_size;
+		}
+	} else {
+		llama_batch batch = llama_batch_get_one(tokens_ptr, tokens.size());
+
+		if (llama_decode(m_context, batch) != 0) {
+			UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt");
+			return false;
+		}
+	}
+	return true;
+}
+
 void LlamaInterface::_bind_methods() {
 	// Model management
 	ClassDB::bind_method(D_METHOD("load_model", "path", "params"), &LlamaInterface::load_model, DEFVAL(Dictionary()));
@@ -512,31 +542,10 @@ String LlamaInterface::generate(const String &prompt) {
 	// Create sampler
 	llama_sampler *smpl = _create_sampler();
 
-	// Process prompt in chunks if it exceeds batch size
-	if ((int)tokens.size() > n_batch) {
-		UtilityFunctions::print("LlamaInterface: Processing prompt in chunks (", (int)tokens.size(), " tokens, batch=", n_batch, ")");
-
-		int pos = 0;
-		while (pos < (int)tokens.size()) {
-			int chunk_size = std::min(n_batch, (int)tokens.size() - pos);
-			llama_batch batch = llama_batch_get_one(tokens.data() + pos, chunk_size);
-
-			if (llama_decode(m_context, batch) != 0) {
-				UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt chunk at position ", pos);
-				llama_sampler_free(smpl);
-				return String();
-			}
-			pos += chunk_size;
-		}
-	} else {
-		// Single batch decode
-		llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
-
-		if (llama_decode(m_context, batch) != 0) {
-			UtilityFunctions::push_error("LlamaInterface: Failed to decode prompt");
-			llama_sampler_free(smpl);
-			return String();
-		}
+	// Decode prompt (with automatic chunking if needed)
+	if (!_decode_prompt_chunked(tokens)) {
+		llama_sampler_free(smpl);
+		return String();
 	}
 
 	// Generation loop
@@ -794,11 +803,8 @@ void LlamaInterface::_async_generate_task(const String &prompt) {
 	// Create sampler
 	llama_sampler *smpl = _create_sampler();
 
-	// Create batch for prompt
-	llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
-
-	// Decode prompt
-	if (llama_decode(m_context, batch) != 0) {
+	// Decode prompt (with automatic chunking if needed)
+	if (!_decode_prompt_chunked(tokens)) {
 		call_deferred("emit_signal", "generation_error", String("Failed to decode prompt"));
 		llama_sampler_free(smpl);
 		m_is_generating.store(false);
@@ -975,11 +981,8 @@ void LlamaInterface::_streaming_generate_task(const String &prompt) {
 	// Create sampler
 	llama_sampler *smpl = _create_sampler();
 
-	// Create batch for prompt
-	llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
-
-	// Decode prompt
-	if (llama_decode(m_context, batch) != 0) {
+	// Decode prompt (with automatic chunking if needed)
+	if (!_decode_prompt_chunked(tokens)) {
 		call_deferred("emit_signal", "generation_error", String("Failed to decode prompt"));
 		llama_sampler_free(smpl);
 		m_is_generating.store(false);
