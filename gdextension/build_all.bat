@@ -40,6 +40,16 @@ if /i "%~1"=="--native" (
     shift
     goto :parse_args
 )
+if /i "%~1"=="--all-backends" (
+    set LLAMA_ARGS=!LLAMA_ARGS! --all-backends
+    shift
+    goto :parse_args
+)
+if /i "%~1"=="--dynamic" (
+    set LLAMA_ARGS=!LLAMA_ARGS! --dynamic
+    shift
+    goto :parse_args
+)
 if /i "%~1"=="--rebuild-llama" (
     set LLAMA_ARGS=!LLAMA_ARGS! --rebuild-llama
     shift
@@ -61,13 +71,16 @@ echo   -j N              Number of parallel jobs (default: auto)
 echo   --cpu             Use CPU backend instead of Vulkan
 echo   --vulkan          Use Vulkan backend (default)
 echo   --native          Enable native CPU optimizations
+echo   --all-backends    Build ALL available backends (CPU, Vulkan)
+echo   --dynamic         Enable dynamic backend loading (runtime detection)
 echo   --rebuild-llama   Force rebuild of llama.cpp
 echo   -h, --help        Show this help message
 echo.
 echo Examples:
-echo   %~nx0                    # Build all with Vulkan (default)
-echo   %~nx0 --cpu -j 8         # Build all with CPU backend, 8 jobs
-echo   %~nx0 --rebuild-llama    # Rebuild llama.cpp and all targets
+echo   %~nx0                              # Build all with Vulkan (default)
+echo   %~nx0 --cpu -j 8                   # Build all with CPU backend, 8 jobs
+echo   %~nx0 --all-backends --dynamic     # All backends with runtime detection
+echo   %~nx0 --rebuild-llama              # Rebuild llama.cpp and all targets
 exit /b 0
 
 :done_parsing
