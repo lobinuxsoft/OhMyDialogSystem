@@ -11,10 +11,10 @@ set BUILD_DIR=%LLAMA_DIR%\build
 
 REM Default configuration
 set BUILD_TYPE=Release
-set BACKEND=cpu
+set BACKEND=vulkan
 set FORCE_REBUILD=0
 set JOBS=%NUMBER_OF_PROCESSORS%
-set NATIVE=ON
+set NATIVE=OFF
 set AVX2=ON
 set CLEAN_BUILD=0
 set ALL_BACKENDS=0
@@ -29,7 +29,9 @@ if /i "%~1"=="--cpu" (
     goto :parse_args
 )
 if /i "%~1"=="--cuda" (
-    set BACKEND=cuda
+    echo [WARNING] CUDA support is not yet implemented. Falling back to Vulkan.
+    echo           See GitHub issue for CUDA implementation status.
+    set BACKEND=vulkan
     shift
     goto :parse_args
 )
@@ -104,16 +106,16 @@ goto :parse_args
 echo Usage: %~nx0 [OPTIONS]
 echo.
 echo Backend Options:
-echo   --cpu          Build with CPU backend only (default)
-echo   --cuda         Build with CUDA support (requires CUDA Toolkit)
-echo   --vulkan       Build with Vulkan support (requires Vulkan SDK)
-echo   --sycl         Build with SYCL support (requires Intel oneAPI)
-echo   --all-backends Build ALL available backends (CPU, CUDA, Vulkan)
+echo   --vulkan       Build with Vulkan support (default, recommended for GPU)
+echo   --cpu          Build with CPU backend only
+echo   --all-backends Build ALL available backends (Vulkan + CPU)
 echo   --dynamic      Enable dynamic backend loading (GGML_BACKEND_DL)
 echo.
+echo   Note: CUDA support is not yet implemented. See GitHub issue for status.
+echo.
 echo CPU Options:
-echo   --native       Enable native CPU optimizations (default: on)
-echo   --no-native    Disable native CPU optimizations
+echo   --native       Enable native CPU optimizations (faster, not portable)
+echo   --no-native    Disable native CPU optimizations (default, portable)
 echo   --avx2         Enable AVX2 (default: on)
 echo   --no-avx2      Disable AVX2
 echo.
@@ -125,8 +127,8 @@ echo   -j N           Number of parallel jobs (default: auto)
 echo   -h, --help     Show this help message
 echo.
 echo Examples:
-echo   %~nx0 --cpu                    # CPU-only build (static)
-echo   %~nx0 --cuda -j 8              # CUDA build with 8 jobs
+echo   %~nx0                          # Vulkan build (default)
+echo   %~nx0 --cpu                    # CPU-only build
 echo   %~nx0 --all-backends --dynamic # All backends as dynamic libraries
 exit /b 0
 
@@ -210,15 +212,9 @@ if %ALL_BACKENDS%==1 (
     REM CPU is always enabled
     echo [INFO]   - CPU backend: enabled
 
-    REM Check and enable CUDA if available
-    where nvcc >nul 2>&1
-    if not errorlevel 1 (
-        echo [INFO]   - CUDA backend: enabled
-        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=75;80;86;89
-    ) else (
-        echo [INFO]   - CUDA backend: skipped ^(nvcc not found^)
-        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CUDA=OFF
-    )
+    REM CUDA is not yet implemented
+    echo [INFO]   - CUDA backend: skipped ^(not yet implemented^)
+    set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CUDA=OFF
 
     REM Check and enable Vulkan if available (check VULKAN_SDK env or glslc in PATH)
     set VULKAN_AVAILABLE=0
@@ -243,34 +239,44 @@ if %ALL_BACKENDS%==1 (
         echo [INFO] Configuring CPU-only build...
         set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CUDA=OFF -DGGML_VULKAN=OFF -DGGML_SYCL=OFF
     )
-    if /i "%BACKEND%"=="cuda" (
-        echo [INFO] Configuring CUDA build...
-        where nvcc >nul 2>&1
-        if errorlevel 1 (
-            echo [ERROR] CUDA Toolkit not found. Please install CUDA Toolkit.
-            exit /b 1
-        )
-        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES=75;80;86;89
-    )
     if /i "%BACKEND%"=="vulkan" (
         echo [INFO] Configuring Vulkan build...
-        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_VULKAN=ON
-    )
-    if /i "%BACKEND%"=="sycl" (
-        echo [INFO] Configuring SYCL build...
-        if not defined ONEAPI_ROOT (
-            echo [WARNING] Intel oneAPI not detected. SYCL build may fail.
+        REM Check if Vulkan SDK is available
+        set VULKAN_AVAILABLE=0
+        if defined VULKAN_SDK (
+            set VULKAN_AVAILABLE=1
+        ) else (
+            where glslc >nul 2>&1
+            if not errorlevel 1 set VULKAN_AVAILABLE=1
         )
-        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_SYCL=ON
+        if !VULKAN_AVAILABLE!==1 (
+            set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_VULKAN=ON
+        ) else (
+            echo [WARNING] Vulkan SDK not found. Falling back to CPU-only build.
+            echo           Install Vulkan SDK for GPU acceleration.
+            set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_VULKAN=OFF
+        )
+        set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CUDA=OFF -DGGML_SYCL=OFF
     )
 )
 
 REM Create build directory
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
+REM Check for Ninja (recommended for Vulkan builds to avoid long path issues)
+set CMAKE_GENERATOR=
+where ninja >nul 2>&1
+if not errorlevel 1 (
+    echo [INFO] Using Ninja generator ^(faster, avoids long path issues^)
+    set CMAKE_GENERATOR=-G Ninja
+) else (
+    echo [INFO] Ninja not found, using Visual Studio generator
+    echo [INFO] Tip: Install Ninja for faster builds: winget install Ninja-build.Ninja
+)
+
 REM Configure with CMake
 echo [INFO] Running CMake configure...
-cmake -B "%BUILD_DIR%" -S "%LLAMA_DIR%" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% %CMAKE_FLAGS%
+cmake -B "%BUILD_DIR%" -S "%LLAMA_DIR%" %CMAKE_GENERATOR% -DCMAKE_BUILD_TYPE=%BUILD_TYPE% %CMAKE_FLAGS%
 if errorlevel 1 (
     echo [ERROR] CMake configure failed.
     exit /b 1
@@ -287,7 +293,12 @@ if errorlevel 1 (
 REM Verify build
 set BUILD_SUCCESS=0
 
-REM Check for static library
+REM Check for static library (Ninja puts files directly in build/src)
+if exist "%BUILD_DIR%\src\llama.lib" (
+    set BUILD_SUCCESS=1
+    set LIB_LOCATION=%BUILD_DIR%\src
+)
+REM Visual Studio generator paths
 if exist "%BUILD_DIR%\%BUILD_TYPE%\llama.lib" (
     set BUILD_SUCCESS=1
     set LIB_LOCATION=%BUILD_DIR%\%BUILD_TYPE%
@@ -298,6 +309,10 @@ if exist "%BUILD_DIR%\bin\%BUILD_TYPE%\llama.lib" (
 )
 
 REM Check for dynamic library (when GGML_BACKEND_DL=ON)
+if exist "%BUILD_DIR%\bin\llama.dll" (
+    set BUILD_SUCCESS=1
+    set LIB_LOCATION=%BUILD_DIR%\bin
+)
 if exist "%BUILD_DIR%\bin\%BUILD_TYPE%\llama.dll" (
     set BUILD_SUCCESS=1
     set LIB_LOCATION=%BUILD_DIR%\bin\%BUILD_TYPE%

@@ -147,6 +147,7 @@
         <li><strong>Visual Studio 2022</strong> con workload de C++, o</li>
         <li><strong>MinGW-w64</strong> (GCC 12+)</li>
         <li><strong>CMake</strong> (desde cmake.org o Visual Studio)</li>
+        <li><strong>Vulkan SDK</strong> (para aceleracion GPU): <a href="https://vulkan.lunarg.com/" target="_blank">vulkan.lunarg.com</a></li>
       </ul>
 
       <h3>macOS</h3>
@@ -171,11 +172,14 @@ cd OhMyDialogSystem</code></pre>
 
       <h3>2. Compilar llama.cpp (primera vez)</h3>
 
-      <pre data-lang="BASH"><code># Linux/macOS
-./gdextension/scripts/build_llama.sh --cpu
+      <pre data-lang="BASH"><code># Linux/macOS (Vulkan por defecto, fallback a CPU si no disponible)
+./gdextension/scripts/build_llama.sh
 
-# Windows
-gdextension\scripts\build_llama.bat --cpu</code></pre>
+# Windows (requiere Vulkan SDK instalado)
+gdextension\scripts\build_llama.bat
+
+# Forzar solo CPU (sin aceleracion GPU)
+./gdextension/scripts/build_llama.sh --cpu</code></pre>
 
       <h3>3. Compilar GDExtension</h3>
 
@@ -189,6 +193,9 @@ gdextension\scripts\build_llama.bat --cpu</code></pre>
 build.bat editor          # Para desarrollo en el editor
 build.bat debug           # Para exportar en modo debug
 build.bat release         # Para exportar en modo release
+
+# Compilar las 3 configuraciones de una vez (Windows)
+build_all.bat
 
 # Linux/macOS
 ./build.sh editor
@@ -261,15 +268,15 @@ scons platform=macos target=editor</code></pre>
         <tbody>
           <tr>
             <td><code>llama_backend</code></td>
-            <td>cpu, cuda, vulkan, metal, sycl</td>
-            <td>cpu</td>
-            <td>Backend de computo</td>
+            <td>vulkan, cpu, metal</td>
+            <td>vulkan</td>
+            <td>Backend de computo (Vulkan recomendado para GPU)</td>
           </tr>
           <tr>
             <td><code>llama_native</code></td>
             <td>yes, no</td>
-            <td>yes</td>
-            <td>Optimizaciones nativas de CPU</td>
+            <td>no</td>
+            <td>Optimizaciones nativas de CPU (no portable)</td>
           </tr>
           <tr>
             <td><code>llama_avx2</code></td>
@@ -288,7 +295,7 @@ scons platform=macos target=editor</code></pre>
 
       <p>Ejemplo:</p>
 
-      <pre data-lang="BASH"><code>scons platform=linux target=template_release llama_backend=cpu llama_native=yes</code></pre>
+      <pre data-lang="BASH"><code>scons platform=linux target=template_release llama_backend=vulkan llama_native=yes</code></pre>
 
       <h3>Opciones estandar de godot-cpp</h3>
 
@@ -321,29 +328,31 @@ scons platform=macos target=editor</code></pre>
 
       <hr>
 
-      <h2>Aceleracion GPU (Opcional)</h2>
+      <h2>Aceleracion GPU</h2>
 
-      <h3>Vulkan</h3>
+      <h3>Vulkan (Recomendado)</h3>
 
-      <p>Requiere paquetes adicionales:</p>
+      <p>Vulkan es el backend GPU por defecto. Funciona en GPUs AMD, Intel y NVIDIA. Requiere el Vulkan SDK instalado:</p>
 
       <pre data-lang="BASH"><code># Linux (Fedora)
 sudo dnf install vulkan-devel shaderc
 
-# Luego recompilar con:
-./gdextension/scripts/build_llama.sh --vulkan --clean
-scons platform=linux llama_backend=vulkan</code></pre>
+# Linux (Ubuntu/Debian)
+sudo apt-get install libvulkan-dev glslc
+
+# Windows: Descargar desde https://vulkan.lunarg.com/</code></pre>
+
+      <p>El script de build detecta automaticamente si Vulkan esta disponible. Si no lo esta, fallback a CPU.</p>
+
+      <pre data-lang="BASH"><code># Build con Vulkan (default)
+./gdextension/scripts/build_llama.sh
+
+# O explicitamente
+./gdextension/scripts/build_llama.sh --vulkan</code></pre>
 
       <div class="callout-info">
-        <p>Ver <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/53" target="_blank">Issue #53</a> para el estado del soporte Vulkan.</p>
+        <p><strong>CUDA:</strong> El soporte para CUDA con seleccion de arquitectura GPU esta planificado para una version futura. Ver issues del proyecto para el estado.</p>
       </div>
-
-      <h3>CUDA</h3>
-
-      <p>Requiere NVIDIA CUDA Toolkit 11.7+.</p>
-
-      <pre data-lang="BASH"><code>./gdextension/scripts/build_llama.sh --cuda
-scons platform=linux llama_backend=cuda</code></pre>
 
       <hr>
 

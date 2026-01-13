@@ -12,7 +12,7 @@ BUILD_DIR="$LLAMA_DIR/build"
 
 # Default configuration
 BUILD_TYPE="Release"
-BACKEND="cpu"
+BACKEND="vulkan"
 FORCE_REBUILD=false
 JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 ALL_BACKENDS=false
@@ -33,17 +33,17 @@ print_usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Backend Options:"
-    echo "  --cpu          Build with CPU backend only (default)"
-    echo "  --cuda         Build with CUDA support (requires CUDA Toolkit)"
-    echo "  --vulkan       Build with Vulkan support (requires Vulkan SDK)"
+    echo "  --vulkan       Build with Vulkan support (default, recommended for GPU)"
+    echo "  --cpu          Build with CPU backend only"
     echo "  --metal        Build with Metal support (macOS only)"
-    echo "  --sycl         Build with SYCL support (requires Intel oneAPI)"
-    echo "  --all-backends Build ALL available backends"
+    echo "  --all-backends Build ALL available backends (Vulkan + CPU, Metal on macOS)"
     echo "  --dynamic      Enable dynamic backend loading (GGML_BACKEND_DL)"
     echo ""
+    echo "  Note: CUDA support is not yet implemented. See GitHub issue for status."
+    echo ""
     echo "CPU Options:"
-    echo "  --native       Enable native CPU optimizations (default: on)"
-    echo "  --no-native    Disable native CPU optimizations"
+    echo "  --native       Enable native CPU optimizations (faster, not portable)"
+    echo "  --no-native    Disable native CPU optimizations (default, portable)"
     echo "  --avx2         Enable AVX2 (default: on)"
     echo "  --no-avx2      Disable AVX2"
     echo ""
@@ -55,13 +55,13 @@ print_usage() {
     echo "  -h, --help     Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0 --cpu                    # CPU-only build (static)"
-    echo "  $0 --cuda -j 8              # CUDA build with 8 jobs"
+    echo "  $0                          # Vulkan build (default)"
+    echo "  $0 --cpu                    # CPU-only build"
     echo "  $0 --all-backends --dynamic # All backends as dynamic libraries"
 }
 
 # Parse arguments
-NATIVE=ON
+NATIVE=OFF
 AVX2=ON
 
 while [[ $# -gt 0 ]]; do
@@ -71,7 +71,9 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --cuda)
-            BACKEND="cuda"
+            echo "[WARNING] CUDA support is not yet implemented. Falling back to Vulkan."
+            echo "          See GitHub issue for CUDA implementation status."
+            BACKEND="vulkan"
             shift
             ;;
         --vulkan)
@@ -193,17 +195,11 @@ if [ "$ALL_BACKENDS" = true ]; then
     # CPU is always enabled
     echo "[INFO]   - CPU backend: enabled"
 
-    # Check and enable CUDA if available
-    if command -v nvcc &> /dev/null; then
-        echo "[INFO]   - CUDA backend: enabled"
-        CMAKE_FLAGS+=(-DGGML_CUDA=ON)
-        CMAKE_FLAGS+=(-DCMAKE_CUDA_ARCHITECTURES="75;80;86;89")
-    else
-        echo "[INFO]   - CUDA backend: skipped (nvcc not found)"
-        CMAKE_FLAGS+=(-DGGML_CUDA=OFF)
-    fi
+    # CUDA is not yet implemented
+    echo "[INFO]   - CUDA backend: skipped (not yet implemented)"
+    CMAKE_FLAGS+=(-DGGML_CUDA=OFF)
 
-    # Enable Vulkan on Linux
+    # Enable Vulkan on Linux/Windows
     if [[ "$OSTYPE" != "darwin"* ]]; then
         echo "[INFO]   - Vulkan backend: enabled"
         CMAKE_FLAGS+=(-DGGML_VULKAN=ON)
@@ -230,18 +226,24 @@ else
             CMAKE_FLAGS+=(-DGGML_METAL=OFF)
             CMAKE_FLAGS+=(-DGGML_SYCL=OFF)
             ;;
-        cuda)
-            echo "[INFO] Configuring CUDA build..."
-            if ! command -v nvcc &> /dev/null; then
-                echo "[ERROR] CUDA Toolkit not found. Please install CUDA Toolkit."
-                exit 1
-            fi
-            CMAKE_FLAGS+=(-DGGML_CUDA=ON)
-            CMAKE_FLAGS+=(-DCMAKE_CUDA_ARCHITECTURES="75;80;86;89")
-            ;;
         vulkan)
             echo "[INFO] Configuring Vulkan build..."
-            CMAKE_FLAGS+=(-DGGML_VULKAN=ON)
+            # Check if Vulkan SDK is available
+            VULKAN_AVAILABLE=false
+            if [[ -n "$VULKAN_SDK" ]] || command -v glslc &> /dev/null; then
+                VULKAN_AVAILABLE=true
+            fi
+
+            if [ "$VULKAN_AVAILABLE" = true ]; then
+                CMAKE_FLAGS+=(-DGGML_VULKAN=ON)
+            else
+                echo "[WARNING] Vulkan SDK not found. Falling back to CPU-only build."
+                echo "          Install Vulkan SDK for GPU acceleration."
+                CMAKE_FLAGS+=(-DGGML_VULKAN=OFF)
+            fi
+            CMAKE_FLAGS+=(-DGGML_CUDA=OFF)
+            CMAKE_FLAGS+=(-DGGML_METAL=OFF)
+            CMAKE_FLAGS+=(-DGGML_SYCL=OFF)
             ;;
         metal)
             if [[ "$OSTYPE" != "darwin"* ]]; then
@@ -250,13 +252,9 @@ else
             fi
             echo "[INFO] Configuring Metal build..."
             CMAKE_FLAGS+=(-DGGML_METAL=ON)
-            ;;
-        sycl)
-            echo "[INFO] Configuring SYCL build..."
-            if [ -z "$ONEAPI_ROOT" ]; then
-                echo "[WARNING] Intel oneAPI not detected. SYCL build may fail."
-            fi
-            CMAKE_FLAGS+=(-DGGML_SYCL=ON)
+            CMAKE_FLAGS+=(-DGGML_CUDA=OFF)
+            CMAKE_FLAGS+=(-DGGML_VULKAN=OFF)
+            CMAKE_FLAGS+=(-DGGML_SYCL=OFF)
             ;;
     esac
 fi
@@ -264,9 +262,20 @@ fi
 # Create build directory
 mkdir -p "$BUILD_DIR"
 
+# Check for Ninja (recommended for Vulkan builds on Windows to avoid long path issues)
+CMAKE_GENERATOR=""
+if command -v ninja &> /dev/null; then
+    echo "[INFO] Using Ninja generator (faster builds)"
+    CMAKE_GENERATOR="-G Ninja"
+elif [[ "$OSTYPE" == "msys"* ]] || [[ "$OSTYPE" == "cygwin"* ]]; then
+    echo "[INFO] Ninja not found, using default generator"
+    echo "[INFO] Tip: Install Ninja for faster builds and to avoid path issues on Windows"
+fi
+
 # Configure with CMake
 echo "[INFO] Running CMake configure..."
 cmake -B "$BUILD_DIR" -S "$LLAMA_DIR" \
+    $CMAKE_GENERATOR \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
     "${CMAKE_FLAGS[@]}"
 

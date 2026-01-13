@@ -14,16 +14,16 @@ def options(opts):
     opts.Add(
         EnumVariable(
             key="llama_backend",
-            help="llama.cpp compute backend",
-            default="cpu",
-            allowed_values=("cpu", "cuda", "vulkan", "metal", "sycl"),
+            help="llama.cpp compute backend (vulkan recommended for GPU)",
+            default="vulkan",
+            allowed_values=("cpu", "vulkan", "metal", "sycl"),
         )
     )
     opts.Add(
         BoolVariable(
             key="llama_native",
-            help="Enable native CPU optimizations for llama.cpp",
-            default=True,
+            help="Enable native CPU optimizations for llama.cpp (not portable)",
+            default=False,
         )
     )
     opts.Add(
@@ -118,7 +118,9 @@ def _check_library_exists(build_dir, env):
 
     if platform == "windows":
         # Check for Windows library
+        # Ninja puts files directly in build/src, VS generator uses build/Release etc.
         lib_paths = [
+            os.path.join(build_dir, "src", "llama.lib"),  # Ninja generator
             os.path.join(build_dir, "Release", "llama.lib"),
             os.path.join(build_dir, "Debug", "llama.lib"),
             os.path.join(build_dir, "bin", "Release", "llama.lib"),
@@ -143,8 +145,8 @@ def _build_llama(env, llama_dir, build_dir):
     print("[llama.py] Building llama.cpp...")
 
     platform = env.get("platform", sys.platform)
-    backend = env.get("llama_backend", "cpu")
-    native = env.get("llama_native", True)
+    backend = env.get("llama_backend", "vulkan")  # Default to Vulkan for GPU acceleration
+    native = env.get("llama_native", False)  # Default to portable builds
     avx2 = env.get("llama_avx2", True)
     all_backends = env.get("llama_all_backends", False)
     dynamic = env.get("llama_dynamic", False)
@@ -184,7 +186,9 @@ def _build_llama(env, llama_dir, build_dir):
     else:
         args.append("--no-avx2")
 
-    args.append("--rebuild")
+    # Only add --rebuild if explicitly requested via llama_rebuild=yes
+    # The function _build_llama is only called when library doesn't exist
+    # or when llama_rebuild=yes was passed
 
     # Run build script
     print(f"[llama.py] Running: {' '.join(args)}")
@@ -242,6 +246,10 @@ def _configure_linking(env, build_dir):
             env.Append(LIBS=["ggml-vulkan"])
             if platform == "windows":
                 env.Append(LIBS=["vulkan-1"])
+                # Add Vulkan SDK library path
+                vulkan_sdk = os.environ.get("VULKAN_SDK", "")
+                if vulkan_sdk:
+                    env.Append(LIBPATH=[os.path.join(vulkan_sdk, "Lib")])
             else:
                 env.Append(LIBS=["vulkan"])
 
@@ -291,6 +299,15 @@ def _find_all_library_dirs(build_dir, platform):
                 os.path.join(build_dir, "common", "Release"),
                 os.path.join(build_dir, "common"),
             ],
+            # Backend-specific libraries
+            "ggml-vulkan.lib": [
+                os.path.join(build_dir, "ggml", "src", "ggml-vulkan"),
+                os.path.join(build_dir, "ggml", "src", "ggml-vulkan", "Release"),
+            ],
+            "ggml-cuda.lib": [
+                os.path.join(build_dir, "ggml", "src", "ggml-cuda"),
+                os.path.join(build_dir, "ggml", "src", "ggml-cuda", "Release"),
+            ],
         }
     else:
         # Unix library locations
@@ -309,6 +326,13 @@ def _find_all_library_dirs(build_dir, platform):
             ],
             "libcommon.a": [
                 os.path.join(build_dir, "common"),
+            ],
+            # Backend-specific libraries
+            "libggml-vulkan.a": [
+                os.path.join(build_dir, "ggml", "src", "ggml-vulkan"),
+            ],
+            "libggml-cuda.a": [
+                os.path.join(build_dir, "ggml", "src", "ggml-cuda"),
             ],
         }
 

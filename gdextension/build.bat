@@ -30,8 +30,8 @@ set PLATFORM=windows
 set JOBS=%NUMBER_OF_PROCESSORS%
 
 REM llama.cpp options
-set LLAMA_BACKEND=cpu
-set LLAMA_NATIVE=yes
+set LLAMA_BACKEND=vulkan
+set LLAMA_NATIVE=no
 set LLAMA_AVX2=yes
 set LLAMA_REBUILD=no
 set LLAMA_ALL_BACKENDS=no
@@ -66,11 +66,6 @@ if /i "%~1"=="--cpu" (
     shift
     goto :parse_args
 )
-if /i "%~1"=="--cuda" (
-    set LLAMA_BACKEND=cuda
-    shift
-    goto :parse_args
-)
 if /i "%~1"=="--vulkan" (
     set LLAMA_BACKEND=vulkan
     shift
@@ -88,6 +83,11 @@ if /i "%~1"=="--all-backends" (
 )
 if /i "%~1"=="--dynamic" (
     set LLAMA_DYNAMIC=yes
+    shift
+    goto :parse_args
+)
+if /i "%~1"=="--native" (
+    set LLAMA_NATIVE=yes
     shift
     goto :parse_args
 )
@@ -125,21 +125,21 @@ echo Options:
 echo   -j N          Number of parallel jobs (default: auto)
 echo.
 echo llama.cpp Backend Options:
-echo   --cpu         Use CPU backend (default)
-echo   --cuda        Use CUDA backend (requires CUDA Toolkit)
-echo   --vulkan      Use Vulkan backend (requires Vulkan SDK)
+echo   --vulkan      Use Vulkan backend (default, recommended for GPU)
+echo   --cpu         Use CPU backend only
 echo   --sycl        Use SYCL backend (requires Intel oneAPI)
-echo   --all-backends  Build ALL available backends (CPU, CUDA, Vulkan)
+echo   --all-backends  Build ALL available backends (CPU, Vulkan)
 echo   --dynamic     Enable dynamic backend loading (runtime detection)
 echo.
 echo llama.cpp Build Options:
-echo   --no-native   Disable native CPU optimizations
+echo   --native      Enable native CPU optimizations (faster but not portable)
+echo   --no-native   Disable native CPU optimizations (default, portable)
 echo   --no-avx2     Disable AVX2 instructions
 echo   --rebuild-llama  Force rebuild of llama.cpp
 echo.
 echo Examples:
-echo   %~nx0 release                         # Release build, CPU backend
-echo   %~nx0 debug --cuda -j 8               # Debug build, CUDA backend
+echo   %~nx0 release                         # Release build, Vulkan backend
+echo   %~nx0 debug --cpu -j 8                # Debug build, CPU backend
 echo   %~nx0 release --all-backends --dynamic  # All backends, runtime detection
 exit /b 0
 
@@ -169,7 +169,11 @@ if defined NEED_LLAMA_BUILD (
         set LLAMA_ARGS=!LLAMA_ARGS! --%LLAMA_BACKEND%
     )
     if "%LLAMA_DYNAMIC%"=="yes" set LLAMA_ARGS=!LLAMA_ARGS! --dynamic
-    if "%LLAMA_NATIVE%"=="no" set LLAMA_ARGS=!LLAMA_ARGS! --no-native
+    if "%LLAMA_NATIVE%"=="yes" (
+        set LLAMA_ARGS=!LLAMA_ARGS! --native
+    ) else (
+        set LLAMA_ARGS=!LLAMA_ARGS! --no-native
+    )
     if "%LLAMA_AVX2%"=="no" set LLAMA_ARGS=!LLAMA_ARGS! --no-avx2
     if "%LLAMA_REBUILD%"=="yes" set LLAMA_ARGS=!LLAMA_ARGS! --rebuild
     call scripts\build_llama.bat !LLAMA_ARGS! -j %JOBS%
@@ -190,6 +194,24 @@ if %ERRORLEVEL% neq 0 (
     echo.
     echo [ERROR] Build failed!
     exit /b 1
+)
+
+REM Copy dynamic backend DLLs if using dynamic loading
+if "%LLAMA_DYNAMIC%"=="yes" (
+    echo.
+    echo [INFO] Copying dynamic backend DLLs...
+    set LLAMA_BIN_DIR=thirdparty\llama.cpp\build\bin\Release
+    set ADDON_DIR=..\addons\ohmydialog\gdextension
+    if exist "!LLAMA_BIN_DIR!\ggml.dll" (
+        copy /Y "!LLAMA_BIN_DIR!\*.dll" "!ADDON_DIR!\" >nul 2>&1
+        if %ERRORLEVEL% equ 0 (
+            echo [INFO] Backend DLLs copied to addon directory
+        ) else (
+            echo [WARNING] Failed to copy some backend DLLs
+        )
+    ) else (
+        echo [WARNING] Backend DLLs not found in !LLAMA_BIN_DIR!
+    )
 )
 
 echo.

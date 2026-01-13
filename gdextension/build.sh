@@ -182,6 +182,28 @@ SCONS_ARGS="$SCONS_ARGS llama_rebuild=$LLAMA_REBUILD"
 [ "$LLAMA_DYNAMIC" = "yes" ] && SCONS_ARGS="$SCONS_ARGS llama_dynamic=yes"
 scons $SCONS_ARGS -j"$JOBS"
 
+# Copy dynamic backend libraries if using dynamic loading
+if [ "$LLAMA_DYNAMIC" = "yes" ]; then
+    echo ""
+    echo "[INFO] Copying dynamic backend libraries..."
+    LLAMA_BIN_DIR="thirdparty/llama.cpp/build/bin"
+    ADDON_DIR="../addons/ohmydialog/gdextension"
+
+    if [ "$PLATFORM" = "macos" ]; then
+        LIB_EXT="dylib"
+    else
+        LIB_EXT="so"
+    fi
+
+    if [ -d "$LLAMA_BIN_DIR" ]; then
+        # Find and copy all backend libraries
+        find "$LLAMA_BIN_DIR" -name "*.${LIB_EXT}" -exec cp -v {} "$ADDON_DIR/" \; 2>/dev/null || true
+        echo "[INFO] Backend libraries copied to addon directory"
+    else
+        echo "[WARNING] Backend libraries not found in $LLAMA_BIN_DIR"
+    fi
+fi
+
 echo ""
 echo "[SUCCESS] Build completed!"
 echo "Output: addons/ohmydialog/gdextension/"

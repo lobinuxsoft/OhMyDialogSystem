@@ -47,11 +47,6 @@ jobs:
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Setup CUDA Toolkit
-        uses: ./.github/actions/setup-cuda-windows
-        with:
-          cuda-version: '12.4'
-
       - name: Setup Vulkan SDK
         uses: ./.github/actions/setup-vulkan-windows
 
@@ -105,11 +100,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential cmake
           pip install scons
-
-      - name: Setup CUDA Toolkit
-        uses: ./.github/actions/setup-cuda-linux
-        with:
-          cuda-version: '12.4'
 
       - name: Setup Vulkan SDK
         uses: ./.github/actions/setup-vulkan-linux
@@ -338,18 +328,17 @@ jobs:
 
             | Plataforma | Backends | Archivo |
             |------------|----------|---------|
-            | **Windows x64** | CPU, CUDA, Vulkan | `OhMyDialogSystem-${{ env.VERSION }}-windows-x64.zip` |
-            | **Linux x64** | CPU, CUDA, Vulkan | `OhMyDialogSystem-${{ env.VERSION }}-linux-x64.tar.gz` |
+            | **Windows x64** | CPU, Vulkan | `OhMyDialogSystem-${{ env.VERSION }}-windows-x64.zip` |
+            | **Linux x64** | CPU, Vulkan | `OhMyDialogSystem-${{ env.VERSION }}-linux-x64.tar.gz` |
             | **macOS ARM64** | CPU, Metal | `OhMyDialogSystem-${{ env.VERSION }}-macos-arm64.tar.gz` |
             | **macOS x64** | CPU | `OhMyDialogSystem-${{ env.VERSION }}-macos-x64.tar.gz` |
 
             ### Detección automática de backends
 
             El addon detecta automáticamente el mejor backend disponible en tu sistema:
-            - **GPU NVIDIA**: Usa CUDA automáticamente
-            - **GPU AMD/Intel**: Usa Vulkan automáticamente
+            - **GPU (AMD/Intel/NVIDIA)**: Usa Vulkan automáticamente
             - **Apple Silicon**: Usa Metal automáticamente
-            - **Sin GPU**: Usa CPU como fallback
+            - **Sin GPU compatible**: Usa CPU como fallback
 
             ### Instalación
 
