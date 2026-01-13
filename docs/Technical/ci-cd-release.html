@@ -704,6 +704,56 @@
         </div>
       </div>
 
+      <!-- Manual Trigger Section -->
+      <h2>Ejecucion Manual</h2>
+
+      <p>El workflow puede ejecutarse manualmente para testing sin crear un release oficial:</p>
+
+      <div class="command-section">
+        <div class="command-grid">
+          <div class="command-card">
+            <div class="command-header">
+              <span class="os-icon">GH</span>
+              <h4>GitHub CLI</h4>
+            </div>
+            <div class="command-body">
+              <pre data-lang="BASH"><code># Solo compilar (sin release)
+gh workflow run "Release GDExtension" \
+  -f version=v0.0.0-test \
+  -f create_release=false
+
+# Compilar y crear release de prueba
+gh workflow run "Release GDExtension" \
+  -f version=v1.0.0-rc1 \
+  -f create_release=true</code></pre>
+            </div>
+          </div>
+
+          <div class="command-card">
+            <div class="command-header">
+              <span class="os-icon">WEB</span>
+              <h4>GitHub Web UI</h4>
+            </div>
+            <div class="command-body">
+              <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.5rem 0;">
+                1. Ir a <strong>Actions</strong> → <strong>Release GDExtension</strong><br>
+                2. Click en <strong>Run workflow</strong><br>
+                3. Ingresar version (ej: <code>v0.0.0-test</code>)<br>
+                4. Seleccionar si crear release<br>
+                5. Click en <strong>Run workflow</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-info">
+        <p>
+          <strong>Nota:</strong> Las ejecuciones manuales con <code>create_release=false</code> solo compilan
+          y suben artefactos. Utiles para verificar que el build funciona antes de crear un tag oficial.
+        </p>
+      </div>
+
       <!-- Backends Section -->
       <h2>Backends Disponibles</h2>
 
