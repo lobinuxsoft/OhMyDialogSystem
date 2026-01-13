@@ -2,8 +2,8 @@ class_name ModelManager
 extends Node
 ## Central manager for LLM model operations.
 ##
-## Handles model loading/unloading, provides access to LlamaInterface,
-## and manages model downloads through ModelDownloader.
+## Handles model loading/unloading and provides access to LlamaInterface.
+## Download functionality is handled by ModelManagerWindow (editor only).
 
 ## Emitted when a model is successfully loaded
 signal model_loaded(config: ModelConfig)
@@ -14,15 +14,6 @@ signal model_load_failed(config: ModelConfig, error: Error)
 ## Emitted when model is unloaded
 signal model_unloaded()
 
-## Emitted when download progress updates
-signal download_progress(model_id: String, progress: float)
-
-## Emitted when download completes
-signal download_completed(model_id: String)
-
-## Emitted when download fails
-signal download_failed(model_id: String, error: String)
-
 ## Emitted when the list of available models changes (added, removed, downloaded)
 signal models_changed()
 
@@ -32,9 +23,6 @@ var llama: LlamaInterface
 ## Currently loaded model configuration
 var current_config: ModelConfig
 
-## Model downloader instance
-var downloader: ModelDownloader
-
 ## Model registry with available models
 var registry: ModelRegistry
 
@@ -43,12 +31,6 @@ var _is_loading: bool = false
 
 func _ready() -> void:
 	llama = LlamaInterface.new()
-
-	downloader = ModelDownloader.new()
-	add_child(downloader)
-	downloader.download_progress.connect(_on_download_progress)
-	downloader.download_completed.connect(_on_download_completed)
-	downloader.download_failed.connect(_on_download_failed)
 
 	# Load or create registry
 	_load_registry()
@@ -153,26 +135,6 @@ func get_available_models() -> Array[ModelConfig]:
 	return registry.get_all_models()
 
 
-## Downloads a model using the downloader
-func download_model(config: ModelConfig) -> Error:
-	return downloader.download_model(config)
-
-
-## Cancels the current download
-func cancel_download() -> void:
-	downloader.cancel_download()
-
-
-## Returns true if a download is in progress
-func is_downloading() -> bool:
-	return downloader.is_downloading()
-
-
-## Returns download progress (0.0 to 1.0)
-func get_download_progress() -> float:
-	return downloader.get_progress()
-
-
 ## Adds a custom model to the registry
 func add_custom_model(config: ModelConfig) -> void:
 	registry.add_custom_model(config)
@@ -199,19 +161,3 @@ func get_model_info() -> Dictionary:
 	if not is_model_loaded():
 		return {}
 	return llama.get_model_info()
-
-
-func _on_download_progress(model_id: String, downloaded_bytes: int, total_bytes: int) -> void:
-	var progress = 0.0
-	if total_bytes > 0:
-		progress = float(downloaded_bytes) / float(total_bytes)
-	download_progress.emit(model_id, progress)
-
-
-func _on_download_completed(model_id: String, _local_path: String) -> void:
-	download_completed.emit(model_id)
-	models_changed.emit()
-
-
-func _on_download_failed(model_id: String, error_message: String) -> void:
-	download_failed.emit(model_id, error_message)

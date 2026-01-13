@@ -42,6 +42,7 @@ enum SortBy { NAME, SIZE, CONTEXT, STATUS }
 # Internal
 var _ai_service: AIService
 var _model_manager: ModelManager
+var _downloader: ModelDownloader
 var _current_sort: SortBy = SortBy.NAME
 var _sort_ascending: bool = true
 var _selected_model_id: String = ""
@@ -99,9 +100,13 @@ func _connect_ai_service() -> void:
 	_model_manager.model_loaded.connect(_on_model_loaded_internal)
 	_model_manager.model_load_failed.connect(_on_model_load_failed)
 	_model_manager.model_unloaded.connect(_on_model_unloaded_internal)
-	_model_manager.download_progress.connect(_on_download_progress)
-	_model_manager.download_completed.connect(_on_download_completed)
-	_model_manager.download_failed.connect(_on_download_failed)
+
+	# Create downloader (editor only)
+	_downloader = ModelDownloader.new()
+	add_child(_downloader)
+	_downloader.download_progress.connect(_on_download_progress)
+	_downloader.download_completed.connect(_on_download_completed)
+	_downloader.download_failed.connect(_on_download_failed)
 
 	# Initialize sub-scenes
 	_generation_tab.set_model_manager(_model_manager)
@@ -330,7 +335,7 @@ func _update_ui_state() -> void:
 
 	var model = _get_selected_model()
 	var is_loaded = _model_manager.is_model_loaded()
-	var is_downloading = _model_manager.is_downloading()
+	var is_downloading = _downloader != null and _downloader.is_downloading()
 
 	if model != null:
 		var model_downloaded = model.is_downloaded()
@@ -406,7 +411,7 @@ func _on_download_model_pressed() -> void:
 	if model == null:
 		return
 
-	var err = _model_manager.download_model(model)
+	var err = _downloader.download_model(model)
 	if err == OK:
 		_download_panel.show()
 		_download_label.text = "Downloading %s..." % model.display_name
@@ -568,7 +573,7 @@ func _on_browse_hf_pressed() -> void:
 
 
 func _on_cancel_download_pressed() -> void:
-	_model_manager.cancel_download()
+	_downloader.cancel_download()
 	_download_panel.hide()
 	_update_ui_state()
 
@@ -594,8 +599,8 @@ func _on_hf_model_selected(config: ModelConfig) -> void:
 
 func _on_download_progress(_model_id: String, progress: float) -> void:
 	_download_progress.value = progress * 100.0
-	var downloaded_mb = _model_manager.downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
-	var total_mb = _model_manager.downloader.get_total_bytes() / (1024.0 * 1024.0)
+	var downloaded_mb = _downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
+	var total_mb = _downloader.get_total_bytes() / (1024.0 * 1024.0)
 	_download_label.text = "Downloading... %.1f / %.1f MB" % [downloaded_mb, total_mb]
 
 
@@ -606,6 +611,9 @@ func _on_download_completed(_model_id: String) -> void:
 	_update_ui_state()
 	_status_label.text = "Download complete!"
 	_status_label.add_theme_color_override("font_color", Color.GREEN)
+	# Notify ModelManager that models changed
+	if _model_manager:
+		_model_manager.notify_models_changed()
 
 
 func _on_download_failed(_model_id: String, error: String) -> void:

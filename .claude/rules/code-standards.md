@@ -28,6 +28,38 @@
 - [Export] for editor configuration
 - Resources for configurable data
 
+## Editor vs Runtime Separation (CRITICAL)
+**NEVER couple editor-only code with runtime code.**
+
+| Code Type | Location | Runs in Export? |
+|-----------|----------|-----------------|
+| Runtime | `core/`, `ai/`, `resources/` | YES |
+| Editor-only | `editor/` | NO |
+
+### Rules
+1. **Runtime code MUST NOT instantiate editor classes**
+   - Bad: `ModelManager` creates `ModelDownloader`
+   - Good: `ModelManagerWindow` creates `ModelDownloader`
+
+2. **Editor classes should be in `editor/` directory**
+   - Model download UI, visual graph editor, inspector plugins
+
+3. **Use `@tool` only when necessary**
+   - For resources that need editor preview
+   - For inspector plugins
+   - NOT for runtime logic
+
+4. **Check context when mixing is unavoidable**
+   ```gdscript
+   if OS.has_feature("editor"):
+       # Editor-only code
+   ```
+
+### Why This Matters
+- Exported builds include ALL instantiated classes
+- Editor code in runtime = bloat + errors in exports
+- `res://` is read-only in exports (no file creation)
+
 ## Testing
 - Unit tests for complex business logic
 - Integration tests for critical systems
