@@ -28,6 +28,37 @@
 - [Export] for editor configuration
 - Resources for configurable data
 
+## SOLID Principles
+**Apply SOLID where it makes sense. Don't over-engineer.**
+
+| Principle | Guideline |
+|-----------|-----------|
+| **S**ingle Responsibility | One class = one reason to change. Don't mix editor + runtime logic. |
+| **O**pen/Closed | Extend via inheritance/composition, not modification. Use signals. |
+| **L**iskov Substitution | Subtypes must be substitutable. Respect base class contracts. |
+| **I**nterface Segregation | Small, focused interfaces. Don't force unused dependencies. |
+| **D**ependency Inversion | Depend on abstractions. Use dependency injection where practical. |
+
+### Anti-Patterns to Avoid
+- **God classes** - Classes doing too much (e.g., ModelManager handling runtime + editor)
+- **Redundant wrappers** - Classes that only forward calls to another class
+- **Feature envy** - Class using another class's data more than its own
+- **Shotgun surgery** - One change requires modifying many classes
+
+## Design Patterns (Use When Appropriate)
+| Pattern | When to Use | Godot Implementation |
+|---------|-------------|---------------------|
+| Singleton | Global access to single instance | `Engine.register_singleton()` or AutoLoad |
+| Observer | Decouple event producers/consumers | Signals |
+| Strategy | Swap algorithms at runtime | Resources with shared interface |
+| Factory | Complex object creation | Static `create()` methods |
+| Facade | Simplify complex subsystems | Single entry-point class |
+
+### Don't Over-Engineer
+- No pattern is better than a bad pattern
+- Start simple, refactor when complexity demands it
+- Godot's node system already provides composition - use it
+
 ## Editor vs Runtime Separation (CRITICAL)
 **NEVER couple editor-only code with runtime code.**
 

@@ -66,7 +66,7 @@ signal unload_requested()
 @onready var _context_percent_label: Label = %ContextPercentLabel
 
 # Internal state
-var _model_manager: ModelManager
+var _ai_service: AIService
 var _generation_thread: Thread
 var _is_generating: bool = false
 
@@ -124,8 +124,8 @@ func _ready() -> void:
 
 func _exit_tree() -> void:
 	# Cancel any ongoing generation
-	if _is_generating and _model_manager != null:
-		var llama = _model_manager.get_llama()
+	if _is_generating and _ai_service != null:
+		var llama = _ai_service.get_llama()
 		if llama != null and llama.is_generating():
 			llama.cancel_generation()
 
@@ -142,13 +142,13 @@ func _exit_tree() -> void:
 	_test_character = null
 	_test_world = null
 	_current_preset = null
-	_model_manager = null
+	_ai_service = null
 	_original_preset_values.clear()
 
 
-## Sets the ModelManager reference for generation
-func set_model_manager(manager: ModelManager) -> void:
-	_model_manager = manager
+## Sets the AIService reference for generation
+func set_ai_service(service: AIService) -> void:
+	_ai_service = service
 	update_ui_state()
 	update_loaded_model_info()
 	_update_context_usage()
@@ -178,7 +178,7 @@ func apply_model_defaults(model: ModelConfig) -> void:
 
 ## Updates UI state based on model status
 func update_ui_state() -> void:
-	if not _model_manager:
+	if not _ai_service:
 		_unload_btn.disabled = true
 		_generate_btn.disabled = true
 		_status_label.text = "No model loaded"
@@ -186,13 +186,14 @@ func update_ui_state() -> void:
 		_clear_llama_reference()
 		return
 
-	var is_loaded = _model_manager.is_model_loaded()
+	var is_loaded = _ai_service.is_model_loaded()
 
 	_unload_btn.disabled = not is_loaded
 	_generate_btn.disabled = not is_loaded or _is_generating
 
-	if is_loaded and _model_manager.current_config != null:
-		_status_label.text = "Model: %s" % _model_manager.current_config.display_name
+	var current_config = _ai_service.get_current_config()
+	if is_loaded and current_config != null:
+		_status_label.text = "Model: %s" % current_config.display_name
 		_status_label.add_theme_color_override("font_color", Color.GREEN)
 	else:
 		_status_label.text = "No model loaded"
@@ -208,12 +209,12 @@ func _clear_llama_reference() -> void:
 
 ## Updates the loaded model info panel
 func update_loaded_model_info() -> void:
-	if not _model_manager or not _model_manager.is_model_loaded():
+	if not _ai_service or not _ai_service.is_model_loaded():
 		_loaded_model_info.text = "[color=#8b949e]No model loaded.[/color]\n[color=#484f58]Go to Models tab to load one.[/color]"
 		return
 
-	var config = _model_manager.current_config
-	var info = _model_manager.get_model_info()
+	var config = _ai_service.get_current_config()
+	var info = _ai_service.get_model_info()
 
 	var text = "[color=#00d4ff][b]%s[/b][/color]\n" % config.display_name
 	text += "[color=#21262d]━━━━━━━━━━━━━━━━━━━━━━[/color]\n\n"
@@ -262,7 +263,7 @@ func _setup_sampling_tooltips() -> void:
 
 
 func _apply_sampling_params() -> void:
-	var llama = _model_manager.get_llama()
+	var llama = _ai_service.get_llama()
 	if llama == null:
 		return
 
@@ -291,7 +292,7 @@ func _on_unload_pressed() -> void:
 
 
 func _on_generate_pressed() -> void:
-	if _is_generating or not _model_manager or not _model_manager.is_model_loaded():
+	if _is_generating or not _ai_service or not _ai_service.is_model_loaded():
 		return
 
 	var user_input = _prompt_input.text.strip_edges()
@@ -324,7 +325,7 @@ func _build_prompt_with_context(user_input: String) -> String:
 		_prompt_builder = PromptBuilder.new()
 
 	# Set llama interface for native template application
-	var llama = _model_manager.get_llama()
+	var llama = _ai_service.get_llama()
 	if llama != null:
 		_prompt_builder.set_llama_interface(llama)
 
@@ -336,8 +337,9 @@ func _build_prompt_with_context(user_input: String) -> String:
 	var memories: Array[String] = []  # Empty for now, could add memory system later
 	var history: Array[Dictionary] = []  # Empty conversation history for testing
 	var max_context = 4096
-	if _model_manager.current_config != null:
-		max_context = _model_manager.current_config.n_ctx
+	var current_config = _ai_service.get_current_config()
+	if current_config != null:
+		max_context = current_config.n_ctx
 
 	return _prompt_builder.build_prompt(
 		_test_character,
@@ -351,7 +353,7 @@ func _build_prompt_with_context(user_input: String) -> String:
 
 func _generate_threaded(prompt: String) -> void:
 	var start_time = Time.get_ticks_msec()
-	var llama = _model_manager.get_llama()
+	var llama = _ai_service.get_llama()
 	var result = llama.generate(prompt)
 	var elapsed = Time.get_ticks_msec() - start_time
 	call_deferred("_on_generation_complete", result, elapsed)
@@ -532,8 +534,9 @@ func _on_save_preset_dialog_file_selected(path: String) -> void:
 		_update_preset_ui()
 
 		# Associate with current model config if available
-		if _model_manager and _model_manager.current_config != null:
-			_model_manager.current_config.ai_preset = new_preset
+		var current_config = _ai_service.get_current_config() if _ai_service else null
+		if current_config != null:
+			current_config.ai_preset = new_preset
 
 
 func _on_reset_preset_pressed() -> void:
@@ -575,8 +578,9 @@ func _on_load_preset_dialog_file_selected(path: String) -> void:
 	set_preset(preset)
 
 	# Associate with current model if one is loaded
-	if _model_manager and _model_manager.current_config != null:
-		_model_manager.current_config.ai_preset = preset
+	var current_config = _ai_service.get_current_config() if _ai_service else null
+	if current_config != null:
+		current_config.ai_preset = preset
 
 
 # ==================== Test Context Management ====================
@@ -695,8 +699,8 @@ func _count_tokens_smart(text: String) -> Array:
 		return [0, true]
 
 	# Try to use model's tokenizer for exact count
-	if _model_manager != null and _model_manager.is_model_loaded():
-		var llama = _model_manager.get_llama()
+	if _ai_service != null and _ai_service.is_model_loaded():
+		var llama = _ai_service.get_llama()
 		if llama != null and llama.has_method("count_tokens"):
 			var count = llama.count_tokens(text)
 			if count >= 0:
@@ -715,7 +719,7 @@ func _update_context_usage() -> void:
 	var response_reserve := int(_max_tokens_spinbox.value)
 
 	# Check if we can use exact tokenization (model must be loaded)
-	var has_tokenizer := _model_manager != null and _model_manager.is_model_loaded()
+	var has_tokenizer := _ai_service != null and _ai_service.is_model_loaded()
 	var is_exact := has_tokenizer  # Start as exact if tokenizer available
 
 	# Calculate character tokens
@@ -742,8 +746,9 @@ func _update_context_usage() -> void:
 
 	# Get max context from model
 	var max_context := 4096  # Default
-	if _model_manager != null and _model_manager.current_config != null:
-		max_context = _model_manager.current_config.n_ctx
+	var current_config = _ai_service.get_current_config() if _ai_service else null
+	if current_config != null:
+		max_context = current_config.n_ctx
 
 	# Calculate total
 	var total_tokens := character_tokens + world_tokens + prompt_tokens + template_tokens + response_reserve

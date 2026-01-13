@@ -101,15 +101,15 @@ func _enter_tree() -> void:
 	_update_status_indicator(false, null)
 	add_control_to_container(CONTAINER_TOOLBAR, _toolbar_menu)
 
-	# Connect to ModelManager signals after a frame (needs AIService to be ready)
-	call_deferred("_connect_model_manager_signals")
+	# Connect to AIService signals after a frame (needs AIService to be ready)
+	call_deferred("_connect_ai_service_signals")
 
 	print("OhMyDialogSystem: Plugin loaded")
 
 
 func _exit_tree() -> void:
-	# Disconnect ModelManager signals
-	_disconnect_model_manager_signals()
+	# Disconnect AIService signals
+	_disconnect_ai_service_signals()
 
 	# Remove toolbar menu
 	if _toolbar_menu:
@@ -207,44 +207,32 @@ func _on_toolbar_menu_id_pressed(id: int) -> void:
 				_dialogue_graph_window.show_window()
 
 
-## Connects to ModelManager signals for status updates.
-func _connect_model_manager_signals() -> void:
+## Connects to AIService signals for status updates.
+func _connect_ai_service_signals() -> void:
 	if not _ai_service:
 		return
 
-	var model_manager := _ai_service.get_model_manager()
-	if not model_manager:
-		return
-
-	if not model_manager.model_loaded.is_connected(_on_model_loaded):
-		model_manager.model_loaded.connect(_on_model_loaded)
-	if not model_manager.model_unloaded.is_connected(_on_model_unloaded):
-		model_manager.model_unloaded.connect(_on_model_unloaded)
-	if not model_manager.models_changed.is_connected(_on_models_changed):
-		model_manager.models_changed.connect(_on_models_changed)
+	if not _ai_service.model_loaded.is_connected(_on_model_loaded):
+		_ai_service.model_loaded.connect(_on_model_loaded)
+	if not _ai_service.model_unloaded.is_connected(_on_model_unloaded):
+		_ai_service.model_unloaded.connect(_on_model_unloaded)
 
 	# Check current state and update tooltip
-	if model_manager.is_model_loaded() and model_manager.current_config:
-		_update_status_indicator(true, model_manager.current_config)
+	if _ai_service.is_model_loaded():
+		_update_status_indicator(true, _ai_service.get_current_config())
 	else:
 		_update_status_indicator(false, null)
 
 
-## Disconnects ModelManager signals.
-func _disconnect_model_manager_signals() -> void:
+## Disconnects AIService signals.
+func _disconnect_ai_service_signals() -> void:
 	if not _ai_service:
 		return
 
-	var model_manager := _ai_service.get_model_manager()
-	if not model_manager:
-		return
-
-	if model_manager.model_loaded.is_connected(_on_model_loaded):
-		model_manager.model_loaded.disconnect(_on_model_loaded)
-	if model_manager.model_unloaded.is_connected(_on_model_unloaded):
-		model_manager.model_unloaded.disconnect(_on_model_unloaded)
-	if model_manager.models_changed.is_connected(_on_models_changed):
-		model_manager.models_changed.disconnect(_on_models_changed)
+	if _ai_service.model_loaded.is_connected(_on_model_loaded):
+		_ai_service.model_loaded.disconnect(_on_model_loaded)
+	if _ai_service.model_unloaded.is_connected(_on_model_unloaded):
+		_ai_service.model_unloaded.disconnect(_on_model_unloaded)
 
 
 ## Updates the toolbar button appearance and tooltip.
@@ -252,28 +240,14 @@ func _update_status_indicator(is_loaded: bool, config: ModelConfig) -> void:
 	if not _toolbar_menu:
 		return
 
-	# Build tooltip with model info
 	var tooltip := ""
-	var downloaded_count := 0
-
-	if _ai_service:
-		var model_manager := _ai_service.get_model_manager()
-		if model_manager and model_manager.registry:
-			var models := model_manager.get_available_models()
-			if models:
-				for model in models:
-					if model and model.is_downloaded():
-						downloaded_count += 1
 
 	if is_loaded and config:
 		_toolbar_menu.add_theme_color_override("font_color", Color.GREEN)
-		tooltip = "Active: %s\nAvailable models: %d" % [config.display_name, downloaded_count]
+		tooltip = "Active: %s\nClick to manage models" % config.display_name
 	else:
 		_toolbar_menu.remove_theme_color_override("font_color")
-		if downloaded_count > 0:
-			tooltip = "No model loaded\nAvailable models: %d" % downloaded_count
-		else:
-			tooltip = "No model loaded\nDownload a model from AI Models"
+		tooltip = "No model loaded\nClick to manage models"
 
 	_toolbar_menu.tooltip_text = tooltip
 
@@ -286,14 +260,3 @@ func _on_model_loaded(config: ModelConfig) -> void:
 ## Called when a model is unloaded.
 func _on_model_unloaded() -> void:
 	_update_status_indicator(false, null)
-
-
-## Called when available models change (download/delete).
-func _on_models_changed() -> void:
-	# Refresh tooltip with updated model count
-	if _ai_service:
-		var model_manager := _ai_service.get_model_manager()
-		if model_manager and model_manager.is_model_loaded() and model_manager.current_config:
-			_update_status_indicator(true, model_manager.current_config)
-		else:
-			_update_status_indicator(false, null)
