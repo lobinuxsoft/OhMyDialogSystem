@@ -32,6 +32,9 @@ var _model_config_inspector_plugin: ModelConfigInspectorPlugin
 ## Reference to the AIPreset inspector plugin.
 var _ai_preset_inspector_plugin: AIPresetInspectorPlugin
 
+## Reference to the model export plugin.
+var _model_export_plugin: ModelExportPlugin
+
 ## Reference to the AI service singleton (editor context).
 var _ai_service: AIService
 
@@ -63,6 +66,10 @@ func _enter_tree() -> void:
 
 	_ai_preset_inspector_plugin = AIPresetInspectorPlugin.new()
 	add_inspector_plugin(_ai_preset_inspector_plugin)
+
+	# Register export plugin for copying models
+	_model_export_plugin = ModelExportPlugin.new()
+	add_export_plugin(_model_export_plugin)
 
 	# Initialize dialogue graph editor window
 	_dialogue_graph_window = DialogueGraphWindow.new()
@@ -134,6 +141,11 @@ func _exit_tree() -> void:
 	if _ai_preset_inspector_plugin:
 		remove_inspector_plugin(_ai_preset_inspector_plugin)
 		_ai_preset_inspector_plugin = null
+
+	# Remove export plugin
+	if _model_export_plugin:
+		remove_export_plugin(_model_export_plugin)
+		_model_export_plugin = null
 
 	# Clean up dialogue graph window
 	if _dialogue_graph_window:
