@@ -4,7 +4,7 @@ extends Window
 ## Window for managing AI models in the editor.
 ##
 ## Provides interface for downloading, loading, and managing LLM models.
-## Uses sub-scenes for Generation tab and HuggingFace browser.
+## Owns the ModelRegistry (editor only) and uses AIService for runtime operations.
 
 ## Emitted when a model is loaded
 signal model_loaded(config: ModelConfig)
@@ -41,7 +41,8 @@ enum SortBy { NAME, SIZE, CONTEXT, STATUS }
 
 # Internal
 var _ai_service: AIService
-var _model_manager: ModelManager
+var _registry: ModelRegistry  # Editor-only model registry
+var _downloader: ModelDownloader
 var _current_sort: SortBy = SortBy.NAME
 var _sort_ascending: bool = true
 var _selected_model_id: String = ""
@@ -50,6 +51,7 @@ var _hf_api: HuggingFaceAPI  # For fetching GGUF metadata
 
 const BUTTON_ID_OPEN_URL := 0
 const BUTTON_ID_GENERATE_PRESET := 1
+const REGISTRY_PATH := "user://ohmydialog_registry.tres"
 
 
 func _ready() -> void:
@@ -89,36 +91,62 @@ func _connect_ai_service() -> void:
 		_status_label.text = "AIService not available"
 		return
 
-	_model_manager = _ai_service.get_model_manager()
-	if not _model_manager:
-		push_warning("ModelManagerWindow: ModelManager not available")
-		_status_label.text = "ModelManager not available"
-		return
+	# Load or create registry (editor only)
+	_load_registry()
 
-	# Connect ModelManager signals
-	_model_manager.model_loaded.connect(_on_model_loaded_internal)
-	_model_manager.model_load_failed.connect(_on_model_load_failed)
-	_model_manager.model_unloaded.connect(_on_model_unloaded_internal)
-	_model_manager.download_progress.connect(_on_download_progress)
-	_model_manager.download_completed.connect(_on_download_completed)
-	_model_manager.download_failed.connect(_on_download_failed)
+	# Connect AIService signals
+	_ai_service.model_loaded.connect(_on_model_loaded_internal)
+	_ai_service.model_load_failed.connect(_on_model_load_failed)
+	_ai_service.model_unloaded.connect(_on_model_unloaded_internal)
+
+	# Create downloader (editor only)
+	_downloader = ModelDownloader.new()
+	add_child(_downloader)
+	_downloader.download_progress.connect(_on_download_progress)
+	_downloader.download_completed.connect(_on_download_completed)
+	_downloader.download_failed.connect(_on_download_failed)
 
 	# Initialize sub-scenes
-	_generation_tab.set_model_manager(_model_manager)
+	_generation_tab.set_ai_service(_ai_service)
 	_hf_dialog.initialize()
 
 	_populate_models_tree()
 	_update_ui_state()
 
 
+func _load_registry() -> void:
+	if ResourceLoader.exists(REGISTRY_PATH):
+		_registry = load(REGISTRY_PATH) as ModelRegistry
+	else:
+		_registry = ModelRegistry.new()
+
+
+func _save_registry() -> Error:
+	return ResourceSaver.save(_registry, REGISTRY_PATH)
+
+
 ## Shows the window
 func show_window() -> void:
-	if _model_manager:
+	if _ai_service:
 		_populate_models_tree()
 		_update_ui_state()
 		_generation_tab.update_ui_state()
 		_generation_tab.update_loaded_model_info()
 	popup_centered()
+
+
+## Returns all available models from the registry
+func get_available_models() -> Array[ModelConfig]:
+	if _registry:
+		return _registry.get_all_models()
+	return []
+
+
+## Returns a model by ID from the registry
+func get_model_by_id(id: String) -> ModelConfig:
+	if _registry:
+		return _registry.get_model_by_id(id)
+	return null
 
 
 func _setup_models_tree() -> void:
@@ -153,10 +181,10 @@ func _populate_models_tree() -> void:
 	_models_tree.hide_root = true
 	_update_column_titles()
 
-	if not _model_manager:
+	if not _registry:
 		return
 
-	var models = _model_manager.get_available_models()
+	var models = _registry.get_all_models()
 	models = _sort_models(models)
 
 	for model in models:
@@ -221,7 +249,10 @@ func _sort_models(models: Array[ModelConfig]) -> Array[ModelConfig]:
 
 
 func _is_model_loaded(model: ModelConfig) -> bool:
-	return _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id
+	if not _ai_service:
+		return false
+	var current = _ai_service.get_current_config()
+	return _ai_service.is_model_loaded() and current != null and current.id == model.id
 
 
 func _get_selected_model() -> ModelConfig:
@@ -233,7 +264,7 @@ func _get_selected_model() -> ModelConfig:
 	if model_id == null or model_id.is_empty():
 		return null
 
-	return _model_manager.registry.get_model_by_id(model_id)
+	return _registry.get_model_by_id(model_id) if _registry else null
 
 
 func _update_model_details() -> void:
@@ -321,7 +352,7 @@ func _update_model_details() -> void:
 
 
 func _update_ui_state() -> void:
-	if not _model_manager:
+	if not _ai_service:
 		_download_model_btn.disabled = true
 		_load_model_btn.disabled = true
 		_delete_model_btn.disabled = true
@@ -329,8 +360,8 @@ func _update_ui_state() -> void:
 		return
 
 	var model = _get_selected_model()
-	var is_loaded = _model_manager.is_model_loaded()
-	var is_downloading = _model_manager.is_downloading()
+	var is_loaded = _ai_service.is_model_loaded()
+	var is_downloading = _downloader != null and _downloader.is_downloading()
 
 	if model != null:
 		var model_downloaded = model.is_downloaded()
@@ -347,8 +378,9 @@ func _update_ui_state() -> void:
 		_delete_model_btn.disabled = true
 		_generate_preset_btn.disabled = true
 
-	if is_loaded and _model_manager.current_config != null:
-		_status_label.text = "Loaded: %s" % _model_manager.current_config.display_name
+	var current_config = _ai_service.get_current_config()
+	if is_loaded and current_config != null:
+		_status_label.text = "Loaded: %s" % current_config.display_name
 		_status_label.add_theme_color_override("font_color", Color.GREEN)
 	elif is_downloading:
 		_status_label.text = "Downloading..."
@@ -377,8 +409,8 @@ func _on_column_title_clicked(column: int, _mouse_button_index: int) -> void:
 func _on_models_tree_button_clicked(item: TreeItem, _column: int, id: int, _mouse_button_index: int) -> void:
 	if id == BUTTON_ID_OPEN_URL:
 		var model_id = item.get_metadata(0) as String
-		if not model_id.is_empty():
-			var model = _model_manager.registry.get_model_by_id(model_id)
+		if not model_id.is_empty() and _registry:
+			var model = _registry.get_model_by_id(model_id)
 			if model and not model.documentation_url.is_empty():
 				OS.shell_open(model.documentation_url)
 
@@ -406,7 +438,7 @@ func _on_download_model_pressed() -> void:
 	if model == null:
 		return
 
-	var err = _model_manager.download_model(model)
+	var err = _downloader.download_model(model)
 	if err == OK:
 		_download_panel.show()
 		_download_label.text = "Downloading %s..." % model.display_name
@@ -423,7 +455,7 @@ func _on_load_model_pressed() -> void:
 	_status_label.text = "Loading %s..." % model.display_name
 	_status_label.add_theme_color_override("font_color", Color.YELLOW)
 
-	var err = _model_manager.load_model(model)
+	var err = _ai_service.load_model(model)
 	if err == OK:
 		_generation_tab.apply_model_defaults(model)
 		_tab_container.current_tab = 1
@@ -443,7 +475,7 @@ func _on_delete_model_pressed() -> void:
 		return
 
 	if _is_model_loaded(model):
-		_model_manager.unload_model()
+		_ai_service.unload_model()
 
 	var path = model.get_effective_path()
 	if FileAccess.file_exists(path):
@@ -452,11 +484,9 @@ func _on_delete_model_pressed() -> void:
 			push_error("Failed to delete file: %s" % error_string(err))
 			return
 
-	if model.is_custom:
-		_model_manager.remove_custom_model(model.id)
-	else:
-		# Notify that a built-in model file was deleted
-		_model_manager.notify_models_changed()
+	if model.is_custom and _registry:
+		_registry.remove_custom_model(model.id)
+		_save_registry()
 
 	_populate_models_tree()
 	_update_model_details()
@@ -473,9 +503,10 @@ func _on_generate_preset_pressed() -> void:
 	_generate_preset_btn.disabled = true
 
 	# Check if model is loaded - use LlamaInterface metadata if available
-	if _model_manager.is_model_loaded() and _model_manager.current_config != null and _model_manager.current_config.id == model.id:
+	var current_config = _ai_service.get_current_config() if _ai_service else null
+	if _ai_service and _ai_service.is_model_loaded() and current_config != null and current_config.id == model.id:
 		# Model is loaded, get metadata from llama.cpp
-		var info = _model_manager.get_model_info()
+		var info = _ai_service.get_model_info()
 		var metadata := {
 			"_architecture": info.get("architecture", ""),
 			"_chat_template": info.get("chat_template", ""),
@@ -568,7 +599,7 @@ func _on_browse_hf_pressed() -> void:
 
 
 func _on_cancel_download_pressed() -> void:
-	_model_manager.cancel_download()
+	_downloader.cancel_download()
 	_download_panel.hide()
 	_update_ui_state()
 
@@ -576,7 +607,7 @@ func _on_cancel_download_pressed() -> void:
 # ==================== Signal Handlers - Sub-scenes ====================
 
 func _on_generation_unload_requested() -> void:
-	_model_manager.unload_model()
+	_ai_service.unload_model()
 	_populate_models_tree()
 	_update_ui_state()
 	_generation_tab.update_ui_state()
@@ -584,18 +615,20 @@ func _on_generation_unload_requested() -> void:
 
 
 func _on_hf_model_selected(config: ModelConfig) -> void:
-	_model_manager.add_custom_model(config)
+	if _registry:
+		_registry.add_custom_model(config)
+		_save_registry()
 	_populate_models_tree()
 	_status_label.text = "Added: %s" % config.display_name
 	_status_label.add_theme_color_override("font_color", Color(0, 0.831, 1))
 
 
-# ==================== Signal Handlers - ModelManager ====================
+# ==================== Signal Handlers - Download & AIService ====================
 
 func _on_download_progress(_model_id: String, progress: float) -> void:
 	_download_progress.value = progress * 100.0
-	var downloaded_mb = _model_manager.downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
-	var total_mb = _model_manager.downloader.get_total_bytes() / (1024.0 * 1024.0)
+	var downloaded_mb = _downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
+	var total_mb = _downloader.get_total_bytes() / (1024.0 * 1024.0)
 	_download_label.text = "Downloading... %.1f / %.1f MB" % [downloaded_mb, total_mb]
 
 

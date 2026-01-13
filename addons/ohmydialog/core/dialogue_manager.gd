@@ -334,36 +334,31 @@ func _load_model_for_dialogue(model_path: String) -> void:
 		_emit_error("AIService not available for model loading")
 		return
 
-	var manager := ai_service.get_model_manager()
-	if not manager:
-		_emit_error("ModelManager not available")
-		return
-
 	# Check if model is already loaded
 	if ai_service.is_model_loaded():
-		var current_config := manager.get_current_config()
+		var current_config := ai_service.get_current_config()
 		if current_config and current_config.get_effective_path() == model_path:
 			# Same model already loaded - reuse it
-			llama_interface = manager.get_llama()
+			llama_interface = ai_service.get_llama()
 			model_loading_completed.emit()
 			return
 		# Different model - unload first
 		ai_service.unload_model()
 
-	# Find config by path and load
-	for config in manager.get_available_models():
-		if config.get_effective_path() == model_path:
-			var err := ai_service.load_model(config)
-			if err == OK:
-				_model_loaded_for_dialogue = true
-				llama_interface = manager.get_llama()
-				model_loading_completed.emit()
-				print("DialogueManager: Model loaded for dialogue: %s" % config.display_name)
-			else:
-				_emit_error("Failed to load model: %s" % error_string(err))
-			return
+	# Create a minimal config for direct path loading
+	var config := ModelConfig.new()
+	config.model_path = model_path
+	config.id = model_path.get_file().get_basename()
+	config.display_name = config.id
 
-	_emit_error("Model not found in registry: %s" % model_path)
+	var err := ai_service.load_model(config)
+	if err == OK:
+		_model_loaded_for_dialogue = true
+		llama_interface = ai_service.get_llama()
+		model_loading_completed.emit()
+		print("DialogueManager: Model loaded for dialogue: %s" % model_path)
+	else:
+		_emit_error("Failed to load model: %s" % error_string(err))
 
 
 ## Unloads the model if it was loaded by this dialogue.

@@ -61,6 +61,7 @@ private:
 	void _cleanup();
 	llama_sampler *_create_sampler() const;
 	bool _check_stop_sequence(const std::string &text) const;
+	bool _decode_prompt_chunked(const std::vector<llama_token> &tokens);
 	void _async_generate_task(const String &prompt);
 	static void _async_generate_callback(void *userdata);
 	void _streaming_generate_task(const String &prompt);
