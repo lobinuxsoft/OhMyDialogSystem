@@ -299,9 +299,9 @@ func _parse_system_features(sys_info: String) -> String:
 	# Key features to show
 	var important_features := ["AVX2", "AVX512", "FMA", "F16C", "NEON", "VULKAN", "CUDA", "METAL"]
 
-	for feature in important_features:
+	for feature: String in important_features:
 		# Check if feature is enabled (= 1)
-		var pattern := feature + " = 1"
+		var pattern: String = feature + " = 1"
 		if pattern in sys_info:
 			enabled_features.append(feature)
 
