@@ -131,6 +131,7 @@ void LlamaInterface::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("unload_model"), &LlamaInterface::unload_model);
 	ClassDB::bind_method(D_METHOD("is_model_loaded"), &LlamaInterface::is_model_loaded);
 	ClassDB::bind_method(D_METHOD("get_model_info"), &LlamaInterface::get_model_info);
+	ClassDB::bind_method(D_METHOD("get_system_info"), &LlamaInterface::get_system_info);
 	ClassDB::bind_method(D_METHOD("get_model_path"), &LlamaInterface::get_model_path);
 	ClassDB::bind_method(D_METHOD("get_chat_template"), &LlamaInterface::get_chat_template);
 	ClassDB::bind_method(D_METHOD("apply_chat_template", "messages", "add_generation_prompt"), &LlamaInterface::apply_chat_template, DEFVAL(true));
@@ -445,6 +446,14 @@ Dictionary LlamaInterface::get_model_info() const {
 
 String LlamaInterface::get_model_path() const {
 	return m_model_path;
+}
+
+String LlamaInterface::get_system_info() const {
+	const char *info = llama_print_system_info();
+	if (info != nullptr) {
+		return String::utf8(info);
+	}
+	return String();
 }
 
 String LlamaInterface::get_chat_template() const {
