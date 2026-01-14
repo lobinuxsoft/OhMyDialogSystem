@@ -1,0 +1,209 @@
+<!-- Sidebar Component - Include via JavaScript -->
+<!-- Usage: Include sidebar.js and call loadSidebar('es' or 'en') -->
+
+<script>
+// Sidebar navigation data
+const sidebarData = {
+  es: {
+    title: 'OhMyDialogSystem',
+    subtitle: 'AI-Powered Dialogues',
+    sections: [
+      {
+        title: 'General',
+        links: [
+          { href: 'index.html', icon: '\uD83C\uDFE0', text: 'Home' }
+        ]
+      },
+      {
+        title: 'Getting Started',
+        links: [
+          { href: 'Guides/quickstart.html', icon: '\uD83D\uDE80', text: 'Quick Start' },
+          { href: 'Guides/installation.html', icon: '\uD83D\uDCE6', text: 'Instalaci\u00f3n' },
+          { href: 'Guides/first-npc.html', icon: '\uD83C\uDFAE', text: 'Tu Primer NPC' }
+        ]
+      },
+      {
+        title: 'API Reference',
+        links: [
+          { href: 'API/index.html', icon: '\uD83D\uDCDA', text: 'Overview' },
+          { href: 'API/llama-interface.html', icon: '\uD83E\uDD99', text: 'LlamaInterface' },
+          { href: 'API/dialogue-manager.html', icon: '\uD83D\uDCAC', text: 'DialogueManager' },
+          { href: 'API/memory-manager.html', icon: '\uD83E\uDDE0', text: 'MemoryManager' },
+          { href: 'API/tts-manager.html', icon: '\uD83D\uDD0A', text: 'TTSManager' },
+          { href: 'API/resources.html', icon: '\uD83D\uDCC4', text: 'Resources' }
+        ]
+      },
+      {
+        title: 'Technical',
+        links: [
+          { href: 'Technical/index.html', icon: '\u2699\uFE0F', text: 'Overview' },
+          { href: 'Technical/architecture.html', icon: '\uD83C\uDFD7\uFE0F', text: 'Arquitectura' },
+          { href: 'Technical/dialogue-nodes.html', icon: '\uD83D\uDD37', text: 'Dialogue Nodes' },
+          { href: 'Technical/gdextension.html', icon: '\uD83D\uDD27', text: 'GDExtension Build' },
+          { href: 'Technical/ci-cd-release.html', icon: '\uD83D\uDE80', text: 'CI/CD y Releases' },
+          { href: 'Technical/memory-system.html', icon: '\uD83D\uDCBE', text: 'Memory System' },
+          { href: 'Technical/localization.html', icon: '\uD83C\uDF10', text: 'Localizaci\u00f3n' }
+        ]
+      },
+      {
+        title: 'Guides',
+        links: [
+          { href: 'Guides/index.html', icon: '\uD83D\uDCD6', text: 'Overview' },
+          { href: 'Guides/visual-editor.html', icon: '\uD83C\uDFA8', text: 'Editor Visual' },
+          { href: 'Guides/character-identity.html', icon: '\uD83D\uDC64', text: 'Character Identity' },
+          { href: 'Guides/tts-setup.html', icon: '\uD83C\uDFA4', text: 'TTS Setup' },
+          { href: 'Guides/csharp-bindings.html', icon: '\uD83D\uDD37', text: 'C# Bindings' }
+        ]
+      },
+      {
+        title: 'Examples',
+        links: [
+          { href: 'Guides/example-basic-npc.html', icon: '\uD83E\uDD16', text: 'Basic NPC' },
+          { href: 'Guides/example-branching.html', icon: '\uD83C\uDF33', text: 'Branching Dialogue' },
+          { href: 'Guides/example-merchant.html', icon: '\uD83D\uDED2', text: 'Dynamic Merchant' }
+        ]
+      },
+      {
+        title: 'External',
+        links: [
+          { href: 'https://github.com/lobinuxsoft/OhMyDialogSystem', icon: '\uD83D\uDD17', text: 'GitHub', external: true },
+          { href: 'https://github.com/users/lobinuxsoft/projects/5', icon: '\uD83D\uDCCB', text: 'Project Board', external: true },
+          { href: 'https://github.com/lobinuxsoft/OhMyDialogSystem/issues', icon: '\uD83D\uDC1B', text: 'Issues', external: true }
+        ]
+      }
+    ]
+  },
+  en: {
+    title: 'OhMyDialogSystem',
+    subtitle: 'AI-Powered Dialogues',
+    sections: [
+      {
+        title: 'General',
+        links: [
+          { href: 'index.html', icon: '\uD83C\uDFE0', text: 'Home' }
+        ]
+      },
+      {
+        title: 'Getting Started',
+        links: [
+          { href: 'Guides/quickstart.html', icon: '\uD83D\uDE80', text: 'Quick Start' },
+          { href: 'Guides/installation.html', icon: '\uD83D\uDCE6', text: 'Installation' },
+          { href: 'Guides/first-npc.html', icon: '\uD83C\uDFAE', text: 'Your First NPC' }
+        ]
+      },
+      {
+        title: 'API Reference',
+        links: [
+          { href: 'API/index.html', icon: '\uD83D\uDCDA', text: 'Overview' },
+          { href: 'API/llama-interface.html', icon: '\uD83E\uDD99', text: 'LlamaInterface' },
+          { href: 'API/dialogue-manager.html', icon: '\uD83D\uDCAC', text: 'DialogueManager' },
+          { href: 'API/memory-manager.html', icon: '\uD83E\uDDE0', text: 'MemoryManager' },
+          { href: 'API/tts-manager.html', icon: '\uD83D\uDD0A', text: 'TTSManager' },
+          { href: 'API/resources.html', icon: '\uD83D\uDCC4', text: 'Resources' }
+        ]
+      },
+      {
+        title: 'Technical',
+        links: [
+          { href: 'Technical/index.html', icon: '\u2699\uFE0F', text: 'Overview' },
+          { href: 'Technical/architecture.html', icon: '\uD83C\uDFD7\uFE0F', text: 'Architecture' },
+          { href: 'Technical/dialogue-nodes.html', icon: '\uD83D\uDD37', text: 'Dialogue Nodes' },
+          { href: 'Technical/gdextension.html', icon: '\uD83D\uDD27', text: 'GDExtension Build' },
+          { href: 'Technical/ci-cd-release.html', icon: '\uD83D\uDE80', text: 'CI/CD & Releases' },
+          { href: 'Technical/memory-system.html', icon: '\uD83D\uDCBE', text: 'Memory System' },
+          { href: 'Technical/localization.html', icon: '\uD83C\uDF10', text: 'Localization' }
+        ]
+      },
+      {
+        title: 'Guides',
+        links: [
+          { href: 'Guides/index.html', icon: '\uD83D\uDCD6', text: 'Overview' },
+          { href: 'Guides/visual-editor.html', icon: '\uD83C\uDFA8', text: 'Visual Editor' },
+          { href: 'Guides/character-identity.html', icon: '\uD83D\uDC64', text: 'Character Identity' },
+          { href: 'Guides/tts-setup.html', icon: '\uD83C\uDFA4', text: 'TTS Setup' },
+          { href: 'Guides/csharp-bindings.html', icon: '\uD83D\uDD37', text: 'C# Bindings' }
+        ]
+      },
+      {
+        title: 'Examples',
+        links: [
+          { href: 'Guides/example-basic-npc.html', icon: '\uD83E\uDD16', text: 'Basic NPC' },
+          { href: 'Guides/example-branching.html', icon: '\uD83C\uDF33', text: 'Branching Dialogue' },
+          { href: 'Guides/example-merchant.html', icon: '\uD83D\uDED2', text: 'Dynamic Merchant' }
+        ]
+      },
+      {
+        title: 'External',
+        links: [
+          { href: 'https://github.com/lobinuxsoft/OhMyDialogSystem', icon: '\uD83D\uDD17', text: 'GitHub', external: true },
+          { href: 'https://github.com/users/lobinuxsoft/projects/5', icon: '\uD83D\uDCCB', text: 'Project Board', external: true },
+          { href: 'https://github.com/lobinuxsoft/OhMyDialogSystem/issues', icon: '\uD83D\uDC1B', text: 'Issues', external: true }
+        ]
+      }
+    ]
+  }
+};
+
+function generateSidebar(lang = 'es', currentPage = '') {
+  const data = sidebarData[lang] || sidebarData.es;
+  const otherLang = lang === 'es' ? 'en' : 'es';
+  const langPrefix = '../';
+
+  let html = `
+    <div class="p-6 text-center border-b border-border-default mb-6">
+      <div class="w-16 h-16 mx-auto mb-4">
+        <img src="${langPrefix}logo-eldritch.png" alt="OhMyDialogSystem"
+             class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]">
+      </div>
+      <div class="text-gradient-cyan-purple text-lg font-bold uppercase tracking-wider">${data.title}</div>
+      <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">${data.subtitle}</div>
+    </div>
+  `;
+
+  data.sections.forEach(section => {
+    html += `
+      <div class="mb-6">
+        <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+          <span class="text-gray-600 text-[0.65rem]">//</span>
+          ${section.title}
+        </div>
+        <ul class="list-none">
+    `;
+
+    section.links.forEach(link => {
+      const isActive = currentPage && link.href.includes(currentPage);
+      const target = link.external ? ' target="_blank"' : '';
+      const activeClass = isActive
+        ? 'bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan shadow-glow-cyan'
+        : 'text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan hover:pl-6 hover:shadow-[inset_3px_0_0_#00d4ff]';
+
+      html += `
+        <li>
+          <a href="${link.href}"${target}
+             class="flex items-center gap-2 py-2 px-4 rounded-md transition-all duration-200 text-sm ${activeClass}">
+            <span class="opacity-70">${link.icon}</span>
+            ${link.text}
+          </a>
+        </li>
+      `;
+    });
+
+    html += `
+        </ul>
+      </div>
+    `;
+  });
+
+  return html;
+}
+
+// Auto-initialize if sidebar element exists
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebarEl = document.getElementById('sidebar-content');
+  if (sidebarEl) {
+    const lang = document.documentElement.lang || 'es';
+    const currentPage = window.location.pathname.split('/').pop();
+    sidebarEl.innerHTML = generateSidebar(lang, currentPage);
+  }
+});
+</script>

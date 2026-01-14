@@ -1,0 +1,215 @@
+/* ============================================
+   OhMyDialogSystem - Base Styles (Tailwind Extension)
+   Custom utilities and component styles that extend Tailwind
+   ============================================ */
+
+/* --- Neural Background Canvas --- */
+#neural-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* --- Sidebar Gradient Border --- */
+.sidebar-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    #00d4ff 30%,
+    #a855f7 70%,
+    transparent 100%
+  );
+  opacity: 0.3;
+}
+
+/* --- Gradient Text --- */
+.text-gradient-ai {
+  background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-cyan-purple {
+  background: linear-gradient(135deg, #00d4ff 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* --- H1 Underline Effect --- */
+.h1-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4ff, #a855f7);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+}
+
+/* --- Blockquote Gradient --- */
+.blockquote-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #00d4ff, #a855f7);
+}
+
+/* --- Code Block Label --- */
+pre[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(90deg, #00d4ff, #a855f7);
+  color: #0a0d12;
+  font-size: 0.6rem;
+  padding: 0.2rem 0.8rem;
+  border-radius: 0 8px 0 8px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+/* --- AI Box Pulse --- */
+.ai-box-pulse::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+  animation: pulse-ai 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* --- Horizontal Rule --- */
+.hr-gradient {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #a855f7 20%,
+    #00d4ff 50%,
+    #a855f7 80%,
+    transparent 100%
+  );
+}
+
+.hr-gradient::before {
+  content: '\2726';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #0a0d12;
+  color: #a855f7;
+  padding: 0 1rem;
+  font-size: 0.8rem;
+}
+
+/* --- Scrollbar Styling --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0d12;
+  border-left: 1px solid #21262d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a855f7 0%, #00d4ff 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00d4ff 0%, #a855f7 100%);
+}
+
+/* --- Selection --- */
+::selection {
+  background: #00d4ff;
+  color: #0a0d12;
+}
+
+/* --- Print Styles --- */
+@media print {
+  .sidebar, #neural-bg, .no-print {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  a {
+    color: black !important;
+    text-decoration: underline !important;
+  }
+
+  h1, h2, h3 {
+    -webkit-text-fill-color: black !important;
+    background: none !important;
+  }
+}
+
+/* --- Language Selector Styles --- */
+.lang-selector {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(15, 20, 25, 0.9);
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #21262d;
+  backdrop-filter: blur(10px);
+}
+
+.lang-btn {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #8b949e;
+}
+
+.lang-btn:hover {
+  background: rgba(0, 212, 255, 0.1);
+  color: #00d4ff;
+}
+
+.lang-btn.active {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  border-color: #00d4ff;
+}
