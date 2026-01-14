@@ -8,6 +8,504 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Architecture-specific styles */
+    .arch-diagram {
+      background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 212, 255, 0.02) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: var(--spacing-xl);
+      margin: var(--spacing-xl) 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .arch-diagram::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--ai-cyan), var(--ai-purple), var(--ai-pink));
+    }
+
+    /* Layer stack */
+    .layer-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .layer {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: var(--spacing-lg);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .layer:hover {
+      transform: translateX(8px);
+      border-color: var(--ai-cyan);
+      box-shadow: 0 0 20px var(--glow-cyan);
+    }
+
+    .layer-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .layer-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .layer-title {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .layer-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-left: 56px;
+    }
+
+    .layer-files {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs);
+      margin-left: 56px;
+      margin-top: var(--spacing-sm);
+    }
+
+    .layer-file {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Layer colors */
+    .layer-gdext .layer-icon { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    .layer-core .layer-icon { background: linear-gradient(135deg, var(--ai-cyan) 0%, #0891b2 100%); }
+    .layer-resources .layer-icon { background: linear-gradient(135deg, var(--ai-purple) 0%, #7c3aed 100%); }
+    .layer-editor .layer-icon { background: linear-gradient(135deg, var(--ai-green) 0%, #059669 100%); }
+    .layer-ai .layer-icon { background: linear-gradient(135deg, var(--ai-orange) 0%, #ea580c 100%); }
+
+    /* Component flow diagram */
+    .flow-diagram {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr 60px 1fr;
+      gap: var(--spacing-md);
+      align-items: center;
+      margin: var(--spacing-xl) 0;
+      padding: var(--spacing-lg);
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .flow-box {
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: var(--spacing-md);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .flow-box:hover {
+      border-color: var(--ai-cyan);
+      box-shadow: 0 0 15px var(--glow-cyan);
+    }
+
+    .flow-box-title {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ai-cyan);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .flow-box-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ai-purple);
+      font-size: 1.5rem;
+    }
+
+    .flow-arrow::before {
+      content: '\2192';
+    }
+
+    /* Executor pattern */
+    .executor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      margin: var(--spacing-lg) 0;
+    }
+
+    .executor-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: var(--spacing-md);
+      transition: all 0.3s ease;
+    }
+
+    .executor-card:hover {
+      border-color: var(--ai-purple);
+      transform: translateY(-2px);
+    }
+
+    .executor-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--ai-cyan);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .executor-type {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .executor-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Node type colors */
+    .dot-start { background: #10b981; }
+    .dot-end { background: #ef4444; }
+    .dot-ai { background: #3b82f6; }
+    .dot-static { background: #6b7280; }
+    .dot-choice { background: #eab308; }
+    .dot-condition { background: #f97316; }
+    .dot-event { background: #a855f7; }
+    .dot-variable { background: #06b6d4; }
+    .dot-jump { background: #ec4899; }
+
+    /* Resource tree - CSS-only visual tree */
+    .resource-tree {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xl);
+      padding: var(--spacing-lg);
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .resource-block {
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: var(--spacing-md);
+      border-left: 3px solid var(--ai-cyan);
+    }
+
+    .resource-header-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .resource-type {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ai-cyan);
+    }
+
+    .resource-ext {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .resource-props {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-left: var(--spacing-md);
+      padding-left: var(--spacing-md);
+      border-left: 2px solid var(--border-color);
+    }
+
+    .resource-prop-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .prop-name {
+      color: var(--ai-purple);
+    }
+
+    .prop-type {
+      color: var(--text-muted);
+    }
+
+    .prop-link {
+      color: var(--ai-cyan);
+    }
+
+    .resource-children {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-xs);
+      margin-top: var(--spacing-sm);
+      margin-left: calc(var(--spacing-md) * 2);
+      padding-left: var(--spacing-md);
+      border-left: 2px solid var(--ai-purple);
+    }
+
+    .child-type {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Directory tree - CSS-only visual tree */
+    .dir-tree {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: var(--spacing-lg);
+    }
+
+    .dir-root {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ai-cyan);
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .dir-section {
+      margin-bottom: var(--spacing-md);
+      padding-left: var(--spacing-md);
+      border-left: 2px solid var(--border-color);
+    }
+
+    .dir-section:hover {
+      border-left-color: var(--ai-cyan);
+    }
+
+    .dir-folder {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--ai-orange);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .dir-folder-icon {
+      color: var(--ai-orange);
+    }
+
+    .dir-comment {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-left: var(--spacing-sm);
+    }
+
+    .dir-files {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-left: var(--spacing-lg);
+      padding-left: var(--spacing-sm);
+      border-left: 1px dashed var(--border-color);
+    }
+
+    .dir-file {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .dir-file-icon {
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
+
+    .dir-subdir {
+      margin-left: var(--spacing-md);
+      margin-top: var(--spacing-xs);
+      padding-left: var(--spacing-sm);
+      border-left: 1px dashed var(--ai-purple);
+    }
+
+    /* Data flow */
+    .data-flow {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      margin: var(--spacing-xl) 0;
+    }
+
+    .data-flow-row {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .data-flow-step {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      flex: 1;
+    }
+
+    .data-flow-step-num {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--ai-cyan), var(--ai-purple));
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: var(--bg-primary);
+      margin-right: var(--spacing-sm);
+    }
+
+    .data-flow-arrow {
+      color: var(--ai-purple);
+      font-size: 1.2rem;
+    }
+
+    /* Singleton diagram */
+    .singleton-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-lg);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+      border: 2px dashed var(--ai-cyan);
+      border-radius: 12px;
+      margin: var(--spacing-lg) 0;
+    }
+
+    .singleton-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ai-cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .singleton-name {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .singleton-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* Mode comparison */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-lg);
+      margin: var(--spacing-xl) 0;
+    }
+
+    .mode-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: var(--spacing-lg);
+      text-align: center;
+    }
+
+    .mode-card h4 {
+      color: var(--ai-cyan);
+      margin-top: 0;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .mode-card ul {
+      text-align: left;
+      padding-left: var(--spacing-lg);
+      margin-bottom: 0;
+    }
+
+    .mode-card li {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .flow-diagram {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+      }
+
+      .flow-arrow::before {
+        content: '\2193';
+      }
+
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
   <canvas id="neural-bg"></canvas>
@@ -26,15 +524,646 @@
       <div class="nav-section"><div class="nav-section-title">Examples</div><ul class="nav-links"><li><a href="../Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li><li><a href="../Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li><li><a href="../Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li></ul></div>
       <div class="nav-section"><div class="nav-section-title">External Links</div><ul class="nav-links"><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li><li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li></ul></div>
     </nav>
+
     <main class="main-content">
       <div class="breadcrumbs"><a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">Technical</a> <span>/</span> <span>Architecture</span></div>
+
       <h1>Architecture</h1>
-      <div class="ai-box" style="text-align: center; padding: 3rem;">
-        <p style="font-size: 3rem; margin-bottom: 1rem;">🚧</p>
-        <h2 style="color: var(--ai-cyan); margin-bottom: 1rem;">Coming Soon</h2>
-        <p style="color: var(--text-muted);">Esta seccion esta en desarrollo.</p>
-        <p style="margin-top: 1.5rem;"><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/185" target="_blank" class="badge badge-cyan">Ver issue #185</a></p>
+
+      <p>OhMyDialogSystem sigue una arquitectura en capas que separa claramente las responsabilidades entre el runtime nativo (C++), la logica de juego (GDScript), y las herramientas del editor.</p>
+
+      <!-- ==================== SYSTEM LAYERS ==================== -->
+      <h2>Capas del Sistema</h2>
+
+      <p>El addon se organiza en 5 capas principales, cada una con responsabilidades especificas:</p>
+
+      <div class="arch-diagram">
+        <div class="layer-stack">
+          <!-- Editor Layer -->
+          <div class="layer layer-editor">
+            <div class="layer-header">
+              <div class="layer-icon">🎨</div>
+              <span class="layer-title">Editor Layer</span>
+            </div>
+            <p class="layer-desc">Herramientas visuales para crear y configurar dialogos. Solo se ejecuta en el editor de Godot.</p>
+            <div class="layer-files">
+              <span class="layer-file">model_manager_window.gd</span>
+              <span class="layer-file">dialogue_graph_editor.gd</span>
+              <span class="layer-file">*_inspector_plugin.gd</span>
+              <span class="layer-file">nodes/*.gd</span>
+            </div>
+          </div>
+
+          <!-- AI Layer -->
+          <div class="layer layer-ai">
+            <div class="layer-header">
+              <div class="layer-icon">🤖</div>
+              <span class="layer-title">AI Layer</span>
+            </div>
+            <p class="layer-desc">Gestion de modelos, descarga desde HuggingFace, y construccion de prompts.</p>
+            <div class="layer-files">
+              <span class="layer-file">prompt_builder.gd</span>
+              <span class="layer-file">model_downloader.gd</span>
+              <span class="layer-file">huggingface_api.gd</span>
+              <span class="layer-file">gguf_parser.gd</span>
+            </div>
+          </div>
+
+          <!-- Core Layer -->
+          <div class="layer layer-core">
+            <div class="layer-header">
+              <div class="layer-icon">🧠</div>
+              <span class="layer-title">Core Layer</span>
+            </div>
+            <p class="layer-desc">Logica principal de dialogos. DialogueManager coordina GraphRunner y AIService.</p>
+            <div class="layer-files">
+              <span class="layer-file">dialogue_manager.gd</span>
+              <span class="layer-file">ai_service.gd</span>
+              <span class="layer-file">graph_runner.gd</span>
+              <span class="layer-file">node_executors/*.gd</span>
+            </div>
+          </div>
+
+          <!-- Resources Layer -->
+          <div class="layer layer-resources">
+            <div class="layer-header">
+              <div class="layer-icon">📦</div>
+              <span class="layer-title">Resources Layer</span>
+            </div>
+            <p class="layer-desc">Datos serializables: grafos de dialogo, personajes, mundos, configuracion de modelos.</p>
+            <div class="layer-files">
+              <span class="layer-file">dialogue_graph.gd</span>
+              <span class="layer-file">character_identity.gd</span>
+              <span class="layer-file">world_context.gd</span>
+              <span class="layer-file">model_config.gd</span>
+            </div>
+          </div>
+
+          <!-- GDExtension Layer -->
+          <div class="layer layer-gdext">
+            <div class="layer-header">
+              <div class="layer-icon">⚡</div>
+              <span class="layer-title">GDExtension Layer (C++)</span>
+            </div>
+            <p class="layer-desc">Wrapper nativo de llama.cpp. Inferencia LLM con soporte GPU (Vulkan/CUDA/Metal).</p>
+            <div class="layer-files">
+              <span class="layer-file">llama_interface.h</span>
+              <span class="layer-file">llama_interface.cpp</span>
+              <span class="layer-file">thirdparty/llama.cpp</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- ==================== CORE COMPONENTS ==================== -->
+      <h2>Componentes Principales</h2>
+
+      <h3>Flujo de Alto Nivel</h3>
+
+      <p>La interaccion entre los componentes principales sigue este flujo:</p>
+
+      <div class="flow-diagram">
+        <div class="flow-box">
+          <div class="flow-box-title">DialogueManager</div>
+          <div class="flow-box-desc">Coordina todo el sistema</div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-box">
+          <div class="flow-box-title">GraphRunner</div>
+          <div class="flow-box-desc">Ejecuta el grafo de nodos</div>
+        </div>
+        <div class="flow-arrow"></div>
+        <div class="flow-box">
+          <div class="flow-box-title">AIService</div>
+          <div class="flow-box-desc">Genera respuestas IA</div>
+        </div>
+      </div>
+
+      <h3>AIService Singleton</h3>
+
+      <p><code>AIService</code> es un singleton global que proporciona acceso centralizado a la inferencia LLM:</p>
+
+      <div class="singleton-box">
+        <span class="singleton-label">Singleton Global</span>
+        <span class="singleton-name">AIService</span>
+        <span class="singleton-desc">Gestiona el ciclo de vida de LlamaInterface.<br>Carga/descarga modelos en runtime. Disponible via <code>AIService.get_singleton()</code></span>
+      </div>
+
+      <pre data-lang="GDScript"><code># Acceso al singleton
+var ai_service := AIService.get_singleton()
+
+# Verificar si hay modelo cargado
+if ai_service.is_model_loaded():
+    var llama := ai_service.get_llama()
+    llama.generate_async("Hello!", 100)</code></pre>
+
+      <h3>DialogueManager</h3>
+
+      <p><code>DialogueManager</code> es el punto de entrada para los desarrolladores. Coordina:</p>
+
+      <ul>
+        <li><strong>GraphRunner</strong> - Ejecuta grafos de dialogo nodo por nodo</li>
+        <li><strong>AIService</strong> - Genera respuestas dinamicas via LLM</li>
+        <li><strong>PromptBuilder</strong> - Construye prompts con contexto (personaje, mundo, historial)</li>
+        <li><strong>Query System</strong> - Permite al juego influir en los dialogos</li>
+      </ul>
+
+      <pre data-lang="GDScript"><code># Uso tipico de DialogueManager
+var dialogue_manager := DialogueManager.new()
+add_child(dialogue_manager)
+
+# Configurar contexto
+dialogue_manager.default_character = load("res://merchant.tres")
+dialogue_manager.world_context = load("res://fantasy_world.tres")
+
+# Iniciar dialogo
+dialogue_manager.start_dialogue(dialogue_graph, DialogueManager.DialogueMode.HYBRID)
+
+# Conectar senales
+dialogue_manager.npc_speaking.connect(_on_npc_speaking)
+dialogue_manager.player_choices_available.connect(_on_choices)</code></pre>
+
+      <!-- ==================== GRAPH EXECUTION ==================== -->
+      <h2>Ejecucion de Grafos</h2>
+
+      <h3>GraphRunner</h3>
+
+      <p><code>GraphRunner</code> interpreta los <code>DialogueGraph</code> ejecutando cada nodo en secuencia:</p>
+
+      <div class="callout-info">
+        <p><strong>Patron Strategy:</strong> Cada tipo de nodo tiene un <code>NodeExecutor</code> dedicado que implementa su logica especifica.</p>
+      </div>
+
+      <h4>Node Executors</h4>
+
+      <div class="executor-grid">
+        <div class="executor-card">
+          <div class="executor-name">StartNodeExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-start"></span> Punto de entrada</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">EndNodeExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-end"></span> Fin del dialogo</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">AIResponseExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-ai"></span> Respuesta LLM</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">StaticResponseExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-static"></span> Texto fijo</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">PlayerChoiceExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-choice"></span> Opciones al jugador</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">ConditionExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-condition"></span> Bifurcacion logica</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">EventExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-event"></span> Dispara eventos</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">SetVariableExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-variable"></span> Modifica variables</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">JumpToFreeExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-jump"></span> Entra modo libre</div>
+        </div>
+        <div class="executor-card">
+          <div class="executor-name">ReturnToGraphExecutor</div>
+          <div class="executor-type"><span class="executor-dot dot-jump"></span> Vuelve al grafo</div>
+        </div>
+      </div>
+
+      <h4>Estados de Ejecucion</h4>
+
+      <p><code>GraphRunner</code> mantiene un estado interno que determina el comportamiento:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Estado</th>
+            <th>Descripcion</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>IDLE</code></td>
+            <td>Sin grafo activo</td>
+          </tr>
+          <tr>
+            <td><code>RUNNING</code></td>
+            <td>Ejecutando nodos</td>
+          </tr>
+          <tr>
+            <td><code>WAITING_INPUT</code></td>
+            <td>Esperando input del jugador (choice/text)</td>
+          </tr>
+          <tr>
+            <td><code>FREE_MODE</code></td>
+            <td>Conversacion libre con IA</td>
+          </tr>
+          <tr>
+            <td><code>PAUSED</code></td>
+            <td>Pausado manualmente</td>
+          </tr>
+          <tr>
+            <td><code>COMPLETED</code></td>
+            <td>Grafo finalizado normalmente</td>
+          </tr>
+          <tr>
+            <td><code>ERROR</code></td>
+            <td>Error durante ejecucion</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ==================== DIALOGUE MODES ==================== -->
+      <h2>Modos de Dialogo</h2>
+
+      <p>OhMyDialogSystem soporta tres modos de dialogo, cada uno con diferentes niveles de control:</p>
+
+      <div class="mode-grid">
+        <div class="mode-card">
+          <h4>FREE</h4>
+          <p style="color: var(--text-secondary); font-size: 0.85rem;">Conversacion 100% IA</p>
+          <ul>
+            <li>Sin grafo predefinido</li>
+            <li>El jugador escribe libremente</li>
+            <li>IA genera todas las respuestas</li>
+            <li>Ideal para NPCs emergentes</li>
+          </ul>
+        </div>
+        <div class="mode-card">
+          <h4>SCRIPTED</h4>
+          <p style="color: var(--text-secondary); font-size: 0.85rem;">Grafo tradicional</p>
+          <ul>
+            <li>Sigue el grafo estrictamente</li>
+            <li>Respuestas predefinidas</li>
+            <li>Choices fijos</li>
+            <li>Maximo control narrativo</li>
+          </ul>
+        </div>
+        <div class="mode-card">
+          <h4>HYBRID</h4>
+          <p style="color: var(--text-secondary); font-size: 0.85rem;">Lo mejor de ambos</p>
+          <ul>
+            <li>Grafo como esqueleto</li>
+            <li>IA enriquece respuestas</li>
+            <li>JumpToFree para zonas libres</li>
+            <li>Balance control/dinamismo</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ==================== RESOURCE HIERARCHY ==================== -->
+      <h2>Jerarquia de Resources</h2>
+
+      <p>El sistema utiliza Resources de Godot para almacenar datos serializables:</p>
+
+      <div class="resource-tree">
+        <!-- DialogueGraph -->
+        <div class="resource-block">
+          <div class="resource-header-row">
+            <span class="resource-type">DialogueGraph</span>
+            <span class="resource-ext">.tres</span>
+          </div>
+          <div class="resource-props">
+            <div class="resource-prop-item">
+              <span class="prop-name">nodes:</span>
+              <span class="prop-type">Array[</span><span class="prop-link">DialogueNodeData</span><span class="prop-type">]</span>
+            </div>
+            <div class="resource-children">
+              <span class="child-type">StartNodeData</span>
+              <span class="child-type">AIResponseNodeData</span>
+              <span class="child-type">StaticResponseNodeData</span>
+              <span class="child-type">PlayerChoiceNodeData</span>
+              <span class="child-type">ConditionNodeData</span>
+              <span class="child-type">EventNodeData</span>
+              <span class="child-type">SetVariableNodeData</span>
+              <span class="child-type">EndNodeData</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">connections:</span>
+              <span class="prop-type">Array[Dictionary]</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">default_character:</span>
+              <span class="prop-link">CharacterIdentity</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">world_context:</span>
+              <span class="prop-link">WorldContext</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">ai_preset:</span>
+              <span class="prop-link">AIPreset</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">local_variables:</span>
+              <span class="prop-type">Dictionary</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CharacterIdentity -->
+        <div class="resource-block">
+          <div class="resource-header-row">
+            <span class="resource-type">CharacterIdentity</span>
+            <span class="resource-ext">.tres</span>
+          </div>
+          <div class="resource-props">
+            <div class="resource-prop-item">
+              <span class="prop-name">character_name:</span>
+              <span class="prop-type">String</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">personality:</span>
+              <span class="prop-type">String</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">speaking_style:</span>
+              <span class="prop-type">SpeechStyle</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">knowledge:</span>
+              <span class="prop-type">Array[String]</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WorldContext -->
+        <div class="resource-block">
+          <div class="resource-header-row">
+            <span class="resource-type">WorldContext</span>
+            <span class="resource-ext">.tres</span>
+          </div>
+          <div class="resource-props">
+            <div class="resource-prop-item">
+              <span class="prop-name">world_name:</span>
+              <span class="prop-type">String</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">setting_description:</span>
+              <span class="prop-type">String</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">current_location:</span>
+              <span class="prop-type">String</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">current_time:</span>
+              <span class="prop-type">String</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ModelConfig -->
+        <div class="resource-block">
+          <div class="resource-header-row">
+            <span class="resource-type">ModelConfig</span>
+            <span class="resource-ext">.tres</span>
+          </div>
+          <div class="resource-props">
+            <div class="resource-prop-item">
+              <span class="prop-name">display_name:</span>
+              <span class="prop-type">String</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">model_path:</span>
+              <span class="prop-type">String</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">n_ctx:</span>
+              <span class="prop-type">int</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">n_gpu_layers:</span>
+              <span class="prop-type">int</span>
+            </div>
+            <div class="resource-prop-item">
+              <span class="prop-name">ai_preset:</span>
+              <span class="prop-link">AIPreset</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== DATA FLOW ==================== -->
+      <h2>Flujo de Datos</h2>
+
+      <h3>Generacion de Respuesta IA</h3>
+
+      <p>Cuando un nodo <code>AIResponse</code> se ejecuta, el flujo es:</p>
+
+      <div class="data-flow">
+        <div class="data-flow-row">
+          <div class="data-flow-step"><span class="data-flow-step-num">1</span><strong>GraphRunner</strong> ejecuta AIResponseNodeData</div>
+        </div>
+        <div class="data-flow-row">
+          <div class="data-flow-step"><span class="data-flow-step-num">2</span><strong>DialogueManager</strong> recibe senal de inferencia requerida</div>
+        </div>
+        <div class="data-flow-row">
+          <div class="data-flow-step"><span class="data-flow-step-num">3</span><strong>PromptBuilder</strong> construye prompt con: sistema, personaje, mundo, historial</div>
+        </div>
+        <div class="data-flow-row">
+          <div class="data-flow-step"><span class="data-flow-step-num">4</span><strong>AIService</strong> obtiene LlamaInterface y llama <code>generate_streaming()</code></div>
+        </div>
+        <div class="data-flow-row">
+          <div class="data-flow-step"><span class="data-flow-step-num">5</span><strong>LlamaInterface</strong> (C++) ejecuta inferencia en llama.cpp</div>
+        </div>
+        <div class="data-flow-row">
+          <div class="data-flow-step"><span class="data-flow-step-num">6</span>Tokens emitidos via <code>token_generated</code> signal</div>
+        </div>
+        <div class="data-flow-row">
+          <div class="data-flow-step"><span class="data-flow-step-num">7</span><strong>DialogueManager</strong> emite <code>npc_speaking</code> para actualizar UI</div>
+        </div>
+      </div>
+
+      <!-- ==================== EDITOR VS RUNTIME ==================== -->
+      <h2>Editor vs Runtime</h2>
+
+      <div class="callout-warning">
+        <p><strong>Separacion Critica:</strong> El codigo del editor <strong>NUNCA</strong> debe estar acoplado al codigo de runtime. Los builds exportados no incluyen el editor.</p>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Ubicacion</th>
+            <th>Se ejecuta en export?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Runtime</td>
+            <td><code>core/</code>, <code>resources/</code>, <code>ai/</code></td>
+            <td><span class="badge badge-green">SI</span></td>
+          </tr>
+          <tr>
+            <td>Editor-only</td>
+            <td><code>editor/</code></td>
+            <td><span class="badge badge-orange">NO</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Consideraciones</h3>
+
+      <ul>
+        <li><strong>AutoLoad:</strong> <code>AIServiceAutoload</code> se registra automaticamente para runtime</li>
+        <li><strong>Export Plugin:</strong> <code>ModelExportPlugin</code> copia los modelos GGUF al build</li>
+        <li><strong>res://</strong> es <strong>read-only</strong> en exports - los modelos van en <code>user://</code></li>
+      </ul>
+
+      <!-- ==================== DIRECTORY STRUCTURE ==================== -->
+      <h2>Estructura de Directorios</h2>
+
+      <div class="dir-tree">
+        <div class="dir-root">addons/ohmydialog/</div>
+
+        <!-- gdextension -->
+        <div class="dir-section">
+          <div class="dir-folder">
+            <span class="dir-folder-icon">📁</span>
+            <span>gdextension/</span>
+            <span class="dir-comment">C++ native code</span>
+          </div>
+          <div class="dir-files">
+            <div class="dir-file"><span class="dir-file-icon">📁</span> godot-cpp/ <span class="dir-comment">Submodule</span></div>
+            <div class="dir-subdir">
+              <div class="dir-file"><span class="dir-file-icon">📁</span> thirdparty/</div>
+              <div class="dir-files">
+                <div class="dir-file"><span class="dir-file-icon">📁</span> llama.cpp/ <span class="dir-comment">Submodule</span></div>
+              </div>
+            </div>
+            <div class="dir-subdir">
+              <div class="dir-file"><span class="dir-file-icon">📁</span> src/</div>
+              <div class="dir-files">
+                <div class="dir-file"><span class="dir-file-icon">📄</span> llama_interface.h <span class="dir-comment">LLM wrapper</span></div>
+                <div class="dir-file"><span class="dir-file-icon">📄</span> llama_interface.cpp</div>
+                <div class="dir-file"><span class="dir-file-icon">📄</span> register_types.cpp</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- core -->
+        <div class="dir-section">
+          <div class="dir-folder">
+            <span class="dir-folder-icon">📁</span>
+            <span>core/</span>
+            <span class="dir-comment">Runtime logic</span>
+          </div>
+          <div class="dir-files">
+            <div class="dir-file"><span class="dir-file-icon">📄</span> ai_service.gd <span class="dir-comment">Singleton LLM</span></div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> dialogue_manager.gd <span class="dir-comment">Main entry</span></div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> graph_runner.gd <span class="dir-comment">Graph interpreter</span></div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> conversation_state.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> context_manager.gd</div>
+            <div class="dir-subdir">
+              <div class="dir-file"><span class="dir-file-icon">📁</span> node_executors/ <span class="dir-comment">Strategy pattern</span></div>
+              <div class="dir-files">
+                <div class="dir-file"><span class="dir-file-icon">📄</span> base_executor.gd</div>
+                <div class="dir-file"><span class="dir-file-icon">📄</span> ai_response_executor.gd</div>
+                <div class="dir-file"><span class="dir-file-icon">📄</span> static_response_executor.gd</div>
+                <div class="dir-file"><span class="dir-file-icon">📄</span> ...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ai -->
+        <div class="dir-section">
+          <div class="dir-folder">
+            <span class="dir-folder-icon">📁</span>
+            <span>ai/</span>
+            <span class="dir-comment">AI utilities</span>
+          </div>
+          <div class="dir-files">
+            <div class="dir-file"><span class="dir-file-icon">📄</span> prompt_builder.gd <span class="dir-comment">Prompt construction</span></div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> model_downloader.gd <span class="dir-comment">HuggingFace downloads</span></div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> huggingface_api.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> gguf_parser.gd</div>
+          </div>
+        </div>
+
+        <!-- resources -->
+        <div class="dir-section">
+          <div class="dir-folder">
+            <span class="dir-folder-icon">📁</span>
+            <span>resources/</span>
+            <span class="dir-comment">Data classes</span>
+          </div>
+          <div class="dir-files">
+            <div class="dir-file"><span class="dir-file-icon">📄</span> dialogue_graph.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> character_identity.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> world_context.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> model_config.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> ai_preset.gd</div>
+            <div class="dir-subdir">
+              <div class="dir-file"><span class="dir-file-icon">📁</span> nodes/ <span class="dir-comment">Node data types</span></div>
+              <div class="dir-files">
+                <div class="dir-file"><span class="dir-file-icon">📄</span> dialogue_node_data.gd</div>
+                <div class="dir-file"><span class="dir-file-icon">📄</span> ai_response_node_data.gd</div>
+                <div class="dir-file"><span class="dir-file-icon">📄</span> ...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- editor -->
+        <div class="dir-section">
+          <div class="dir-folder">
+            <span class="dir-folder-icon">📁</span>
+            <span>editor/</span>
+            <span class="dir-comment">Editor-only</span>
+          </div>
+          <div class="dir-files">
+            <div class="dir-file"><span class="dir-file-icon">📄</span> model_manager_window.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> dialogue_graph_editor.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📄</span> dialogue_graph_window.gd</div>
+            <div class="dir-file"><span class="dir-file-icon">📁</span> inspector/ <span class="dir-comment">Inspector plugins</span></div>
+            <div class="dir-file"><span class="dir-file-icon">📁</span> nodes/ <span class="dir-comment">Visual graph nodes</span></div>
+          </div>
+        </div>
+
+        <!-- autoload -->
+        <div class="dir-section">
+          <div class="dir-folder">
+            <span class="dir-folder-icon">📁</span>
+            <span>autoload/</span>
+          </div>
+          <div class="dir-files">
+            <div class="dir-file"><span class="dir-file-icon">📄</span> ai_service_autoload.gd</div>
+          </div>
+        </div>
+
+        <!-- plugin.gd -->
+        <div class="dir-section" style="border-left-color: var(--ai-green);">
+          <div class="dir-file" style="font-size: 0.85rem;">
+            <span class="dir-file-icon">📄</span>
+            <span style="color: var(--ai-green);">plugin.gd</span>
+            <span class="dir-comment">EditorPlugin entry point</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SEE ALSO ==================== -->
+      <h2>Ver Tambien</h2>
+
+      <ul>
+        <li><a href="../API/dialogue-manager.html">DialogueManager API</a> - Referencia completa del manager</li>
+        <li><a href="../API/llama-interface.html">LlamaInterface API</a> - Wrapper de llama.cpp</li>
+        <li><a href="dialogue-nodes.html">Dialogue Nodes</a> - Tipos de nodos disponibles</li>
+        <li><a href="gdextension.html">GDExtension Build</a> - Como compilar el addon</li>
+      </ul>
+
       <footer class="wiki-footer"><p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p></footer>
     </main>
   </div>

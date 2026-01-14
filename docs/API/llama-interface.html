@@ -165,6 +165,22 @@ llama.load_model("res://models/model.gguf")</code></pre>
             <td><code>String</code></td>
             <td><a href="#get_model_path">get_model_path</a>() const</td>
           </tr>
+          <tr>
+            <td><code>String</code></td>
+            <td><a href="#get_system_info">get_system_info</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>String</code></td>
+            <td><a href="#get_chat_template">get_chat_template</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>String</code></td>
+            <td><a href="#apply_chat_template">apply_chat_template</a>(messages: Array, add_generation_prompt: bool = true)</td>
+          </tr>
+          <tr>
+            <td><code>int</code></td>
+            <td><a href="#count_tokens">count_tokens</a>(text: String) const</td>
+          </tr>
         </tbody>
       </table>
 
@@ -181,6 +197,39 @@ llama.load_model("res://models/model.gguf")</code></pre>
           <tr>
             <td><code>String</code></td>
             <td><a href="#generate">generate</a>(prompt: String)</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#generate_async">generate_async</a>(prompt: String)</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#generate_streaming">generate_streaming</a>(prompt: String)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Control de Generación Asíncrona</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Retorno</th>
+            <th>Método</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>bool</code></td>
+            <td><a href="#is_generating">is_generating</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>float</code></td>
+            <td><a href="#get_generation_progress">get_generation_progress</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#cancel_generation">cancel_generation</a>()</td>
           </tr>
         </tbody>
       </table>
@@ -234,6 +283,30 @@ llama.load_model("res://models/model.gguf")</code></pre>
           <tr>
             <td><code>float</code></td>
             <td><a href="#get_repeat_penalty">get_repeat_penalty</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_frequency_penalty">set_frequency_penalty</a>(penalty: float)</td>
+          </tr>
+          <tr>
+            <td><code>float</code></td>
+            <td><a href="#get_frequency_penalty">get_frequency_penalty</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_presence_penalty">set_presence_penalty</a>(penalty: float)</td>
+          </tr>
+          <tr>
+            <td><code>float</code></td>
+            <td><a href="#get_presence_penalty">get_presence_penalty</a>() const</td>
+          </tr>
+          <tr>
+            <td><code>void</code></td>
+            <td><a href="#set_repeat_last_n">set_repeat_last_n</a>(n: int)</td>
+          </tr>
+          <tr>
+            <td><code>int</code></td>
+            <td><a href="#get_repeat_last_n">get_repeat_last_n</a>() const</td>
           </tr>
           <tr>
             <td><code>void</code></td>
@@ -573,6 +646,35 @@ else:
         </tbody>
       </table>
 
+      <h4>Información de GPU/Backend</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>n_gpu_layers</code></td>
+            <td>int</td>
+            <td>Número real de capas en GPU (0 = CPU only)</td>
+          </tr>
+          <tr>
+            <td><code>gpu_backend_name</code></td>
+            <td>String</td>
+            <td>Nombre del backend: "Vulkan0", "CUDA0", "Metal", "CPU"</td>
+          </tr>
+          <tr>
+            <td><code>gpu_backend_desc</code></td>
+            <td>String</td>
+            <td>Descripción del dispositivo (ej: "AMD Radeon RX 9070 XT")</td>
+          </tr>
+        </tbody>
+      </table>
+
       <h4>Ejemplo</h4>
 
       <pre data-lang="GDSCRIPT"><code>var info = llama.get_model_info()
@@ -580,7 +682,16 @@ if not info.is_empty():
     print("Model: ", info.description)
     print("Parameters: ", info.n_params / 1_000_000_000.0, "B")
     print("Context: ", info.n_ctx, " tokens")
-    print("Layers: ", info.n_layer)</code></pre>
+    print("Layers: ", info.n_layer)
+
+    # GPU info
+    var gpu_layers = info.get("n_gpu_layers", 0)
+    var backend = info.get("gpu_backend_name", "CPU")
+    if gpu_layers > 0:
+        print("GPU: ", info.get("gpu_backend_desc", ""))
+        print("Layers on GPU: %d/%d" % [gpu_layers, info.n_layer])
+    else:
+        print("Running on CPU only")</code></pre>
 
       <hr>
 
@@ -593,6 +704,119 @@ if not info.is_empty():
       <h4>Retorno</h4>
 
       <p>La ruta del modelo, o un String vacío si no hay modelo cargado.</p>
+
+      <hr>
+
+      <h3 id="get_system_info">get_system_info</h3>
+
+      <pre data-lang="GDSCRIPT"><code>String get_system_info() const</code></pre>
+
+      <p>Retorna información del sistema: características de CPU y backends disponibles.</p>
+
+      <h4>Retorno</h4>
+
+      <p>String con formato <code>"FEATURE = 0/1 | FEATURE = 0/1 | ..."</code> incluyendo:</p>
+
+      <ul>
+        <li><strong>CPU:</strong> AVX, AVX2, AVX512, FMA, F16C, NEON</li>
+        <li><strong>GPU:</strong> VULKAN, CUDA, METAL</li>
+      </ul>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>var sys_info = llama.get_system_info()
+print(sys_info)
+# Output: "AVX = 1 | AVX2 = 1 | AVX512 = 0 | ... | VULKAN = 1 | CUDA = 0"
+
+# Parse specific features
+if "AVX2 = 1" in sys_info:
+    print("AVX2 supported!")
+if "VULKAN = 1" in sys_info:
+    print("Vulkan backend available!")</code></pre>
+
+      <hr>
+
+      <h3 id="get_chat_template">get_chat_template</h3>
+
+      <pre data-lang="GDSCRIPT"><code>String get_chat_template() const</code></pre>
+
+      <p>Obtiene el template de chat embebido en los metadatos del modelo (formato Jinja2).</p>
+
+      <h4>Retorno</h4>
+
+      <p>El template de chat, o String vacío si el modelo no incluye uno.</p>
+
+      <blockquote>
+        <strong>Nota:</strong> La mayoría de modelos de chat modernos (Llama 3, Qwen, Mistral) incluyen su template. Modelos base no suelen tenerlo.
+      </blockquote>
+
+      <hr>
+
+      <h3 id="apply_chat_template">apply_chat_template</h3>
+
+      <pre data-lang="GDSCRIPT"><code>String apply_chat_template(messages: Array, add_generation_prompt: bool = true) const</code></pre>
+
+      <p>Formatea mensajes de conversación usando el template del modelo. Usa el parser nativo de llama.cpp (minja).</p>
+
+      <h4>Parámetros</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>messages</code></td>
+            <td>Array</td>
+            <td>Array de diccionarios con <code>role</code> y <code>content</code></td>
+          </tr>
+          <tr>
+            <td><code>add_generation_prompt</code></td>
+            <td>bool</td>
+            <td>Si true, añade el prefijo para que el modelo responda</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>var messages = [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Hello!"},
+    {"role": "assistant", "content": "Hi! How can I help?"},
+    {"role": "user", "content": "Tell me a joke."}
+]
+
+var prompt = llama.apply_chat_template(messages, true)
+var response = llama.generate(prompt)</code></pre>
+
+      <hr>
+
+      <h3 id="count_tokens">count_tokens</h3>
+
+      <pre data-lang="GDSCRIPT"><code>int count_tokens(text: String) const</code></pre>
+
+      <p>Cuenta tokens usando el tokenizador exacto del modelo cargado.</p>
+
+      <h4>Retorno</h4>
+
+      <p>Número de tokens, o <code>-1</code> si no hay modelo cargado.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>var text = "Hello, world! This is a test."
+var token_count = llama.count_tokens(text)
+print("Tokens: ", token_count)  # Varies by model, typically ~8-10
+
+# Verificar que el prompt cabe en el contexto
+var model_info = llama.get_model_info()
+var max_ctx = model_info.get("n_ctx", 4096)
+if token_count > max_ctx - 512:  # Reserve space for response
+    print("Warning: Prompt may be too long!")</code></pre>
 
       <hr>
 
@@ -641,8 +865,122 @@ var response = llama.generate("The quick brown fox")
 print(response)  # " jumps over the lazy dog..."</code></pre>
 
       <blockquote>
-        <strong>Nota:</strong> Esta operación es bloqueante. Para generación asíncrona, usa un Thread o espera la implementación de <code>generate_async()</code>.
+        <strong>Nota:</strong> Esta operación es bloqueante. Para generación no bloqueante, usa <code>generate_async()</code> o <code>generate_streaming()</code>.
       </blockquote>
+
+      <hr>
+
+      <h3 id="generate_async">generate_async</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void generate_async(prompt: String)</code></pre>
+
+      <p>Genera texto de forma asíncrona en un thread de trabajo. No bloquea el hilo principal.</p>
+
+      <h4>Señales emitidas</h4>
+
+      <ul>
+        <li><code>generation_started</code> - Al comenzar</li>
+        <li><code>generation_completed(text)</code> - Al terminar exitosamente</li>
+        <li><code>generation_error(message)</code> - Si hay error</li>
+        <li><code>generation_cancelled</code> - Si se cancela</li>
+      </ul>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>func _ready():
+    llama.generation_completed.connect(_on_completed)
+    llama.generation_error.connect(_on_error)
+
+func generate_response():
+    llama.generate_async("What is the meaning of life?")
+    # Returns immediately, result via signal
+
+func _on_completed(text: String):
+    print("Response: ", text)
+
+func _on_error(message: String):
+    push_error("Failed: " + message)</code></pre>
+
+      <hr>
+
+      <h3 id="generate_streaming">generate_streaming</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void generate_streaming(prompt: String)</code></pre>
+
+      <p>Genera texto con streaming: emite cada token a medida que se genera. Ideal para mostrar respuestas progresivamente en la UI.</p>
+
+      <h4>Señales emitidas</h4>
+
+      <ul>
+        <li><code>generation_started</code> - Al comenzar</li>
+        <li><code>token_generated(token)</code> - Para cada token generado</li>
+        <li><code>generation_progress(tokens, max_tokens)</code> - Progreso periódico</li>
+        <li><code>generation_completed(text)</code> - Al terminar (texto completo)</li>
+      </ul>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>@onready var label: RichTextLabel = %ResponseLabel
+
+func _ready():
+    llama.generation_started.connect(func(): label.text = "")
+    llama.token_generated.connect(func(token): label.text += token)
+    llama.generation_completed.connect(_on_done)
+
+func start_chat():
+    llama.generate_streaming("Tell me about space exploration")
+
+func _on_done(full_text: String):
+    print("Generation finished, %d characters" % full_text.length())</code></pre>
+
+      <hr>
+
+      <h3 id="is_generating">is_generating</h3>
+
+      <pre data-lang="GDSCRIPT"><code>bool is_generating() const</code></pre>
+
+      <p>Verifica si hay una generación asíncrona o streaming en progreso.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>func _on_send_pressed():
+    if llama.is_generating():
+        print("Already generating, please wait...")
+        return
+    llama.generate_streaming(input.text)</code></pre>
+
+      <hr>
+
+      <h3 id="get_generation_progress">get_generation_progress</h3>
+
+      <pre data-lang="GDSCRIPT"><code>float get_generation_progress() const</code></pre>
+
+      <p>Retorna el progreso de la generación actual como valor entre 0.0 y 1.0.</p>
+
+      <h4>Retorno</h4>
+
+      <p><code>tokens_generated / max_tokens</code>. Retorna 0.0 si no hay generación en curso.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>func _process(_delta):
+    if llama.is_generating():
+        progress_bar.value = llama.get_generation_progress() * 100.0</code></pre>
+
+      <hr>
+
+      <h3 id="cancel_generation">cancel_generation</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void cancel_generation()</code></pre>
+
+      <p>Cancela una generación asíncrona o streaming en progreso. Emite <code>generation_cancelled</code> cuando la generación se detiene.</p>
+
+      <h4>Ejemplo</h4>
+
+      <pre data-lang="GDSCRIPT"><code>func _on_cancel_pressed():
+    if llama.is_generating():
+        llama.cancel_generation()
+        status_label.text = "Cancelled"</code></pre>
 
       <hr>
 
@@ -706,6 +1044,57 @@ float get_repeat_penalty() const</code></pre>
       <p>Penaliza la repetición de tokens. <code>1.0</code> = sin penalización.</p>
 
       <p><strong>Default:</strong> <code>1.1</code> | <strong>Rango:</strong> <code>1.0 - 2.0</code></p>
+
+      <hr>
+
+      <h3 id="set_frequency_penalty">set_frequency_penalty / get_frequency_penalty</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_frequency_penalty(penalty: float)
+float get_frequency_penalty() const</code></pre>
+
+      <p>Penaliza tokens según su frecuencia en el texto generado. Reduce repetición de palabras comunes.</p>
+
+      <ul>
+        <li><strong>0.0</strong> = Sin penalización</li>
+        <li><strong>0.5-1.0</strong> = Penalización moderada</li>
+        <li><strong>2.0</strong> = Penalización fuerte</li>
+      </ul>
+
+      <p><strong>Default:</strong> <code>0.0</code> | <strong>Rango:</strong> <code>0.0 - 2.0</code></p>
+
+      <hr>
+
+      <h3 id="set_presence_penalty">set_presence_penalty / get_presence_penalty</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_presence_penalty(penalty: float)
+float get_presence_penalty() const</code></pre>
+
+      <p>Penaliza tokens que ya aparecieron (independiente de frecuencia). Fomenta nuevos temas.</p>
+
+      <ul>
+        <li><strong>0.0</strong> = Sin penalización</li>
+        <li><strong>0.5-1.0</strong> = Fomenta variedad</li>
+        <li><strong>2.0</strong> = Evita fuertemente repetir conceptos</li>
+      </ul>
+
+      <p><strong>Default:</strong> <code>0.0</code> | <strong>Rango:</strong> <code>0.0 - 2.0</code></p>
+
+      <hr>
+
+      <h3 id="set_repeat_last_n">set_repeat_last_n / get_repeat_last_n</h3>
+
+      <pre data-lang="GDSCRIPT"><code>void set_repeat_last_n(n: int)
+int get_repeat_last_n() const</code></pre>
+
+      <p>Define cuántos tokens hacia atrás considerar para aplicar repeat_penalty.</p>
+
+      <ul>
+        <li><strong>0</strong> = Desactivado (sin contexto de repetición)</li>
+        <li><strong>64</strong> = Últimos 64 tokens (recomendado)</li>
+        <li><strong>-1</strong> = Todo el contexto (puede ser lento)</li>
+      </ul>
+
+      <p><strong>Default:</strong> <code>64</code></p>
 
       <hr>
 
@@ -805,6 +1194,8 @@ if llama.has_generation_timed_out():
 
       <h2>Señales</h2>
 
+      <h3>Generación Asíncrona</h3>
+
       <table>
         <thead>
           <tr>
@@ -814,37 +1205,103 @@ if llama.has_generation_timed_out():
         </thead>
         <tbody>
           <tr>
+            <td><code>generation_started()</code></td>
+            <td>Emitida cuando comienza una generación asíncrona o streaming</td>
+          </tr>
+          <tr>
+            <td><code>generation_completed(text: String)</code></td>
+            <td>Emitida cuando la generación termina exitosamente. <code>text</code> contiene el resultado completo.</td>
+          </tr>
+          <tr>
+            <td><code>generation_error(message: String)</code></td>
+            <td>Emitida cuando ocurre un error durante la generación</td>
+          </tr>
+          <tr>
+            <td><code>generation_cancelled()</code></td>
+            <td>Emitida cuando la generación es cancelada mediante <code>cancel_generation()</code></td>
+          </tr>
+          <tr>
             <td><code>generation_timeout()</code></td>
             <td>Emitida cuando la generación excede el tiempo límite configurado</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Ejemplo</h4>
+      <h3>Streaming</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Señal</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>token_generated(token: String)</code></td>
+            <td>Emitida para cada token generado durante streaming. Permite mostrar texto progresivamente.</td>
+          </tr>
+          <tr>
+            <td><code>generation_progress(tokens: int, max_tokens: int)</code></td>
+            <td>Emitida periódicamente con el progreso de generación. Útil para barras de progreso.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Ejemplo de Streaming</h4>
 
       <pre data-lang="GDSCRIPT"><code>func _ready():
     llama = LlamaInterface.new()
-    llama.generation_timeout.connect(_on_timeout)
+    llama.generation_started.connect(_on_started)
+    llama.token_generated.connect(_on_token)
+    llama.generation_completed.connect(_on_completed)
+    llama.generation_error.connect(_on_error)
+    llama.generation_cancelled.connect(_on_cancelled)
 
-func _on_timeout():
-    print("Generation took too long!")</code></pre>
+func start_streaming():
+    llama.generate_streaming("Tell me a story about")
+
+func _on_started():
+    label.text = ""
+    print("Generation started...")
+
+func _on_token(token: String):
+    label.text += token  # Append each token as it arrives
+
+func _on_completed(full_text: String):
+    print("Done! Total length: ", full_text.length())
+
+func _on_error(message: String):
+    push_error("Generation failed: " + message)
+
+func _on_cancelled():
+    print("Generation was cancelled")</code></pre>
 
       <hr>
 
       <h2>Ejemplo Completo</h2>
 
       <pre data-lang="GDSCRIPT"><code>extends Node
+## Complete example showing sync and async generation with GPU support
 
 var llama: LlamaInterface
+@onready var output_label: RichTextLabel = %OutputLabel
+@onready var progress_bar: ProgressBar = %ProgressBar
 
 func _ready():
     llama = LlamaInterface.new()
+
+    # Connect async signals
+    llama.generation_started.connect(_on_generation_started)
+    llama.token_generated.connect(_on_token_generated)
+    llama.generation_completed.connect(_on_generation_completed)
+    llama.generation_error.connect(_on_generation_error)
     llama.generation_timeout.connect(_on_generation_timeout)
 
-    # Cargar modelo con configuración personalizada
+    # Load model with GPU offloading
     var err = llama.load_model("user://models/qwen2.5-7b-q4_k_m.gguf", {
         "n_ctx": 8192,
-        "n_gpu_layers": 35,  # Offload a GPU si está disponible
+        "n_gpu_layers": -1,  # -1 = all layers to GPU
         "n_threads": 8
     })
 
@@ -852,32 +1309,94 @@ func _ready():
         push_error("Error loading model")
         return
 
-    # Mostrar información del modelo
+    _print_model_info()
+    _configure_generation()
+
+
+func _print_model_info():
     var info = llama.get_model_info()
     print("=== Model Info ===")
     print("Description: ", info.get("description", "Unknown"))
-    print("Size: ", info.get("size_bytes", 0) / (1024 * 1024), " MB")
-    print("Parameters: ", info.get("n_params", 0))
+    print("Parameters: %.1fB" % (info.get("n_params", 0) / 1_000_000_000.0))
+    print("Context: %d tokens" % info.get("n_ctx", 0))
 
-    # Configurar generación
-    llama.set_temperature(0.7)
-    llama.set_max_tokens(150)
-    llama.set_timeout(30000)  # 30 segundos máximo
-    llama.set_stop_sequences(["User:", "\n\n"])
-
-    # Generar respuesta
-    var response = llama.generate("Hello! How are you today?")
-
-    if llama.has_generation_timed_out():
-        print("Warning: Generation timed out")
-        print("Partial response: ", response)
+    # GPU info
+    var gpu_layers = info.get("n_gpu_layers", 0)
+    var backend = info.get("gpu_backend_name", "CPU")
+    if gpu_layers > 0:
+        print("GPU: %s (%s)" % [backend, info.get("gpu_backend_desc", "")])
+        print("Layers on GPU: %d/%d" % [gpu_layers, info.get("n_layer", 0)])
     else:
-        print("Response: ", response)
+        print("Running on CPU")
+
+    # System capabilities
+    var sys_info = llama.get_system_info()
+    if "VULKAN = 1" in sys_info:
+        print("Vulkan: Available")
+    if "AVX2 = 1" in sys_info:
+        print("AVX2: Available")
+
+
+func _configure_generation():
+    llama.set_temperature(0.7)
+    llama.set_top_p(0.9)
+    llama.set_max_tokens(256)
+    llama.set_repeat_penalty(1.1)
+    llama.set_frequency_penalty(0.5)
+    llama.set_timeout(60000)  # 60 second timeout
+    llama.set_stop_sequences(["User:", "\n\n", "<|im_end|>"])
+
+
+func generate_with_chat_template():
+    # Use model's built-in chat template
+    var messages = [
+        {"role": "system", "content": "You are a helpful NPC in a fantasy game."},
+        {"role": "user", "content": "What quests do you have for me?"}
+    ]
+
+    var prompt = llama.apply_chat_template(messages, true)
+    var tokens = llama.count_tokens(prompt)
+    print("Prompt tokens: ", tokens)
+
+    # Start streaming generation
+    llama.generate_streaming(prompt)
+
+
+func _on_generation_started():
+    output_label.text = ""
+    progress_bar.value = 0
+    print("Generation started...")
+
+
+func _on_token_generated(token: String):
+    output_label.text += token
+
+
+func _process(_delta):
+    if llama.is_generating():
+        progress_bar.value = llama.get_generation_progress() * 100.0
+
+
+func _on_generation_completed(full_text: String):
+    print("Done! Generated %d characters" % full_text.length())
+    progress_bar.value = 100
+
+
+func _on_generation_error(message: String):
+    push_error("Generation failed: " + message)
+
 
 func _on_generation_timeout():
-    print("Generation exceeded time limit!")
+    print("Generation timed out!")
+
+
+func cancel_if_running():
+    if llama.is_generating():
+        llama.cancel_generation()
+
 
 func _exit_tree():
+    cancel_if_running()
     if llama and llama.is_model_loaded():
         llama.unload_model()</code></pre>
 
@@ -886,6 +1405,47 @@ func _exit_tree():
       <h2>Modelos Compatibles</h2>
 
       <p>LlamaInterface soporta cualquier modelo en formato <strong>GGUF</strong>. Algunos modelos recomendados:</p>
+
+      <h4>Modelos Pequeños (Steam Deck, dispositivos móviles)</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>Tamaño</th>
+            <th>RAM/VRAM</th>
+            <th>Uso Recomendado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SmolLM2-360M</td>
+            <td>~250 MB</td>
+            <td>~500 MB</td>
+            <td>Respuestas muy cortas, dispositivos limitados</td>
+          </tr>
+          <tr>
+            <td>SmolLM2-1.7B</td>
+            <td>~1 GB</td>
+            <td>~2 GB</td>
+            <td>Steam Deck, NPCs simples</td>
+          </tr>
+          <tr>
+            <td>Qwen2.5-0.5B</td>
+            <td>~400 MB</td>
+            <td>~800 MB</td>
+            <td>Respuestas básicas, muy rápido</td>
+          </tr>
+          <tr>
+            <td>Qwen2.5-1.5B</td>
+            <td>~1 GB</td>
+            <td>~2 GB</td>
+            <td>Balance para dispositivos limitados</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4>Modelos Medianos (PC de escritorio)</h4>
 
       <table>
         <thead>
