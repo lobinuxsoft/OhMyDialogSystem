@@ -45,6 +45,9 @@ void LlamaInterface::_cleanup() {
 		m_backend_initialized = false;
 	}
 	m_model_path = "";
+	m_n_gpu_layers = 0;
+	m_gpu_backend_name = "";
+	m_gpu_backend_desc = "";
 }
 
 llama_sampler *LlamaInterface::_create_sampler() const {
@@ -314,12 +317,15 @@ Error LlamaInterface::load_model(const String &path, const Dictionary &params) {
 
 	UtilityFunctions::print(vformat("LlamaInterface: Model has %d layers, %d offloaded to GPU", n_layers, n_gpu_layers_actual));
 
+	// Store actual GPU layers used
+	m_n_gpu_layers = n_gpu_layers_actual;
+	m_gpu_backend_name = "";
+	m_gpu_backend_desc = "";
+
 	// Determine and log which backend is being used
 	if (n_gpu_layers_actual > 0 && n_backends > 0) {
 		// Check if we have a GPU backend available
 		bool has_gpu_backend = false;
-		String gpu_backend_name;
-		String gpu_backend_desc;
 		for (size_t i = 0; i < n_backends; i++) {
 			ggml_backend_dev_t dev = ggml_backend_dev_get(i);
 			const char* name = ggml_backend_dev_name(dev);
@@ -328,19 +334,27 @@ Error LlamaInterface::load_model(const String &path, const Dictionary &params) {
 			// GPU backends have type GPU (dedicated) or IGPU (integrated)
 			if (dev_type == GGML_BACKEND_DEVICE_TYPE_GPU || dev_type == GGML_BACKEND_DEVICE_TYPE_IGPU) {
 				has_gpu_backend = true;
-				gpu_backend_name = String::utf8(name);
-				gpu_backend_desc = String::utf8(desc);
+				m_gpu_backend_name = String::utf8(name);
+				m_gpu_backend_desc = String::utf8(desc);
 				break;
 			}
 		}
 		if (has_gpu_backend) {
-			UtilityFunctions::print(vformat("LlamaInterface: [BACKEND] Using GPU: %s (%s)", gpu_backend_name, gpu_backend_desc));
+			UtilityFunctions::print(vformat("LlamaInterface: [BACKEND] Using GPU: %s (%s)", m_gpu_backend_name, m_gpu_backend_desc));
 		} else {
+			m_gpu_backend_name = "CPU";
+			m_gpu_backend_desc = "no GPU backend available";
+			m_n_gpu_layers = 0;
 			UtilityFunctions::print("LlamaInterface: [BACKEND] Using CPU (no GPU backend available)");
 		}
 	} else if (n_gpu_layers_actual == 0) {
+		m_gpu_backend_name = "CPU";
+		m_gpu_backend_desc = "n_gpu_layers = 0";
 		UtilityFunctions::print("LlamaInterface: [BACKEND] Using CPU (n_gpu_layers = 0)");
 	} else {
+		m_gpu_backend_name = "CPU";
+		m_gpu_backend_desc = "no backends detected";
+		m_n_gpu_layers = 0;
 		UtilityFunctions::print("LlamaInterface: [BACKEND] Using CPU (no backends detected)");
 	}
 
@@ -420,6 +434,11 @@ Dictionary LlamaInterface::get_model_info() const {
 	if (chat_template != nullptr) {
 		info["chat_template"] = String::utf8(chat_template);
 	}
+
+	// GPU/Backend info
+	info["n_gpu_layers"] = m_n_gpu_layers;
+	info["gpu_backend_name"] = m_gpu_backend_name;
+	info["gpu_backend_desc"] = m_gpu_backend_desc;
 
 	return info;
 }

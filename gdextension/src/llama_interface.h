@@ -32,6 +32,11 @@ private:
 	String m_model_path;
 	bool m_backend_initialized = false;
 
+	// GPU/Backend info (populated after model load)
+	int32_t m_n_gpu_layers = 0;
+	String m_gpu_backend_name;
+	String m_gpu_backend_desc;
+
 	// Sampling parameters
 	float m_temperature = 0.8f;
 	float m_top_p = 0.95f;
