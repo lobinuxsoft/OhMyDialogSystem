@@ -131,3 +131,10 @@ func get_model_info() -> Dictionary:
 	if not is_model_loaded():
 		return {}
 	return _llama.get_model_info()
+
+
+## Gets system info string (CPU features, backend capabilities)
+func get_system_info() -> String:
+	if _llama:
+		return _llama.get_system_info()
+	return ""

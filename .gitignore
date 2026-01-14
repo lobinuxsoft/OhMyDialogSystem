@@ -69,3 +69,8 @@ user://
 build/
 dist/
 *.os
+
+# Local build helpers (machine-specific paths)
+gdextension/run_build.bat
+run_build.bat
+tmpclaude-*

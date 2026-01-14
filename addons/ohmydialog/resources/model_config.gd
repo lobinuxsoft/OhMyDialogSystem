@@ -67,8 +67,8 @@ extends Resource
 ## Context size in tokens
 @export var n_ctx: int = 2048
 
-## Number of layers to offload to GPU (0 = CPU only)
-@export var n_gpu_layers: int = 0
+## Number of layers to offload to GPU (-1 = all layers, 0 = CPU only)
+@export var n_gpu_layers: int = -1
 
 ## Batch size for prompt processing
 @export var n_batch: int = 512

@@ -5,6 +5,9 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
+// For dynamic backend loading (GGML_BACKEND_DL)
+#include "ggml-backend.h"
+
 #include <string>
 
 namespace godot {
@@ -42,6 +45,9 @@ void LlamaInterface::_cleanup() {
 		m_backend_initialized = false;
 	}
 	m_model_path = "";
+	m_n_gpu_layers = 0;
+	m_gpu_backend_name = "";
+	m_gpu_backend_desc = "";
 }
 
 llama_sampler *LlamaInterface::_create_sampler() const {
@@ -125,6 +131,7 @@ void LlamaInterface::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("unload_model"), &LlamaInterface::unload_model);
 	ClassDB::bind_method(D_METHOD("is_model_loaded"), &LlamaInterface::is_model_loaded);
 	ClassDB::bind_method(D_METHOD("get_model_info"), &LlamaInterface::get_model_info);
+	ClassDB::bind_method(D_METHOD("get_system_info"), &LlamaInterface::get_system_info);
 	ClassDB::bind_method(D_METHOD("get_model_path"), &LlamaInterface::get_model_path);
 	ClassDB::bind_method(D_METHOD("get_chat_template"), &LlamaInterface::get_chat_template);
 	ClassDB::bind_method(D_METHOD("apply_chat_template", "messages", "add_generation_prompt"), &LlamaInterface::apply_chat_template, DEFVAL(true));
@@ -213,12 +220,43 @@ Error LlamaInterface::load_model(const String &path, const Dictionary &params) {
 		return ERR_FILE_NOT_FOUND;
 	}
 
+	// Load dynamic backends (GGML_BACKEND_DL)
+	// This will scan for and load backend libraries (ggml-cuda.dll, ggml-vulkan.dll, etc.)
+	// and automatically select the best available backend at runtime
+	// Note: We must specify the addon path because ggml_backend_load_all() looks
+	// in the executable directory (Godot.exe), not where our DLLs are located
+	ProjectSettings* settings = ProjectSettings::get_singleton();
+	if (settings != nullptr) {
+		String addon_path = settings->globalize_path("res://addons/ohmydialog/gdextension/");
+		CharString addon_path_utf8 = addon_path.utf8();
+		UtilityFunctions::print("LlamaInterface: Loading backends from: ", addon_path);
+		ggml_backend_load_all_from_path(addon_path_utf8.get_data());
+	} else {
+		// Fallback to default search (executable directory)
+		UtilityFunctions::print("LlamaInterface: ProjectSettings not available, using default backend search");
+		ggml_backend_load_all();
+	}
+
+	// Log available backends for debugging
+	size_t n_backends = ggml_backend_dev_count();
+	UtilityFunctions::print(vformat("LlamaInterface: %d backend device(s) available", n_backends));
+	for (size_t i = 0; i < n_backends; i++) {
+		ggml_backend_dev_t dev = ggml_backend_dev_get(i);
+		const char* name = ggml_backend_dev_name(dev);
+		const char* desc = ggml_backend_dev_description(dev);
+		UtilityFunctions::print(vformat("  - %s: %s", name, desc));
+	}
+
 	// Initialize backend
 	llama_backend_init();
 	m_backend_initialized = true;
 
 	// Configure model parameters
 	llama_model_params model_params = llama_model_default_params();
+
+	// Default to all layers on GPU (-1 means all layers)
+	// This prioritizes Vulkan/GPU over CPU when available
+	model_params.n_gpu_layers = 999;
 
 	if (params.has("n_gpu_layers")) {
 		model_params.n_gpu_layers = static_cast<int32_t>(static_cast<int>(params["n_gpu_layers"]));
@@ -270,6 +308,56 @@ Error LlamaInterface::load_model(const String &path, const Dictionary &params) {
 
 	m_model_path = path;
 	UtilityFunctions::print("LlamaInterface: Model loaded successfully: ", path);
+
+	// Log model layer information and backend usage
+	int n_layers = llama_model_n_layer(m_model);
+	int n_gpu_layers_requested = model_params.n_gpu_layers;
+	int n_gpu_layers_actual = (n_gpu_layers_requested < 0 || n_gpu_layers_requested > n_layers)
+		? n_layers
+		: n_gpu_layers_requested;
+
+	UtilityFunctions::print(vformat("LlamaInterface: Model has %d layers, %d offloaded to GPU", n_layers, n_gpu_layers_actual));
+
+	// Store actual GPU layers used
+	m_n_gpu_layers = n_gpu_layers_actual;
+	m_gpu_backend_name = "";
+	m_gpu_backend_desc = "";
+
+	// Determine and log which backend is being used
+	if (n_gpu_layers_actual > 0 && n_backends > 0) {
+		// Check if we have a GPU backend available
+		bool has_gpu_backend = false;
+		for (size_t i = 0; i < n_backends; i++) {
+			ggml_backend_dev_t dev = ggml_backend_dev_get(i);
+			const char* name = ggml_backend_dev_name(dev);
+			const char* desc = ggml_backend_dev_description(dev);
+			enum ggml_backend_dev_type dev_type = ggml_backend_dev_type(dev);
+			// GPU backends have type GPU (dedicated) or IGPU (integrated)
+			if (dev_type == GGML_BACKEND_DEVICE_TYPE_GPU || dev_type == GGML_BACKEND_DEVICE_TYPE_IGPU) {
+				has_gpu_backend = true;
+				m_gpu_backend_name = String::utf8(name);
+				m_gpu_backend_desc = String::utf8(desc);
+				break;
+			}
+		}
+		if (has_gpu_backend) {
+			UtilityFunctions::print(vformat("LlamaInterface: [BACKEND] Using GPU: %s (%s)", m_gpu_backend_name, m_gpu_backend_desc));
+		} else {
+			m_gpu_backend_name = "CPU";
+			m_gpu_backend_desc = "no GPU backend available";
+			m_n_gpu_layers = 0;
+			UtilityFunctions::print("LlamaInterface: [BACKEND] Using CPU (no GPU backend available)");
+		}
+	} else if (n_gpu_layers_actual == 0) {
+		m_gpu_backend_name = "CPU";
+		m_gpu_backend_desc = "n_gpu_layers = 0";
+		UtilityFunctions::print("LlamaInterface: [BACKEND] Using CPU (n_gpu_layers = 0)");
+	} else {
+		m_gpu_backend_name = "CPU";
+		m_gpu_backend_desc = "no backends detected";
+		m_n_gpu_layers = 0;
+		UtilityFunctions::print("LlamaInterface: [BACKEND] Using CPU (no backends detected)");
+	}
 
 	return OK;
 }
@@ -348,11 +436,24 @@ Dictionary LlamaInterface::get_model_info() const {
 		info["chat_template"] = String::utf8(chat_template);
 	}
 
+	// GPU/Backend info
+	info["n_gpu_layers"] = m_n_gpu_layers;
+	info["gpu_backend_name"] = m_gpu_backend_name;
+	info["gpu_backend_desc"] = m_gpu_backend_desc;
+
 	return info;
 }
 
 String LlamaInterface::get_model_path() const {
 	return m_model_path;
+}
+
+String LlamaInterface::get_system_info() const {
+	const char *info = llama_print_system_info();
+	if (info != nullptr) {
+		return String::utf8(info);
+	}
+	return String();
 }
 
 String LlamaInterface::get_chat_template() const {

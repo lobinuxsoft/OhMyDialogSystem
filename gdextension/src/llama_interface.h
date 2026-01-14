@@ -32,6 +32,11 @@ private:
 	String m_model_path;
 	bool m_backend_initialized = false;
 
+	// GPU/Backend info (populated after model load)
+	int32_t m_n_gpu_layers = 0;
+	String m_gpu_backend_name;
+	String m_gpu_backend_desc;
+
 	// Sampling parameters
 	float m_temperature = 0.8f;
 	float m_top_p = 0.95f;
@@ -92,6 +97,10 @@ public:
 	/// Get information about the currently loaded model.
 	/// @return Dictionary with model info, or empty if no model is loaded
 	Dictionary get_model_info() const;
+
+	/// Get system information (CPU features, backend capabilities).
+	/// @return String with system info (AVX2, Vulkan, etc.)
+	String get_system_info() const;
 
 	/// Get the path of the currently loaded model.
 	/// @return Model path or empty string if no model is loaded

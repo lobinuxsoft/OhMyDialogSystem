@@ -772,6 +772,443 @@ ResourceSaver.save(graph, "res://dialogues/merchant_greeting.tres")</code></pre>
 
       <hr>
 
+      <!-- ==================== AIPreset ==================== -->
+      <h2 id="ai-preset">
+        <div class="resource-header">
+          <span class="icon">⚙️</span>
+          <span>AIPreset</span>
+        </div>
+      </h2>
+
+      <p>Almacena parámetros de generación LLM como presets reutilizables. Permite cambiar rápidamente entre diferentes estilos de generación (creativo, consistente, roleplay) sin reconfigurar parámetros.</p>
+
+      <p><strong>Archivo:</strong> <code>addons/ohmydialog/resources/ai_preset.gd</code></p>
+
+      <h3>Propiedades</h3>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Grupo</th>
+            <th>Propiedad</th>
+            <th>Tipo</th>
+            <th>Default</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="3"><strong>Identity</strong></td>
+            <td><code>preset_name</code></td>
+            <td>String</td>
+            <td>"Custom"</td>
+            <td>Nombre legible del preset</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td>String</td>
+            <td>""</td>
+            <td>Descripción de cuándo usar este preset</td>
+          </tr>
+          <tr>
+            <td><code>preset_type</code></td>
+            <td>PresetType</td>
+            <td>CUSTOM</td>
+            <td>Tipo de preset (ver enum)</td>
+          </tr>
+          <tr>
+            <td rowspan="5"><strong>Temperature & Sampling</strong></td>
+            <td><code>temperature</code></td>
+            <td>float</td>
+            <td>0.7</td>
+            <td>Aleatoriedad (0 = greedy, 2 = muy aleatorio)</td>
+          </tr>
+          <tr>
+            <td><code>top_p</code></td>
+            <td>float</td>
+            <td>0.9</td>
+            <td>Nucleus sampling threshold</td>
+          </tr>
+          <tr>
+            <td><code>top_k</code></td>
+            <td>int</td>
+            <td>40</td>
+            <td>Considerar solo los K tokens más probables</td>
+          </tr>
+          <tr>
+            <td><code>min_p</code></td>
+            <td>float</td>
+            <td>0.05</td>
+            <td>Probabilidad mínima para considerar token</td>
+          </tr>
+          <tr>
+            <td><code>typical_p</code></td>
+            <td>float</td>
+            <td>1.0</td>
+            <td>Typical sampling (1.0 = deshabilitado)</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Output</strong></td>
+            <td><code>max_tokens</code></td>
+            <td>int</td>
+            <td>256</td>
+            <td>Máximo de tokens por respuesta</td>
+          </tr>
+          <tr>
+            <td><code>stop_sequences</code></td>
+            <td>Array[String]</td>
+            <td>[]</td>
+            <td>Secuencias que detienen la generación</td>
+          </tr>
+          <tr>
+            <td rowspan="4"><strong>Repetition</strong></td>
+            <td><code>repeat_penalty</code></td>
+            <td>float</td>
+            <td>1.1</td>
+            <td>Penalización por repetición</td>
+          </tr>
+          <tr>
+            <td><code>repeat_last_n</code></td>
+            <td>int</td>
+            <td>64</td>
+            <td>Tokens recientes a considerar</td>
+          </tr>
+          <tr>
+            <td><code>frequency_penalty</code></td>
+            <td>float</td>
+            <td>0.0</td>
+            <td>Penaliza por frecuencia (estilo OpenAI)</td>
+          </tr>
+          <tr>
+            <td><code>presence_penalty</code></td>
+            <td>float</td>
+            <td>0.0</td>
+            <td>Penaliza si apareció (estilo OpenAI)</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Context</strong></td>
+            <td><code>context_size</code></td>
+            <td>int</td>
+            <td>4096</td>
+            <td>Tamaño máximo de contexto en tokens</td>
+          </tr>
+          <tr>
+            <td><code>response_reserve</code></td>
+            <td>int</td>
+            <td>256</td>
+            <td>Tokens reservados para respuesta</td>
+          </tr>
+          <tr>
+            <td rowspan="4"><strong>Advanced</strong></td>
+            <td><code>seed</code></td>
+            <td>int</td>
+            <td>-1</td>
+            <td>Semilla (-1 = aleatorio)</td>
+          </tr>
+          <tr>
+            <td><code>mirostat</code></td>
+            <td>int</td>
+            <td>0</td>
+            <td>Modo Mirostat (0=off, 1=v1, 2=v2)</td>
+          </tr>
+          <tr>
+            <td><code>mirostat_tau</code></td>
+            <td>float</td>
+            <td>5.0</td>
+            <td>Entropía objetivo Mirostat</td>
+          </tr>
+          <tr>
+            <td><code>mirostat_eta</code></td>
+            <td>float</td>
+            <td>0.1</td>
+            <td>Tasa de aprendizaje Mirostat</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Enum: PresetType</h3>
+
+      <div class="enum-list">
+        <div class="enum-item"><code>CUSTOM</code><small>Configuración personalizada</small></div>
+        <div class="enum-item"><code>CREATIVE</code><small>Alta temperatura, diverso</small></div>
+        <div class="enum-item"><code>BALANCED</code><small>Configuración balanceada</small></div>
+        <div class="enum-item"><code>CONSISTENT</code><small>Baja temperatura, predecible</small></div>
+        <div class="enum-item"><code>ROLEPLAY</code><small>Optimizado para diálogos</small></div>
+        <div class="enum-item"><code>TECHNICAL</code><small>Preciso, factual</small></div>
+      </div>
+
+      <h3>Métodos</h3>
+
+      <div class="method-signature">func apply_to(llama: Object) -> void</div>
+      <p class="method-desc">Aplica los parámetros del preset a una instancia de LlamaInterface.</p>
+
+      <div class="method-signature">func to_dict() -> Dictionary</div>
+      <p class="method-desc">Serializa el preset a Dictionary.</p>
+
+      <div class="method-signature">static func from_dict(dict: Dictionary) -> AIPreset</div>
+      <p class="method-desc">Crea un AIPreset desde un Dictionary.</p>
+
+      <div class="method-signature">func get_summary() -> String</div>
+      <p class="method-desc">Retorna resumen del preset para debug.</p>
+
+      <h4>Factory Methods (Presets Predefinidos)</h4>
+
+      <div class="method-signature">static func create_creative() -> AIPreset</div>
+      <p class="method-desc">Crea preset creativo: temp=1.0, top_p=0.95, max_tokens=512</p>
+
+      <div class="method-signature">static func create_balanced() -> AIPreset</div>
+      <p class="method-desc">Crea preset balanceado: temp=0.7, top_p=0.9, max_tokens=256</p>
+
+      <div class="method-signature">static func create_consistent() -> AIPreset</div>
+      <p class="method-desc">Crea preset consistente: temp=0.3, top_p=0.8, max_tokens=256</p>
+
+      <div class="method-signature">static func create_roleplay() -> AIPreset</div>
+      <p class="method-desc">Crea preset roleplay: temp=0.8, presence_penalty=0.3, max_tokens=384</p>
+
+      <div class="method-signature">static func create_technical() -> AIPreset</div>
+      <p class="method-desc">Crea preset técnico: temp=0.2, top_p=0.7, max_tokens=512</p>
+
+      <div class="method-signature">static func get_preset(type: PresetType) -> AIPreset</div>
+      <p class="method-desc">Obtiene un preset por tipo.</p>
+
+      <div class="method-signature">static func create_from_gguf_metadata(metadata: Dictionary, base_type: PresetType, model_name: String) -> AIPreset</div>
+      <p class="method-desc">Crea preset desde metadatos GGUF del modelo, incluyendo chat template y stop sequences.</p>
+
+      <h3>Ejemplo de Uso</h3>
+
+      <pre data-lang="GDSCRIPT"><code># Usar preset predefinido
+var preset := AIPreset.create_roleplay()
+
+# Aplicar a LlamaInterface
+var llama := AIService.get_singleton().get_llama()
+preset.apply_to(llama)
+
+# Crear preset personalizado
+var custom := AIPreset.new()
+custom.preset_name = "Mi Preset"
+custom.temperature = 0.85
+custom.top_p = 0.92
+custom.max_tokens = 300
+custom.stop_sequences = ["USER:", "ASSISTANT:"]
+
+# Guardar como resource
+ResourceSaver.save(custom, "res://presets/custom.tres")
+
+# Cargar y usar
+var loaded := load("res://presets/custom.tres") as AIPreset
+loaded.apply_to(llama)</code></pre>
+
+      <hr>
+
+      <!-- ==================== ModelConfig ==================== -->
+      <h2 id="model-config">
+        <div class="resource-header">
+          <span class="icon">🤖</span>
+          <span>ModelConfig</span>
+        </div>
+      </h2>
+
+      <p>Configuración para un modelo GGUF. Almacena metadatos del modelo, URL de descarga, parámetros de carga y sampling por defecto.</p>
+
+      <p><strong>Archivo:</strong> <code>addons/ohmydialog/resources/model_config.gd</code></p>
+
+      <h3>Propiedades</h3>
+
+      <table class="property-table">
+        <thead>
+          <tr>
+            <th>Grupo</th>
+            <th>Propiedad</th>
+            <th>Tipo</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="9"><strong>Model Info</strong></td>
+            <td><code>id</code></td>
+            <td>String</td>
+            <td>ID único del modelo (e.g., "qwen2.5-0.5b")</td>
+          </tr>
+          <tr>
+            <td><code>display_name</code></td>
+            <td>String</td>
+            <td>Nombre legible</td>
+          </tr>
+          <tr>
+            <td><code>description</code></td>
+            <td>String</td>
+            <td>Descripción del modelo</td>
+          </tr>
+          <tr>
+            <td><code>model_path</code></td>
+            <td>String</td>
+            <td>Ruta al archivo GGUF</td>
+          </tr>
+          <tr>
+            <td><code>download_url</code></td>
+            <td>String</td>
+            <td>URL de HuggingFace para descarga</td>
+          </tr>
+          <tr>
+            <td><code>documentation_url</code></td>
+            <td>String</td>
+            <td>URL a la model card</td>
+          </tr>
+          <tr>
+            <td><code>size_mb</code></td>
+            <td>float</td>
+            <td>Tamaño estimado en MB</td>
+          </tr>
+          <tr>
+            <td><code>is_custom</code></td>
+            <td>bool</td>
+            <td>Si es modelo agregado por usuario</td>
+          </tr>
+          <tr>
+            <td><code>include_in_export</code></td>
+            <td>bool</td>
+            <td>Incluir en builds exportados</td>
+          </tr>
+          <tr>
+            <td rowspan="6"><strong>Default Sampling</strong></td>
+            <td><code>default_temperature</code></td>
+            <td>float</td>
+            <td>Temperatura por defecto (0.7)</td>
+          </tr>
+          <tr>
+            <td><code>default_top_p</code></td>
+            <td>float</td>
+            <td>Top-p por defecto (0.95)</td>
+          </tr>
+          <tr>
+            <td><code>default_top_k</code></td>
+            <td>int</td>
+            <td>Top-k por defecto (40)</td>
+          </tr>
+          <tr>
+            <td><code>default_max_tokens</code></td>
+            <td>int</td>
+            <td>Max tokens por defecto (256)</td>
+          </tr>
+          <tr>
+            <td><code>default_repeat_penalty</code></td>
+            <td>float</td>
+            <td>Repeat penalty por defecto (1.1)</td>
+          </tr>
+          <tr>
+            <td><code>default_min_p</code></td>
+            <td>float</td>
+            <td>Min-p por defecto (0.05)</td>
+          </tr>
+          <tr>
+            <td rowspan="3"><strong>Context</strong></td>
+            <td><code>n_ctx</code></td>
+            <td>int</td>
+            <td>Tamaño de contexto en tokens (2048)</td>
+          </tr>
+          <tr>
+            <td><code>n_gpu_layers</code></td>
+            <td>int</td>
+            <td>Capas GPU (-1 = todas, 0 = CPU)</td>
+          </tr>
+          <tr>
+            <td><code>n_batch</code></td>
+            <td>int</td>
+            <td>Batch size para prompt (512)</td>
+          </tr>
+          <tr>
+            <td rowspan="6"><strong>GGUF Metadata</strong></td>
+            <td><code>architecture</code></td>
+            <td>String</td>
+            <td>Arquitectura (llama, qwen2, phi...)</td>
+          </tr>
+          <tr>
+            <td><code>raw_chat_template</code></td>
+            <td>String</td>
+            <td>Chat template Jinja2 del modelo</td>
+          </tr>
+          <tr>
+            <td><code>chat_template_format</code></td>
+            <td>String</td>
+            <td>Formato detectado (chatml, llama3...)</td>
+          </tr>
+          <tr>
+            <td><code>bos_token_id</code></td>
+            <td>int</td>
+            <td>ID del token BOS (-1 si no existe)</td>
+          </tr>
+          <tr>
+            <td><code>eos_token_id</code></td>
+            <td>int</td>
+            <td>ID del token EOS (-1 si no existe)</td>
+          </tr>
+          <tr>
+            <td><code>ai_preset</code></td>
+            <td>AIPreset</td>
+            <td>Preset asociado generado de metadatos</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Métodos</h3>
+
+      <div class="method-signature">func get_load_params() -> Dictionary</div>
+      <p class="method-desc">Retorna parámetros para <code>LlamaInterface.load_model()</code> (n_ctx, n_gpu_layers, n_batch).</p>
+
+      <div class="method-signature">func apply_defaults_to(llama: LlamaInterface) -> void</div>
+      <p class="method-desc">Aplica parámetros de sampling por defecto a la instancia.</p>
+
+      <div class="method-signature">func is_downloaded() -> bool</div>
+      <p class="method-desc">Retorna true si el modelo existe en el sistema de archivos.</p>
+
+      <div class="method-signature">func get_filename() -> String</div>
+      <p class="method-desc">Extrae el nombre del archivo de la URL o genera uno basado en el ID.</p>
+
+      <div class="method-signature">func get_effective_path() -> String</div>
+      <p class="method-desc">Retorna la ruta efectiva donde buscar el modelo (res://models/).</p>
+
+      <div class="method-signature">func is_valid() -> bool</div>
+      <p class="method-desc">Retorna true si tiene id y display_name.</p>
+
+      <div class="method-signature">func get_summary() -> String</div>
+      <p class="method-desc">Retorna resumen para debug.</p>
+
+      <div class="method-signature">func populate_from_metadata(metadata: Dictionary) -> void</div>
+      <p class="method-desc">Llena campos de metadatos GGUF desde un Dictionary.</p>
+
+      <div class="method-signature">func create_ai_preset() -> AIPreset</div>
+      <p class="method-desc">Crea un AIPreset basado en los metadatos del modelo.</p>
+
+      <div class="method-signature">func has_metadata() -> bool</div>
+      <p class="method-desc">Retorna true si tiene metadatos GGUF poblados.</p>
+
+      <h3>Ejemplo de Uso</h3>
+
+      <pre data-lang="GDSCRIPT"><code># Crear configuración de modelo
+var config := ModelConfig.new()
+config.id = "smollm2-360m"
+config.display_name = "SmolLM2 360M Instruct"
+config.download_url = "https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct-GGUF/resolve/main/smollm2-360m-instruct-q4_k_m.gguf"
+config.size_mb = 254.0
+config.n_ctx = 2048
+config.n_gpu_layers = -1  # Todas en GPU
+
+# Verificar si está descargado
+if config.is_downloaded():
+    print("Modelo disponible en: ", config.get_effective_path())
+
+# Cargar modelo via AIService
+var ai_service := AIService.get_singleton()
+var err := ai_service.load_model(config)
+if err == OK:
+    print("Modelo cargado!")
+
+# Los defaults se aplican automáticamente, pero puedes hacerlo manualmente:
+config.apply_defaults_to(ai_service.get_llama())</code></pre>
+
+      <hr>
+
       <h2>Próximamente</h2>
 
       <p>Estos Resources están planificados pero aún no implementados:</p>
@@ -785,11 +1222,6 @@ ResourceSaver.save(graph, "res://dialogues/merchant_greeting.tres")</code></pre>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td><code>AIPreset</code></td>
-            <td>Configuración de parámetros de generación</td>
-            <td><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/9">#9</a></td>
-          </tr>
           <tr>
             <td><code>VoiceProfile</code></td>
             <td>Configuración de voz TTS por personaje</td>
