@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +37,7 @@
       </p>
 
       <div class="ai-box">
-        <p>Esta guia contiene prompts de prueba para el personaje <strong>Marcus</strong>, un mercader codicioso pero jovial del mundo de Eldoria. Usalo para probar diferentes modelos LLM y verificar que el sistema genera respuestas coherentes.</p>
+        <p>This guide contains test prompts for the character <strong>Marcus</strong>, a greedy but jovial merchant from the world of Eldoria. Use it to test different LLM models and verify that the system generates coherent responses.</p>
       </div>
 
       <hr>
@@ -256,7 +256,7 @@
       <h2>Test Prompts</h2>
 
       <div class="callout-info">
-        <p>Click en cualquier prompt para copiarlo al portapapeles. Luego pegalo en el Generation Tab del editor.</p>
+        <p>Click on any prompt to copy it to the clipboard. Then paste it in the Generation Tab of the editor.</p>
       </div>
 
       <!-- Basic Interactions -->
@@ -270,7 +270,7 @@
           <div class="prompt-item" onclick="copyPrompt(this)">I'm looking for something special, what's your best item?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">How's business going?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">Tell me about yourself.</div>
-          <p class="prompt-note">Deberia responder de forma amigable usando frases como "my friend", "finest quality", etc.</p>
+          <p class="prompt-note">Should respond in a friendly manner using phrases like "my friend", "finest quality", etc.</p>
         </div>
       </div>
 
@@ -285,7 +285,7 @@
           <div class="prompt-item" onclick="copyPrompt(this)">I only have half the gold you're asking for.</div>
           <div class="prompt-item" onclick="copyPrompt(this)">I'll buy everything you have. Name your price.</div>
           <div class="prompt-item" onclick="copyPrompt(this)">My friend recommended a cheaper merchant down the road.</div>
-          <p class="prompt-note">Deberia mostrar su lado negociador y codicioso, pero sin ser hostil.</p>
+          <p class="prompt-note">Should show his negotiator and greedy side, but without being hostile.</p>
         </div>
       </div>
 
@@ -299,7 +299,7 @@
           <div class="prompt-item" onclick="copyPrompt(this)">I heard you sell... special goods. Things the guards wouldn't approve of.</div>
           <div class="prompt-item" onclick="copyPrompt(this)">I need something that's not exactly legal. Can you help?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">The Thieves Guild sent me. They said you have what I need.</div>
-          <p class="prompt-note">Deberia ser cauteloso, posiblemente evasivo al principio, pero podria abrirse si el jugador insiste.</p>
+          <p class="prompt-note">Should be cautious, possibly evasive at first, but might open up if the player insists.</p>
         </div>
       </div>
 
@@ -314,7 +314,7 @@
           <div class="prompt-item" onclick="copyPrompt(this)">The tax collector is coming this way.</div>
           <div class="prompt-item" onclick="copyPrompt(this)">Someone told me you're a fraud. Is that true?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">I work for Lord Aldric. He wants to audit your accounts.</div>
-          <p class="prompt-note">Deberia mostrar nerviosismo o intentar cambiar de tema rapidamente.</p>
+          <p class="prompt-note">Should show nervousness or try to change the subject quickly.</p>
         </div>
       </div>
 
@@ -330,7 +330,7 @@
           <div class="prompt-item" onclick="copyPrompt(this)">What's happening at the Harvest Festival tomorrow?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">Do you know anything about King Aldric?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">Who is the High Priestess Vera?</div>
-          <p class="prompt-note">Deberia demostrar conocimiento del mundo, especialmente sobre comercio y rumores locales.</p>
+          <p class="prompt-note">Should demonstrate world knowledge, especially about trade and local rumors.</p>
         </div>
       </div>
 
@@ -344,7 +344,7 @@
           <div class="prompt-item" onclick="copyPrompt(this)">Do you know the Guard Captain?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">The innkeeper sent me. Said you might have a deal for me.</div>
           <div class="prompt-item" onclick="copyPrompt(this)">I heard you have connections with the Royal Guard.</div>
-          <p class="prompt-note">Deberia reaccionar segun sus relaciones definidas (soborna al capitan, amigo del tabernero).</p>
+          <p class="prompt-note">Should react according to his defined relationships (bribes the captain, friend of the innkeeper).</p>
         </div>
       </div>
 
@@ -359,7 +359,7 @@
           <div class="prompt-item" onclick="copyPrompt(this)">Tienes algo especial para un aventurero como yo?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">Bonjour, avez-vous des objets rares?</div>
           <div class="prompt-item" onclick="copyPrompt(this)">Guten Tag, was verkaufen Sie heute?</div>
-          <p class="prompt-note">Requiere modelo con buen soporte multilingue (Qwen recomendado).</p>
+          <p class="prompt-note">Requires a model with good multilingual support (Qwen recommended).</p>
         </div>
       </div>
 
@@ -367,7 +367,7 @@
 
       <h2>Recommended Models</h2>
 
-      <p>Para probar a Marcus con diferentes capacidades:</p>
+      <p>To test Marcus with different capabilities:</p>
 
       <table class="model-table">
         <thead>
@@ -412,7 +412,7 @@
       </table>
 
       <div class="callout-info">
-        <p><strong>Recomendacion:</strong> Para modelos &lt;1GB con buen soporte multilingue, usa <code>Qwen2.5-1.5B-Instruct-Q4_K_M</code>. Es el mejor balance entre calidad y velocidad.</p>
+        <p><strong>Recommendation:</strong> For models &lt;1GB with good multilingual support, use <code>Qwen2.5-1.5B-Instruct-Q4_K_M</code>. It's the best balance between quality and speed.</p>
       </div>
 
       <hr>
@@ -421,19 +421,19 @@
 
       <h3>Sampling Parameters</h3>
       <ul>
-        <li><strong>Temperature:</strong> 0.7-0.9 para respuestas variadas, 0.3-0.5 para consistencia</li>
-        <li><strong>Top-P:</strong> 0.9 funciona bien para la mayoria de casos</li>
-        <li><strong>Max Tokens:</strong> 128-256 para dialogos cortos</li>
-        <li><strong>Repeat Penalty:</strong> 1.1-1.2 para evitar repeticiones</li>
+        <li><strong>Temperature:</strong> 0.7-0.9 for varied responses, 0.3-0.5 for consistency</li>
+        <li><strong>Top-P:</strong> 0.9 works well for most cases</li>
+        <li><strong>Max Tokens:</strong> 128-256 for short dialogues</li>
+        <li><strong>Repeat Penalty:</strong> 1.1-1.2 to avoid repetitions</li>
       </ul>
 
       <h3>What to Look For</h3>
       <ul>
-        <li>Usa las frases caracteristicas ("my friend", "finest quality")?</li>
-        <li>Mantiene la personalidad codicioso-pero-amigable?</li>
-        <li>Respeta los secretos (no los revela inmediatamente)?</li>
-        <li>Muestra conocimiento del mundo de Eldoria?</li>
-        <li>Reacciona apropiadamente a los triggers de miedo?</li>
+        <li>Does it use characteristic phrases ("my friend", "finest quality")?</li>
+        <li>Does it maintain the greedy-but-friendly personality?</li>
+        <li>Does it respect secrets (not revealing them immediately)?</li>
+        <li>Does it show knowledge of the Eldoria world?</li>
+        <li>Does it react appropriately to fear triggers?</li>
       </ul>
 
       <h3>Common Issues</h3>
@@ -443,29 +443,29 @@
         </thead>
         <tbody>
           <tr>
-            <td>Respuestas muy cortas</td>
-            <td>Max tokens muy bajo</td>
-            <td>Aumentar a 256+</td>
+            <td>Very short responses</td>
+            <td>Max tokens too low</td>
+            <td>Increase to 256+</td>
           </tr>
           <tr>
-            <td>Respuestas repetitivas</td>
-            <td>Repeat penalty muy bajo</td>
-            <td>Aumentar a 1.2</td>
+            <td>Repetitive responses</td>
+            <td>Repeat penalty too low</td>
+            <td>Increase to 1.2</td>
           </tr>
           <tr>
-            <td>Rompe el personaje</td>
-            <td>Modelo muy pequeno</td>
-            <td>Usar Qwen2.5-1.5B+</td>
+            <td>Breaks character</td>
+            <td>Model too small</td>
+            <td>Use Qwen2.5-1.5B+</td>
           </tr>
           <tr>
-            <td>No responde en espanol</td>
-            <td>Modelo no multilingue</td>
-            <td>Usar Qwen en vez de SmolLM</td>
+            <td>Doesn't respond in Spanish</td>
+            <td>Non-multilingual model</td>
+            <td>Use Qwen instead of SmolLM</td>
           </tr>
           <tr>
-            <td>Crash silencioso</td>
-            <td>Prompt muy largo</td>
-            <td>Reducir contexto o usar modelo con mas n_ctx</td>
+            <td>Silent crash</td>
+            <td>Prompt too long</td>
+            <td>Reduce context or use model with more n_ctx</td>
           </tr>
         </tbody>
       </table>
@@ -474,12 +474,12 @@
 
       <h2>Resource Files</h2>
 
-      <p>Los archivos de ejemplo estan en:</p>
+      <p>The example files are located at:</p>
 
-      <pre data-lang="PATHS"><code>examples/resources/merchant_character.tres  # CharacterIdentity de Marcus
-examples/resources/fantasy_world.tres       # WorldContext de Eldoria</code></pre>
+      <pre data-lang="PATHS"><code>examples/resources/merchant_character.tres  # Marcus's CharacterIdentity
+examples/resources/fantasy_world.tres       # Eldoria's WorldContext</code></pre>
 
-      <p>Puedes cargarlos desde el Generation Tab seleccionando los recursos en los campos Character y World.</p>
+      <p>You can load them from the Generation Tab by selecting the resources in the Character and World fields.</p>
 
       <script>
         function copyPrompt(element) {

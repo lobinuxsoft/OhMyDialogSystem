@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,49 +99,49 @@
 
       <p><span class="badge badge-cyan">GDExtension</span> <span class="badge badge-purple">C++</span></p>
 
-      <p>Interfaz de bajo nivel para <a href="https://github.com/ggerganov/llama.cpp" target="_blank">llama.cpp</a>. Permite cargar modelos GGUF y gestionar su ciclo de vida.</p>
+      <p>Low-level interface for <a href="https://github.com/ggerganov/llama.cpp" target="_blank">llama.cpp</a>. Allows loading GGUF models and managing their lifecycle.</p>
 
       <blockquote>
-        <strong>Nota:</strong> Esta clase es parte del módulo GDExtension nativo. Requiere que el addon esté correctamente compilado para tu plataforma.
+        <strong>Note:</strong> This class is part of the native GDExtension module. It requires the addon to be correctly compiled for your platform.
       </blockquote>
 
       <hr>
 
-      <h2>Herencia</h2>
+      <h2>Inheritance</h2>
 
       <p><code>RefCounted</code> → <code>LlamaInterface</code></p>
 
       <hr>
 
-      <h2>Descripción</h2>
+      <h2>Description</h2>
 
-      <p><code>LlamaInterface</code> proporciona una API de bajo nivel para cargar modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
+      <p><code>LlamaInterface</code> provides a low-level API for loading language models in GGUF format using the llama.cpp library. This class handles backend initialization, model loading, memory management, and inference context.</p>
 
-      <p>Es la base sobre la cual se construyen los componentes de más alto nivel como <code>AIService</code> y <code>DialogueManager</code>.</p>
+      <p>It is the foundation upon which higher-level components like <code>AIService</code> and <code>DialogueManager</code> are built.</p>
 
       <div class="callout-info" style="margin: 1.5rem 0;">
-        <p><strong>Uso Recomendado:</strong> Para la mayoría de casos, usar <code>AIService</code> en lugar de instanciar <code>LlamaInterface</code> directamente:</p>
-        <pre data-lang="GDSCRIPT" style="margin-top: 0.75rem;"><code># Forma recomendada - usar AIService singleton
+        <p><strong>Recommended Usage:</strong> For most use cases, use <code>AIService</code> instead of instantiating <code>LlamaInterface</code> directly:</p>
+        <pre data-lang="GDSCRIPT" style="margin-top: 0.75rem;"><code># Recommended way - use AIService singleton
 var ai_service := AIService.get_singleton()
 if ai_service and ai_service.is_model_loaded():
-    # El modelo ya está disponible globalmente
+    # The model is already available globally
     pass
 
-# Forma directa (bajo nivel) - instanciar LlamaInterface
+# Direct way (low level) - instantiate LlamaInterface
 var llama := LlamaInterface.new()
 llama.load_model("res://models/model.gguf")</code></pre>
-        <p style="margin-top: 0.75rem;"><code>AIService</code> gestiona el ciclo de vida del modelo, integra con <code>ModelManager</code> para descarga de modelos, y proporciona señales para cambios de estado.</p>
+        <p style="margin-top: 0.75rem;"><code>AIService</code> manages the model lifecycle, integrates with <code>ModelManager</code> for model downloads, and provides signals for state changes.</p>
       </div>
 
       <hr>
 
-      <h2>Métodos</h2>
+      <h2>Methods</h2>
 
       <table>
         <thead>
           <tr>
-            <th>Retorno</th>
-            <th>Método</th>
+            <th>Return</th>
+            <th>Method</th>
           </tr>
         </thead>
         <tbody>
@@ -184,13 +184,13 @@ llama.load_model("res://models/model.gguf")</code></pre>
         </tbody>
       </table>
 
-      <h3>Generación de Texto</h3>
+      <h3>Text Generation</h3>
 
       <table>
         <thead>
           <tr>
-            <th>Retorno</th>
-            <th>Método</th>
+            <th>Return</th>
+            <th>Method</th>
           </tr>
         </thead>
         <tbody>
@@ -209,13 +209,13 @@ llama.load_model("res://models/model.gguf")</code></pre>
         </tbody>
       </table>
 
-      <h3>Control de Generación Asíncrona</h3>
+      <h3>Async Generation Control</h3>
 
       <table>
         <thead>
           <tr>
-            <th>Retorno</th>
-            <th>Método</th>
+            <th>Return</th>
+            <th>Method</th>
           </tr>
         </thead>
         <tbody>
@@ -234,13 +234,13 @@ llama.load_model("res://models/model.gguf")</code></pre>
         </tbody>
       </table>
 
-      <h3>Parámetros de Sampling</h3>
+      <h3>Sampling Parameters</h3>
 
       <table>
         <thead>
           <tr>
-            <th>Retorno</th>
-            <th>Método</th>
+            <th>Return</th>
+            <th>Method</th>
           </tr>
         </thead>
         <tbody>
@@ -332,8 +332,8 @@ llama.load_model("res://models/model.gguf")</code></pre>
       <table>
         <thead>
           <tr>
-            <th>Retorno</th>
-            <th>Método</th>
+            <th>Return</th>
+            <th>Method</th>
           </tr>
         </thead>
         <tbody>
@@ -357,8 +357,8 @@ llama.load_model("res://models/model.gguf")</code></pre>
       <table>
         <thead>
           <tr>
-            <th>Retorno</th>
-            <th>Método</th>
+            <th>Return</th>
+            <th>Method</th>
           </tr>
         </thead>
         <tbody>
@@ -379,112 +379,112 @@ llama.load_model("res://models/model.gguf")</code></pre>
 
       <hr>
 
-      <h2>Descripciones de Métodos</h2>
+      <h2>Method Descriptions</h2>
 
       <h3 id="load_model">load_model</h3>
 
       <pre data-lang="GDSCRIPT"><code>Error load_model(path: String, params: Dictionary = {})</code></pre>
 
-      <p>Carga un modelo GGUF desde la ruta especificada.</p>
+      <p>Loads a GGUF model from the specified path.</p>
 
-      <h4>Parámetros</h4>
+      <h4>Parameters</h4>
 
       <table>
         <thead>
           <tr>
-            <th>Parámetro</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>path</code></td>
             <td>String</td>
-            <td>Ruta al archivo .gguf. Soporta <code>res://</code> y <code>user://</code></td>
+            <td>Path to the .gguf file. Supports <code>res://</code> and <code>user://</code></td>
           </tr>
           <tr>
             <td><code>params</code></td>
             <td>Dictionary</td>
-            <td>Parámetros opcionales de configuración</td>
+            <td>Optional configuration parameters</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Parámetros del Dictionary</h4>
+      <h4>Dictionary Parameters</h4>
 
       <table>
         <thead>
           <tr>
             <th>Key</th>
-            <th>Tipo</th>
+            <th>Type</th>
             <th>Default</th>
-            <th>Descripción</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>n_ctx</code></td>
             <td>int</td>
-            <td>modelo</td>
-            <td>Tamaño de contexto en tokens</td>
+            <td>model</td>
+            <td>Context size in tokens</td>
           </tr>
           <tr>
             <td><code>n_gpu_layers</code></td>
             <td>int</td>
             <td>0</td>
-            <td>Capas a offload a GPU (0 = solo CPU)</td>
+            <td>Layers to offload to GPU (0 = CPU only)</td>
           </tr>
           <tr>
             <td><code>n_batch</code></td>
             <td>int</td>
             <td>512</td>
-            <td>Tamaño de batch para procesamiento</td>
+            <td>Batch size for processing</td>
           </tr>
           <tr>
             <td><code>n_threads</code></td>
             <td>int</td>
             <td>auto</td>
-            <td>Threads para generación</td>
+            <td>Threads for generation</td>
           </tr>
           <tr>
             <td><code>n_threads_batch</code></td>
             <td>int</td>
             <td>auto</td>
-            <td>Threads para procesamiento de batch</td>
+            <td>Threads for batch processing</td>
           </tr>
           <tr>
             <td><code>use_mmap</code></td>
             <td>bool</td>
             <td>true</td>
-            <td>Usar memory-mapped file</td>
+            <td>Use memory-mapped file</td>
           </tr>
           <tr>
             <td><code>use_mlock</code></td>
             <td>bool</td>
             <td>false</td>
-            <td>Bloquear modelo en RAM</td>
+            <td>Lock model in RAM</td>
           </tr>
           <tr>
             <td><code>vocab_only</code></td>
             <td>bool</td>
             <td>false</td>
-            <td>Solo cargar vocabulario (sin pesos)</td>
+            <td>Only load vocabulary (without weights)</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p>Retorna <code>OK</code> si el modelo se cargó correctamente, o un código de error:</p>
+      <p>Returns <code>OK</code> if the model loaded correctly, or an error code:</p>
 
       <ul>
-        <li><code>ERR_FILE_NOT_FOUND</code> - El archivo no existe</li>
-        <li><code>ERR_CANT_OPEN</code> - No se pudo abrir/parsear el modelo</li>
-        <li><code>ERR_CANT_CREATE</code> - No se pudo crear el contexto</li>
+        <li><code>ERR_FILE_NOT_FOUND</code> - File does not exist</li>
+        <li><code>ERR_CANT_OPEN</code> - Could not open/parse the model</li>
+        <li><code>ERR_CANT_CREATE</code> - Could not create the context</li>
       </ul>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>var llama = LlamaInterface.new()
 var err = llama.load_model("user://models/mistral-7b-q4.gguf", {
@@ -504,11 +504,11 @@ print("Model loaded successfully!")</code></pre>
 
       <pre data-lang="GDSCRIPT"><code>void unload_model()</code></pre>
 
-      <p>Descarga el modelo actual y libera todos los recursos asociados (contexto, backend, memoria).</p>
+      <p>Unloads the current model and frees all associated resources (context, backend, memory).</p>
 
-      <p>Es seguro llamar este método incluso si no hay modelo cargado.</p>
+      <p>It is safe to call this method even if no model is loaded.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>llama.unload_model()
 print("Model unloaded")</code></pre>
@@ -519,13 +519,13 @@ print("Model unloaded")</code></pre>
 
       <pre data-lang="GDSCRIPT"><code>bool is_model_loaded() const</code></pre>
 
-      <p>Verifica si hay un modelo cargado y listo para usar.</p>
+      <p>Checks if a model is loaded and ready to use.</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p><code>true</code> si hay un modelo cargado, <code>false</code> en caso contrario.</p>
+      <p><code>true</code> if a model is loaded, <code>false</code> otherwise.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>if llama.is_model_loaded():
     print("Ready to generate!")
@@ -538,144 +538,144 @@ else:
 
       <pre data-lang="GDSCRIPT"><code>Dictionary get_model_info() const</code></pre>
 
-      <p>Retorna información detallada sobre el modelo cargado.</p>
+      <p>Returns detailed information about the loaded model.</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p>Un Dictionary con las siguientes keys (vacío si no hay modelo cargado):</p>
+      <p>A Dictionary with the following keys (empty if no model is loaded):</p>
 
       <table>
         <thead>
           <tr>
             <th>Key</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
+            <th>Type</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>description</code></td>
             <td>String</td>
-            <td>Descripción del modelo</td>
+            <td>Model description</td>
           </tr>
           <tr>
             <td><code>path</code></td>
             <td>String</td>
-            <td>Ruta del archivo cargado</td>
+            <td>Path of the loaded file</td>
           </tr>
           <tr>
             <td><code>size_bytes</code></td>
             <td>int</td>
-            <td>Tamaño del modelo en bytes</td>
+            <td>Model size in bytes</td>
           </tr>
           <tr>
             <td><code>n_params</code></td>
             <td>int</td>
-            <td>Número de parámetros</td>
+            <td>Number of parameters</td>
           </tr>
           <tr>
             <td><code>n_ctx_train</code></td>
             <td>int</td>
-            <td>Contexto de entrenamiento</td>
+            <td>Training context</td>
           </tr>
           <tr>
             <td><code>n_embd</code></td>
             <td>int</td>
-            <td>Dimensión de embeddings</td>
+            <td>Embedding dimension</td>
           </tr>
           <tr>
             <td><code>n_layer</code></td>
             <td>int</td>
-            <td>Número de capas</td>
+            <td>Number of layers</td>
           </tr>
           <tr>
             <td><code>n_head</code></td>
             <td>int</td>
-            <td>Número de attention heads</td>
+            <td>Number of attention heads</td>
           </tr>
           <tr>
             <td><code>n_ctx</code></td>
             <td>int</td>
-            <td>Contexto actual configurado</td>
+            <td>Current configured context</td>
           </tr>
           <tr>
             <td><code>n_batch</code></td>
             <td>int</td>
-            <td>Batch size actual</td>
+            <td>Current batch size</td>
           </tr>
           <tr>
             <td><code>vocab_size</code></td>
             <td>int</td>
-            <td>Tamaño del vocabulario</td>
+            <td>Vocabulary size</td>
           </tr>
           <tr>
             <td><code>vocab_type</code></td>
             <td>int</td>
-            <td>Tipo de tokenizador (0=SPM, 1=BPE, etc.)</td>
+            <td>Tokenizer type (0=SPM, 1=BPE, etc.)</td>
           </tr>
           <tr>
             <td><code>bos_token</code></td>
             <td>int</td>
-            <td>ID del token BOS</td>
+            <td>BOS token ID</td>
           </tr>
           <tr>
             <td><code>eos_token</code></td>
             <td>int</td>
-            <td>ID del token EOS</td>
+            <td>EOS token ID</td>
           </tr>
           <tr>
             <td><code>has_encoder</code></td>
             <td>bool</td>
-            <td>Si el modelo tiene encoder</td>
+            <td>Whether the model has an encoder</td>
           </tr>
           <tr>
             <td><code>has_decoder</code></td>
             <td>bool</td>
-            <td>Si el modelo tiene decoder</td>
+            <td>Whether the model has a decoder</td>
           </tr>
           <tr>
             <td><code>is_recurrent</code></td>
             <td>bool</td>
-            <td>Si es recurrente (Mamba, RWKV)</td>
+            <td>Whether it's recurrent (Mamba, RWKV)</td>
           </tr>
           <tr>
             <td><code>rope_type</code></td>
             <td>int</td>
-            <td>Tipo de RoPE</td>
+            <td>RoPE type</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Información de GPU/Backend</h4>
+      <h4>GPU/Backend Information</h4>
 
       <table>
         <thead>
           <tr>
             <th>Key</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
+            <th>Type</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>n_gpu_layers</code></td>
             <td>int</td>
-            <td>Número real de capas en GPU (0 = CPU only)</td>
+            <td>Actual number of layers on GPU (0 = CPU only)</td>
           </tr>
           <tr>
             <td><code>gpu_backend_name</code></td>
             <td>String</td>
-            <td>Nombre del backend: "Vulkan0", "CUDA0", "Metal", "CPU"</td>
+            <td>Backend name: "Vulkan0", "CUDA0", "Metal", "CPU"</td>
           </tr>
           <tr>
             <td><code>gpu_backend_desc</code></td>
             <td>String</td>
-            <td>Descripción del dispositivo (ej: "AMD Radeon RX 9070 XT")</td>
+            <td>Device description (e.g., "AMD Radeon RX 9070 XT")</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>var info = llama.get_model_info()
 if not info.is_empty():
@@ -699,11 +699,11 @@ if not info.is_empty():
 
       <pre data-lang="GDSCRIPT"><code>String get_model_path() const</code></pre>
 
-      <p>Retorna la ruta del modelo actualmente cargado.</p>
+      <p>Returns the path of the currently loaded model.</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p>La ruta del modelo, o un String vacío si no hay modelo cargado.</p>
+      <p>The model path, or an empty String if no model is loaded.</p>
 
       <hr>
 
@@ -711,18 +711,18 @@ if not info.is_empty():
 
       <pre data-lang="GDSCRIPT"><code>String get_system_info() const</code></pre>
 
-      <p>Retorna información del sistema: características de CPU y backends disponibles.</p>
+      <p>Returns system information: CPU features and available backends.</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p>String con formato <code>"FEATURE = 0/1 | FEATURE = 0/1 | ..."</code> incluyendo:</p>
+      <p>String in format <code>"FEATURE = 0/1 | FEATURE = 0/1 | ..."</code> including:</p>
 
       <ul>
         <li><strong>CPU:</strong> AVX, AVX2, AVX512, FMA, F16C, NEON</li>
         <li><strong>GPU:</strong> VULKAN, CUDA, METAL</li>
       </ul>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>var sys_info = llama.get_system_info()
 print(sys_info)
@@ -740,14 +740,14 @@ if "VULKAN = 1" in sys_info:
 
       <pre data-lang="GDSCRIPT"><code>String get_chat_template() const</code></pre>
 
-      <p>Obtiene el template de chat embebido en los metadatos del modelo (formato Jinja2).</p>
+      <p>Gets the chat template embedded in the model's metadata (Jinja2 format).</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p>El template de chat, o String vacío si el modelo no incluye uno.</p>
+      <p>The chat template, or an empty String if the model doesn't include one.</p>
 
       <blockquote>
-        <strong>Nota:</strong> La mayoría de modelos de chat modernos (Llama 3, Qwen, Mistral) incluyen su template. Modelos base no suelen tenerlo.
+        <strong>Note:</strong> Most modern chat models (Llama 3, Qwen, Mistral) include their template. Base models usually don't have one.
       </blockquote>
 
       <hr>
@@ -756,33 +756,33 @@ if "VULKAN = 1" in sys_info:
 
       <pre data-lang="GDSCRIPT"><code>String apply_chat_template(messages: Array, add_generation_prompt: bool = true) const</code></pre>
 
-      <p>Formatea mensajes de conversación usando el template del modelo. Usa el parser nativo de llama.cpp (minja).</p>
+      <p>Formats conversation messages using the model's template. Uses llama.cpp's native parser (minja).</p>
 
-      <h4>Parámetros</h4>
+      <h4>Parameters</h4>
 
       <table>
         <thead>
           <tr>
-            <th>Parámetro</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>messages</code></td>
             <td>Array</td>
-            <td>Array de diccionarios con <code>role</code> y <code>content</code></td>
+            <td>Array of dictionaries with <code>role</code> and <code>content</code></td>
           </tr>
           <tr>
             <td><code>add_generation_prompt</code></td>
             <td>bool</td>
-            <td>Si true, añade el prefijo para que el modelo responda</td>
+            <td>If true, adds the prefix for the model to respond</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>var messages = [
     {"role": "system", "content": "You are a helpful assistant."},
@@ -800,19 +800,19 @@ var response = llama.generate(prompt)</code></pre>
 
       <pre data-lang="GDSCRIPT"><code>int count_tokens(text: String) const</code></pre>
 
-      <p>Cuenta tokens usando el tokenizador exacto del modelo cargado.</p>
+      <p>Counts tokens using the loaded model's exact tokenizer.</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p>Número de tokens, o <code>-1</code> si no hay modelo cargado.</p>
+      <p>Number of tokens, or <code>-1</code> if no model is loaded.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>var text = "Hello, world! This is a test."
 var token_count = llama.count_tokens(text)
 print("Tokens: ", token_count)  # Varies by model, typically ~8-10
 
-# Verificar que el prompt cabe en el contexto
+# Verify that the prompt fits in the context
 var model_info = llama.get_model_info()
 var max_ctx = model_info.get("n_ctx", 4096)
 if token_count > max_ctx - 512:  # Reserve space for response
@@ -820,52 +820,52 @@ if token_count > max_ctx - 512:  # Reserve space for response
 
       <hr>
 
-      <h2>Generación de Texto</h2>
+      <h2>Text Generation</h2>
 
       <h3 id="generate">generate</h3>
 
       <pre data-lang="GDSCRIPT"><code>String generate(prompt: String)</code></pre>
 
-      <p>Genera texto de forma síncrona (bloqueante) a partir de un prompt.</p>
+      <p>Generates text synchronously (blocking) from a prompt.</p>
 
-      <h4>Parámetros</h4>
+      <h4>Parameters</h4>
 
       <table>
         <thead>
           <tr>
-            <th>Parámetro</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>prompt</code></td>
             <td>String</td>
-            <td>El texto de entrada para continuar</td>
+            <td>The input text to continue</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p>El texto generado, o un String vacío si hay error o no hay modelo cargado.</p>
+      <p>The generated text, or an empty String if there's an error or no model is loaded.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>var llama = LlamaInterface.new()
 llama.load_model("res://models/mistral-7b-q4.gguf")
 
-# Configurar parámetros
+# Configure parameters
 llama.set_temperature(0.7)
 llama.set_max_tokens(100)
 
-# Generar texto
+# Generate text
 var response = llama.generate("The quick brown fox")
 print(response)  # " jumps over the lazy dog..."</code></pre>
 
       <blockquote>
-        <strong>Nota:</strong> Esta operación es bloqueante. Para generación no bloqueante, usa <code>generate_async()</code> o <code>generate_streaming()</code>.
+        <strong>Note:</strong> This operation is blocking. For non-blocking generation, use <code>generate_async()</code> or <code>generate_streaming()</code>.
       </blockquote>
 
       <hr>
@@ -874,18 +874,18 @@ print(response)  # " jumps over the lazy dog..."</code></pre>
 
       <pre data-lang="GDSCRIPT"><code>void generate_async(prompt: String)</code></pre>
 
-      <p>Genera texto de forma asíncrona en un thread de trabajo. No bloquea el hilo principal.</p>
+      <p>Generates text asynchronously in a worker thread. Does not block the main thread.</p>
 
-      <h4>Señales emitidas</h4>
+      <h4>Emitted Signals</h4>
 
       <ul>
-        <li><code>generation_started</code> - Al comenzar</li>
-        <li><code>generation_completed(text)</code> - Al terminar exitosamente</li>
-        <li><code>generation_error(message)</code> - Si hay error</li>
-        <li><code>generation_cancelled</code> - Si se cancela</li>
+        <li><code>generation_started</code> - When starting</li>
+        <li><code>generation_completed(text)</code> - When finished successfully</li>
+        <li><code>generation_error(message)</code> - If there's an error</li>
+        <li><code>generation_cancelled</code> - If cancelled</li>
       </ul>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>func _ready():
     llama.generation_completed.connect(_on_completed)
@@ -907,18 +907,18 @@ func _on_error(message: String):
 
       <pre data-lang="GDSCRIPT"><code>void generate_streaming(prompt: String)</code></pre>
 
-      <p>Genera texto con streaming: emite cada token a medida que se genera. Ideal para mostrar respuestas progresivamente en la UI.</p>
+      <p>Generates text with streaming: emits each token as it's generated. Ideal for progressively displaying responses in the UI.</p>
 
-      <h4>Señales emitidas</h4>
+      <h4>Emitted Signals</h4>
 
       <ul>
-        <li><code>generation_started</code> - Al comenzar</li>
-        <li><code>token_generated(token)</code> - Para cada token generado</li>
-        <li><code>generation_progress(tokens, max_tokens)</code> - Progreso periódico</li>
-        <li><code>generation_completed(text)</code> - Al terminar (texto completo)</li>
+        <li><code>generation_started</code> - When starting</li>
+        <li><code>token_generated(token)</code> - For each token generated</li>
+        <li><code>generation_progress(tokens, max_tokens)</code> - Periodic progress</li>
+        <li><code>generation_completed(text)</code> - When finished (complete text)</li>
       </ul>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>@onready var label: RichTextLabel = %ResponseLabel
 
@@ -939,9 +939,9 @@ func _on_done(full_text: String):
 
       <pre data-lang="GDSCRIPT"><code>bool is_generating() const</code></pre>
 
-      <p>Verifica si hay una generación asíncrona o streaming en progreso.</p>
+      <p>Checks if an async or streaming generation is in progress.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>func _on_send_pressed():
     if llama.is_generating():
@@ -955,13 +955,13 @@ func _on_done(full_text: String):
 
       <pre data-lang="GDSCRIPT"><code>float get_generation_progress() const</code></pre>
 
-      <p>Retorna el progreso de la generación actual como valor entre 0.0 y 1.0.</p>
+      <p>Returns the current generation progress as a value between 0.0 and 1.0.</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p><code>tokens_generated / max_tokens</code>. Retorna 0.0 si no hay generación en curso.</p>
+      <p><code>tokens_generated / max_tokens</code>. Returns 0.0 if no generation is in progress.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>func _process(_delta):
     if llama.is_generating():
@@ -973,9 +973,9 @@ func _on_done(full_text: String):
 
       <pre data-lang="GDSCRIPT"><code>void cancel_generation()</code></pre>
 
-      <p>Cancela una generación asíncrona o streaming en progreso. Emite <code>generation_cancelled</code> cuando la generación se detiene.</p>
+      <p>Cancels an async or streaming generation in progress. Emits <code>generation_cancelled</code> when the generation stops.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>func _on_cancel_pressed():
     if llama.is_generating():
@@ -984,19 +984,19 @@ func _on_done(full_text: String):
 
       <hr>
 
-      <h2>Parámetros de Sampling</h2>
+      <h2>Sampling Parameters</h2>
 
       <h3 id="set_temperature">set_temperature / get_temperature</h3>
 
       <pre data-lang="GDSCRIPT"><code>void set_temperature(temperature: float)
 float get_temperature() const</code></pre>
 
-      <p>Controla la aleatoriedad de la generación.</p>
+      <p>Controls the randomness of generation.</p>
 
       <ul>
-        <li><strong>0.0</strong> = Greedy (siempre elige el token más probable)</li>
-        <li><strong>0.7-0.9</strong> = Balance creatividad/coherencia (recomendado)</li>
-        <li><strong>1.0+</strong> = Más aleatorio/creativo</li>
+        <li><strong>0.0</strong> = Greedy (always chooses the most probable token)</li>
+        <li><strong>0.7-0.9</strong> = Balance between creativity/coherence (recommended)</li>
+        <li><strong>1.0+</strong> = More random/creative</li>
       </ul>
 
       <p><strong>Default:</strong> <code>0.8</code></p>
@@ -1008,9 +1008,9 @@ float get_temperature() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_top_p(top_p: float)
 float get_top_p() const</code></pre>
 
-      <p>Nucleus sampling - considera solo tokens cuya probabilidad acumulada sea ≤ top_p.</p>
+      <p>Nucleus sampling - considers only tokens whose cumulative probability is ≤ top_p.</p>
 
-      <p><strong>Default:</strong> <code>0.95</code> | <strong>Rango:</strong> <code>0.0 - 1.0</code></p>
+      <p><strong>Default:</strong> <code>0.95</code> | <strong>Range:</strong> <code>0.0 - 1.0</code></p>
 
       <hr>
 
@@ -1019,7 +1019,7 @@ float get_top_p() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_top_k(top_k: int)
 int get_top_k() const</code></pre>
 
-      <p>Considera solo los top-k tokens más probables. <code>0</code> = desactivado.</p>
+      <p>Considers only the top-k most probable tokens. <code>0</code> = disabled.</p>
 
       <p><strong>Default:</strong> <code>40</code></p>
 
@@ -1030,7 +1030,7 @@ int get_top_k() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_max_tokens(max_tokens: int)
 int get_max_tokens() const</code></pre>
 
-      <p>Número máximo de tokens a generar. Mínimo: <code>1</code>.</p>
+      <p>Maximum number of tokens to generate. Minimum: <code>1</code>.</p>
 
       <p><strong>Default:</strong> <code>256</code></p>
 
@@ -1041,9 +1041,9 @@ int get_max_tokens() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_repeat_penalty(penalty: float)
 float get_repeat_penalty() const</code></pre>
 
-      <p>Penaliza la repetición de tokens. <code>1.0</code> = sin penalización.</p>
+      <p>Penalizes token repetition. <code>1.0</code> = no penalty.</p>
 
-      <p><strong>Default:</strong> <code>1.1</code> | <strong>Rango:</strong> <code>1.0 - 2.0</code></p>
+      <p><strong>Default:</strong> <code>1.1</code> | <strong>Range:</strong> <code>1.0 - 2.0</code></p>
 
       <hr>
 
@@ -1052,15 +1052,15 @@ float get_repeat_penalty() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_frequency_penalty(penalty: float)
 float get_frequency_penalty() const</code></pre>
 
-      <p>Penaliza tokens según su frecuencia en el texto generado. Reduce repetición de palabras comunes.</p>
+      <p>Penalizes tokens based on their frequency in the generated text. Reduces repetition of common words.</p>
 
       <ul>
-        <li><strong>0.0</strong> = Sin penalización</li>
-        <li><strong>0.5-1.0</strong> = Penalización moderada</li>
-        <li><strong>2.0</strong> = Penalización fuerte</li>
+        <li><strong>0.0</strong> = No penalty</li>
+        <li><strong>0.5-1.0</strong> = Moderate penalty</li>
+        <li><strong>2.0</strong> = Strong penalty</li>
       </ul>
 
-      <p><strong>Default:</strong> <code>0.0</code> | <strong>Rango:</strong> <code>0.0 - 2.0</code></p>
+      <p><strong>Default:</strong> <code>0.0</code> | <strong>Range:</strong> <code>0.0 - 2.0</code></p>
 
       <hr>
 
@@ -1069,15 +1069,15 @@ float get_frequency_penalty() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_presence_penalty(penalty: float)
 float get_presence_penalty() const</code></pre>
 
-      <p>Penaliza tokens que ya aparecieron (independiente de frecuencia). Fomenta nuevos temas.</p>
+      <p>Penalizes tokens that have already appeared (regardless of frequency). Encourages new topics.</p>
 
       <ul>
-        <li><strong>0.0</strong> = Sin penalización</li>
-        <li><strong>0.5-1.0</strong> = Fomenta variedad</li>
-        <li><strong>2.0</strong> = Evita fuertemente repetir conceptos</li>
+        <li><strong>0.0</strong> = No penalty</li>
+        <li><strong>0.5-1.0</strong> = Encourages variety</li>
+        <li><strong>2.0</strong> = Strongly avoids repeating concepts</li>
       </ul>
 
-      <p><strong>Default:</strong> <code>0.0</code> | <strong>Rango:</strong> <code>0.0 - 2.0</code></p>
+      <p><strong>Default:</strong> <code>0.0</code> | <strong>Range:</strong> <code>0.0 - 2.0</code></p>
 
       <hr>
 
@@ -1086,12 +1086,12 @@ float get_presence_penalty() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_repeat_last_n(n: int)
 int get_repeat_last_n() const</code></pre>
 
-      <p>Define cuántos tokens hacia atrás considerar para aplicar repeat_penalty.</p>
+      <p>Defines how many tokens to look back when applying repeat_penalty.</p>
 
       <ul>
-        <li><strong>0</strong> = Desactivado (sin contexto de repetición)</li>
-        <li><strong>64</strong> = Últimos 64 tokens (recomendado)</li>
-        <li><strong>-1</strong> = Todo el contexto (puede ser lento)</li>
+        <li><strong>0</strong> = Disabled (no repetition context)</li>
+        <li><strong>64</strong> = Last 64 tokens (recommended)</li>
+        <li><strong>-1</strong> = Entire context (can be slow)</li>
       </ul>
 
       <p><strong>Default:</strong> <code>64</code></p>
@@ -1103,9 +1103,9 @@ int get_repeat_last_n() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_min_p(min_p: float)
 float get_min_p() const</code></pre>
 
-      <p>Filtra tokens con probabilidad menor a min_p * prob_max.</p>
+      <p>Filters tokens with probability less than min_p * prob_max.</p>
 
-      <p><strong>Default:</strong> <code>0.05</code> | <strong>Rango:</strong> <code>0.0 - 1.0</code></p>
+      <p><strong>Default:</strong> <code>0.05</code> | <strong>Range:</strong> <code>0.0 - 1.0</code></p>
 
       <hr>
 
@@ -1114,9 +1114,9 @@ float get_min_p() const</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_seed(seed: int)
 int get_seed() const</code></pre>
 
-      <p>Semilla para reproducibilidad. <code>0xFFFFFFFF</code> = aleatorio.</p>
+      <p>Seed for reproducibility. <code>0xFFFFFFFF</code> = random.</p>
 
-      <p><strong>Default:</strong> <code>0xFFFFFFFF</code> (aleatorio)</p>
+      <p><strong>Default:</strong> <code>0xFFFFFFFF</code> (random)</p>
 
       <hr>
 
@@ -1126,11 +1126,11 @@ int get_seed() const</code></pre>
 
       <pre data-lang="GDSCRIPT"><code>void set_stop_sequences(sequences: PackedStringArray)</code></pre>
 
-      <p>Define secuencias que detienen la generación cuando se encuentran.</p>
+      <p>Defines sequences that stop generation when encountered.</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
-      <pre data-lang="GDSCRIPT"><code># Detener en fin de turno de diálogo
+      <pre data-lang="GDSCRIPT"><code># Stop at dialogue turn end
 llama.set_stop_sequences(["User:", "\n\n", "[END]"])</code></pre>
 
       <hr>
@@ -1139,7 +1139,7 @@ llama.set_stop_sequences(["User:", "\n\n", "[END]"])</code></pre>
 
       <pre data-lang="GDSCRIPT"><code>PackedStringArray get_stop_sequences() const</code></pre>
 
-      <p>Retorna las secuencias de stop configuradas.</p>
+      <p>Returns the configured stop sequences.</p>
 
       <hr>
 
@@ -1147,7 +1147,7 @@ llama.set_stop_sequences(["User:", "\n\n", "[END]"])</code></pre>
 
       <pre data-lang="GDSCRIPT"><code>void clear_stop_sequences()</code></pre>
 
-      <p>Elimina todas las secuencias de stop.</p>
+      <p>Removes all stop sequences.</p>
 
       <hr>
 
@@ -1158,18 +1158,18 @@ llama.set_stop_sequences(["User:", "\n\n", "[END]"])</code></pre>
       <pre data-lang="GDSCRIPT"><code>void set_timeout(timeout_ms: int)
 int get_timeout() const</code></pre>
 
-      <p>Configura el timeout máximo para la generación en milisegundos.</p>
+      <p>Configures the maximum timeout for generation in milliseconds.</p>
 
       <ul>
-        <li><strong>0</strong> = Sin timeout (espera indefinidamente)</li>
-        <li><strong>>0</strong> = Tiempo máximo en ms</li>
+        <li><strong>0</strong> = No timeout (waits indefinitely)</li>
+        <li><strong>>0</strong> = Maximum time in ms</li>
       </ul>
 
-      <p><strong>Default:</strong> <code>0</code> (sin timeout)</p>
+      <p><strong>Default:</strong> <code>0</code> (no timeout)</p>
 
-      <h4>Ejemplo</h4>
+      <h4>Example</h4>
 
-      <pre data-lang="GDSCRIPT"><code># Limitar generación a 10 segundos
+      <pre data-lang="GDSCRIPT"><code># Limit generation to 10 seconds
 llama.set_timeout(10000)
 
 var response = llama.generate("Tell me a story")
@@ -1184,45 +1184,45 @@ if llama.has_generation_timed_out():
 
       <pre data-lang="GDSCRIPT"><code>bool has_generation_timed_out() const</code></pre>
 
-      <p>Verifica si la última generación terminó por timeout.</p>
+      <p>Checks if the last generation ended due to timeout.</p>
 
-      <h4>Retorno</h4>
+      <h4>Return</h4>
 
-      <p><code>true</code> si la última llamada a <code>generate()</code> terminó por timeout.</p>
+      <p><code>true</code> if the last call to <code>generate()</code> ended due to timeout.</p>
 
       <hr>
 
-      <h2>Señales</h2>
+      <h2>Signals</h2>
 
-      <h3>Generación Asíncrona</h3>
+      <h3>Async Generation</h3>
 
       <table>
         <thead>
           <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
+            <th>Signal</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>generation_started()</code></td>
-            <td>Emitida cuando comienza una generación asíncrona o streaming</td>
+            <td>Emitted when an async or streaming generation begins</td>
           </tr>
           <tr>
             <td><code>generation_completed(text: String)</code></td>
-            <td>Emitida cuando la generación termina exitosamente. <code>text</code> contiene el resultado completo.</td>
+            <td>Emitted when generation finishes successfully. <code>text</code> contains the complete result.</td>
           </tr>
           <tr>
             <td><code>generation_error(message: String)</code></td>
-            <td>Emitida cuando ocurre un error durante la generación</td>
+            <td>Emitted when an error occurs during generation</td>
           </tr>
           <tr>
             <td><code>generation_cancelled()</code></td>
-            <td>Emitida cuando la generación es cancelada mediante <code>cancel_generation()</code></td>
+            <td>Emitted when generation is cancelled via <code>cancel_generation()</code></td>
           </tr>
           <tr>
             <td><code>generation_timeout()</code></td>
-            <td>Emitida cuando la generación excede el tiempo límite configurado</td>
+            <td>Emitted when generation exceeds the configured time limit</td>
           </tr>
         </tbody>
       </table>
@@ -1232,23 +1232,23 @@ if llama.has_generation_timed_out():
       <table>
         <thead>
           <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
+            <th>Signal</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>token_generated(token: String)</code></td>
-            <td>Emitida para cada token generado durante streaming. Permite mostrar texto progresivamente.</td>
+            <td>Emitted for each token generated during streaming. Allows progressively displaying text.</td>
           </tr>
           <tr>
             <td><code>generation_progress(tokens: int, max_tokens: int)</code></td>
-            <td>Emitida periódicamente con el progreso de generación. Útil para barras de progreso.</td>
+            <td>Emitted periodically with generation progress. Useful for progress bars.</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Ejemplo de Streaming</h4>
+      <h4>Streaming Example</h4>
 
       <pre data-lang="GDSCRIPT"><code>func _ready():
     llama = LlamaInterface.new()
@@ -1279,7 +1279,7 @@ func _on_cancelled():
 
       <hr>
 
-      <h2>Ejemplo Completo</h2>
+      <h2>Complete Example</h2>
 
       <pre data-lang="GDSCRIPT"><code>extends Node
 ## Complete example showing sync and async generation with GPU support
@@ -1402,19 +1402,19 @@ func _exit_tree():
 
       <hr>
 
-      <h2>Modelos Compatibles</h2>
+      <h2>Compatible Models</h2>
 
-      <p>LlamaInterface soporta cualquier modelo en formato <strong>GGUF</strong>. Algunos modelos recomendados:</p>
+      <p>LlamaInterface supports any model in <strong>GGUF</strong> format. Some recommended models:</p>
 
-      <h4>Modelos Pequeños (Steam Deck, dispositivos móviles)</h4>
+      <h4>Small Models (Steam Deck, mobile devices)</h4>
 
       <table>
         <thead>
           <tr>
-            <th>Modelo</th>
-            <th>Tamaño</th>
+            <th>Model</th>
+            <th>Size</th>
             <th>RAM/VRAM</th>
-            <th>Uso Recomendado</th>
+            <th>Recommended Use</th>
           </tr>
         </thead>
         <tbody>
@@ -1422,38 +1422,38 @@ func _exit_tree():
             <td>SmolLM2-360M</td>
             <td>~250 MB</td>
             <td>~500 MB</td>
-            <td>Respuestas muy cortas, dispositivos limitados</td>
+            <td>Very short responses, limited devices</td>
           </tr>
           <tr>
             <td>SmolLM2-1.7B</td>
             <td>~1 GB</td>
             <td>~2 GB</td>
-            <td>Steam Deck, NPCs simples</td>
+            <td>Steam Deck, simple NPCs</td>
           </tr>
           <tr>
             <td>Qwen2.5-0.5B</td>
             <td>~400 MB</td>
             <td>~800 MB</td>
-            <td>Respuestas básicas, muy rápido</td>
+            <td>Basic responses, very fast</td>
           </tr>
           <tr>
             <td>Qwen2.5-1.5B</td>
             <td>~1 GB</td>
             <td>~2 GB</td>
-            <td>Balance para dispositivos limitados</td>
+            <td>Balance for limited devices</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Modelos Medianos (PC de escritorio)</h4>
+      <h4>Medium Models (Desktop PC)</h4>
 
       <table>
         <thead>
           <tr>
-            <th>Modelo</th>
-            <th>Tamaño</th>
+            <th>Model</th>
+            <th>Size</th>
             <th>VRAM (Q4)</th>
-            <th>Uso Recomendado</th>
+            <th>Recommended Use</th>
           </tr>
         </thead>
         <tbody>
@@ -1461,48 +1461,48 @@ func _exit_tree():
             <td>Qwen2.5-3B</td>
             <td>~2 GB</td>
             <td>~3 GB</td>
-            <td>NPCs simples, respuestas cortas</td>
+            <td>Simple NPCs, short responses</td>
           </tr>
           <tr>
             <td>Mistral-7B</td>
             <td>~4 GB</td>
             <td>~6 GB</td>
-            <td>Balance calidad/velocidad</td>
+            <td>Balance between quality/speed</td>
           </tr>
           <tr>
             <td>Qwen2.5-7B</td>
             <td>~4 GB</td>
             <td>~6 GB</td>
-            <td>Diálogos complejos</td>
+            <td>Complex dialogues</td>
           </tr>
           <tr>
             <td>Llama-3.1-8B</td>
             <td>~5 GB</td>
             <td>~7 GB</td>
-            <td>Alta calidad general</td>
+            <td>High overall quality</td>
           </tr>
         </tbody>
       </table>
 
       <blockquote>
-        <strong>Tip:</strong> Usa cuantizaciones Q4_K_M o Q5_K_M para el mejor balance entre calidad y rendimiento.
+        <strong>Tip:</strong> Use Q4_K_M or Q5_K_M quantizations for the best balance between quality and performance.
       </blockquote>
 
       <hr>
 
-      <h2>Notas Técnicas</h2>
+      <h2>Technical Notes</h2>
 
       <ul>
-        <li>La clase inicializa automáticamente el backend de llama.cpp al cargar un modelo</li>
-        <li>Solo puede haber un modelo cargado a la vez. Cargar un nuevo modelo descarga el anterior</li>
-        <li>El destructor libera automáticamente todos los recursos</li>
-        <li>Compatible con multi-threading via OpenMP</li>
-        <li>Soporta GPU offloading con CUDA, Vulkan o Metal (según compilación)</li>
+        <li>The class automatically initializes the llama.cpp backend when loading a model</li>
+        <li>Only one model can be loaded at a time. Loading a new model unloads the previous one</li>
+        <li>The destructor automatically frees all resources</li>
+        <li>Compatible with multi-threading via OpenMP</li>
+        <li>Supports GPU offloading with CUDA, Vulkan, or Metal (depending on build)</li>
       </ul>
 
       <hr>
 
-      <a href="index.html">← Volver a API Reference</a>
+      <a href="index.html">← Back to API Reference</a>
 
       <footer class="wiki-footer">
         <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -97,38 +97,38 @@
 
       <h1>API Reference</h1>
 
-      <p>Documentación completa de todas las clases públicas del addon OhMyDialogSystem.</p>
+      <p>Complete documentation for all public classes of the OhMyDialogSystem addon.</p>
 
       <hr>
 
-      <h2>Clases Principales</h2>
+      <h2>Main Classes</h2>
 
       <div class="feature-grid">
         <div class="feature-card">
           <span class="icon">🦙</span>
           <h3><a href="llama-interface.html">LlamaInterface</a></h3>
-          <p>Interfaz de bajo nivel para llama.cpp. Carga modelos GGUF y genera texto.</p>
+          <p>Low-level interface for llama.cpp. Loads GGUF models and generates text.</p>
           <p><span class="badge badge-cyan">GDExtension</span></p>
         </div>
 
         <div class="feature-card">
           <span class="icon">💬</span>
           <h3><a href="dialogue-manager.html">DialogueManager</a></h3>
-          <p>Orquestador principal del sistema de diálogos. Conecta todos los componentes.</p>
+          <p>Main orchestrator for the dialogue system. Connects all components together.</p>
           <p><span class="badge badge-purple">Core</span></p>
         </div>
 
         <div class="feature-card">
           <span class="icon">🧠</span>
           <h3><a href="memory-manager.html">MemoryManager</a></h3>
-          <p>Sistema de memorias persistentes con búsqueda semántica.</p>
+          <p>Persistent memories system with semantic search.</p>
           <p><span class="badge badge-green">Memory</span></p>
         </div>
 
         <div class="feature-card">
           <span class="icon">🔊</span>
           <h3><a href="tts-manager.html">TTSManager</a></h3>
-          <p>Síntesis de voz con Piper TTS. Genera audio para diálogos.</p>
+          <p>Voice synthesis with Piper TTS. Generates audio for dialogues.</p>
           <p><span class="badge badge-orange">TTS</span></p>
         </div>
       </div>
@@ -141,49 +141,49 @@
         <thead>
           <tr>
             <th>Resource</th>
-            <th>Descripción</th>
-            <th>Uso</th>
+            <th>Description</th>
+            <th>Usage</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>DialogueNodeData</code></td>
-            <td>Datos de un nodo individual en el grafo de diálogo</td>
-            <td>Interno, usado por DialogueGraph</td>
+            <td>Data for an individual node in the dialogue graph</td>
+            <td>Internal, used by DialogueGraph</td>
           </tr>
           <tr>
             <td><code>CharacterIdentity</code></td>
-            <td>Define la personalidad, background y estilo de un NPC</td>
-            <td>Un resource por personaje</td>
+            <td>Defines the personality, background, and style of an NPC</td>
+            <td>One resource per character</td>
           </tr>
           <tr>
             <td><code>WorldContext</code></td>
-            <td>Contexto del mundo, lore, eventos actuales</td>
-            <td>Uno o más por escenario</td>
+            <td>World context, lore, current events</td>
+            <td>One or more per scenario</td>
           </tr>
           <tr>
             <td><code>DialogueGraph</code></td>
-            <td>Grafo visual de nodos de diálogo</td>
-            <td>Uno por conversación/quest</td>
+            <td>Visual graph of dialogue nodes</td>
+            <td>One per conversation/quest</td>
           </tr>
           <tr>
             <td><code>AIPreset</code></td>
-            <td>Configuración de generación (temperature, top_p, etc.)</td>
-            <td>Presets reutilizables</td>
+            <td>Generation settings (temperature, top_p, etc.)</td>
+            <td>Reusable presets</td>
           </tr>
           <tr>
             <td><code>VoiceProfile</code></td>
-            <td>Configuración de voz para TTS</td>
-            <td>Un profile por personaje</td>
+            <td>Voice configuration for TTS</td>
+            <td>One profile per character</td>
           </tr>
         </tbody>
       </table>
 
-      <p><a href="resources.html">Ver documentación completa de Resources →</a></p>
+      <p><a href="resources.html">View complete Resources documentation →</a></p>
 
       <hr>
 
-      <h2>Signals Comunes</h2>
+      <h2>Common Signals</h2>
 
       <h3>DialogueManager</h3>
 
@@ -191,45 +191,45 @@
         <thead>
           <tr>
             <th>Signal</th>
-            <th>Parámetros</th>
-            <th>Descripción</th>
+            <th>Parameters</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>dialogue_started</code></td>
             <td>-</td>
-            <td>Emitido al iniciar un diálogo</td>
+            <td>Emitted when a dialogue starts</td>
           </tr>
           <tr>
             <td><code>npc_response_started</code></td>
             <td>-</td>
-            <td>El NPC comenzó a "pensar"</td>
+            <td>The NPC started "thinking"</td>
           </tr>
           <tr>
             <td><code>token_generated</code></td>
             <td><code>token: String</code></td>
-            <td>Cada token generado (streaming)</td>
+            <td>Each token generated (streaming)</td>
           </tr>
           <tr>
             <td><code>npc_response_completed</code></td>
             <td><code>response: String</code></td>
-            <td>Respuesta completa del NPC</td>
+            <td>Complete NPC response</td>
           </tr>
           <tr>
             <td><code>choices_available</code></td>
             <td><code>choices: Array[String]</code></td>
-            <td>Opciones disponibles para el jugador</td>
+            <td>Available options for the player</td>
           </tr>
           <tr>
             <td><code>event_triggered</code></td>
             <td><code>name: String, data: Dictionary</code></td>
-            <td>Evento del grafo disparado</td>
+            <td>Graph event triggered</td>
           </tr>
           <tr>
             <td><code>dialogue_ended</code></td>
             <td>-</td>
-            <td>Conversación finalizada</td>
+            <td>Conversation finished</td>
           </tr>
         </tbody>
       </table>
@@ -240,42 +240,42 @@
         <thead>
           <tr>
             <th>Signal</th>
-            <th>Parámetros</th>
-            <th>Descripción</th>
+            <th>Parameters</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>model_loaded</code></td>
             <td><code>info: Dictionary</code></td>
-            <td>Modelo cargado exitosamente</td>
+            <td>Model loaded successfully</td>
           </tr>
           <tr>
             <td><code>generation_started</code></td>
             <td>-</td>
-            <td>Inicio de generación</td>
+            <td>Generation started</td>
           </tr>
           <tr>
             <td><code>token_generated</code></td>
             <td><code>token: String</code></td>
-            <td>Token generado</td>
+            <td>Token generated</td>
           </tr>
           <tr>
             <td><code>generation_completed</code></td>
             <td><code>text: String</code></td>
-            <td>Generación completada</td>
+            <td>Generation completed</td>
           </tr>
           <tr>
             <td><code>generation_error</code></td>
             <td><code>error: String</code></td>
-            <td>Error durante generación</td>
+            <td>Error during generation</td>
           </tr>
         </tbody>
       </table>
 
       <hr>
 
-      <h2>Ejemplo de Uso Completo</h2>
+      <h2>Complete Usage Example</h2>
 
       <pre data-lang="GDSCRIPT"><code>extends Node
 
@@ -284,7 +284,7 @@ var dialogue_manager: DialogueManager
 var memory_manager: MemoryManager
 
 func _ready():
-    # Inicializar LLM
+    # Initialize LLM
     llama = LlamaInterface.new()
     add_child(llama)
 
@@ -297,11 +297,11 @@ func _ready():
         push_error("Failed to load model")
         return
 
-    # Inicializar MemoryManager
+    # Initialize MemoryManager
     memory_manager = MemoryManager.new()
     add_child(memory_manager)
 
-    # Inicializar DialogueManager
+    # Initialize DialogueManager
     dialogue_manager = DialogueManager.new()
     dialogue_manager.set_llama_interface(llama)
     dialogue_manager.set_memory_manager(memory_manager)
@@ -309,7 +309,7 @@ func _ready():
     dialogue_manager.set_world_context(preload("res://world/fantasy_world.tres"))
     add_child(dialogue_manager)
 
-    # Conectar signals
+    # Connect signals
     dialogue_manager.npc_response_completed.connect(_on_npc_response)
     dialogue_manager.choices_available.connect(_on_choices)
     dialogue_manager.event_triggered.connect(_on_event)
@@ -336,7 +336,7 @@ func _on_event(event_name: String, data: Dictionary):
 
       <hr>
 
-      <a href="../index.html">← Volver a Home</a>
+      <a href="../index.html">← Back to Home</a>
 
       <footer class="wiki-footer">
         <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>

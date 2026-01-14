@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CI/CD y Releases - OhMyDialogSystem Wiki</title>
+  <title>CI/CD and Releases - OhMyDialogSystem Wiki</title>
   <link rel="stylesheet" href="../../styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -608,10 +608,10 @@
       <div class="nav-section">
         <div class="nav-section-title">Navigation</div>
         <ul class="nav-links">
-          <li><a href="../index.html"><span class="icon">home</span> Inicio</a></li>
-          <li><a href="../Guides/index.html"><span class="icon">book</span> Guias</a></li>
+          <li><a href="../index.html"><span class="icon">home</span> Home</a></li>
+          <li><a href="../Guides/index.html"><span class="icon">book</span> Guides</a></li>
           <li><a href="../API/index.html"><span class="icon">code</span> API</a></li>
-          <li><a href="index.html" class="active"><span class="icon">settings</span> Tecnico</a></li>
+          <li><a href="index.html" class="active"><span class="icon">settings</span> Technical</a></li>
           <li><a href="../roadmap.html"><span class="icon">map</span> Roadmap</a></li>
         </ul>
       </div>
@@ -631,31 +631,31 @@
     <!-- Main Content -->
     <main class="main-content">
       <div class="breadcrumbs">
-        <a href="../index.html">Inicio</a>
+        <a href="../index.html">Home</a>
         <span>/</span>
         <a href="index.html">Technical</a>
         <span>/</span>
-        CI/CD y Releases
+        CI/CD and Releases
       </div>
 
-      <h1>CI/CD y Sistema de Releases</h1>
+      <h1>CI/CD and Release System</h1>
 
       <p>
-        OhMyDialogSystem utiliza <strong>GitHub Actions</strong> para automatizar la compilacion
-        y publicacion de releases. El sistema soporta <em>deteccion automatica de backends</em>
-        en runtime, permitiendo que un solo paquete funcione en diferentes configuraciones de hardware.
+        OhMyDialogSystem uses <strong>GitHub Actions</strong> to automate compilation
+        and release publishing. The system supports <em>automatic backend detection</em>
+        at runtime, allowing a single package to work across different hardware configurations.
       </p>
 
       <!-- Release Flow Section -->
-      <h2>Flujo de Release</h2>
+      <h2>Release Flow</h2>
 
       <div class="release-flow-diagram">
         <div class="flow-container">
           <div class="flow-step">
             <div class="flow-number">1</div>
             <div class="flow-content">
-              <h4>Crear Tag de Version</h4>
-              <p>El desarrollador crea un tag siguiendo SemVer</p>
+              <h4>Create Version Tag</h4>
+              <p>The developer creates a tag following SemVer</p>
               <pre data-lang="BASH"><code>git tag v1.0.0 && git push origin v1.0.0</code></pre>
             </div>
           </div>
@@ -669,8 +669,8 @@
           <div class="flow-step">
             <div class="flow-number">2</div>
             <div class="flow-content">
-              <h4>GitHub Actions Detecta</h4>
-              <p>El workflow <code>release-gdextension.yml</code> se dispara automaticamente al detectar el patron <code>v*.*.*</code></p>
+              <h4>GitHub Actions Detects</h4>
+              <p>The workflow <code>release-gdextension.yml</code> triggers automatically upon detecting the pattern <code>v*.*.*</code></p>
             </div>
           </div>
 
@@ -683,8 +683,8 @@
           <div class="flow-step">
             <div class="flow-number">3</div>
             <div class="flow-content">
-              <h4>Compilacion Paralela</h4>
-              <p>Se compila para Windows, Linux y macOS simultaneamente con todos los backends habilitados</p>
+              <h4>Parallel Compilation</h4>
+              <p>Builds for Windows, Linux, and macOS simultaneously with all backends enabled</p>
             </div>
           </div>
 
@@ -698,16 +698,16 @@
             <div class="flow-number">4</div>
             <div class="flow-content">
               <h4>GitHub Release</h4>
-              <p>Se crea automaticamente un Release con paquetes optimizados para cada plataforma</p>
+              <p>A Release is automatically created with optimized packages for each platform</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Manual Trigger Section -->
-      <h2>Ejecucion Manual</h2>
+      <h2>Manual Execution</h2>
 
-      <p>El workflow puede ejecutarse manualmente para testing sin crear un release oficial:</p>
+      <p>The workflow can be executed manually for testing without creating an official release:</p>
 
       <div class="command-section">
         <div class="command-grid">
@@ -717,12 +717,12 @@
               <h4>GitHub CLI</h4>
             </div>
             <div class="command-body">
-              <pre data-lang="BASH"><code># Solo compilar (sin release)
+              <pre data-lang="BASH"><code># Build only (no release)
 gh workflow run "Release GDExtension" \
   -f version=v0.0.0-test \
   -f create_release=false
 
-# Compilar y crear release de prueba
+# Build and create test release
 gh workflow run "Release GDExtension" \
   -f version=v1.0.0-rc1 \
   -f create_release=true</code></pre>
@@ -736,11 +736,11 @@ gh workflow run "Release GDExtension" \
             </div>
             <div class="command-body">
               <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.5rem 0;">
-                1. Ir a <strong>Actions</strong> → <strong>Release GDExtension</strong><br>
-                2. Click en <strong>Run workflow</strong><br>
-                3. Ingresar version (ej: <code>v0.0.0-test</code>)<br>
-                4. Seleccionar si crear release<br>
-                5. Click en <strong>Run workflow</strong>
+                1. Go to <strong>Actions</strong> → <strong>Release GDExtension</strong><br>
+                2. Click on <strong>Run workflow</strong><br>
+                3. Enter version (e.g.: <code>v0.0.0-test</code>)<br>
+                4. Select whether to create release<br>
+                5. Click on <strong>Run workflow</strong>
               </p>
             </div>
           </div>
@@ -749,43 +749,43 @@ gh workflow run "Release GDExtension" \
 
       <div class="callout-info">
         <p>
-          <strong>Nota:</strong> Las ejecuciones manuales con <code>create_release=false</code> solo compilan
-          y suben artefactos. Utiles para verificar que el build funciona antes de crear un tag oficial.
+          <strong>Note:</strong> Manual executions with <code>create_release=false</code> only compile
+          and upload artifacts. Useful for verifying that the build works before creating an official tag.
         </p>
       </div>
 
       <!-- Backends Section -->
-      <h2>Backends Disponibles</h2>
+      <h2>Available Backends</h2>
 
-      <p>El addon detecta automaticamente el mejor backend disponible en el sistema del usuario:</p>
+      <p>The addon automatically detects the best available backend on the user's system:</p>
 
       <div class="backend-grid">
         <div class="backend-card vulkan">
           <div class="icon-wrapper">VK</div>
           <h4>Vulkan</h4>
-          <p>API grafica multiplataforma. Soporta GPUs AMD, Intel y NVIDIA. Backend GPU recomendado.</p>
+          <p>Cross-platform graphics API. Supports AMD, Intel, and NVIDIA GPUs. Recommended GPU backend.</p>
           <div class="backend-score">Score: 80+</div>
         </div>
 
         <div class="backend-card cpu">
           <div class="icon-wrapper">CPU</div>
           <h4>CPU</h4>
-          <p>Funciona en cualquier sistema. Utiliza instrucciones SIMD (AVX2, AVX512) cuando estan disponibles. Fallback automatico.</p>
+          <p>Works on any system. Uses SIMD instructions (AVX2, AVX512) when available. Automatic fallback.</p>
           <div class="backend-score">Score: 10 - 170</div>
         </div>
 
         <div class="backend-card metal">
           <div class="icon-wrapper">MTL</div>
           <h4>Metal</h4>
-          <p>Optimizado para Apple Silicon (M1/M2/M3/M4). Nativo en macOS, maximo rendimiento en Mac.</p>
+          <p>Optimized for Apple Silicon (M1/M2/M3/M4). Native on macOS, maximum performance on Mac.</p>
           <div class="backend-score">Score: 90</div>
         </div>
       </div>
 
       <!-- Detection Flowchart -->
-      <h2>Deteccion Automatica</h2>
+      <h2>Automatic Detection</h2>
 
-      <p>Cuando se carga un modelo, el sistema ejecuta el siguiente proceso de seleccion:</p>
+      <p>When loading a model, the system executes the following selection process:</p>
 
       <div class="detection-flowchart">
         <div class="flowchart-container">
@@ -795,7 +795,7 @@ gh workflow run "Release GDExtension" \
             <span></span>
           </div>
 
-          <div class="flowchart-node process">Escanea DLLs/SOs de backend en directorio</div>
+          <div class="flowchart-node process">Scans backend DLLs/SOs in directory</div>
 
           <div class="flowchart-arrow">
             <span></span>
@@ -808,7 +808,7 @@ gh workflow run "Release GDExtension" \
             </div>
             <div class="flowchart-branch">
               <div class="backend-box">ggml-cpu.dll</div>
-              <div class="api-call">Siempre disponible</div>
+              <div class="api-call">Always available</div>
             </div>
           </div>
 
@@ -816,19 +816,19 @@ gh workflow run "Release GDExtension" \
             <span></span>
           </div>
 
-          <div class="flowchart-node decision">Mayor Score</div>
+          <div class="flowchart-node decision">Highest Score</div>
         </div>
       </div>
 
       <div class="callout-info">
         <p>
-          Cada backend exporta una funcion <code>ggml_backend_score()</code> que retorna un valor numerico
-          basado en la disponibilidad del hardware. El sistema selecciona automaticamente el backend con mayor score.
+          Each backend exports a <code>ggml_backend_score()</code> function that returns a numeric value
+          based on hardware availability. The system automatically selects the backend with the highest score.
         </p>
       </div>
 
       <!-- Platforms Section -->
-      <h2>Paquetes por Plataforma</h2>
+      <h2>Platform Packages</h2>
 
       <div class="platform-section">
         <div class="platform-cards">
@@ -882,9 +882,9 @@ gh workflow run "Release GDExtension" \
       </div>
 
       <!-- Local Build Section -->
-      <h2>Compilacion Local</h2>
+      <h2>Local Compilation</h2>
 
-      <p>Para compilar localmente con todos los backends habilitados:</p>
+      <p>To compile locally with all backends enabled:</p>
 
       <div class="command-section">
         <div class="command-grid">
@@ -914,15 +914,15 @@ build.bat release --all-backends --dynamic</code></pre>
 
       <div class="callout-success">
         <p>
-          Los flags <code>--all-backends</code> y <code>--dynamic</code> habilitan <code>GGML_BACKEND_DL=ON</code>,
-          compilando cada backend como una biblioteca dinamica separada.
+          The flags <code>--all-backends</code> and <code>--dynamic</code> enable <code>GGML_BACKEND_DL=ON</code>,
+          compiling each backend as a separate dynamic library.
         </p>
       </div>
 
       <!-- Workflow Structure -->
-      <h2>Estructura del Workflow</h2>
+      <h2>Workflow Structure</h2>
 
-      <p>El workflow de GitHub Actions ejecuta los siguientes jobs:</p>
+      <p>The GitHub Actions workflow executes the following jobs:</p>
 
       <div class="workflow-diagram">
         <div class="workflow-jobs">
@@ -949,29 +949,29 @@ build.bat release --all-backends --dynamic</code></pre>
             </div>
           </div>
 
-          <div class="workflow-connector">dependencia</div>
+          <div class="workflow-connector">dependency</div>
 
           <div class="workflow-row">
             <div class="workflow-job final">
               <div class="job-icon">PKG</div>
               <div class="job-name">create-release</div>
-              <div class="job-desc">Empaqueta y publica</div>
+              <div class="job-desc">Package and publish</div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Reusable Actions -->
-      <h2>Actions Reutilizables</h2>
+      <h2>Reusable Actions</h2>
 
-      <p>El proyecto incluye GitHub Actions personalizadas en <code>.github/actions/</code>:</p>
+      <p>The project includes custom GitHub Actions in <code>.github/actions/</code>:</p>
 
       <div class="actions-grid">
         <div class="action-item">
           <div class="action-icon">VK</div>
           <div>
             <code>setup-vulkan-windows</code>
-            <p style="margin:0;font-size:0.8rem;color:var(--text-muted)">Vulkan SDK para Windows</p>
+            <p style="margin:0;font-size:0.8rem;color:var(--text-muted)">Vulkan SDK for Windows</p>
           </div>
         </div>
 
@@ -979,7 +979,7 @@ build.bat release --all-backends --dynamic</code></pre>
           <div class="action-icon">VK</div>
           <div>
             <code>setup-vulkan-linux</code>
-            <p style="margin:0;font-size:0.8rem;color:var(--text-muted)">Vulkan SDK para Linux</p>
+            <p style="margin:0;font-size:0.8rem;color:var(--text-muted)">Vulkan SDK for Linux</p>
           </div>
         </div>
       </div>

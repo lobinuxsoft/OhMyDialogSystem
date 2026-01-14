@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -97,20 +97,20 @@
 
       <h1>GDExtension Build Guide</h1>
 
-      <p>Guia completa para compilar la GDExtension de OhMyDialogSystem con integracion de llama.cpp.</p>
+      <p>Complete guide to compile the OhMyDialogSystem GDExtension with llama.cpp integration.</p>
 
       <hr>
 
-      <h2>Prerequisitos</h2>
+      <h2>Prerequisites</h2>
 
-      <h3>Todas las Plataformas</h3>
+      <h3>All Platforms</h3>
 
       <ul>
-        <li><strong>Python 3.10+</strong> con pip</li>
+        <li><strong>Python 3.10+</strong> with pip</li>
         <li><strong>SCons 4.x+</strong>: <code>pip install scons</code></li>
         <li><strong>CMake 3.20+</strong></li>
-        <li><strong>Ninja</strong> (recomendado para builds mas rapidos)</li>
-        <li><strong>Git</strong> (para submodulos)</li>
+        <li><strong>Ninja</strong> (recommended for faster builds)</li>
+        <li><strong>Git</strong> (for submodules)</li>
       </ul>
 
       <h3>Linux</h3>
@@ -118,19 +118,19 @@
       <table>
         <thead>
           <tr>
-            <th>Paquete</th>
+            <th>Package</th>
             <th>Fedora/Bazzite</th>
             <th>Ubuntu/Debian</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Compilador C++</td>
+            <td>C++ Compiler</td>
             <td><code>gcc-c++</code></td>
             <td><code>build-essential</code></td>
           </tr>
           <tr>
-            <td>Headers de desarrollo</td>
+            <td>Development Headers</td>
             <td><code>libstdc++-devel</code></td>
             <td><code>libstdc++-dev</code></td>
           </tr>
@@ -138,16 +138,16 @@
       </table>
 
       <div class="callout-warning">
-        <p><strong>Bazzite/Fedora Silverblue (rpm-ostree):</strong> Si hay conflictos de version con gcc, descargar la version exacta desde <a href="https://kojipkgs.fedoraproject.org/packages/" target="_blank">Koji</a>.</p>
+        <p><strong>Bazzite/Fedora Silverblue (rpm-ostree):</strong> If there are version conflicts with gcc, download the exact version from <a href="https://kojipkgs.fedoraproject.org/packages/" target="_blank">Koji</a>.</p>
       </div>
 
       <h3>Windows</h3>
 
       <ul>
-        <li><strong>Visual Studio 2022</strong> con workload de C++, o</li>
+        <li><strong>Visual Studio 2022</strong> with C++ workload, or</li>
         <li><strong>MinGW-w64</strong> (GCC 12+)</li>
-        <li><strong>CMake</strong> (desde cmake.org o Visual Studio)</li>
-        <li><strong>Vulkan SDK</strong> (para aceleracion GPU): <a href="https://vulkan.lunarg.com/" target="_blank">vulkan.lunarg.com</a></li>
+        <li><strong>CMake</strong> (from cmake.org or Visual Studio)</li>
+        <li><strong>Vulkan SDK</strong> (for GPU acceleration): <a href="https://vulkan.lunarg.com/" target="_blank">vulkan.lunarg.com</a></li>
       </ul>
 
       <h3>macOS</h3>
@@ -159,42 +159,42 @@
 
       <hr>
 
-      <h2>Compilacion</h2>
+      <h2>Compilation</h2>
 
-      <h3>1. Clonar con submodulos</h3>
+      <h3>1. Clone with submodules</h3>
 
       <pre data-lang="BASH"><code>git clone --recursive https://github.com/lobinuxsoft/OhMyDialogSystem.git
 cd OhMyDialogSystem</code></pre>
 
-      <p>Si ya esta clonado:</p>
+      <p>If already cloned:</p>
 
       <pre data-lang="BASH"><code>git submodule update --init --recursive</code></pre>
 
-      <h3>2. Compilar llama.cpp (primera vez)</h3>
+      <h3>2. Compile llama.cpp (first time)</h3>
 
-      <pre data-lang="BASH"><code># Linux/macOS (Vulkan por defecto, fallback a CPU si no disponible)
+      <pre data-lang="BASH"><code># Linux/macOS (Vulkan by default, fallback to CPU if not available)
 ./gdextension/scripts/build_llama.sh
 
-# Windows (requiere Vulkan SDK instalado)
+# Windows (requires Vulkan SDK installed)
 gdextension\scripts\build_llama.bat
 
-# Forzar solo CPU (sin aceleracion GPU)
+# Force CPU only (no GPU acceleration)
 ./gdextension/scripts/build_llama.sh --cpu</code></pre>
 
-      <h3>3. Compilar GDExtension</h3>
+      <h3>3. Compile GDExtension</h3>
 
-      <h4>Usando los scripts de build (recomendado)</h4>
+      <h4>Using the build scripts (recommended)</h4>
 
-      <p>Los scripts <code>build.bat</code> (Windows) y <code>build.sh</code> (Linux/macOS) simplifican el proceso:</p>
+      <p>The <code>build.bat</code> (Windows) and <code>build.sh</code> (Linux/macOS) scripts simplify the process:</p>
 
       <pre data-lang="BASH"><code>cd gdextension
 
 # Windows
-build.bat editor          # Para desarrollo en el editor
-build.bat debug           # Para exportar en modo debug
-build.bat release         # Para exportar en modo release
+build.bat editor          # For development in the editor
+build.bat debug           # For exporting in debug mode
+build.bat release         # For exporting in release mode
 
-# Compilar las 3 configuraciones de una vez (Windows)
+# Build all 3 configurations at once (Windows)
 build_all.bat
 
 # Linux/macOS
@@ -203,41 +203,41 @@ build_all.bat
 ./build.sh release</code></pre>
 
       <div class="callout-warning">
-        <p><strong>Importante:</strong> Para abrir el proyecto en el editor de Godot, <strong>debes compilar con <code>editor</code></strong>. El target <code>template_debug</code> solo sirve para exportar el juego, no para desarrollo.</p>
+        <p><strong>Important:</strong> To open the project in the Godot editor, <strong>you must compile with <code>editor</code></strong>. The <code>template_debug</code> target is only for exporting the game, not for development.</p>
       </div>
 
-      <h4>Entendiendo los targets</h4>
+      <h4>Understanding the targets</h4>
 
       <table>
         <thead>
           <tr>
             <th>Target</th>
-            <th>Uso</th>
-            <th>Cuando compilar</th>
+            <th>Usage</th>
+            <th>When to compile</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>editor</code></td>
-            <td>Desarrollo en el editor de Godot</td>
-            <td><strong>Siempre</strong> - necesario para abrir el proyecto</td>
+            <td>Development in the Godot editor</td>
+            <td><strong>Always</strong> - needed to open the project</td>
           </tr>
           <tr>
             <td><code>template_debug</code></td>
-            <td>Exportar juego con debug habilitado</td>
-            <td>Cuando quieras probar exports con debugging</td>
+            <td>Export game with debug enabled</td>
+            <td>When you want to test exports with debugging</td>
           </tr>
           <tr>
             <td><code>template_release</code></td>
-            <td>Exportar juego optimizado para produccion</td>
-            <td>Para distribuir el juego final</td>
+            <td>Export optimized game for production</td>
+            <td>For distributing the final game</td>
           </tr>
         </tbody>
       </table>
 
-      <h4>Usando SCons directamente</h4>
+      <h4>Using SCons directly</h4>
 
-      <p>Si prefieres control manual:</p>
+      <p>If you prefer manual control:</p>
 
       <pre data-lang="BASH"><code>cd gdextension
 
@@ -252,17 +252,17 @@ scons platform=macos target=editor</code></pre>
 
       <hr>
 
-      <h2>Opciones de Build</h2>
+      <h2>Build Options</h2>
 
-      <h3>Opciones de llama.cpp</h3>
+      <h3>llama.cpp Options</h3>
 
       <table>
         <thead>
           <tr>
-            <th>Opcion</th>
-            <th>Valores</th>
+            <th>Option</th>
+            <th>Values</th>
             <th>Default</th>
-            <th>Descripcion</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
@@ -270,69 +270,69 @@ scons platform=macos target=editor</code></pre>
             <td><code>llama_backend</code></td>
             <td>vulkan, cpu, metal</td>
             <td>vulkan</td>
-            <td>Backend de computo (Vulkan recomendado para GPU)</td>
+            <td>Compute backend (Vulkan recommended for GPU)</td>
           </tr>
           <tr>
             <td><code>llama_native</code></td>
             <td>yes, no</td>
             <td>no</td>
-            <td>Optimizaciones nativas de CPU (no portable)</td>
+            <td>Native CPU optimizations (not portable)</td>
           </tr>
           <tr>
             <td><code>llama_avx2</code></td>
             <td>yes, no</td>
             <td>yes</td>
-            <td>Instrucciones AVX2 (x86_64)</td>
+            <td>AVX2 instructions (x86_64)</td>
           </tr>
           <tr>
             <td><code>llama_rebuild</code></td>
             <td>yes, no</td>
             <td>no</td>
-            <td>Forzar rebuild de llama.cpp</td>
+            <td>Force rebuild of llama.cpp</td>
           </tr>
         </tbody>
       </table>
 
-      <p>Ejemplo:</p>
+      <p>Example:</p>
 
       <pre data-lang="BASH"><code>scons platform=linux target=template_release llama_backend=vulkan llama_native=yes</code></pre>
 
-      <h3>Opciones estandar de godot-cpp</h3>
+      <h3>Standard godot-cpp Options</h3>
 
       <table>
         <thead>
           <tr>
-            <th>Opcion</th>
-            <th>Valores</th>
-            <th>Descripcion</th>
+            <th>Option</th>
+            <th>Values</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><code>platform</code></td>
             <td>linux, windows, macos, ios, android</td>
-            <td>Plataforma objetivo</td>
+            <td>Target platform</td>
           </tr>
           <tr>
             <td><code>target</code></td>
             <td>editor, template_debug, template_release</td>
-            <td>Tipo de build</td>
+            <td>Build type</td>
           </tr>
           <tr>
             <td><code>arch</code></td>
             <td>x86_64, arm64</td>
-            <td>Arquitectura objetivo</td>
+            <td>Target architecture</td>
           </tr>
         </tbody>
       </table>
 
       <hr>
 
-      <h2>Aceleracion GPU</h2>
+      <h2>GPU Acceleration</h2>
 
-      <h3>Vulkan (Recomendado)</h3>
+      <h3>Vulkan (Recommended)</h3>
 
-      <p>Vulkan es el backend GPU por defecto. Funciona en GPUs AMD, Intel y NVIDIA. Requiere el Vulkan SDK instalado:</p>
+      <p>Vulkan is the default GPU backend. It works on AMD, Intel and NVIDIA GPUs. Requires Vulkan SDK installed:</p>
 
       <pre data-lang="BASH"><code># Linux (Fedora)
 sudo dnf install vulkan-devel shaderc
@@ -340,18 +340,18 @@ sudo dnf install vulkan-devel shaderc
 # Linux (Ubuntu/Debian)
 sudo apt-get install libvulkan-dev glslc
 
-# Windows: Descargar desde https://vulkan.lunarg.com/</code></pre>
+# Windows: Download from https://vulkan.lunarg.com/</code></pre>
 
-      <p>El script de build detecta automaticamente si Vulkan esta disponible. Si no lo esta, fallback a CPU.</p>
+      <p>The build script automatically detects if Vulkan is available. If not, it falls back to CPU.</p>
 
-      <pre data-lang="BASH"><code># Build con Vulkan (default)
+      <pre data-lang="BASH"><code># Build with Vulkan (default)
 ./gdextension/scripts/build_llama.sh
 
-# O explicitamente
+# Or explicitly
 ./gdextension/scripts/build_llama.sh --vulkan</code></pre>
 
       <div class="callout-info">
-        <p><strong>CUDA:</strong> El soporte para CUDA con seleccion de arquitectura GPU esta planificado para una version futura. Ver issues del proyecto para el estado.</p>
+        <p><strong>CUDA:</strong> Support for CUDA with GPU architecture selection is planned for a future version. See project issues for status.</p>
       </div>
 
       <hr>
@@ -360,31 +360,31 @@ sudo apt-get install libvulkan-dev glslc
 
       <h3>"cannot find -lstdc++"</h3>
 
-      <p>El build requiere libstdc++ estatico por defecto. Si no esta disponible, el SConstruct automaticamente usa linkeo dinamico. Para distribucion, considerar:</p>
+      <p>The build requires static libstdc++ by default. If not available, the SConstruct automatically uses dynamic linking. For distribution, consider:</p>
 
       <pre data-lang="BASH"><code># Fedora
 sudo dnf install libstdc++-static</code></pre>
 
       <h3>"llama.cpp not found"</h3>
 
-      <p>Asegurar que los submodulos estan inicializados:</p>
+      <p>Ensure the submodules are initialized:</p>
 
       <pre data-lang="BASH"><code>git submodule update --init --recursive</code></pre>
 
-      <h3>Errores de CMake durante build de llama.cpp</h3>
+      <h3>CMake errors during llama.cpp build</h3>
 
-      <p>Los scripts de build usan estos flags para evitar dependencias opcionales:</p>
+      <p>The build scripts use these flags to avoid optional dependencies:</p>
 
       <ul>
-        <li><code>-DLLAMA_CURL=OFF</code> - Desactiva descarga de modelos (no necesario)</li>
-        <li><code>-DLLAMA_BUILD_TOOLS=OFF</code> - Salta herramientas CLI (no necesario)</li>
+        <li><code>-DLLAMA_CURL=OFF</code> - Disables model download (not needed)</li>
+        <li><code>-DLLAMA_BUILD_TOOLS=OFF</code> - Skips CLI tools (not needed)</li>
       </ul>
 
       <hr>
 
       <h2>Output</h2>
 
-      <p>Las librerias compiladas se colocan en <code>addons/ohmydialog/gdextension/</code>:</p>
+      <p>The compiled libraries are placed in <code>addons/ohmydialog/gdextension/</code>:</p>
 
       <style>
         .binary-tree {
@@ -560,12 +560,12 @@ sudo dnf install libstdc++-static</code></pre>
       </div>
 
       <div class="callout-info">
-        <p>Solo se generan los binarios de la plataforma y target que compiles. Para un setup completo de desarrollo, compila al menos el target <code>editor</code> de tu plataforma.</p>
+        <p>Only the binaries for the platform and target you compile are generated. For a complete development setup, compile at least the <code>editor</code> target for your platform.</p>
       </div>
 
       <hr>
 
-      <a href="index.html">← Volver a Technical</a>
+      <a href="index.html">← Back to Technical</a>
 
       <footer class="wiki-footer">
         <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>

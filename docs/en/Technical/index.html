@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,7 +55,7 @@
           <li><a href="architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
           <li><a href="dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
           <li><a href="gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
-          <li><a href="ci-cd-release.html"><span class="icon">🚀</span> CI/CD y Releases</a></li>
+          <li><a href="ci-cd-release.html"><span class="icon">🚀</span> CI/CD and Releases</a></li>
           <li><a href="memory-system.html"><span class="icon">💾</span> Memory System</a></li>
           <li><a href="localization.html"><span class="icon">🌐</span> Localization</a></li>
         </ul>
@@ -98,88 +98,88 @@
 
       <h1>Technical Documentation</h1>
 
-      <p>Documentación técnica detallada sobre la arquitectura, compilación y sistemas internos de OhMyDialogSystem.</p>
+      <p>Detailed technical documentation about the architecture, compilation and internal systems of OhMyDialogSystem.</p>
 
       <hr>
 
-      <h2>Contenido</h2>
+      <h2>Contents</h2>
 
       <div class="feature-grid">
         <div class="feature-card">
           <span class="icon">🏗️</span>
           <h3><a href="architecture.html">Architecture</a></h3>
-          <p>Visión general de la arquitectura del sistema, diagramas de clases y flujos de datos.</p>
+          <p>Overview of the system architecture, class diagrams and data flows.</p>
         </div>
 
         <div class="feature-card">
           <span class="icon">🔷</span>
           <h3><a href="dialogue-nodes.html">Dialogue Nodes</a></h3>
-          <p>Catálogo visual de nodos del editor. Sistema híbrido grafo + IA.</p>
+          <p>Visual catalog of editor nodes. Hybrid graph + AI system.</p>
         </div>
 
         <div class="feature-card">
           <span class="icon">🔧</span>
           <h3><a href="gdextension.html">GDExtension Build</a></h3>
-          <p>Guía para compilar el addon desde código fuente. Requisitos, SCons, plataformas.</p>
+          <p>Guide to compile the addon from source code. Requirements, SCons, platforms.</p>
         </div>
 
         <div class="feature-card">
           <span class="icon">💾</span>
           <h3><a href="memory-system.html">Memory System</a></h3>
-          <p>Diseño del sistema de memorias persistentes y búsqueda semántica.</p>
+          <p>Design of the persistent memory system and semantic search.</p>
         </div>
 
         <div class="feature-card">
           <span class="icon">🌐</span>
           <h3><a href="localization.html">Localization</a></h3>
-          <p>Integración con TranslationServer y plantillas de prompts multi-idioma.</p>
+          <p>Integration with TranslationServer and multi-language prompt templates.</p>
         </div>
       </div>
 
       <hr>
 
-      <h2>Stack Tecnológico</h2>
+      <h2>Technology Stack</h2>
 
       <table>
         <thead>
           <tr>
-            <th>Componente</th>
-            <th>Tecnología</th>
-            <th>Propósito</th>
+            <th>Component</th>
+            <th>Technology</th>
+            <th>Purpose</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Game Engine</td>
             <td>Godot 4.5+</td>
-            <td>Motor base del addon</td>
+            <td>Base engine for the addon</td>
           </tr>
           <tr>
             <td>Native Bindings</td>
             <td>GDExtension + godot-cpp</td>
-            <td>Exponer C++ a GDScript/C#</td>
+            <td>Expose C++ to GDScript/C#</td>
           </tr>
           <tr>
             <td>LLM Inference</td>
             <td>llama.cpp</td>
-            <td>Ejecutar modelos GGUF localmente</td>
+            <td>Run GGUF models locally</td>
           </tr>
           <tr>
             <td>Text-to-Speech</td>
             <td>Piper TTS</td>
-            <td>Síntesis de voz offline</td>
+            <td>Offline voice synthesis</td>
           </tr>
           <tr>
             <td>Build System</td>
             <td>SCons</td>
-            <td>Compilación multiplataforma</td>
+            <td>Cross-platform compilation</td>
           </tr>
         </tbody>
       </table>
 
       <hr>
 
-      <h2>Estructura del Proyecto</h2>
+      <h2>Project Structure</h2>
 
       <style>
         .file-tree {
@@ -265,14 +265,14 @@
             <div class="item">
               <span class="icon">📄</span>
               <span class="name file">plugin.cfg</span>
-              <span class="comment">Metadata del addon</span>
+              <span class="comment">Addon metadata</span>
             </div>
           </li>
           <li>
             <div class="item">
               <span class="icon">📜</span>
               <span class="name file">plugin.gd</span>
-              <span class="comment">EditorPlugin principal</span>
+              <span class="comment">Main EditorPlugin</span>
             </div>
           </li>
 
@@ -280,7 +280,7 @@
             <div class="item">
               <span class="icon">⚙️</span>
               <span class="name folder">gdextension/</span>
-              <span class="comment">Codigo C++ nativo</span>
+              <span class="comment">Native C++ code</span>
             </div>
             <ul>
               <li><div class="item"><span class="icon">📁</span><span class="name folder">godot-cpp/</span><span class="comment">Submodule</span></div></li>
@@ -308,11 +308,11 @@
             <div class="item">
               <span class="icon">🤖</span>
               <span class="name folder">ai/</span>
-              <span class="comment">Servicios de IA</span>
+              <span class="comment">AI services</span>
             </div>
             <ul>
-              <li><div class="item"><span class="icon">📜</span><span class="name file">model_manager.gd</span><span class="comment">Gestor de modelos GGUF</span></div></li>
-              <li><div class="item"><span class="icon">📜</span><span class="name file">prompt_builder.gd</span><span class="comment">Constructor de prompts</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">model_manager.gd</span><span class="comment">GGUF model manager</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">prompt_builder.gd</span><span class="comment">Prompt builder</span></div></li>
             </ul>
           </li>
 
@@ -320,10 +320,10 @@
             <div class="item">
               <span class="icon">💬</span>
               <span class="name folder">core/</span>
-              <span class="comment">Managers principales</span>
+              <span class="comment">Main managers</span>
             </div>
             <ul>
-              <li><div class="item"><span class="icon">📜</span><span class="name file">ai_service.gd</span><span class="comment">Singleton de acceso a IA</span></div></li>
+              <li><div class="item"><span class="icon">📜</span><span class="name file">ai_service.gd</span><span class="comment">AI access singleton</span></div></li>
               <li><div class="item"><span class="icon">📜</span><span class="name file">dialogue_manager.gd</span></div></li>
               <li><div class="item"><span class="icon">📜</span><span class="name file">graph_runner.gd</span></div></li>
               <li><div class="item"><span class="icon">📜</span><span class="name file">context_manager.gd</span></div></li>
@@ -333,7 +333,7 @@
                 <ul>
                   <li><div class="item"><span class="icon">📜</span><span class="name file">ai_response_executor.gd</span></div></li>
                   <li><div class="item"><span class="icon">📜</span><span class="name file">condition_executor.gd</span></div></li>
-                  <li><div class="item"><span class="icon">📜</span><span class="name file">...</span><span class="comment">8 ejecutores</span></div></li>
+                  <li><div class="item"><span class="icon">📜</span><span class="name file">...</span><span class="comment">8 executors</span></div></li>
                 </ul>
               </li>
             </ul>
@@ -358,7 +358,7 @@
             <div class="item">
               <span class="icon">🎨</span>
               <span class="name folder">editor/</span>
-              <span class="comment">Editor visual</span>
+              <span class="comment">Visual editor</span>
             </div>
             <ul>
               <li><div class="item"><span class="icon">📜</span><span class="name file">dialogue_graph_editor.gd</span></div></li>
@@ -381,7 +381,7 @@
             <div class="item">
               <span class="icon">🧠</span>
               <span class="name folder">memory/</span>
-              <span class="comment">Sistema de memorias</span>
+              <span class="comment">Memory system</span>
             </div>
             <ul>
               <li><div class="item"><span class="icon">📜</span><span class="name file">memory_manager.gd</span></div></li>
@@ -406,7 +406,7 @@
             <div class="item">
               <span class="icon">🌐</span>
               <span class="name folder">localization/</span>
-              <span class="comment">Sistema de idiomas</span>
+              <span class="comment">Language system</span>
             </div>
             <ul>
               <li><div class="item"><span class="icon">📜</span><span class="name file">locale_manager.gd</span></div></li>
@@ -427,7 +427,7 @@
 
       <hr>
 
-      <h2>Dependencias</h2>
+      <h2>Dependencies</h2>
 
       <h3>Submodules</h3>
 
@@ -435,7 +435,7 @@
         <thead>
           <tr>
             <th>Submodule</th>
-            <th>Versión</th>
+            <th>Version</th>
             <th>Path</th>
           </tr>
         </thead>
@@ -458,47 +458,47 @@
         </tbody>
       </table>
 
-      <h3>Requisitos de Compilación</h3>
+      <h3>Build Requirements</h3>
 
       <ul>
-        <li><strong>Windows:</strong> MSVC 2019+ o MinGW-w64</li>
-        <li><strong>Linux:</strong> GCC 11+ o Clang 14+</li>
+        <li><strong>Windows:</strong> MSVC 2019+ or MinGW-w64</li>
+        <li><strong>Linux:</strong> GCC 11+ or Clang 14+</li>
         <li><strong>macOS:</strong> Xcode Command Line Tools</li>
-        <li><strong>Todos:</strong> Python 3.8+, SCons 4.0+</li>
+        <li><strong>All:</strong> Python 3.8+, SCons 4.0+</li>
       </ul>
 
       <div class="callout-info">
-        <p>Para instrucciones detalladas de compilación, ver <a href="gdextension.html">GDExtension Build Guide</a>.</p>
+        <p>For detailed build instructions, see the <a href="gdextension.html">GDExtension Build Guide</a>.</p>
       </div>
 
       <hr>
 
-      <h2>Principios de Diseño</h2>
+      <h2>Design Principles</h2>
 
-      <h3>1. Modularidad</h3>
-      <p>Cada sistema (LLM, TTS, Memory) es independiente y puede usarse por separado.</p>
+      <h3>1. Modularity</h3>
+      <p>Each system (LLM, TTS, Memory) is independent and can be used separately.</p>
 
       <h3>2. Performance</h3>
       <ul>
-        <li>Inferencia LLM en thread separado</li>
-        <li>Streaming de tokens para UI responsiva</li>
-        <li>Cache de audio TTS</li>
-        <li>Lazy loading de recursos</li>
+        <li>LLM inference in separate thread</li>
+        <li>Token streaming for responsive UI</li>
+        <li>TTS audio cache</li>
+        <li>Lazy loading of resources</li>
       </ul>
 
-      <h3>3. Extensibilidad</h3>
+      <h3>3. Extensibility</h3>
       <ul>
-        <li>Nodos de diálogo custom via herencia</li>
-        <li>Templates de prompts configurables</li>
-        <li>Signals para integración con sistemas del juego</li>
+        <li>Custom dialogue nodes via inheritance</li>
+        <li>Configurable prompt templates</li>
+        <li>Signals for integration with game systems</li>
       </ul>
 
       <h3>4. Offline-First</h3>
-      <p>Todo funciona sin conexión a internet. Sin APIs externas, sin telemetría.</p>
+      <p>Everything works without an internet connection. No external APIs, no telemetry.</p>
 
       <hr>
 
-      <a href="../index.html">← Volver a Home</a>
+      <a href="../index.html">← Back to Home</a>
 
       <footer class="wiki-footer">
         <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
