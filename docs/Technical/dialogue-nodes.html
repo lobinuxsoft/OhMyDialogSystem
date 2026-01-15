@@ -32,6 +32,7 @@
           lStart: 'Start', lEnd: 'End', lAI: 'AI Response', lStatic: 'Static Response', lChoice: 'Player Choice',
           lCond: 'Condition', lEvent: 'Event', lVar: 'Set Variable', lJump: 'Jump', lFree: 'Jump to Free', lReturn: 'Return to Graph',
           clickDetail: 'Click para detalles',
+          catFlow: 'Control de Flujo', catContent: 'Contenido', catLogic: 'Logica y Estado', catAI: 'AI Exclusivo',
           nodeStart: 'StartNode', subStart: 'Punto de entrada', descStart: 'Marca el inicio del grafo de dialogo. Cada grafo debe tener exactamente un StartNode.',
           nodeEnd: 'EndNode', subEnd: 'Termina dialogo', descEnd: 'Finaliza la ejecucion del grafo. Puede indicar una razon para analytics.',
           nodeAI: 'AIResponseNode', subAI: 'IA genera respuesta', descAI: 'La IA genera texto dinamicamente usando LlamaInterface y el CharacterIdentity del NPC.',
@@ -41,15 +42,15 @@
           nodeEvent: 'EventNode', subEvent: 'Emite senales', descEvent: 'Dispara un evento/signal que el juego puede escuchar para activar misiones, items, etc.',
           nodeVar: 'SetVariableNode', subVar: 'Modifica estado', descVar: 'Modifica variables del contexto. Soporta 6 operaciones diferentes.',
           nodeJump: 'JumpNode', subJump: 'Salta a otro grafo', descJump: 'Salta a otro DialogueGraph o a un nodo especifico, permitiendo modularizar dialogos.',
-          nodeFree: 'JumpToFreeNode', subFree: 'Entra a modo libre', descFree: 'Concepto unico. Escapa del grafo a conversacion libre con IA, con condiciones para volver.', badgeNew: 'NUEVO',
+          nodeFree: 'JumpToFreeNode', subFree: 'Entra a modo libre', descFree: 'Concepto unico. Escapa del grafo a conversacion libre con IA, con condiciones para volver.', badgeAI: 'AI EXCLUSIVO',
           nodeReturn: 'ReturnToGraphNode', subReturn: 'Vuelve al grafo', descReturn: 'Complemento de JumpToFree. Sale del modo conversacion libre y retorna al grafo.',
           hExample: 'Ejemplo: Mision del Herrero',
           pExample: 'Este diagrama muestra un flujo completo usando el sistema hibrido:',
           exFlowTitle: 'herrero_quest.tres', exFlowDesc: 'Mision de encontrar la espada perdida',
           modeFreeTitle: 'MODO FREE - Conversacion Abierta',
           hDiff: 'Lo Que Nos Diferencia',
-          thFeature: 'Caracteristica', thDialogic: 'Dialogic', thClyde: 'Clyde', thOMDS: 'OhMyDialogSystem',
-          fEditor: 'Editor visual', fAI: 'Generacion IA', fFree: 'Modo libre + grafos', fTrans: 'Transiciones fluidas', fMem: 'Memorias persistentes',
+          thFeature: 'Caracteristica', thDialogic: 'Dialogic', thClyde: 'Clyde', thNobody: 'NobodyWho', thOMDS: 'OhMyDialogSystem',
+          fEditor: 'Editor visual', fAI: 'Generacion IA', fFree: 'Modo libre + grafos', fTrans: 'Transiciones fluidas', fMem: 'Memorias persistentes', fTTS: 'TTS Integrado', fGraph: 'Sistema de Grafos',
           backToTech: 'Volver a Technical',
           // Lightbox content
           lbDesc: 'Descripcion', lbConn: 'Conexiones', lbParams: 'Parametros', lbValid: 'Validacion',
@@ -73,6 +74,7 @@
           lStart: 'Start', lEnd: 'End', lAI: 'AI Response', lStatic: 'Static Response', lChoice: 'Player Choice',
           lCond: 'Condition', lEvent: 'Event', lVar: 'Set Variable', lJump: 'Jump', lFree: 'Jump to Free', lReturn: 'Return to Graph',
           clickDetail: 'Click for details',
+          catFlow: 'Flow Control', catContent: 'Content', catLogic: 'Logic & State', catAI: 'AI Exclusive',
           nodeStart: 'StartNode', subStart: 'Entry Point', descStart: 'Marks the start of the dialogue graph. Each graph must have exactly one StartNode.',
           nodeEnd: 'EndNode', subEnd: 'Ends Dialogue', descEnd: 'Terminates graph execution. Can indicate a reason for analytics.',
           nodeAI: 'AIResponseNode', subAI: 'AI Generates Response', descAI: 'AI dynamically generates text using LlamaInterface and the NPC CharacterIdentity.',
@@ -82,15 +84,15 @@
           nodeEvent: 'EventNode', subEvent: 'Emits Signals', descEvent: 'Triggers a signal that the game can listen to for quests, items, etc.',
           nodeVar: 'SetVariableNode', subVar: 'Modifies State', descVar: 'Modifies context variables. Supports 6 different operations.',
           nodeJump: 'JumpNode', subJump: 'Jumps to Graph', descJump: 'Jumps to another DialogueGraph or specific node, allowing modular dialogues.',
-          nodeFree: 'JumpToFreeNode', subFree: 'Enter Free Mode', descFree: 'Unique concept. Escapes graph to free AI conversation, with return conditions.', badgeNew: 'NEW',
+          nodeFree: 'JumpToFreeNode', subFree: 'Enter Free Mode', descFree: 'Unique concept. Escapes graph to free AI conversation, with return conditions.', badgeAI: 'AI EXCLUSIVE',
           nodeReturn: 'ReturnToGraphNode', subReturn: 'Return to Graph', descReturn: 'Complement to JumpToFree. Exits free conversation mode and returns to graph.',
           hExample: 'Example: Blacksmith Quest',
           pExample: 'This diagram shows a full flow using the hybrid system:',
           exFlowTitle: 'blacksmith_quest.tres', exFlowDesc: 'Quest to find the lost sword',
           modeFreeTitle: 'FREE MODE - Open Conversation',
           hDiff: 'What Sets Us Apart',
-          thFeature: 'Feature', thDialogic: 'Dialogic', thClyde: 'Clyde', thOMDS: 'OhMyDialogSystem',
-          fEditor: 'Visual Editor', fAI: 'AI Generation', fFree: 'Free Mode + Graphs', fTrans: 'Fluid Transitions', fMem: 'Persistent Memories',
+          thFeature: 'Feature', thDialogic: 'Dialogic', thClyde: 'Clyde', thNobody: 'NobodyWho', thOMDS: 'OhMyDialogSystem',
+          fEditor: 'Visual Editor', fAI: 'AI Generation', fFree: 'Free Mode + Graphs', fTrans: 'Fluid Transitions', fMem: 'Persistent Memories', fTTS: 'Integrated TTS', fGraph: 'Graph System',
           backToTech: 'Back to Technical',
           // Lightbox content
           lbDesc: 'Description', lbConn: 'Connections', lbParams: 'Parameters', lbValid: 'Validation',
@@ -241,6 +243,12 @@
             <li><a href="ci-cd-release.html"
                 class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
                   class="opacity-70">&#x1F680;</span> CI/CD & Releases</a></li>
+            <li><a href="memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BE;</span> Memory System</a></li>
+            <li><a href="localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> Localization</a></li>
           </ul>
         </div>
         <div class="mb-6">
@@ -362,17 +370,19 @@
         </div>
       </div>
 
-      <!-- Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- CATEGORIA: CONTROL DE FLUJO -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <h3 class="text-lg font-bold text-gray-300 mb-4 flex items-center gap-2 mt-8">
+        <span class="w-8 h-8 rounded bg-emerald-500/20 flex items-center justify-center text-emerald-500">&#x2192;</span>
+        <span data-i18n="catFlow">Control de Flujo</span>
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <!-- Start Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('start')">
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('start')">
           <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>
           <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div
-              class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-xl text-emerald-500">
-              &#x25B6;</div>
+            <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-xl text-emerald-500">&#x25B6;</div>
             <div>
               <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeStart">StartNode</div>
               <div class="text-xs text-gray-500" data-i18n="subStart">Punto de entrada</div>
@@ -380,23 +390,18 @@
           </div>
           <div class="p-4">
             <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descStart">Marca el inicio...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
               <span></span>
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
             </div>
           </div>
         </div>
 
         <!-- End Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('end')">
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-red-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('end')">
           <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
           <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-xl text-red-500">
-              &#x25A0;</div>
+            <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-xl text-red-500">&#x25A0;</div>
             <div>
               <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeEnd">EndNode</div>
               <div class="text-xs text-gray-500" data-i18n="subEnd">Termina dialogo</div>
@@ -404,200 +409,18 @@
           </div>
           <div class="p-4">
             <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descEnd">Finaliza la ejecucion...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
               <span></span>
             </div>
           </div>
         </div>
 
-        <!-- AI Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('ai')">
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
-          <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-xl text-blue-500">
-              &#x1F9E0;</div>
-            <div>
-              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeAI">AIResponseNode</div>
-              <div class="text-xs text-gray-500" data-i18n="subAI">IA genera respuesta</div>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descAI">La IA genera texto...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Static Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('static')">
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500"></div>
-          <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-gray-500/10 flex items-center justify-center text-xl text-gray-500">
-              &#x1F4AC;</div>
-            <div>
-              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeStatic">StaticResponseNode</div>
-              <div class="text-xs text-gray-500" data-i18n="subStatic">Texto fijo</div>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descStatic">Muestra texto fijo...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- JumpToFree Node (New) -->
-        <div
-          class="bg-bg-card border-2 border-ai-cyan rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('free')">
-          <div
-            class="absolute top-0 right-0 bg-gradient-to-r from-ai-cyan to-ai-purple text-bg-primary text-[0.6rem] font-bold px-3 py-1 rounded-bl-lg z-10"
-            data-i18n="badgeNew">NUEVO</div>
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-violet-500"></div>
-          <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center text-xl text-violet-500">
-              &#x221E;</div>
-            <div>
-              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeFree">JumpToFreeNode</div>
-              <div class="text-xs text-gray-500" data-i18n="subFree">Entra a modo libre</div>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descFree">Concepto unico...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-purple bg-purple-500/30"></span> FREE</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- PlayerChoice Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('choice')">
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-500"></div>
-          <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center text-xl text-yellow-500">
-              &#x2630;</div>
-            <div>
-              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeChoice">PlayerChoiceNode</div>
-              <div class="text-xs text-gray-500" data-i18n="subChoice">Opciones del jugador</div>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descChoice">Presenta opciones...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-yellow-500 bg-yellow-500/30"></span> OUT x N</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Condition Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('condition')">
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-500"></div>
-          <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-xl text-orange-500">
-              &#x25C7;</div>
-            <div>
-              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeCond">ConditionNode</div>
-              <div class="text-xs text-gray-500" data-i18n="subCond">Bifurcacion logica</div>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descCond">Evalua una condicion...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
-              <span class="flex items-center gap-1">TRUE/FALSE</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Event Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('event')">
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
-          <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-xl text-purple-500">
-              &#x26A1;</div>
-            <div>
-              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeEvent">EventNode</div>
-              <div class="text-xs text-gray-500" data-i18n="subEvent">Emite senales</div>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descEvent">Dispara un evento...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Variable Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('variable')">
-          <div class="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500"></div>
-          <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center text-xl text-cyan-500">X=
-            </div>
-            <div>
-              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeVar">SetVariableNode</div>
-              <div class="text-xs text-gray-500" data-i18n="subVar">Modifica estado</div>
-            </div>
-          </div>
-          <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descVar">Modifica variables...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Jump Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-green-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('jump')">
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-green-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('jump')">
           <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
           <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-xl text-green-500">
-              &#x21AA;</div>
+            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center text-xl text-green-500">&#x21AA;</div>
             <div>
               <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeJump">JumpNode</div>
               <div class="text-xs text-gray-500" data-i18n="subJump">Salta a otro grafo</div>
@@ -605,35 +428,190 @@
           </div>
           <div class="p-4">
             <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descJump">Salta a otro...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
               <span class="flex items-center gap-1">JUMP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- CATEGORIA: CONTENIDO -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <h3 class="text-lg font-bold text-gray-300 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded bg-gray-500/20 flex items-center justify-center text-gray-400">&#x1F4AC;</span>
+        <span data-i18n="catContent">Contenido</span>
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Static Node -->
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('static')">
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-gray-500"></div>
+          <div class="p-4 border-b border-border-default flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gray-500/10 flex items-center justify-center text-xl text-gray-500">&#x1F4AC;</div>
+            <div>
+              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeStatic">StaticResponseNode</div>
+              <div class="text-xs text-gray-500" data-i18n="subStatic">Texto fijo</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descStatic">Muestra texto fijo...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PlayerChoice Node -->
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('choice')">
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-500"></div>
+          <div class="p-4 border-b border-border-default flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center text-xl text-yellow-500">&#x2630;</div>
+            <div>
+              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeChoice">PlayerChoiceNode</div>
+              <div class="text-xs text-gray-500" data-i18n="subChoice">Opciones del jugador</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descChoice">Presenta opciones...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-yellow-500 bg-yellow-500/30"></span> OUT x N</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- CATEGORIA: LOGICA Y ESTADO -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <h3 class="text-lg font-bold text-gray-300 mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded bg-orange-500/20 flex items-center justify-center text-orange-500">&#x25C7;</span>
+        <span data-i18n="catLogic">Logica y Estado</span>
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Condition Node -->
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-orange-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('condition')">
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-500"></div>
+          <div class="p-4 border-b border-border-default flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center text-xl text-orange-500">&#x25C7;</div>
+            <div>
+              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeCond">ConditionNode</div>
+              <div class="text-xs text-gray-500" data-i18n="subCond">Bifurcacion logica</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descCond">Evalua una condicion...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+              <span class="flex items-center gap-1">TRUE/FALSE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Variable Node -->
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-cyan-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('variable')">
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500"></div>
+          <div class="p-4 border-b border-border-default flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center text-xl text-cyan-500">X=</div>
+            <div>
+              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeVar">SetVariableNode</div>
+              <div class="text-xs text-gray-500" data-i18n="subVar">Modifica estado</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descVar">Modifica variables...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Node -->
+        <div class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 transition-all cursor-pointer group relative" onclick="openLightbox('event')">
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-purple-500"></div>
+          <div class="p-4 border-b border-border-default flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-xl text-purple-500">&#x26A1;</div>
+            <div>
+              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeEvent">EventNode</div>
+              <div class="text-xs text-gray-500" data-i18n="subEvent">Emite senales</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descEvent">Dispara un evento...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <!-- CATEGORIA: AI EXCLUSIVO -->
+      <!-- ═══════════════════════════════════════════════════════════════════ -->
+      <h3 class="text-lg font-bold text-ai-cyan mb-4 flex items-center gap-2">
+        <span class="w-8 h-8 rounded bg-blue-500/20 flex items-center justify-center text-blue-500">&#x1F9E0;</span>
+        <span data-i18n="catAI">AI Exclusivo</span>
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <!-- AI Node -->
+        <div class="bg-bg-card border-2 border-blue-500/50 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/20 transition-all cursor-pointer group relative" onclick="openLightbox('ai')">
+          <div class="absolute top-0 right-0 bg-gradient-to-r from-ai-cyan to-ai-purple text-bg-primary text-[0.6rem] font-bold px-3 py-1 rounded-bl-lg z-10" data-i18n="badgeAI">AI EXCLUSIVO</div>
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+          <div class="p-4 border-b border-border-default flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-xl text-blue-500">&#x1F9E0;</div>
+            <div>
+              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeAI">AIResponseNode</div>
+              <div class="text-xs text-gray-500" data-i18n="subAI">IA genera respuesta</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descAI">La IA genera texto...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-cyan bg-cyan-500/30"></span> OUT</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- JumpToFree Node -->
+        <div class="bg-bg-card border-2 border-violet-500/50 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-violet-500/20 transition-all cursor-pointer group relative" onclick="openLightbox('free')">
+          <div class="absolute top-0 right-0 bg-gradient-to-r from-ai-cyan to-ai-purple text-bg-primary text-[0.6rem] font-bold px-3 py-1 rounded-bl-lg z-10" data-i18n="badgeAI">AI EXCLUSIVO</div>
+          <div class="absolute left-0 top-0 bottom-0 w-1 bg-violet-500"></div>
+          <div class="p-4 border-b border-border-default flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center text-xl text-violet-500">&#x221E;</div>
+            <div>
+              <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeFree">JumpToFreeNode</div>
+              <div class="text-xs text-gray-500" data-i18n="subFree">Entra a modo libre</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descFree">Concepto unico...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-purple bg-purple-500/30"></span> FREE</span>
             </div>
           </div>
         </div>
 
         <!-- Return Node -->
-        <div
-          class="bg-bg-card border border-border-default rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-teal-500/10 transition-all cursor-pointer group relative"
-          onclick="openLightbox('return')">
+        <div class="bg-bg-card border-2 border-teal-500/50 rounded-xl overflow-hidden hover:-translate-y-1 hover:shadow-lg hover:shadow-teal-500/20 transition-all cursor-pointer group relative" onclick="openLightbox('return')">
+          <div class="absolute top-0 right-0 bg-gradient-to-r from-ai-cyan to-ai-purple text-bg-primary text-[0.6rem] font-bold px-3 py-1 rounded-bl-lg z-10" data-i18n="badgeAI">AI EXCLUSIVO</div>
           <div class="absolute left-0 top-0 bottom-0 w-1 bg-teal-500"></div>
           <div class="p-4 border-b border-border-default flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center text-xl text-teal-500">
-              &#x21A9;</div>
+            <div class="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center text-xl text-teal-500">&#x21A9;</div>
             <div>
               <div class="font-bold text-sm text-gray-200 font-mono" data-i18n="nodeReturn">ReturnToGraphNode</div>
               <div class="text-xs text-gray-500" data-i18n="subReturn">Vuelve al grafo</div>
             </div>
           </div>
           <div class="p-4">
-            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descReturn">Complemento de
-              JumpToFree...</p>
-            <div
-              class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
-              <span class="flex items-center gap-1"><span
-                  class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
+            <p class="text-xs text-gray-400 mb-4 h-12 overflow-hidden" data-i18n="descReturn">Complemento de JumpToFree...</p>
+            <div class="flex justify-between items-center text-[0.65rem] font-mono text-gray-500 bg-bg-tertiary p-2 rounded">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-ai-green bg-emerald-500/30"></span> IN</span>
               <span></span>
             </div>
           </div>
@@ -864,9 +842,222 @@
         </div>
       </div>
 
-      <!-- Other lightboxes can be added similarly, omitting for brevity in this specific tool call but in real app would include all -->
+      <!-- Condition Node Lightbox -->
+      <div id="lightbox-condition"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4 lightbox-overlay">
+        <div
+          class="bg-bg-secondary border border-border-default rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-scale-in">
+          <button onclick="closeLightbox('condition')"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg-tertiary border border-border-default text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500 transition-colors flex items-center justify-center">&times;</button>
+          <div class="p-8 border-b border-border-default flex items-center gap-6">
+            <div class="w-16 h-16 rounded-xl bg-orange-500/10 flex items-center justify-center text-3xl text-orange-500">&#x25C7;</div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-1">ConditionNode</h3>
+              <p class="text-gray-400">Bifurcacion logica</p>
+            </div>
+          </div>
+          <div class="p-8 space-y-8">
+            <p class="text-gray-400 text-sm leading-relaxed" data-i18n="descCond">Evalua una condicion...</p>
+            <div>
+              <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbParams">Parametros</span></h4>
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-ai-purple uppercase bg-bg-tertiary">
+                  <tr class="border-b border-ai-purple"><th class="px-4 py-2">Param</th><th class="px-4 py-2">Type</th><th class="px-4 py-2">Desc</th></tr>
+                </thead>
+                <tbody class="divide-y divide-border-default">
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">variable</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">String</td><td class="px-4 py-2 text-gray-400">Variable to evaluate</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">operator</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">Enum</td><td class="px-4 py-2 text-gray-400">==, !=, &lt;, &gt;, etc.</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">value</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">Variant</td><td class="px-4 py-2 text-gray-400">Value to compare</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbConn">Conexiones</span></h4>
+              <div class="bg-bg-tertiary rounded-lg p-6 flex justify-around">
+                <div class="flex flex-col items-center gap-2">
+                  <div class="w-8 h-8 rounded-full border-2 border-ai-green bg-emerald-500/20 text-ai-green flex items-center justify-center text-xs font-bold">&#x2190;</div>
+                  <span class="text-xs font-mono text-gray-500">1 IN</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                  <div class="w-8 h-8 rounded-full border-2 border-emerald-500 bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-xs font-bold">&#x2713;</div>
+                  <span class="text-xs font-mono text-gray-500">TRUE</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                  <div class="w-8 h-8 rounded-full border-2 border-red-500 bg-red-500/20 text-red-500 flex items-center justify-center text-xs font-bold">&#x2717;</div>
+                  <span class="text-xs font-mono text-gray-500">FALSE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Placeholder for other lightboxes (AI, Static, etc.) - In a real migration I would add all of them. For brevity, I am adding the script logic to generic close. -->
+      <!-- Event Node Lightbox -->
+      <div id="lightbox-event"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4 lightbox-overlay">
+        <div
+          class="bg-bg-secondary border border-border-default rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-scale-in">
+          <button onclick="closeLightbox('event')"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg-tertiary border border-border-default text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500 transition-colors flex items-center justify-center">&times;</button>
+          <div class="p-8 border-b border-border-default flex items-center gap-6">
+            <div class="w-16 h-16 rounded-xl bg-purple-500/10 flex items-center justify-center text-3xl text-purple-500">&#x26A1;</div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-1">EventNode</h3>
+              <p class="text-gray-400">Emite senales al juego</p>
+            </div>
+          </div>
+          <div class="p-8 space-y-8">
+            <p class="text-gray-400 text-sm leading-relaxed" data-i18n="descEvent">Dispara un evento...</p>
+            <div>
+              <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbParams">Parametros</span></h4>
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-ai-purple uppercase bg-bg-tertiary">
+                  <tr class="border-b border-ai-purple"><th class="px-4 py-2">Param</th><th class="px-4 py-2">Type</th><th class="px-4 py-2">Desc</th></tr>
+                </thead>
+                <tbody class="divide-y divide-border-default">
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">event_name</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">String</td><td class="px-4 py-2 text-gray-400">Signal name to emit</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">payload</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">Dictionary</td><td class="px-4 py-2 text-gray-400">Data to pass with signal</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variable Node Lightbox -->
+      <div id="lightbox-variable"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4 lightbox-overlay">
+        <div
+          class="bg-bg-secondary border border-border-default rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-scale-in">
+          <button onclick="closeLightbox('variable')"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg-tertiary border border-border-default text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500 transition-colors flex items-center justify-center">&times;</button>
+          <div class="p-8 border-b border-border-default flex items-center gap-6">
+            <div class="w-16 h-16 rounded-xl bg-cyan-500/10 flex items-center justify-center text-3xl text-cyan-500">X=</div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-1">SetVariableNode</h3>
+              <p class="text-gray-400">Modifica estado del contexto</p>
+            </div>
+          </div>
+          <div class="p-8 space-y-8">
+            <p class="text-gray-400 text-sm leading-relaxed" data-i18n="descVar">Modifica variables...</p>
+            <div>
+              <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbParams">Parametros</span></h4>
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-ai-purple uppercase bg-bg-tertiary">
+                  <tr class="border-b border-ai-purple"><th class="px-4 py-2">Param</th><th class="px-4 py-2">Type</th><th class="px-4 py-2">Desc</th></tr>
+                </thead>
+                <tbody class="divide-y divide-border-default">
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">variable</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">String</td><td class="px-4 py-2 text-gray-400">Variable name</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">operation</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">Enum</td><td class="px-4 py-2 text-gray-400">SET, ADD, SUB, MUL, DIV, TOGGLE</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">value</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">Variant</td><td class="px-4 py-2 text-gray-400">Value to apply</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jump Node Lightbox -->
+      <div id="lightbox-jump"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4 lightbox-overlay">
+        <div
+          class="bg-bg-secondary border border-border-default rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-scale-in">
+          <button onclick="closeLightbox('jump')"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg-tertiary border border-border-default text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500 transition-colors flex items-center justify-center">&times;</button>
+          <div class="p-8 border-b border-border-default flex items-center gap-6">
+            <div class="w-16 h-16 rounded-xl bg-green-500/10 flex items-center justify-center text-3xl text-green-500">&#x21AA;</div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-1">JumpNode</h3>
+              <p class="text-gray-400">Salta entre grafos</p>
+            </div>
+          </div>
+          <div class="p-8 space-y-8">
+            <p class="text-gray-400 text-sm leading-relaxed" data-i18n="descJump">Salta a otro...</p>
+            <div>
+              <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbParams">Parametros</span></h4>
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-ai-purple uppercase bg-bg-tertiary">
+                  <tr class="border-b border-ai-purple"><th class="px-4 py-2">Param</th><th class="px-4 py-2">Type</th><th class="px-4 py-2">Desc</th></tr>
+                </thead>
+                <tbody class="divide-y divide-border-default">
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">target_graph</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">Resource</td><td class="px-4 py-2 text-gray-400">DialogueGraph to jump to</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">target_node</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">String</td><td class="px-4 py-2 text-gray-400">Specific node ID (optional)</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">return_after</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">bool</td><td class="px-4 py-2 text-gray-400">Return to caller graph</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JumpToFree Node Lightbox -->
+      <div id="lightbox-free"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4 lightbox-overlay">
+        <div
+          class="bg-bg-secondary border-2 border-violet-500/50 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-scale-in">
+          <div class="absolute top-0 right-12 bg-gradient-to-r from-ai-cyan to-ai-purple text-bg-primary text-[0.6rem] font-bold px-3 py-1 rounded-b-lg" data-i18n="badgeAI">AI EXCLUSIVO</div>
+          <button onclick="closeLightbox('free')"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg-tertiary border border-border-default text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500 transition-colors flex items-center justify-center">&times;</button>
+          <div class="p-8 border-b border-border-default flex items-center gap-6">
+            <div class="w-16 h-16 rounded-xl bg-violet-500/10 flex items-center justify-center text-3xl text-violet-500">&#x221E;</div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-1">JumpToFreeNode</h3>
+              <p class="text-gray-400">Escapa a conversacion libre</p>
+            </div>
+          </div>
+          <div class="p-8 space-y-8">
+            <div class="bg-violet-500/10 border border-violet-500/30 rounded-lg p-4">
+              <p class="text-violet-400 text-sm"><strong>Concepto unico:</strong> Permite salir del grafo estructurado a una conversacion 100% libre con la IA, manteniendo el contexto del personaje. El jugador puede hablar de cualquier tema hasta que se detecte una condicion de retorno.</p>
+            </div>
+            <div>
+              <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbParams">Parametros</span></h4>
+              <table class="w-full text-sm text-left">
+                <thead class="text-xs text-ai-purple uppercase bg-bg-tertiary">
+                  <tr class="border-b border-ai-purple"><th class="px-4 py-2">Param</th><th class="px-4 py-2">Type</th><th class="px-4 py-2">Desc</th></tr>
+                </thead>
+                <tbody class="divide-y divide-border-default">
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">return_keywords</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">Array[String]</td><td class="px-4 py-2 text-gray-400">Words that trigger return</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">return_node</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">String</td><td class="px-4 py-2 text-gray-400">Node to return to</td></tr>
+                  <tr><td class="px-4 py-2 font-mono text-ai-cyan">max_turns</td><td class="px-4 py-2 font-mono text-ai-purple text-xs">int</td><td class="px-4 py-2 text-gray-400">Max exchanges before auto-return</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Return Node Lightbox -->
+      <div id="lightbox-return"
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4 lightbox-overlay">
+        <div
+          class="bg-bg-secondary border border-border-default rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-scale-in">
+          <button onclick="closeLightbox('return')"
+            class="absolute top-4 right-4 w-8 h-8 rounded-full bg-bg-tertiary border border-border-default text-gray-400 hover:text-white hover:bg-red-500/20 hover:border-red-500 transition-colors flex items-center justify-center">&times;</button>
+          <div class="p-8 border-b border-border-default flex items-center gap-6">
+            <div class="w-16 h-16 rounded-xl bg-teal-500/10 flex items-center justify-center text-3xl text-teal-500">&#x21A9;</div>
+            <div>
+              <h3 class="text-2xl font-bold text-white mb-1">ReturnToGraphNode</h3>
+              <p class="text-gray-400">Retorna al grafo estructurado</p>
+            </div>
+          </div>
+          <div class="p-8 space-y-8">
+            <p class="text-gray-400 text-sm leading-relaxed">Complemento de JumpToFreeNode. Cuando se detecta la condicion de retorno durante el modo libre, este nodo se activa automaticamente para continuar el flujo del grafo.</p>
+            <div>
+              <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbConn">Conexiones</span></h4>
+              <div class="bg-bg-tertiary rounded-lg p-6 flex justify-around">
+                <div class="flex flex-col items-center gap-2">
+                  <div class="w-8 h-8 rounded-full border-2 border-violet-500 bg-violet-500/20 text-violet-500 flex items-center justify-center text-xs font-bold">&#x221E;</div>
+                  <span class="text-xs font-mono text-gray-500">FROM FREE</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                  <div class="w-8 h-8 rounded-full border-2 border-ai-cyan bg-cyan-500/20 text-ai-cyan flex items-center justify-center text-xs font-bold">&#x2192;</div>
+                  <span class="text-xs font-mono text-gray-500">TO GRAPH</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Example Graph Section -->
       <h2 class="text-2xl font-bold text-ai-cyan mb-6 mt-12 flex items-center gap-2">
@@ -929,9 +1120,10 @@
           <thead class="bg-bg-tertiary text-xs uppercase text-ai-purple font-mono">
             <tr>
               <th class="px-6 py-3" data-i18n="thFeature">Caracteristica</th>
-              <th class="px-6 py-3" data-i18n="thDialogic">Dialogic</th>
-              <th class="px-6 py-3" data-i18n="thClyde">Clyde</th>
-              <th class="px-6 py-3 text-ai-cyan" data-i18n="thOMDS">OhMyDialogSystem</th>
+              <th class="px-6 py-3"><a href="https://github.com/dialogic-godot/dialogic" target="_blank" class="hover:text-ai-cyan transition-colors">Dialogic &#x2197;</a></th>
+              <th class="px-6 py-3"><a href="https://github.com/viniciusgerevini/godot-clyde-dialogue" target="_blank" class="hover:text-ai-cyan transition-colors">Clyde &#x2197;</a></th>
+              <th class="px-6 py-3"><a href="https://github.com/nobodywho-ooo/nobodywho" target="_blank" class="hover:text-ai-cyan transition-colors">NobodyWho &#x2197;</a></th>
+              <th class="px-6 py-3 text-ai-cyan">OhMyDialogSystem</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border-default bg-bg-card">
@@ -939,22 +1131,58 @@
               <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fEditor">Editor visual</td>
               <td class="px-6 py-4 text-emerald-500">&#x2713;</td>
               <td class="px-6 py-4 text-red-500">&#x2717;</td>
-              <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
-            </tr>
-            <tr class="hover:bg-bg-tertiary transition-colors">
-              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fAI">Generacion AI</td>
-              <td class="px-6 py-4 text-red-500">&#x2717;</td>
               <td class="px-6 py-4 text-red-500">&#x2717;</td>
               <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
             </tr>
             <tr class="hover:bg-bg-tertiary transition-colors">
-              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fFree">Modo Libre</td>
+              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fGraph">Sistema de Grafos</td>
+              <td class="px-6 py-4 text-emerald-500">&#x2713;</td>
+              <td class="px-6 py-4 text-emerald-500">&#x2713;</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
+            </tr>
+            <tr class="hover:bg-bg-tertiary transition-colors">
+              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fAI">Generacion IA</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-emerald-500">&#x2713;</td>
+              <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
+            </tr>
+            <tr class="hover:bg-bg-tertiary transition-colors">
+              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fFree">Modo Libre + Grafos</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-yellow-500">~</td>
+              <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
+            </tr>
+            <tr class="hover:bg-bg-tertiary transition-colors">
+              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fTrans">Transiciones Fluidas</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
+            </tr>
+            <tr class="hover:bg-bg-tertiary transition-colors">
+              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fMem">Memorias Persistentes</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
+              <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
+            </tr>
+            <tr class="hover:bg-bg-tertiary transition-colors">
+              <td class="px-6 py-4 font-medium text-gray-300" data-i18n="fTTS">TTS Integrado</td>
+              <td class="px-6 py-4 text-red-500">&#x2717;</td>
               <td class="px-6 py-4 text-red-500">&#x2717;</td>
               <td class="px-6 py-4 text-red-500">&#x2717;</td>
               <td class="px-6 py-4 text-emerald-500 font-bold">&#x2713;</td>
             </tr>
           </tbody>
         </table>
+        <div class="bg-bg-tertiary px-6 py-3 text-xs text-gray-500 border-t border-border-default">
+          <span class="text-emerald-500">&#x2713;</span> = Soportado |
+          <span class="text-yellow-500">~</span> = Solo modo libre (sin grafos) |
+          <span class="text-red-500">&#x2717;</span> = No soportado
+        </div>
       </div>
 
       <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm">
