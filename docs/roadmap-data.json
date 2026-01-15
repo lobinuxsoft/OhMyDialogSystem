@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-01-11T04:43:45Z",
+  "updated_at": "2026-01-15T22:29:01Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
@@ -69,9 +69,9 @@
       "number": 8,
       "title": "M8: Ejemplos y Documentación",
       "description": "Ejemplos, API docs, guía de inicio rápido, CI/CD",
-      "open": 10,
+      "open": 11,
       "closed": 8,
-      "progress": 44,
+      "progress": 42,
       "state": "open"
     },
     {
@@ -1063,7 +1063,7 @@
             "priority:high"
           ],
           "fields": {
-            "Status": "In Progress"
+            "Status": "Done"
           }
         },
         {
@@ -1074,6 +1074,20 @@
           "labels": [
             "documentation",
             "priority:high"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
+        },
+        {
+          "number": 217,
+          "title": "fix(gdextension): agregar chunking de prompt a funciones async y streaming en LlamaInterface",
+          "state": "CLOSED",
+          "milestone": null,
+          "labels": [
+            "bug",
+            "priority:high",
+            "gdextension"
           ],
           "fields": {
             "Status": "Done"
@@ -2866,7 +2880,7 @@
         "priority:high"
       ],
       "fields": {
-        "Status": "In Progress"
+        "Status": "Done"
       }
     },
     {
@@ -2881,6 +2895,31 @@
       "fields": {
         "Status": "Done"
       }
+    },
+    {
+      "number": 217,
+      "title": "fix(gdextension): agregar chunking de prompt a funciones async y streaming en LlamaInterface",
+      "state": "CLOSED",
+      "milestone": null,
+      "labels": [
+        "bug",
+        "priority:high",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done"
+      }
+    },
+    {
+      "number": 223,
+      "title": "feat(docs): Documentar páginas placeholder con implementación existente",
+      "state": "OPEN",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation",
+        "next-session"
+      ],
+      "fields": {}
     },
     {
       "number": 188,
