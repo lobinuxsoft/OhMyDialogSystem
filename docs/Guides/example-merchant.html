@@ -4,431 +4,466 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dynamic Merchant Example - OhMyDialogSystem Wiki</title>
-  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
+          pageTitle: 'Ejemplo: Dynamic Merchant',
+          badgeTesting: 'Testing', badgeMarcus: 'Marcus the Merchant',
+          introText: 'Esta guia contiene prompts de prueba para el personaje <strong>Marcus</strong>, un mercader codicioso pero jovial del mundo de Eldoria. Usalo para probar diferentes modelos LLM y verificar que el sistema genera respuestas coherentes.',
+          sectionProfile: 'Character Profile: Marcus',
+          profileTitle: 'Greedy but jovial merchant in Riverside Market, Eldoria',
+          labelPersonality: 'Personality', labelSpeech: 'Speech Patterns', labelKnowledge: 'Knowledge',
+          labelGoals: 'Goals', labelFears: 'Fears', labelSecrets: 'Secrets',
+          personalityDesc: 'Greedy but jovial merchant. Cunning negotiator who loves to talk about deals and profits. Friendly on the surface but always looking for an advantage.',
+          sectionPrompts: 'Test Prompts',
+          promptsInfo: 'Click en cualquier prompt para copiarlo al portapapeles. Luego pegalo en el Generation Tab del editor.',
+          catBasic: 'Basic Interactions', catPersonality: 'Personality Tests (Greedy/Cunning)',
+          catSecret: 'Secret Knowledge (Illegal Goods)', catFear: 'Fear Triggers',
+          catWorld: 'World Knowledge (Eldoria)', catRelations: 'Relationships', catMulti: 'Multilingual Tests',
+          noteBasic: 'Deberia responder de forma amigable usando frases como "my friend", "finest quality", etc.',
+          notePersonality: 'Deberia mostrar su lado negociador y codicioso, pero sin ser hostil.',
+          noteSecret: 'Deberia ser cauteloso, posiblemente evasivo al principio, pero podria abrirse si el jugador insiste.',
+          noteFear: 'Deberia mostrar nerviosismo o intentar cambiar de tema rapidamente.',
+          noteWorld: 'Deberia demostrar conocimiento del mundo, especialmente sobre comercio y rumores locales.',
+          noteRelations: 'Deberia reaccionar segun sus relaciones definidas (soborna al capitan, amigo del tabernero).',
+          noteMulti: 'Requiere modelo con buen soporte multilingue (Qwen recomendado).',
+          sectionModels: 'Recommended Models',
+          modelsIntro: 'Para probar a Marcus con diferentes capacidades:',
+          colModel: 'Model', colSize: 'Size (Q4)', colMulti: 'Multilingual', colCoherence: 'Coherence', colSpeed: 'Speed',
+          modelRec: '<strong>Recomendacion:</strong> Para modelos &lt;1GB con buen soporte multilingue, usa <code class="px-1 py-0.5 bg-bg-tertiary rounded text-ai-cyan font-mono text-sm">Qwen2.5-1.5B-Instruct-Q4_K_M</code>. Es el mejor balance entre calidad y velocidad.',
+          sectionTips: 'Testing Tips',
+          tipsSampling: 'Sampling Parameters',
+          tipsLookFor: 'What to Look For',
+          tipsIssues: 'Common Issues',
+          sectionResources: 'Resource Files',
+          resourcesIntro: 'Los archivos de ejemplo estan en:',
+          resourcesNote: 'Puedes cargarlos desde el Generation Tab seleccionando los recursos en los campos Character y World.',
+          clickToCopy: 'Click to copy', copied: 'Copied!'
+        },
+        en: {
+          navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
+          pageTitle: 'Example: Dynamic Merchant',
+          badgeTesting: 'Testing', badgeMarcus: 'Marcus the Merchant',
+          introText: 'This guide contains test prompts for the character <strong>Marcus</strong>, a greedy but jovial merchant from the world of Eldoria. Use it to test different LLM models and verify that the system generates coherent responses.',
+          sectionProfile: 'Character Profile: Marcus',
+          profileTitle: 'Greedy but jovial merchant in Riverside Market, Eldoria',
+          labelPersonality: 'Personality', labelSpeech: 'Speech Patterns', labelKnowledge: 'Knowledge',
+          labelGoals: 'Goals', labelFears: 'Fears', labelSecrets: 'Secrets',
+          personalityDesc: 'Greedy but jovial merchant. Cunning negotiator who loves to talk about deals and profits. Friendly on the surface but always looking for an advantage.',
+          sectionPrompts: 'Test Prompts',
+          promptsInfo: 'Click on any prompt to copy it to clipboard. Then paste it in the Generation Tab of the editor.',
+          catBasic: 'Basic Interactions', catPersonality: 'Personality Tests (Greedy/Cunning)',
+          catSecret: 'Secret Knowledge (Illegal Goods)', catFear: 'Fear Triggers',
+          catWorld: 'World Knowledge (Eldoria)', catRelations: 'Relationships', catMulti: 'Multilingual Tests',
+          noteBasic: 'Should respond in a friendly manner using phrases like "my friend", "finest quality", etc.',
+          notePersonality: 'Should show his negotiating and greedy side, but without being hostile.',
+          noteSecret: 'Should be cautious, possibly evasive at first, but might open up if the player insists.',
+          noteFear: 'Should show nervousness or try to change the subject quickly.',
+          noteWorld: 'Should demonstrate knowledge of the world, especially about trade and local gossip.',
+          noteRelations: 'Should react according to his defined relationships (bribes the captain, friend of the innkeeper).',
+          noteMulti: 'Requires model with good multilingual support (Qwen recommended).',
+          sectionModels: 'Recommended Models',
+          modelsIntro: 'To test Marcus with different capabilities:',
+          colModel: 'Model', colSize: 'Size (Q4)', colMulti: 'Multilingual', colCoherence: 'Coherence', colSpeed: 'Speed',
+          modelRec: '<strong>Recommendation:</strong> For models &lt;1GB with good multilingual support, use <code class="px-1 py-0.5 bg-bg-tertiary rounded text-ai-cyan font-mono text-sm">Qwen2.5-1.5B-Instruct-Q4_K_M</code>. It\'s the best balance between quality and speed.',
+          sectionTips: 'Testing Tips',
+          tipsSampling: 'Sampling Parameters',
+          tipsLookFor: 'What to Look For',
+          tipsIssues: 'Common Issues',
+          sectionResources: 'Resource Files',
+          resourcesIntro: 'Example files are located at:',
+          resourcesNote: 'You can load them from the Generation Tab by selecting the resources in the Character and World fields.',
+          clickToCopy: 'Click to copy', copied: 'Copied!'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) {
+            if (el.dataset.i18nHtml) el.innerHTML = this.t[this.lang][key];
+            else el.textContent = this.t[this.lang][key];
+          }
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+
+    function copyPrompt(element) {
+      const text = element.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        element.classList.add('copied');
+        setTimeout(() => element.classList.remove('copied'), 1500);
+      });
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
+    .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .prompt-item { position: relative; cursor: pointer; transition: all 0.2s; }
+    .prompt-item:hover { background: rgba(0, 212, 255, 0.1) !important; }
+    .prompt-item::after { content: attr(data-copy-text); position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: #6b7280; opacity: 0; transition: opacity 0.2s; }
+    .prompt-item:hover::after { opacity: 1; }
+    .prompt-item.copied::after { content: 'Copied!'; color: #00d4ff; opacity: 1; }
+    .stars { color: #eab308; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-  <div class="wiki-container">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
-        <div class="sidebar-logo">OhMyDialogSystem</div>
-        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+  <div class="flex min-h-screen relative z-10">
+    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
-      <div class="nav-section"><div class="nav-section-title">General</div><ul class="nav-links"><li><a href="../index.html"><span class="icon">🏠</span> Home</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Getting Started</div><ul class="nav-links"><li><a href="quickstart.html"><span class="icon">🚀</span> Quick Start</a></li><li><a href="installation.html"><span class="icon">📦</span> Installation</a></li><li><a href="first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">API Reference</div><ul class="nav-links"><li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li><li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li><li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li><li><a href="../API/memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li><li><a href="../API/tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li><li><a href="../API/resources.html"><span class="icon">📄</span> Resources</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Technical</div><ul class="nav-links"><li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li><li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li><li><a href="../Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li><li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li><li><a href="../Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li><li><a href="../Technical/localization.html"><span class="icon">🌐</span> Localization</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Guides</div><ul class="nav-links"><li><a href="index.html"><span class="icon">📖</span> Overview</a></li><li><a href="visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li><li><a href="character-identity.html"><span class="icon">👤</span> Character Identity</a></li><li><a href="tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li><li><a href="csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Examples</div><ul class="nav-links"><li><a href="example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li><li><a href="example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li><li><a href="example-merchant.html" class="active"><span class="icon">🛒</span> Dynamic Merchant</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">External Links</div><ul class="nav-links"><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li><li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li></ul></div>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+      </div>
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> General</div>
+          <ul><li><a href="../home.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3E0;</span> Home</a></li></ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <ul>
+            <li><a href="quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <ul>
+            <li><a href="../API/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <ul>
+            <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <ul>
+            <li><a href="index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4D6;</span> Overview</a></li>
+            <li><a href="visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+            <li><a href="character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Examples</div>
+          <ul>
+            <li><a href="example-basic-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F916;</span> Basic NPC</a></li>
+            <li><a href="example-branching.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F333;</span> Branching Dialogue</a></li>
+            <li><a href="example-merchant.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F6D2;</span> Dynamic Merchant</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+          </ul>
+        </div>
+      </div>
     </nav>
-    <main class="main-content">
-      <div class="breadcrumbs"><a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">Guides</a> <span>/</span> <span>Dynamic Merchant Example</span></div>
 
-      <h1>Dynamic Merchant Example</h1>
-
-      <p>
-        <span class="badge badge-cyan">Testing</span>
-        <span class="badge badge-purple">Marcus the Merchant</span>
-      </p>
-
-      <div class="ai-box">
-        <p>Esta guia contiene prompts de prueba para el personaje <strong>Marcus</strong>, un mercader codicioso pero jovial del mundo de Eldoria. Usalo para probar diferentes modelos LLM y verificar que el sistema genera respuestas coherentes.</p>
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Guides</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>Dynamic Merchant</span>
       </div>
 
-      <hr>
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">Ejemplo: Dynamic Merchant</span>
+        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
 
-      <h2>Character Profile: Marcus</h2>
+      <div class="flex gap-2 mb-6">
+        <span class="px-2 py-1 text-xs rounded bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30" data-i18n="badgeTesting">Testing</span>
+        <span class="px-2 py-1 text-xs rounded bg-ai-purple/20 text-ai-purple border border-ai-purple/30" data-i18n="badgeMarcus">Marcus the Merchant</span>
+      </div>
 
-      <style>
-        .profile-card {
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
-          border-radius: 12px;
-          padding: 1.5rem;
-          margin: 1.5rem 0;
-        }
-        .profile-header {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 1rem;
-          padding-bottom: 1rem;
-          border-bottom: 1px solid var(--border-color);
-        }
-        .profile-avatar {
-          width: 60px;
-          height: 60px;
-          background: linear-gradient(135deg, #eab308, #ca8a04);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2rem;
-        }
-        .profile-name {
-          font-size: 1.5rem;
-          font-weight: 600;
-          color: var(--ai-cyan);
-        }
-        .profile-title {
-          color: var(--text-muted);
-          font-size: 0.9rem;
-        }
-        .profile-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1rem;
-        }
-        .profile-section {
-          background: rgba(0,0,0,0.2);
-          border-radius: 8px;
-          padding: 1rem;
-        }
-        .profile-section h4 {
-          color: var(--ai-purple);
-          font-size: 0.8rem;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          margin-bottom: 0.5rem;
-        }
-        .profile-section ul {
-          margin: 0;
-          padding-left: 1.25rem;
-        }
-        .profile-section li {
-          font-size: 0.9rem;
-          margin-bottom: 0.25rem;
-        }
-        .prompt-card {
-          background: var(--bg-card);
-          border: 1px solid var(--border-color);
-          border-radius: 8px;
-          margin: 1rem 0;
-          overflow: hidden;
-        }
-        .prompt-header {
-          background: rgba(0, 212, 255, 0.1);
-          padding: 0.75rem 1rem;
-          border-bottom: 1px solid var(--border-color);
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .prompt-category {
-          font-weight: 600;
-          color: var(--ai-cyan);
-          font-size: 0.9rem;
-        }
-        .prompt-lang {
-          font-size: 0.75rem;
-          padding: 0.25rem 0.5rem;
-          background: rgba(168, 85, 247, 0.2);
-          border-radius: 4px;
-          color: var(--ai-purple);
-        }
-        .prompt-body {
-          padding: 1rem;
-        }
-        .prompt-item {
-          background: rgba(0,0,0,0.3);
-          border-radius: 6px;
-          padding: 0.75rem 1rem;
-          margin-bottom: 0.5rem;
-          font-family: var(--font-mono);
-          font-size: 0.85rem;
-          cursor: pointer;
-          transition: all 0.2s;
-          position: relative;
-        }
-        .prompt-item:hover {
-          background: rgba(0, 212, 255, 0.1);
-          border-color: var(--ai-cyan);
-        }
-        .prompt-item:last-child {
-          margin-bottom: 0;
-        }
-        .prompt-item::after {
-          content: 'Click to copy';
-          position: absolute;
-          right: 0.75rem;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 0.7rem;
-          color: var(--text-muted);
-          opacity: 0;
-          transition: opacity 0.2s;
-        }
-        .prompt-item:hover::after {
-          opacity: 1;
-        }
-        .prompt-item.copied::after {
-          content: 'Copied!';
-          color: var(--ai-cyan);
-          opacity: 1;
-        }
-        .prompt-note {
-          font-size: 0.8rem;
-          color: var(--text-muted);
-          font-style: italic;
-          margin-top: 0.5rem;
-        }
-        .model-table {
-          width: 100%;
-          margin: 1rem 0;
-        }
-        .model-table th {
-          text-align: left;
-          background: rgba(0, 212, 255, 0.1);
-        }
-        .model-rec {
-          background: rgba(16, 185, 129, 0.1);
-          border: 1px solid #10b981;
-        }
-        .stars {
-          color: #eab308;
-        }
-      </style>
+      <div class="p-4 rounded-lg border border-ai-cyan/30 bg-ai-cyan/5 mb-8">
+        <p class="text-gray-300" data-i18n="introText" data-i18n-html="true">Esta guia contiene prompts de prueba para el personaje <strong>Marcus</strong>, un mercader codicioso pero jovial del mundo de Eldoria. Usalo para probar diferentes modelos LLM y verificar que el sistema genera respuestas coherentes.</p>
+      </div>
 
-      <div class="profile-card">
-        <div class="profile-header">
-          <div class="profile-avatar">🛒</div>
+      <!-- Character Profile -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionProfile">Character Profile: Marcus</span>
+      </h2>
+
+      <div class="p-6 rounded-xl border border-border-default bg-bg-card/50 mb-8">
+        <div class="flex items-center gap-4 mb-6 pb-4 border-b border-border-default">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center text-3xl">&#x1F6D2;</div>
           <div>
-            <div class="profile-name">Marcus</div>
-            <div class="profile-title">Greedy but jovial merchant in Riverside Market, Eldoria</div>
+            <div class="text-2xl font-bold text-ai-cyan">Marcus</div>
+            <div class="text-gray-400 text-sm" data-i18n="profileTitle">Greedy but jovial merchant in Riverside Market, Eldoria</div>
           </div>
         </div>
-        <div class="profile-grid">
-          <div class="profile-section">
-            <h4>Personality</h4>
-            <p style="font-size: 0.9rem; margin: 0;">Greedy but jovial merchant. Cunning negotiator who loves to talk about deals and profits. Friendly on the surface but always looking for an advantage.</p>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="p-4 rounded-lg bg-black/20">
+            <h4 class="text-ai-purple text-xs uppercase tracking-wider mb-2" data-i18n="labelPersonality">Personality</h4>
+            <p class="text-sm text-gray-300" data-i18n="personalityDesc">Greedy but jovial merchant. Cunning negotiator who loves to talk about deals and profits. Friendly on the surface but always looking for an advantage.</p>
           </div>
-          <div class="profile-section">
-            <h4>Speech Patterns</h4>
-            <ul>
-              <li>"my friend"</li>
-              <li>"a steal at this price"</li>
-              <li>"finest quality"</li>
-              <li>Enthusiastic merchant jargon</li>
-            </ul>
+          <div class="p-4 rounded-lg bg-black/20">
+            <h4 class="text-ai-purple text-xs uppercase tracking-wider mb-2" data-i18n="labelSpeech">Speech Patterns</h4>
+            <ul class="text-sm text-gray-300 list-disc list-inside"><li>"my friend"</li><li>"a steal at this price"</li><li>"finest quality"</li><li>Enthusiastic merchant jargon</li></ul>
           </div>
-          <div class="profile-section">
-            <h4>Knowledge</h4>
-            <ul>
-              <li>Trade &amp; economics</li>
-              <li>Rare goods</li>
-              <li>Travel routes</li>
-              <li>Local gossip &amp; prices</li>
-            </ul>
+          <div class="p-4 rounded-lg bg-black/20">
+            <h4 class="text-ai-purple text-xs uppercase tracking-wider mb-2" data-i18n="labelKnowledge">Knowledge</h4>
+            <ul class="text-sm text-gray-300 list-disc list-inside"><li>Trade &amp; economics</li><li>Rare goods</li><li>Travel routes</li><li>Local gossip &amp; prices</li></ul>
           </div>
-          <div class="profile-section">
-            <h4>Goals</h4>
-            <ul>
-              <li>Make a profit</li>
-              <li>Find rare artifacts</li>
-              <li>Avoid the tax collector</li>
-            </ul>
+          <div class="p-4 rounded-lg bg-black/20">
+            <h4 class="text-ai-purple text-xs uppercase tracking-wider mb-2" data-i18n="labelGoals">Goals</h4>
+            <ul class="text-sm text-gray-300 list-disc list-inside"><li>Make a profit</li><li>Find rare artifacts</li><li>Avoid the tax collector</li></ul>
           </div>
-          <div class="profile-section">
-            <h4>Fears</h4>
-            <ul>
-              <li>Being exposed as a fraud</li>
-              <li>The tax collector</li>
-              <li>Losing merchandise</li>
-            </ul>
+          <div class="p-4 rounded-lg bg-black/20">
+            <h4 class="text-ai-purple text-xs uppercase tracking-wider mb-2" data-i18n="labelFears">Fears</h4>
+            <ul class="text-sm text-gray-300 list-disc list-inside"><li>Being exposed as a fraud</li><li>The tax collector</li><li>Losing merchandise</li></ul>
           </div>
-          <div class="profile-section">
-            <h4>Secrets</h4>
-            <ul>
-              <li>Hidden stash of illegal goods</li>
-              <li>Once cheated a noble</li>
-            </ul>
+          <div class="p-4 rounded-lg bg-black/20">
+            <h4 class="text-ai-purple text-xs uppercase tracking-wider mb-2" data-i18n="labelSecrets">Secrets</h4>
+            <ul class="text-sm text-gray-300 list-disc list-inside"><li>Hidden stash of illegal goods</li><li>Once cheated a noble</li></ul>
           </div>
         </div>
       </div>
 
-      <hr>
+      <!-- Test Prompts -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionPrompts">Test Prompts</span>
+      </h2>
 
-      <h2>Test Prompts</h2>
-
-      <div class="callout-info">
-        <p>Click en cualquier prompt para copiarlo al portapapeles. Luego pegalo en el Generation Tab del editor.</p>
+      <div class="p-4 rounded-lg border-l-4 border-ai-cyan bg-ai-cyan/5 mb-6">
+        <p class="text-gray-300" data-i18n="promptsInfo">Click en cualquier prompt para copiarlo al portapapeles. Luego pegalo en el Generation Tab del editor.</p>
       </div>
 
       <!-- Basic Interactions -->
-      <div class="prompt-card">
-        <div class="prompt-header">
-          <span class="prompt-category">Basic Interactions</span>
-          <span class="prompt-lang">English</span>
+      <div class="rounded-xl border border-border-default overflow-hidden mb-4">
+        <div class="px-4 py-3 bg-ai-cyan/10 border-b border-border-default flex justify-between items-center">
+          <span class="font-semibold text-ai-cyan" data-i18n="catBasic">Basic Interactions</span>
+          <span class="text-xs px-2 py-1 bg-ai-purple/20 rounded text-ai-purple">English</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-item" onclick="copyPrompt(this)">Hello, what do you have for sale today?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">I'm looking for something special, what's your best item?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">How's business going?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Tell me about yourself.</div>
-          <p class="prompt-note">Deberia responder de forma amigable usando frases como "my friend", "finest quality", etc.</p>
+        <div class="p-4 space-y-2">
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Hello, what do you have for sale today?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">I'm looking for something special, what's your best item?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">How's business going?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Tell me about yourself.</div>
+          <p class="text-xs text-gray-500 italic mt-2" data-i18n="noteBasic">Deberia responder de forma amigable usando frases como "my friend", "finest quality", etc.</p>
         </div>
       </div>
 
       <!-- Personality Tests -->
-      <div class="prompt-card">
-        <div class="prompt-header">
-          <span class="prompt-category">Personality Tests (Greedy/Cunning)</span>
-          <span class="prompt-lang">English</span>
+      <div class="rounded-xl border border-border-default overflow-hidden mb-4">
+        <div class="px-4 py-3 bg-ai-cyan/10 border-b border-border-default flex justify-between items-center">
+          <span class="font-semibold text-ai-cyan" data-i18n="catPersonality">Personality Tests (Greedy/Cunning)</span>
+          <span class="text-xs px-2 py-1 bg-ai-purple/20 rounded text-ai-purple">English</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-item" onclick="copyPrompt(this)">This price is too high, can you lower it?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">I only have half the gold you're asking for.</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">I'll buy everything you have. Name your price.</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">My friend recommended a cheaper merchant down the road.</div>
-          <p class="prompt-note">Deberia mostrar su lado negociador y codicioso, pero sin ser hostil.</p>
+        <div class="p-4 space-y-2">
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">This price is too high, can you lower it?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">I only have half the gold you're asking for.</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">I'll buy everything you have. Name your price.</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">My friend recommended a cheaper merchant down the road.</div>
+          <p class="text-xs text-gray-500 italic mt-2" data-i18n="notePersonality">Deberia mostrar su lado negociador y codicioso, pero sin ser hostil.</p>
         </div>
       </div>
 
       <!-- Secret Knowledge -->
-      <div class="prompt-card">
-        <div class="prompt-header">
-          <span class="prompt-category">Secret Knowledge (Illegal Goods)</span>
-          <span class="prompt-lang">English</span>
+      <div class="rounded-xl border border-border-default overflow-hidden mb-4">
+        <div class="px-4 py-3 bg-ai-cyan/10 border-b border-border-default flex justify-between items-center">
+          <span class="font-semibold text-ai-cyan" data-i18n="catSecret">Secret Knowledge (Illegal Goods)</span>
+          <span class="text-xs px-2 py-1 bg-ai-purple/20 rounded text-ai-purple">English</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-item" onclick="copyPrompt(this)">I heard you sell... special goods. Things the guards wouldn't approve of.</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">I need something that's not exactly legal. Can you help?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">The Thieves Guild sent me. They said you have what I need.</div>
-          <p class="prompt-note">Deberia ser cauteloso, posiblemente evasivo al principio, pero podria abrirse si el jugador insiste.</p>
+        <div class="p-4 space-y-2">
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">I heard you sell... special goods. Things the guards wouldn't approve of.</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">I need something that's not exactly legal. Can you help?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">The Thieves Guild sent me. They said you have what I need.</div>
+          <p class="text-xs text-gray-500 italic mt-2" data-i18n="noteSecret">Deberia ser cauteloso, posiblemente evasivo al principio, pero podria abrirse si el jugador insiste.</p>
         </div>
       </div>
 
       <!-- Fear Triggers -->
-      <div class="prompt-card">
-        <div class="prompt-header">
-          <span class="prompt-category">Fear Triggers</span>
-          <span class="prompt-lang">English</span>
+      <div class="rounded-xl border border-border-default overflow-hidden mb-4">
+        <div class="px-4 py-3 bg-ai-cyan/10 border-b border-border-default flex justify-between items-center">
+          <span class="font-semibold text-ai-cyan" data-i18n="catFear">Fear Triggers</span>
+          <span class="text-xs px-2 py-1 bg-ai-purple/20 rounded text-ai-purple">English</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-item" onclick="copyPrompt(this)">A noble was asking about you earlier. Said you owe him something.</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">The tax collector is coming this way.</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Someone told me you're a fraud. Is that true?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">I work for Lord Aldric. He wants to audit your accounts.</div>
-          <p class="prompt-note">Deberia mostrar nerviosismo o intentar cambiar de tema rapidamente.</p>
+        <div class="p-4 space-y-2">
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">A noble was asking about you earlier. Said you owe him something.</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">The tax collector is coming this way.</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Someone told me you're a fraud. Is that true?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">I work for Lord Aldric. He wants to audit your accounts.</div>
+          <p class="text-xs text-gray-500 italic mt-2" data-i18n="noteFear">Deberia mostrar nerviosismo o intentar cambiar de tema rapidamente.</p>
         </div>
       </div>
 
       <!-- World Knowledge -->
-      <div class="prompt-card">
-        <div class="prompt-header">
-          <span class="prompt-category">World Knowledge (Eldoria)</span>
-          <span class="prompt-lang">English</span>
+      <div class="rounded-xl border border-border-default overflow-hidden mb-4">
+        <div class="px-4 py-3 bg-ai-cyan/10 border-b border-border-default flex justify-between items-center">
+          <span class="font-semibold text-ai-cyan" data-i18n="catWorld">World Knowledge (Eldoria)</span>
+          <span class="text-xs px-2 py-1 bg-ai-purple/20 rounded text-ai-purple">English</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-item" onclick="copyPrompt(this)">What do you know about the bandits on the northern road?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Tell me about the Merchant Guild.</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">What's happening at the Harvest Festival tomorrow?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Do you know anything about King Aldric?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Who is the High Priestess Vera?</div>
-          <p class="prompt-note">Deberia demostrar conocimiento del mundo, especialmente sobre comercio y rumores locales.</p>
+        <div class="p-4 space-y-2">
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">What do you know about the bandits on the northern road?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Tell me about the Merchant Guild.</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">What's happening at the Harvest Festival tomorrow?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Do you know anything about King Aldric?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Who is the High Priestess Vera?</div>
+          <p class="text-xs text-gray-500 italic mt-2" data-i18n="noteWorld">Deberia demostrar conocimiento del mundo, especialmente sobre comercio y rumores locales.</p>
         </div>
       </div>
 
       <!-- Relationships -->
-      <div class="prompt-card">
-        <div class="prompt-header">
-          <span class="prompt-category">Relationships</span>
-          <span class="prompt-lang">English</span>
+      <div class="rounded-xl border border-border-default overflow-hidden mb-4">
+        <div class="px-4 py-3 bg-ai-cyan/10 border-b border-border-default flex justify-between items-center">
+          <span class="font-semibold text-ai-cyan" data-i18n="catRelations">Relationships</span>
+          <span class="text-xs px-2 py-1 bg-ai-purple/20 rounded text-ai-purple">English</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-item" onclick="copyPrompt(this)">Do you know the Guard Captain?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">The innkeeper sent me. Said you might have a deal for me.</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">I heard you have connections with the Royal Guard.</div>
-          <p class="prompt-note">Deberia reaccionar segun sus relaciones definidas (soborna al capitan, amigo del tabernero).</p>
+        <div class="p-4 space-y-2">
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Do you know the Guard Captain?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">The innkeeper sent me. Said you might have a deal for me.</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">I heard you have connections with the Royal Guard.</div>
+          <p class="text-xs text-gray-500 italic mt-2" data-i18n="noteRelations">Deberia reaccionar segun sus relaciones definidas (soborna al capitan, amigo del tabernero).</p>
         </div>
       </div>
 
       <!-- Multilingual -->
-      <div class="prompt-card">
-        <div class="prompt-header">
-          <span class="prompt-category">Multilingual Tests</span>
-          <span class="prompt-lang">ES / FR / DE</span>
+      <div class="rounded-xl border border-border-default overflow-hidden mb-8">
+        <div class="px-4 py-3 bg-ai-cyan/10 border-b border-border-default flex justify-between items-center">
+          <span class="font-semibold text-ai-cyan" data-i18n="catMulti">Multilingual Tests</span>
+          <span class="text-xs px-2 py-1 bg-ai-purple/20 rounded text-ai-purple">ES / FR / DE</span>
         </div>
-        <div class="prompt-body">
-          <div class="prompt-item" onclick="copyPrompt(this)">Hola Marcus, que me recomiendas comprar?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Tienes algo especial para un aventurero como yo?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Bonjour, avez-vous des objets rares?</div>
-          <div class="prompt-item" onclick="copyPrompt(this)">Guten Tag, was verkaufen Sie heute?</div>
-          <p class="prompt-note">Requiere modelo con buen soporte multilingue (Qwen recomendado).</p>
+        <div class="p-4 space-y-2">
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Hola Marcus, que me recomiendas comprar?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Tienes algo especial para un aventurero como yo?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Bonjour, avez-vous des objets rares?</div>
+          <div class="prompt-item p-3 rounded-lg bg-black/30 font-mono text-sm" data-copy-text="Click to copy" onclick="copyPrompt(this)">Guten Tag, was verkaufen Sie heute?</div>
+          <p class="text-xs text-gray-500 italic mt-2" data-i18n="noteMulti">Requiere modelo con buen soporte multilingue (Qwen recomendado).</p>
         </div>
       </div>
 
-      <hr>
+      <!-- Recommended Models -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionModels">Recommended Models</span>
+      </h2>
 
-      <h2>Recommended Models</h2>
+      <p class="text-gray-400 mb-4" data-i18n="modelsIntro">Para probar a Marcus con diferentes capacidades:</p>
 
-      <p>Para probar a Marcus con diferentes capacidades:</p>
-
-      <table class="model-table">
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Size (Q4)</th>
-            <th>Multilingual</th>
-            <th>Coherence</th>
-            <th>Speed</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>SmolLM2-360M-Instruct</code></td>
-            <td>~250MB</td>
-            <td><span class="stars">★★☆☆☆</span></td>
-            <td><span class="stars">★★★☆☆</span></td>
-            <td><span class="stars">★★★★★</span></td>
-          </tr>
-          <tr>
-            <td><code>Qwen2.5-0.5B-Instruct</code></td>
-            <td>~400MB</td>
-            <td><span class="stars">★★★★★</span></td>
-            <td><span class="stars">★★★★☆</span></td>
-            <td><span class="stars">★★★★★</span></td>
-          </tr>
-          <tr class="model-rec">
-            <td><strong><code>Qwen2.5-1.5B-Instruct</code></strong></td>
-            <td>~900MB</td>
-            <td><span class="stars">★★★★★</span></td>
-            <td><span class="stars">★★★★★</span></td>
-            <td><span class="stars">★★★★☆</span></td>
-          </tr>
-          <tr>
-            <td><code>Qwen2.5-3B-Instruct</code></td>
-            <td>~1.8GB</td>
-            <td><span class="stars">★★★★★</span></td>
-            <td><span class="stars">★★★★★</span></td>
-            <td><span class="stars">★★★☆☆</span></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="callout-info">
-        <p><strong>Recomendacion:</strong> Para modelos &lt;1GB con buen soporte multilingue, usa <code>Qwen2.5-1.5B-Instruct-Q4_K_M</code>. Es el mejor balance entre calidad y velocidad.</p>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colModel">Model</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colSize">Size (Q4)</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colMulti">Multilingual</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colCoherence">Coherence</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colSpeed">Speed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-sm">SmolLM2-360M-Instruct</td>
+              <td class="py-3 px-4 text-gray-400">~250MB</td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9734;&#9734;&#9734;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9734;&#9734;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-sm">Qwen2.5-0.5B-Instruct</td>
+              <td class="py-3 px-4 text-gray-400">~400MB</td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            </tr>
+            <tr class="border-b border-border-default/50 bg-ai-green/5 border-l-2 border-l-ai-green">
+              <td class="py-3 px-4 font-mono text-sm font-bold">Qwen2.5-1.5B-Instruct</td>
+              <td class="py-3 px-4 text-gray-400">~900MB</td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</span></td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-sm">Qwen2.5-3B-Instruct</td>
+              <td class="py-3 px-4 text-gray-400">~1.8GB</td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+              <td class="py-3 px-4"><span class="stars">&#9733;&#9733;&#9733;&#9734;&#9734;</span></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <hr>
+      <div class="p-4 rounded-lg border-l-4 border-ai-cyan bg-ai-cyan/5 mb-8">
+        <p class="text-gray-300" data-i18n="modelRec" data-i18n-html="true"><strong>Recomendacion:</strong> Para modelos &lt;1GB con buen soporte multilingue, usa <code class="px-1 py-0.5 bg-bg-tertiary rounded text-ai-cyan font-mono text-sm">Qwen2.5-1.5B-Instruct-Q4_K_M</code>. Es el mejor balance entre calidad y velocidad.</p>
+      </div>
 
-      <h2>Testing Tips</h2>
+      <!-- Testing Tips -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionTips">Testing Tips</span>
+      </h2>
 
-      <h3>Sampling Parameters</h3>
-      <ul>
+      <h3 class="text-lg font-bold text-white mb-3" data-i18n="tipsSampling">Sampling Parameters</h3>
+      <ul class="list-disc list-inside text-gray-300 mb-6 space-y-1">
         <li><strong>Temperature:</strong> 0.7-0.9 para respuestas variadas, 0.3-0.5 para consistencia</li>
         <li><strong>Top-P:</strong> 0.9 funciona bien para la mayoria de casos</li>
         <li><strong>Max Tokens:</strong> 128-256 para dialogos cortos</li>
         <li><strong>Repeat Penalty:</strong> 1.1-1.2 para evitar repeticiones</li>
       </ul>
 
-      <h3>What to Look For</h3>
-      <ul>
+      <h3 class="text-lg font-bold text-white mb-3" data-i18n="tipsLookFor">What to Look For</h3>
+      <ul class="list-disc list-inside text-gray-300 mb-6 space-y-1">
         <li>Usa las frases caracteristicas ("my friend", "finest quality")?</li>
         <li>Mantiene la personalidad codicioso-pero-amigable?</li>
         <li>Respeta los secretos (no los revela inmediatamente)?</li>
@@ -436,62 +471,44 @@
         <li>Reacciona apropiadamente a los triggers de miedo?</li>
       </ul>
 
-      <h3>Common Issues</h3>
-      <table>
-        <thead>
-          <tr><th>Issue</th><th>Possible Cause</th><th>Solution</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Respuestas muy cortas</td>
-            <td>Max tokens muy bajo</td>
-            <td>Aumentar a 256+</td>
-          </tr>
-          <tr>
-            <td>Respuestas repetitivas</td>
-            <td>Repeat penalty muy bajo</td>
-            <td>Aumentar a 1.2</td>
-          </tr>
-          <tr>
-            <td>Rompe el personaje</td>
-            <td>Modelo muy pequeno</td>
-            <td>Usar Qwen2.5-1.5B+</td>
-          </tr>
-          <tr>
-            <td>No responde en espanol</td>
-            <td>Modelo no multilingue</td>
-            <td>Usar Qwen en vez de SmolLM</td>
-          </tr>
-          <tr>
-            <td>Crash silencioso</td>
-            <td>Prompt muy largo</td>
-            <td>Reducir contexto o usar modelo con mas n_ctx</td>
-          </tr>
-        </tbody>
-      </table>
+      <h3 class="text-lg font-bold text-white mb-3" data-i18n="tipsIssues">Common Issues</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Issue</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Possible Cause</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Solution</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 text-gray-300">Respuestas muy cortas</td><td class="py-3 px-4 text-gray-400">Max tokens muy bajo</td><td class="py-3 px-4 text-gray-300">Aumentar a 256+</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 text-gray-300">Respuestas repetitivas</td><td class="py-3 px-4 text-gray-400">Repeat penalty muy bajo</td><td class="py-3 px-4 text-gray-300">Aumentar a 1.2</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 text-gray-300">Rompe el personaje</td><td class="py-3 px-4 text-gray-400">Modelo muy pequeno</td><td class="py-3 px-4 text-gray-300">Usar Qwen2.5-1.5B+</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 text-gray-300">No responde en espanol</td><td class="py-3 px-4 text-gray-400">Modelo no multilingue</td><td class="py-3 px-4 text-gray-300">Usar Qwen en vez de SmolLM</td></tr>
+            <tr><td class="py-3 px-4 text-gray-300">Crash silencioso</td><td class="py-3 px-4 text-gray-400">Prompt muy largo</td><td class="py-3 px-4 text-gray-300">Reducir contexto o usar modelo con mas n_ctx</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-      <hr>
+      <!-- Resource Files -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionResources">Resource Files</span>
+      </h2>
 
-      <h2>Resource Files</h2>
+      <p class="text-gray-400 mb-4" data-i18n="resourcesIntro">Los archivos de ejemplo estan en:</p>
 
-      <p>Los archivos de ejemplo estan en:</p>
-
-      <pre data-lang="PATHS"><code>examples/resources/merchant_character.tres  # CharacterIdentity de Marcus
+      <pre class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code>examples/resources/merchant_character.tres  # CharacterIdentity de Marcus
 examples/resources/fantasy_world.tres       # WorldContext de Eldoria</code></pre>
 
-      <p>Puedes cargarlos desde el Generation Tab seleccionando los recursos en los campos Character y World.</p>
+      <p class="text-gray-400 mb-8" data-i18n="resourcesNote">Puedes cargarlos desde el Generation Tab seleccionando los recursos en los campos Character y World.</p>
 
-      <script>
-        function copyPrompt(element) {
-          const text = element.textContent;
-          navigator.clipboard.writeText(text).then(() => {
-            element.classList.add('copied');
-            setTimeout(() => element.classList.remove('copied'), 1500);
-          });
-        }
-      </script>
-
-      <footer class="wiki-footer"><p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p></footer>
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
+      </footer>
     </main>
   </div>
   <script src="../ai-bg.js"></script>
