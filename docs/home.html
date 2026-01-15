@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - OhMyDialogSystem Wiki</title>
+
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'bg-primary': '#0a0d12',
+            'bg-secondary': '#0f1419',
+            'bg-tertiary': '#161d26',
+            'bg-card': '#121921',
+            'ai-cyan': '#00d4ff',
+            'ai-cyan-dim': '#0099cc',
+            'ai-purple': '#a855f7',
+            'ai-purple-dim': '#7c3aed',
+            'ai-green': '#10b981',
+            'ai-green-dim': '#059669',
+            'ai-pink': '#ec4899',
+            'ai-orange': '#f97316',
+            'border-default': '#21262d',
+          },
+          fontFamily: {
+            'body': ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
+            'mono': ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 20px rgba(0, 212, 255, 0.4)',
+            'glow-purple': '0 0 20px rgba(168, 85, 247, 0.4)',
+          },
+        },
+      },
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Base styles -->
+  <link rel="stylesheet" href="base.css">
+
+  <!-- i18n System -->
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          // Sidebar
+          navInstallation: 'Instalación',
+          navFirstNpc: 'Tu Primer NPC',
+          navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases',
+          navVisualEditor: 'Editor Visual',
+          // Main content
+          introText: '<strong class="text-ai-cyan">Sistema de diálogos con IA para Godot</strong> que permite crear NPCs inteligentes con personalidades únicas, memorias persistentes y voces sintetizadas. Potenciado por LLMs locales via llama.cpp.',
+          featuresTitle: 'Características Principales',
+          featureLlmTitle: 'LLM Local',
+          featureLlmDesc: 'Inferencia de modelos GGUF directamente en Godot via llama.cpp. Sin dependencias de APIs externas.',
+          featureEditorTitle: 'Editor Visual',
+          featureEditorDesc: 'Editor de grafos de diálogo integrado con nodos de IA, condiciones, eventos y opciones.',
+          featureMemoryTitle: 'Memorias Persistentes',
+          featureMemoryDesc: 'Los NPCs recuerdan conversaciones previas con búsqueda semántica de memorias relevantes.',
+          featureTtsDesc: 'Voces sintetizadas offline con Piper TTS. Cada personaje puede tener su propia voz.',
+          featureL10nTitle: 'Localización',
+          featureL10nDesc: 'Integración con TranslationServer de Godot. Prompts y plantillas en múltiples idiomas.',
+          featureCsharpTitle: 'Bindings C#',
+          featureCsharpDesc: 'API idiomática de C# con async/await, eventos y documentación XML completa.',
+          requirementsTitle: 'Requisitos',
+          quickNavTitle: 'Navegación Rápida',
+          quickNavStart: 'Para Empezar',
+          quickNavTech: 'Documentación Técnica',
+          quickNavGuides: 'Guías Prácticas',
+          infoText: 'Para una guía completa de instalación y configuración, visita',
+          // Donate
+          supportTitle: 'Apoya el Proyecto',
+          supportDesc: 'Si este proyecto te resulta útil, considera apoyar su desarrollo:',
+          clickToClose: 'Click para cerrar'
+        },
+        en: {
+          // Sidebar
+          navInstallation: 'Installation',
+          navFirstNpc: 'Your First NPC',
+          navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases',
+          navVisualEditor: 'Visual Editor',
+          // Main content
+          introText: '<strong class="text-ai-cyan">AI-powered dialogue system for Godot</strong> that enables creating intelligent NPCs with unique personalities, persistent memories, and synthesized voices. Powered by local LLMs via llama.cpp.',
+          featuresTitle: 'Main Features',
+          featureLlmTitle: 'Local LLM',
+          featureLlmDesc: 'GGUF model inference directly in Godot via llama.cpp. No external API dependencies.',
+          featureEditorTitle: 'Visual Editor',
+          featureEditorDesc: 'Integrated dialogue graph editor with AI nodes, conditions, events, and choices.',
+          featureMemoryTitle: 'Persistent Memories',
+          featureMemoryDesc: 'NPCs remember previous conversations with semantic search for relevant memories.',
+          featureTtsDesc: 'Offline synthesized voices with Piper TTS. Each character can have their own voice.',
+          featureL10nTitle: 'Localization',
+          featureL10nDesc: "Integration with Godot's TranslationServer. Prompts and templates in multiple languages.",
+          featureCsharpTitle: 'C# Bindings',
+          featureCsharpDesc: 'Idiomatic C# API with async/await, events, and complete XML documentation.',
+          requirementsTitle: 'Requirements',
+          quickNavTitle: 'Quick Navigation',
+          quickNavStart: 'Getting Started',
+          quickNavTech: 'Technical Docs',
+          quickNavGuides: 'Practical Guides',
+          infoText: 'For a complete installation and setup guide, visit',
+          // Donate
+          supportTitle: 'Support the Project',
+          supportDesc: 'If you find this project useful, consider supporting its development:',
+          clickToClose: 'Click to close'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) {
+            if (el.dataset.i18nHtml) el.innerHTML = this.t[this.lang][key];
+            else el.textContent = this.t[this.lang][key];
+          }
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    /* Gradient text utility */
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Code blocks */
+    pre {
+      position: relative;
+    }
+    pre[data-lang]::before {
+      content: attr(data-lang);
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: linear-gradient(90deg, #00d4ff, #a855f7);
+      color: #0a0d12;
+      font-size: 0.6rem;
+      padding: 0.2rem 0.8rem;
+      border-radius: 0 8px 0 8px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0a0d12; }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #a855f7, #00d4ff);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  <canvas id="neural-bg"></canvas>
+
+  <div class="flex min-h-screen relative z-10">
+    <!-- Sidebar -->
+    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <!-- Sidebar glow effect -->
+      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
+
+      <!-- Header -->
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4">
+          <img src="logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]">
+        </div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
+      </div>
+
+      <!-- Language Switcher -->
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+      </div>
+
+      <!-- Navigation -->
+      <div class="p-4">
+        <!-- General -->
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
+          <ul>
+            <li>
+              <a href="index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan">
+                <span class="opacity-70">&#x1F3E0;</span> Home
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Getting Started -->
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started
+          </div>
+          <ul>
+            <li><a href="Guides/quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="Guides/installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalación</span></a></li>
+            <li><a href="Guides/first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+          </ul>
+        </div>
+
+        <!-- API Reference -->
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
+          <ul>
+            <li><a href="API/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="API/llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="API/dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="API/memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="API/tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="API/resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+
+        <!-- Technical -->
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
+          <ul>
+            <li><a href="Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+
+        <!-- Guides -->
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
+          <ul>
+            <li><a href="Guides/visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+            <li><a href="Guides/character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="Guides/tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+          </ul>
+        </div>
+
+        <!-- External -->
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External
+          </div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <!-- Breadcrumbs -->
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>Home</span>
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai">OhMyDialogSystem</span>
+        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
+
+      <!-- Badges -->
+      <div class="flex flex-wrap gap-2 mb-8">
+        <span class="px-3 py-1 text-xs font-mono uppercase tracking-wider rounded border bg-ai-cyan/10 text-ai-cyan border-ai-cyan">Godot 4.5+</span>
+        <span class="px-3 py-1 text-xs font-mono uppercase tracking-wider rounded border bg-ai-purple/10 text-ai-purple border-ai-purple">GDExtension</span>
+        <span class="px-3 py-1 text-xs font-mono uppercase tracking-wider rounded border bg-ai-green/10 text-ai-green border-ai-green">Apache 2.0</span>
+      </div>
+
+      <!-- AI Box -->
+      <div class="relative p-6 rounded-xl border border-border-default mb-8 overflow-hidden
+                  bg-gradient-to-br from-ai-cyan/5 to-ai-purple/5
+                  shadow-[0_0_30px_rgba(0,212,255,0.1),inset_0_0_60px_rgba(0,0,0,0.2)]">
+        <p data-i18n="introText" data-i18n-html="true"><strong class="text-ai-cyan">Sistema de diálogos con IA para Godot</strong> que permite crear NPCs inteligentes con personalidades únicas, memorias persistentes y voces sintetizadas. Potenciado por LLMs locales via llama.cpp.</p>
+      </div>
+
+      <!-- HR -->
+      <div class="relative my-12 h-px bg-gradient-to-r from-transparent via-ai-cyan to-transparent">
+        <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-primary px-4 text-ai-purple text-xs">&#x2726;</span>
+      </div>
+
+      <!-- Features -->
+      <h2 class="text-2xl font-semibold text-ai-cyan border-b border-border-default pb-2 mb-6 mt-8" data-i18n="featuresTitle">Características Principales</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div class="p-6 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan hover:shadow-glow-cyan hover:-translate-y-1 transition-all">
+          <span class="text-3xl block mb-4">&#x1F999;</span>
+          <h3 class="text-lg font-semibold text-ai-purple mb-2" data-i18n="featureLlmTitle">LLM Local</h3>
+          <p class="text-sm text-gray-400" data-i18n="featureLlmDesc">Inferencia de modelos GGUF directamente en Godot via llama.cpp. Sin dependencias de APIs externas.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan hover:shadow-glow-cyan hover:-translate-y-1 transition-all">
+          <span class="text-3xl block mb-4">&#x1F3A8;</span>
+          <h3 class="text-lg font-semibold text-ai-purple mb-2" data-i18n="featureEditorTitle">Editor Visual</h3>
+          <p class="text-sm text-gray-400" data-i18n="featureEditorDesc">Editor de grafos de diálogo integrado con nodos de IA, condiciones, eventos y opciones.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan hover:shadow-glow-cyan hover:-translate-y-1 transition-all">
+          <span class="text-3xl block mb-4">&#x1F9E0;</span>
+          <h3 class="text-lg font-semibold text-ai-purple mb-2" data-i18n="featureMemoryTitle">Memorias Persistentes</h3>
+          <p class="text-sm text-gray-400" data-i18n="featureMemoryDesc">Los NPCs recuerdan conversaciones previas con búsqueda semántica de memorias relevantes.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan hover:shadow-glow-cyan hover:-translate-y-1 transition-all">
+          <span class="text-3xl block mb-4">&#x1F50A;</span>
+          <h3 class="text-lg font-semibold text-ai-purple mb-2">Text-to-Speech</h3>
+          <p class="text-sm text-gray-400" data-i18n="featureTtsDesc">Voces sintetizadas offline con Piper TTS. Cada personaje puede tener su propia voz.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan hover:shadow-glow-cyan hover:-translate-y-1 transition-all">
+          <span class="text-3xl block mb-4">&#x1F310;</span>
+          <h3 class="text-lg font-semibold text-ai-purple mb-2" data-i18n="featureL10nTitle">Localización</h3>
+          <p class="text-sm text-gray-400" data-i18n="featureL10nDesc">Integración con TranslationServer de Godot. Prompts y plantillas en múltiples idiomas.</p>
+        </div>
+        <div class="p-6 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan hover:shadow-glow-cyan hover:-translate-y-1 transition-all">
+          <span class="text-3xl block mb-4">&#x1F537;</span>
+          <h3 class="text-lg font-semibold text-ai-purple mb-2" data-i18n="featureCsharpTitle">Bindings C#</h3>
+          <p class="text-sm text-gray-400" data-i18n="featureCsharpDesc">API idiomática de C# con async/await, eventos y documentación XML completa.</p>
+        </div>
+      </div>
+
+      <!-- HR -->
+      <div class="relative my-12 h-px bg-gradient-to-r from-transparent via-ai-purple to-transparent">
+        <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-primary px-4 text-ai-purple text-xs">&#x2726;</span>
+      </div>
+
+      <!-- Quick Start -->
+      <h2 class="text-2xl font-semibold text-ai-cyan border-b border-border-default pb-2 mb-6 mt-8">Quick Start</h2>
+
+      <pre data-lang="GDSCRIPT" class="relative bg-gradient-to-br from-bg-card to-[#0d1117] border border-border-default rounded-lg p-6 overflow-x-auto mb-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_4px_20px_rgba(0,0,0,0.3)]"><code class="text-sm font-mono leading-relaxed"># Crear DialogueManager y verificar AIService
+var dialogue_manager: DialogueManager
+
+func _ready() -&gt; void:
+    # Verificar que hay modelo cargado (via Model Manager)
+    var ai_service := AIService.get_singleton()
+    if not ai_service or not ai_service.is_model_loaded():
+        push_warning("No hay modelo cargado - usar Model Manager primero")
+
+    # Crear y configurar DialogueManager
+    dialogue_manager = DialogueManager.new()
+    add_child(dialogue_manager)
+
+    # Conectar se&ntilde;ales
+    dialogue_manager.npc_response_completed.connect(_on_npc_response)
+    dialogue_manager.player_choices_available.connect(_on_choices)
+
+func start_conversation() -&gt; void:
+    var graph: DialogueGraph = preload("res://dialogues/merchant.tres")
+    dialogue_manager.start_dialogue(graph)</code></pre>
+
+      <!-- Info Callout -->
+      <div class="p-4 rounded-r-lg border-l-4 border-ai-cyan bg-ai-cyan/5 mb-8">
+        <div class="text-xs font-mono text-ai-cyan mb-2 tracking-widest">&#x2139; INFO</div>
+        <p class="text-gray-400 text-sm">Para una gu&iacute;a completa de instalaci&oacute;n y configuraci&oacute;n, visita <a href="Guides/quickstart.html" class="text-ai-cyan hover:text-ai-pink">Quick Start Guide</a>.</p>
+      </div>
+
+      <!-- HR -->
+      <div class="relative my-12 h-px bg-gradient-to-r from-transparent via-ai-cyan to-transparent">
+        <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-primary px-4 text-ai-purple text-xs">&#x2726;</span>
+      </div>
+
+      <!-- Requirements -->
+      <h2 class="text-2xl font-semibold text-ai-cyan border-b border-border-default pb-2 mb-6 mt-8" data-i18n="requirementsTitle">Requisitos</h2>
+
+      <div class="overflow-hidden rounded-lg border border-border-default bg-bg-card shadow-[0_0_30px_rgba(0,212,255,0.03),0_4px_20px_rgba(0,0,0,0.3)] mb-12">
+        <table class="w-full">
+          <thead class="bg-gradient-to-b from-bg-tertiary to-bg-secondary">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-mono uppercase tracking-wider text-ai-cyan border-b-2 border-ai-cyan">Componente</th>
+              <th class="px-4 py-3 text-left text-xs font-mono uppercase tracking-wider text-ai-cyan border-b-2 border-ai-cyan">Versi&oacute;n</th>
+              <th class="px-4 py-3 text-left text-xs font-mono uppercase tracking-wider text-ai-cyan border-b-2 border-ai-cyan">Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="hover:bg-ai-cyan/5">
+              <td class="px-4 py-3 border-b border-border-default text-gray-300">Godot Engine</td>
+              <td class="px-4 py-3 border-b border-border-default text-gray-400">4.5+</td>
+              <td class="px-4 py-3 border-b border-border-default text-gray-400">Requerido para GDExtension 4.3+</td>
+            </tr>
+            <tr class="hover:bg-ai-cyan/5">
+              <td class="px-4 py-3 border-b border-border-default text-gray-300">Modelo LLM</td>
+              <td class="px-4 py-3 border-b border-border-default text-gray-400">GGUF Q4/Q5/Q8</td>
+              <td class="px-4 py-3 border-b border-border-default text-gray-400">Recomendado: Qwen2.5-0.5B-Instruct (~530MB)</td>
+            </tr>
+            <tr class="hover:bg-ai-cyan/5">
+              <td class="px-4 py-3 border-b border-border-default text-gray-300">RAM</td>
+              <td class="px-4 py-3 border-b border-border-default text-gray-400">8GB+</td>
+              <td class="px-4 py-3 border-b border-border-default text-gray-400">16GB recomendado para modelos grandes</td>
+            </tr>
+            <tr class="hover:bg-ai-cyan/5">
+              <td class="px-4 py-3 text-gray-300">GPU (opcional)</td>
+              <td class="px-4 py-3 text-gray-400">CUDA/Vulkan</td>
+              <td class="px-4 py-3 text-gray-400">Para aceleraci&oacute;n de inferencia</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Navigation -->
+      <h2 class="text-2xl font-semibold text-ai-cyan border-b border-border-default pb-2 mb-6 mt-8" data-i18n="quickNavTitle">Navegación Rápida</h2>
+
+      <div class="grid md:grid-cols-3 gap-6 mb-12">
+        <div>
+          <h3 class="text-lg font-semibold text-ai-purple mb-3" data-i18n="quickNavStart">Para Empezar</h3>
+          <ul class="space-y-2">
+            <li><a href="Guides/quickstart.html" class="text-ai-cyan hover:text-ai-pink transition-colors">&#x1F680; Quick Start Guide</a></li>
+            <li><a href="Guides/installation.html" class="text-ai-cyan hover:text-ai-pink transition-colors">&#x1F4E6; Instalaci&oacute;n</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-ai-purple mb-3" data-i18n="quickNavTech">Documentación Técnica</h3>
+          <ul class="space-y-2">
+            <li><a href="API/index.html" class="text-ai-cyan hover:text-ai-pink transition-colors">&#x1F4DA; API Reference</a></li>
+            <li><a href="Technical/architecture.html" class="text-ai-cyan hover:text-ai-pink transition-colors">&#x1F3D7;&#xFE0F; <span data-i18n="navArchitecture">Arquitectura</span></a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-ai-purple mb-3" data-i18n="quickNavGuides">Guías Prácticas</h3>
+          <ul class="space-y-2">
+            <li><a href="Guides/visual-editor.html" class="text-ai-cyan hover:text-ai-pink transition-colors">&#x1F3A8; Editor Visual</a></li>
+            <li><a href="Guides/character-identity.html" class="text-ai-cyan hover:text-ai-pink transition-colors">&#x1F464; Character Identity</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- HR -->
+      <div class="relative my-12 h-px bg-gradient-to-r from-transparent via-ai-purple to-transparent">
+        <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-primary px-4 text-ai-purple text-xs">&#x2726;</span>
+      </div>
+
+      <!-- Support Section -->
+      <h2 class="text-2xl font-semibold text-ai-purple border-b border-border-default pb-2 mb-6 mt-8" data-i18n="supportTitle">Apoya el Proyecto</h2>
+      <p class="text-gray-400 mb-8" data-i18n="supportDesc">Si este proyecto te resulta útil, considera apoyar su desarrollo:</p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <!-- USDT TRC20 -->
+        <div class="group p-4 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan/50 transition-all text-center cursor-pointer"
+             onclick="openLightbox('donate/usdt-trc20.png', 'USDT (TRC20)', 'TF6AXBP3LKBCcbJkLG6RqyMsrPNs2JCpdQ')">
+          <img src="donate/usdt-trc20.png" alt="USDT TRC20" class="w-24 h-24 mx-auto mb-3 rounded-lg bg-white p-2 group-hover:scale-105 transition-transform">
+          <h4 class="text-ai-cyan font-semibold text-sm">USDT (TRC20)</h4>
+          <code class="text-[0.6rem] text-gray-500 break-all block mt-1">TF6AXBP3...JCpdQ</code>
+        </div>
+
+        <!-- USDT BEP20 -->
+        <div class="group p-4 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan/50 transition-all text-center cursor-pointer"
+             onclick="openLightbox('donate/usdt-bep20.png', 'USDT (BEP20)', '0xd8d2Ed67C567CB3Af437f4638d3531e560575A20')">
+          <img src="donate/usdt-bep20.png" alt="USDT BEP20" class="w-24 h-24 mx-auto mb-3 rounded-lg bg-white p-2 group-hover:scale-105 transition-transform">
+          <h4 class="text-ai-cyan font-semibold text-sm">USDT (BEP20)</h4>
+          <code class="text-[0.6rem] text-gray-500 break-all block mt-1">0xd8d2Ed...5A20</code>
+        </div>
+
+        <!-- BTC -->
+        <div class="group p-4 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan/50 transition-all text-center cursor-pointer"
+             onclick="openLightbox('donate/btc.png', 'Bitcoin (BTC)', 'bc1qkxy898wa6mz04c9hrjekx6p0yht2ukz56e9xxq')">
+          <img src="donate/btc.png" alt="BTC" class="w-24 h-24 mx-auto mb-3 rounded-lg bg-white p-2 group-hover:scale-105 transition-transform">
+          <h4 class="text-ai-orange font-semibold text-sm">BTC</h4>
+          <code class="text-[0.6rem] text-gray-500 break-all block mt-1">bc1qkxy...9xxq</code>
+        </div>
+
+        <!-- Binance Pay -->
+        <div class="group p-4 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan/50 transition-all text-center cursor-pointer"
+             onclick="openLightbox('donate/binance-pay.jpeg', 'Binance Pay', '78328894')">
+          <img src="donate/binance-pay.jpeg" alt="Binance Pay" class="w-24 h-24 mx-auto mb-3 rounded-lg bg-white p-2 group-hover:scale-105 transition-transform">
+          <h4 class="text-yellow-500 font-semibold text-sm">Binance Pay</h4>
+          <code class="text-[0.6rem] text-gray-500 block mt-1">78328894</code>
+        </div>
+      </div>
+
+      <!-- Lightbox -->
+      <div id="qrLightbox" class="fixed inset-0 bg-black/90 z-[100] hidden items-center justify-center flex-col cursor-pointer" onclick="closeLightbox()">
+        <img id="lightboxImg" src="" alt="QR Code" class="max-w-[80%] max-h-[50%] bg-white p-5 rounded-xl shadow-[0_0_50px_rgba(0,212,255,0.3)]">
+        <div id="lightboxTitle" class="text-ai-cyan text-2xl font-semibold mt-6"></div>
+        <div id="lightboxAddress" class="text-white font-mono text-sm mt-3 px-6 py-3 bg-white/10 rounded-lg select-all"></div>
+        <div class="text-gray-500 text-xs mt-4" data-i18n="clickToClose">Click para cerrar</div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="ai-bg.js"></script>
+  <script>
+    function openLightbox(imgSrc, title, address) {
+      const lightbox = document.getElementById('qrLightbox');
+      document.getElementById('lightboxImg').src = imgSrc;
+      document.getElementById('lightboxTitle').textContent = title;
+      document.getElementById('lightboxAddress').textContent = address;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      const lightbox = document.getElementById('qrLightbox');
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+  </script>
+</body>
+</html>

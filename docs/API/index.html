@@ -4,346 +4,411 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>API Reference - OhMyDialogSystem Wiki</title>
-  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
+          pageTitle: 'API Reference',
+          pageSubtitle: 'Documentacion completa de todas las clases publicas del addon OhMyDialogSystem.',
+          sectionMainClasses: 'Clases Principales',
+          llamaDesc: 'Interfaz de bajo nivel para llama.cpp. Carga modelos GGUF y genera texto.',
+          dialogueDesc: 'Orquestador principal del sistema de dialogos. Conecta todos los componentes.',
+          memoryDesc: 'Sistema de memorias persistentes con busqueda semantica.',
+          ttsDesc: 'Sintesis de voz con Piper TTS. Genera audio para dialogos.',
+          sectionResources: 'Resources (Godot Resources)',
+          colResource: 'Resource', colDescription: 'Descripcion', colUsage: 'Uso',
+          resNodeDesc: 'Datos de un nodo individual en el grafo de dialogo',
+          resNodeUsage: 'Interno, usado por DialogueGraph',
+          resCharDesc: 'Define la personalidad, background y estilo de un NPC',
+          resCharUsage: 'Un resource por personaje',
+          resWorldDesc: 'Contexto del mundo, lore, eventos actuales',
+          resWorldUsage: 'Uno o mas por escenario',
+          resGraphDesc: 'Grafo visual de nodos de dialogo',
+          resGraphUsage: 'Uno por conversacion/quest',
+          resPresetDesc: 'Configuracion de generacion (temperature, top_p, etc.)',
+          resPresetUsage: 'Presets reutilizables',
+          resVoiceDesc: 'Configuracion de voz para TTS',
+          resVoiceUsage: 'Un profile por personaje',
+          viewResourcesDocs: 'Ver documentacion completa de Resources',
+          sectionSignals: 'Signals Comunes',
+          colSignal: 'Signal', colParams: 'Parametros',
+          sigDialogueStarted: 'Emitido al iniciar un dialogo',
+          sigNpcStarted: 'El NPC comenzo a "pensar"',
+          sigToken: 'Cada token generado (streaming)',
+          sigNpcCompleted: 'Respuesta completa del NPC',
+          sigChoices: 'Opciones disponibles para el jugador',
+          sigEvent: 'Evento del grafo disparado',
+          sigDialogueEnded: 'Conversacion finalizada',
+          sigModelLoadingStarted: 'Inicio de carga del modelo',
+          sigModelLoadingCompleted: 'Modelo cargado y listo',
+          sigModelLoaded: 'Modelo cargado exitosamente',
+          sigGenStarted: 'Inicio de generacion',
+          sigGenToken: 'Token generado',
+          sigGenCompleted: 'Generacion completada',
+          sigGenError: 'Error durante generacion',
+          sectionExample: 'Ejemplo de Uso Completo',
+          backToHome: 'Volver a Home'
+        },
+        en: {
+          navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
+          pageTitle: 'API Reference',
+          pageSubtitle: 'Complete documentation of all public classes in the OhMyDialogSystem addon.',
+          sectionMainClasses: 'Main Classes',
+          llamaDesc: 'Low-level interface for llama.cpp. Loads GGUF models and generates text.',
+          dialogueDesc: 'Main orchestrator of the dialogue system. Connects all components.',
+          memoryDesc: 'Persistent memory system with semantic search.',
+          ttsDesc: 'Voice synthesis with Piper TTS. Generates audio for dialogues.',
+          sectionResources: 'Resources (Godot Resources)',
+          colResource: 'Resource', colDescription: 'Description', colUsage: 'Usage',
+          resNodeDesc: 'Data for an individual node in the dialogue graph',
+          resNodeUsage: 'Internal, used by DialogueGraph',
+          resCharDesc: 'Defines the personality, background and style of an NPC',
+          resCharUsage: 'One resource per character',
+          resWorldDesc: 'World context, lore, current events',
+          resWorldUsage: 'One or more per scenario',
+          resGraphDesc: 'Visual graph of dialogue nodes',
+          resGraphUsage: 'One per conversation/quest',
+          resPresetDesc: 'Generation configuration (temperature, top_p, etc.)',
+          resPresetUsage: 'Reusable presets',
+          resVoiceDesc: 'Voice configuration for TTS',
+          resVoiceUsage: 'One profile per character',
+          viewResourcesDocs: 'View complete Resources documentation',
+          sectionSignals: 'Common Signals',
+          colSignal: 'Signal', colParams: 'Parameters',
+          sigDialogueStarted: 'Emitted when starting a dialogue',
+          sigNpcStarted: 'The NPC started "thinking"',
+          sigToken: 'Each generated token (streaming)',
+          sigNpcCompleted: 'Complete NPC response',
+          sigChoices: 'Available options for the player',
+          sigEvent: 'Graph event triggered',
+          sigDialogueEnded: 'Conversation ended',
+          sigModelLoadingStarted: 'Model loading started',
+          sigModelLoadingCompleted: 'Model loaded and ready',
+          sigModelLoaded: 'Model loaded successfully',
+          sigGenStarted: 'Generation started',
+          sigGenToken: 'Token generated',
+          sigGenCompleted: 'Generation completed',
+          sigGenError: 'Error during generation',
+          sectionExample: 'Complete Usage Example',
+          backToHome: 'Back to Home'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) el.textContent = this.t[this.lang][key];
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
+    .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-
-  <div class="wiki-container">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
-        <div class="sidebar-logo">OhMyDialogSystem</div>
-        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+  <div class="flex min-h-screen relative z-10">
+    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">General</div>
-        <ul class="nav-links">
-          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
-        </ul>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Getting Started</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
-          <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
-          <li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">API Reference</div>
-        <ul class="nav-links">
-          <li><a href="index.html" class="active"><span class="icon">📚</span> Overview</a></li>
-          <li><a href="llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
-          <li><a href="dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
-          <li><a href="memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
-          <li><a href="tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
-          <li><a href="resources.html"><span class="icon">📄</span> Resources</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Technical</div>
-        <ul class="nav-links">
-          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
-          <li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
-          <li><a href="../Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
-          <li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
-          <li><a href="../Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li>
-          <li><a href="../Technical/localization.html"><span class="icon">🌐</span> Localization</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Guides</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/index.html"><span class="icon">📖</span> Overview</a></li>
-          <li><a href="../Guides/visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
-          <li><a href="../Guides/character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
-          <li><a href="../Guides/tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
-          <li><a href="../Guides/csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Examples</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
-          <li><a href="../Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
-          <li><a href="../Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">External Links</div>
-        <ul class="nav-links">
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
-          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li>
-        </ul>
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> General</div>
+          <ul><li><a href="../home.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3E0;</span> Home</a></li></ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <ul>
+            <li><a href="../Guides/quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="../Guides/installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="../Guides/first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <ul>
+            <li><a href="index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <ul>
+            <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <ul>
+            <li><a href="../Guides/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4D6;</span> Overview</a></li>
+            <li><a href="../Guides/visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+            <li><a href="../Guides/character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="../Guides/tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <main class="main-content">
-      <div class="breadcrumbs">
-        <a href="../index.html">Wiki</a> <span>/</span> <span>API Reference</span>
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>API Reference</span>
       </div>
 
-      <h1>API Reference</h1>
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">API Reference</span>
+        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
 
-      <p>Documentación completa de todas las clases públicas del addon OhMyDialogSystem.</p>
+      <p class="text-gray-400 mb-8" data-i18n="pageSubtitle">Documentacion completa de todas las clases publicas del addon OhMyDialogSystem.</p>
 
-      <hr>
+      <!-- Main Classes -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionMainClasses">Clases Principales</span>
+      </h2>
 
-      <h2>Clases Principales</h2>
+      <div class="grid md:grid-cols-2 gap-4 mb-12">
+        <a href="llama-interface.html" class="group p-6 rounded-xl border border-border-default bg-bg-card/50 hover:border-ai-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.2)] transition-all">
+          <div class="text-3xl mb-3">&#x1F999;</div>
+          <h3 class="text-lg font-bold text-ai-cyan mb-2 group-hover:text-white transition-colors">LlamaInterface</h3>
+          <p class="text-sm text-gray-400 mb-3" data-i18n="llamaDesc">Interfaz de bajo nivel para llama.cpp. Carga modelos GGUF y genera texto.</p>
+          <span class="inline-block px-2 py-1 text-xs rounded bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30">GDExtension</span>
+        </a>
 
-      <div class="feature-grid">
-        <div class="feature-card">
-          <span class="icon">🦙</span>
-          <h3><a href="llama-interface.html">LlamaInterface</a></h3>
-          <p>Interfaz de bajo nivel para llama.cpp. Carga modelos GGUF y genera texto.</p>
-          <p><span class="badge badge-cyan">GDExtension</span></p>
-        </div>
+        <a href="dialogue-manager.html" class="group p-6 rounded-xl border border-border-default bg-bg-card/50 hover:border-ai-purple hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] transition-all">
+          <div class="text-3xl mb-3">&#x1F4AC;</div>
+          <h3 class="text-lg font-bold text-ai-purple mb-2 group-hover:text-white transition-colors">DialogueManager</h3>
+          <p class="text-sm text-gray-400 mb-3" data-i18n="dialogueDesc">Orquestador principal del sistema de dialogos. Conecta todos los componentes.</p>
+          <span class="inline-block px-2 py-1 text-xs rounded bg-ai-purple/20 text-ai-purple border border-ai-purple/30">Core</span>
+        </a>
 
-        <div class="feature-card">
-          <span class="icon">💬</span>
-          <h3><a href="dialogue-manager.html">DialogueManager</a></h3>
-          <p>Orquestador principal del sistema de diálogos. Conecta todos los componentes.</p>
-          <p><span class="badge badge-purple">Core</span></p>
-        </div>
+        <a href="memory-manager.html" class="group p-6 rounded-xl border border-border-default bg-bg-card/50 hover:border-ai-green hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all">
+          <div class="text-3xl mb-3">&#x1F9E0;</div>
+          <h3 class="text-lg font-bold text-ai-green mb-2 group-hover:text-white transition-colors">MemoryManager</h3>
+          <p class="text-sm text-gray-400 mb-3" data-i18n="memoryDesc">Sistema de memorias persistentes con busqueda semantica.</p>
+          <span class="inline-block px-2 py-1 text-xs rounded bg-ai-green/20 text-ai-green border border-ai-green/30">Memory</span>
+        </a>
 
-        <div class="feature-card">
-          <span class="icon">🧠</span>
-          <h3><a href="memory-manager.html">MemoryManager</a></h3>
-          <p>Sistema de memorias persistentes con búsqueda semántica.</p>
-          <p><span class="badge badge-green">Memory</span></p>
-        </div>
-
-        <div class="feature-card">
-          <span class="icon">🔊</span>
-          <h3><a href="tts-manager.html">TTSManager</a></h3>
-          <p>Síntesis de voz con Piper TTS. Genera audio para diálogos.</p>
-          <p><span class="badge badge-orange">TTS</span></p>
-        </div>
+        <a href="tts-manager.html" class="group p-6 rounded-xl border border-border-default bg-bg-card/50 hover:border-ai-orange hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] transition-all">
+          <div class="text-3xl mb-3">&#x1F50A;</div>
+          <h3 class="text-lg font-bold text-ai-orange mb-2 group-hover:text-white transition-colors">TTSManager</h3>
+          <p class="text-sm text-gray-400 mb-3" data-i18n="ttsDesc">Sintesis de voz con Piper TTS. Genera audio para dialogos.</p>
+          <span class="inline-block px-2 py-1 text-xs rounded bg-ai-orange/20 text-ai-orange border border-ai-orange/30">TTS</span>
+        </a>
       </div>
 
-      <hr>
+      <!-- Resources -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionResources">Resources (Godot Resources)</span>
+      </h2>
 
-      <h2>Resources (Godot Resources)</h2>
+      <div class="overflow-x-auto mb-4">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colResource">Resource</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colDescription">Descripcion</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colUsage">Uso</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">DialogueNodeData</td><td class="py-3 px-4 text-gray-300" data-i18n="resNodeDesc">Datos de un nodo individual en el grafo de dialogo</td><td class="py-3 px-4 text-gray-400" data-i18n="resNodeUsage">Interno, usado por DialogueGraph</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">CharacterIdentity</td><td class="py-3 px-4 text-gray-300" data-i18n="resCharDesc">Define la personalidad, background y estilo de un NPC</td><td class="py-3 px-4 text-gray-400" data-i18n="resCharUsage">Un resource por personaje</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">WorldContext</td><td class="py-3 px-4 text-gray-300" data-i18n="resWorldDesc">Contexto del mundo, lore, eventos actuales</td><td class="py-3 px-4 text-gray-400" data-i18n="resWorldUsage">Uno o mas por escenario</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">DialogueGraph</td><td class="py-3 px-4 text-gray-300" data-i18n="resGraphDesc">Grafo visual de nodos de dialogo</td><td class="py-3 px-4 text-gray-400" data-i18n="resGraphUsage">Uno por conversacion/quest</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">AIPreset</td><td class="py-3 px-4 text-gray-300" data-i18n="resPresetDesc">Configuracion de generacion (temperature, top_p, etc.)</td><td class="py-3 px-4 text-gray-400" data-i18n="resPresetUsage">Presets reutilizables</td></tr>
+            <tr><td class="py-3 px-4 font-mono text-ai-purple">VoiceProfile</td><td class="py-3 px-4 text-gray-300" data-i18n="resVoiceDesc">Configuracion de voz para TTS</td><td class="py-3 px-4 text-gray-400" data-i18n="resVoiceUsage">Un profile por personaje</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Resource</th>
-            <th>Descripción</th>
-            <th>Uso</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>DialogueNodeData</code></td>
-            <td>Datos de un nodo individual en el grafo de diálogo</td>
-            <td>Interno, usado por DialogueGraph</td>
-          </tr>
-          <tr>
-            <td><code>CharacterIdentity</code></td>
-            <td>Define la personalidad, background y estilo de un NPC</td>
-            <td>Un resource por personaje</td>
-          </tr>
-          <tr>
-            <td><code>WorldContext</code></td>
-            <td>Contexto del mundo, lore, eventos actuales</td>
-            <td>Uno o más por escenario</td>
-          </tr>
-          <tr>
-            <td><code>DialogueGraph</code></td>
-            <td>Grafo visual de nodos de diálogo</td>
-            <td>Uno por conversación/quest</td>
-          </tr>
-          <tr>
-            <td><code>AIPreset</code></td>
-            <td>Configuración de generación (temperature, top_p, etc.)</td>
-            <td>Presets reutilizables</td>
-          </tr>
-          <tr>
-            <td><code>VoiceProfile</code></td>
-            <td>Configuración de voz para TTS</td>
-            <td>Un profile por personaje</td>
-          </tr>
-        </tbody>
-      </table>
+      <p class="mb-12"><a href="resources.html" class="text-ai-cyan hover:text-ai-pink transition-colors" data-i18n="viewResourcesDocs">Ver documentacion completa de Resources</a> &#x2192;</p>
 
-      <p><a href="resources.html">Ver documentación completa de Resources →</a></p>
+      <!-- Signals -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionSignals">Signals Comunes</span>
+      </h2>
 
-      <hr>
+      <h3 class="text-lg font-bold text-white mb-3">DialogueManager</h3>
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colSignal">Signal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colParams">Parametros</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colDescription">Descripcion</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">dialogue_started</td><td class="py-3 px-4 font-mono text-gray-400">graph: DialogueGraph</td><td class="py-3 px-4 text-gray-300" data-i18n="sigDialogueStarted">Emitido al iniciar un dialogo</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">npc_speaking</td><td class="py-3 px-4 font-mono text-gray-400">speaker, text, is_streaming</td><td class="py-3 px-4 text-gray-300" data-i18n="sigNpcStarted">El NPC comenzo a "pensar"</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">npc_response_token</td><td class="py-3 px-4 font-mono text-gray-400">token: String</td><td class="py-3 px-4 text-gray-300" data-i18n="sigToken">Cada token generado (streaming)</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">npc_response_completed</td><td class="py-3 px-4 font-mono text-gray-400">full_text: String</td><td class="py-3 px-4 text-gray-300" data-i18n="sigNpcCompleted">Respuesta completa del NPC</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">player_choices_available</td><td class="py-3 px-4 font-mono text-gray-400">choices: Array[Dictionary]</td><td class="py-3 px-4 text-gray-300" data-i18n="sigChoices">Opciones disponibles para el jugador</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">event_triggered</td><td class="py-3 px-4 font-mono text-gray-400">event_name, data: Dictionary</td><td class="py-3 px-4 text-gray-300" data-i18n="sigEvent">Evento del grafo disparado</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">dialogue_ended</td><td class="py-3 px-4 font-mono text-gray-400">reason: String</td><td class="py-3 px-4 text-gray-300" data-i18n="sigDialogueEnded">Conversacion finalizada</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">model_loading_started</td><td class="py-3 px-4 font-mono text-gray-400">model_path: String</td><td class="py-3 px-4 text-gray-300" data-i18n="sigModelLoadingStarted">Inicio de carga del modelo</td></tr>
+            <tr><td class="py-3 px-4 font-mono text-ai-green">model_loading_completed</td><td class="py-3 px-4 text-gray-500">-</td><td class="py-3 px-4 text-gray-300" data-i18n="sigModelLoadingCompleted">Modelo cargado y listo</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h2>Signals Comunes</h2>
+      <h3 class="text-lg font-bold text-white mb-3">LlamaInterface</h3>
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colSignal">Signal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colParams">Parametros</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="colDescription">Descripcion</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">model_loaded</td><td class="py-3 px-4 font-mono text-gray-400">info: Dictionary</td><td class="py-3 px-4 text-gray-300" data-i18n="sigModelLoaded">Modelo cargado exitosamente</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">generation_started</td><td class="py-3 px-4 text-gray-500">-</td><td class="py-3 px-4 text-gray-300" data-i18n="sigGenStarted">Inicio de generacion</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">token_generated</td><td class="py-3 px-4 font-mono text-gray-400">token: String</td><td class="py-3 px-4 text-gray-300" data-i18n="sigGenToken">Token generado</td></tr>
+            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-green">generation_completed</td><td class="py-3 px-4 font-mono text-gray-400">text: String</td><td class="py-3 px-4 text-gray-300" data-i18n="sigGenCompleted">Generacion completada</td></tr>
+            <tr><td class="py-3 px-4 font-mono text-ai-green">generation_error</td><td class="py-3 px-4 font-mono text-gray-400">error: String</td><td class="py-3 px-4 text-gray-300" data-i18n="sigGenError">Error durante generacion</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h3>DialogueManager</h3>
+      <!-- Example -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="sectionExample">Ejemplo de Uso Completo</span>
+      </h2>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Signal</th>
-            <th>Parámetros</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>dialogue_started</code></td>
-            <td>-</td>
-            <td>Emitido al iniciar un diálogo</td>
-          </tr>
-          <tr>
-            <td><code>npc_response_started</code></td>
-            <td>-</td>
-            <td>El NPC comenzó a "pensar"</td>
-          </tr>
-          <tr>
-            <td><code>token_generated</code></td>
-            <td><code>token: String</code></td>
-            <td>Cada token generado (streaming)</td>
-          </tr>
-          <tr>
-            <td><code>npc_response_completed</code></td>
-            <td><code>response: String</code></td>
-            <td>Respuesta completa del NPC</td>
-          </tr>
-          <tr>
-            <td><code>choices_available</code></td>
-            <td><code>choices: Array[String]</code></td>
-            <td>Opciones disponibles para el jugador</td>
-          </tr>
-          <tr>
-            <td><code>event_triggered</code></td>
-            <td><code>name: String, data: Dictionary</code></td>
-            <td>Evento del grafo disparado</td>
-          </tr>
-          <tr>
-            <td><code>dialogue_ended</code></td>
-            <td>-</td>
-            <td>Conversación finalizada</td>
-          </tr>
-        </tbody>
-      </table>
+      <pre class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-8 overflow-x-auto"><code><span class="text-ai-purple">extends</span> <span class="text-ai-cyan">Node</span>
 
-      <h3>LlamaInterface</h3>
+<span class="text-gray-500"># DialogueManager as child node (recommended) or @onready</span>
+<span class="text-ai-purple">@onready var</span> dialogue_manager: <span class="text-ai-cyan">DialogueManager</span> = $DialogueManager
 
-      <table>
-        <thead>
-          <tr>
-            <th>Signal</th>
-            <th>Parámetros</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>model_loaded</code></td>
-            <td><code>info: Dictionary</code></td>
-            <td>Modelo cargado exitosamente</td>
-          </tr>
-          <tr>
-            <td><code>generation_started</code></td>
-            <td>-</td>
-            <td>Inicio de generación</td>
-          </tr>
-          <tr>
-            <td><code>token_generated</code></td>
-            <td><code>token: String</code></td>
-            <td>Token generado</td>
-          </tr>
-          <tr>
-            <td><code>generation_completed</code></td>
-            <td><code>text: String</code></td>
-            <td>Generación completada</td>
-          </tr>
-          <tr>
-            <td><code>generation_error</code></td>
-            <td><code>error: String</code></td>
-            <td>Error durante generación</td>
-          </tr>
-        </tbody>
-      </table>
+<span class="text-gray-500"># Preloaded resources (or use @export to configure in editor)</span>
+<span class="text-ai-purple">var</span> merchant_graph := preload(<span class="text-ai-orange">"res://dialogues/merchant.tres"</span>)
+<span class="text-gray-500"># Note: merchant.tres has model_path = "user://models/mistral-7b-q4.gguf"</span>
+<span class="text-gray-500"># The model is loaded automatically when start_dialogue() is called</span>
 
-      <hr>
+<span class="text-ai-purple">func</span> <span class="text-ai-green">_ready</span>():
+    <span class="text-gray-500"># Configure character and world (or set via @export in editor)</span>
+    dialogue_manager.default_character = preload(<span class="text-ai-orange">"res://npcs/merchant.tres"</span>)
+    dialogue_manager.world_context = preload(<span class="text-ai-orange">"res://world/fantasy_world.tres"</span>)
 
-      <h2>Ejemplo de Uso Completo</h2>
-
-      <pre data-lang="GDSCRIPT"><code>extends Node
-
-var llama: LlamaInterface
-var dialogue_manager: DialogueManager
-var memory_manager: MemoryManager
-
-func _ready():
-    # Inicializar LLM
-    llama = LlamaInterface.new()
-    add_child(llama)
-
-    var err = llama.load_model("user://models/mistral-7b-q4.gguf", {
-        "n_ctx": 4096,
-        "n_gpu_layers": 0
-    })
-
-    if err != OK:
-        push_error("Failed to load model")
-        return
-
-    # Inicializar MemoryManager
-    memory_manager = MemoryManager.new()
-    add_child(memory_manager)
-
-    # Inicializar DialogueManager
-    dialogue_manager = DialogueManager.new()
-    dialogue_manager.set_llama_interface(llama)
-    dialogue_manager.set_memory_manager(memory_manager)
-    dialogue_manager.set_character(preload("res://npcs/merchant.tres"))
-    dialogue_manager.set_world_context(preload("res://world/fantasy_world.tres"))
-    add_child(dialogue_manager)
-
-    # Conectar signals
+    <span class="text-gray-500"># Connect signals</span>
     dialogue_manager.npc_response_completed.connect(_on_npc_response)
-    dialogue_manager.choices_available.connect(_on_choices)
+    dialogue_manager.player_choices_available.connect(_on_choices)
     dialogue_manager.event_triggered.connect(_on_event)
+    dialogue_manager.dialogue_ended.connect(_on_dialogue_ended)
 
-func start_conversation():
-    dialogue_manager.start_dialogue(preload("res://dialogues/merchant_greeting.tres"))
+    <span class="text-gray-500"># Optional: loading indicators</span>
+    dialogue_manager.model_loading_started.connect(_on_model_loading)
+    dialogue_manager.model_loading_completed.connect(_on_model_ready)
 
-func send_message(text: String):
+<span class="text-ai-purple">func</span> <span class="text-ai-green">start_conversation</span>():
+    <span class="text-gray-500"># Model loads automatically from DialogueGraph.model_path</span>
+    dialogue_manager.start_dialogue(merchant_graph, DialogueManager.DialogueMode.HYBRID)
+
+<span class="text-ai-purple">func</span> <span class="text-ai-green">send_message</span>(text: <span class="text-ai-cyan">String</span>):
     dialogue_manager.send_player_message(text)
 
-func _on_npc_response(response: String):
-    print("NPC: ", response)
+<span class="text-ai-purple">func</span> <span class="text-ai-green">select_choice</span>(index: <span class="text-ai-cyan">int</span>):
+    dialogue_manager.select_choice(index)
 
-func _on_choices(choices: Array[String]):
-    for i in choices.size():
-        print("[%d] %s" % [i + 1, choices[i]])
+<span class="text-ai-purple">func</span> <span class="text-ai-green">_on_npc_response</span>(response: <span class="text-ai-cyan">String</span>):
+    <span class="text-ai-purple">print</span>(<span class="text-ai-orange">"NPC: "</span>, response)
 
-func _on_event(event_name: String, data: Dictionary):
-    match event_name:
-        "open_shop":
+<span class="text-ai-purple">func</span> <span class="text-ai-green">_on_choices</span>(choices: <span class="text-ai-cyan">Array</span>[<span class="text-ai-cyan">Dictionary</span>]):
+    <span class="text-ai-purple">for</span> i <span class="text-ai-purple">in</span> choices.size():
+        <span class="text-ai-purple">print</span>(<span class="text-ai-orange">"[%d] %s"</span> % [i + <span class="text-ai-pink">1</span>, choices[i].text])
+
+<span class="text-ai-purple">func</span> <span class="text-ai-green">_on_event</span>(event_name: <span class="text-ai-cyan">String</span>, data: <span class="text-ai-cyan">Dictionary</span>):
+    <span class="text-ai-purple">match</span> event_name:
+        <span class="text-ai-orange">"open_shop"</span>:
             open_shop_ui()
-        "give_quest":
-            add_quest(data["quest_id"])</code></pre>
+        <span class="text-ai-orange">"give_quest"</span>:
+            add_quest(data[<span class="text-ai-orange">"quest_id"</span>])
 
-      <hr>
+<span class="text-ai-purple">func</span> <span class="text-ai-green">_on_dialogue_ended</span>(reason: <span class="text-ai-cyan">String</span>):
+    <span class="text-ai-purple">print</span>(<span class="text-ai-orange">"Dialogue ended: "</span>, reason)
 
-      <a href="../index.html">← Volver a Home</a>
+<span class="text-ai-purple">func</span> <span class="text-ai-green">_on_model_loading</span>(path: <span class="text-ai-cyan">String</span>):
+    show_loading_indicator()
 
-      <footer class="wiki-footer">
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+<span class="text-ai-purple">func</span> <span class="text-ai-green">_on_model_ready</span>():
+    hide_loading_indicator()</code></pre>
+
+      <!-- Back Link -->
+      <a href="../home.html" class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors mb-8">
+        <span>&#x2190;</span>
+        <span data-i18n="backToHome">Volver a Home</span>
+      </a>
+
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
-
   <script src="../ai-bg.js"></script>
 </body>
 </html>
