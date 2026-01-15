@@ -1,42 +1,116 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Installation - OhMyDialogSystem Wiki</title>
-
-  <!-- Tailwind CSS Play CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="../tailwind.config.js"></script>
-
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-  <!-- Base styles -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../base.css">
 
-  <!-- i18n System -->
   <script>
     const I18n = {
       lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
       t: {
         es: {
-          navInstallation: 'Instalación', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
           navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
-          pageTitle: 'Instalación',
-          comingSoon: 'Próximamente',
-          comingSoonDesc: 'Esta sección está en desarrollo.',
-          viewIssue: 'Ver issue #183'
+          pageTitle: 'Instalacion',
+          pageDesc: 'Guia completa para instalar OhMyDialogSystem en tu proyecto Godot.',
+          hRequirements: 'Requisitos',
+          hPlatforms: 'Plataformas Soportadas',
+          hInstall: 'Instalacion',
+          hVerify: 'Verificar Instalacion',
+          hStructure: 'Estructura del Addon',
+          hAutoload: 'AutoLoad Automatico',
+          reqGodot: 'Godot 4.5 o superior',
+          reqGodotDesc: 'El addon usa GDExtension con compatibilidad minima 4.5.',
+          reqRAM: '8GB+ RAM recomendado',
+          reqRAMDesc: 'Los modelos LLM consumen memoria significativa. Modelos pequeños (~2GB) funcionan con menos.',
+          reqGPU: 'GPU opcional',
+          reqGPUDesc: 'llama.cpp puede usar CPU. GPU acelera la generacion pero no es obligatorio.',
+          platWin: 'Windows x86_64',
+          platLinux: 'Linux x86_64',
+          platMac: 'macOS (Universal)',
+          stepDownload: 'Descargar el Addon',
+          stepDownloadDesc: 'Descarga la ultima version desde GitHub Releases.',
+          stepCopy: 'Copiar al Proyecto',
+          stepCopyDesc: 'Extrae el archivo y copia la carpeta addons/ohmydialog a tu proyecto.',
+          stepEnable: 'Activar el Plugin',
+          stepEnableDesc: 'Ve a Project -> Project Settings -> Plugins y activa "OhMyDialogSystem".',
+          stepRestart: 'Reiniciar Editor',
+          stepRestartDesc: 'Godot pedira reiniciar. Acepta para cargar el GDExtension.',
+          verifyToolbar: 'Boton AI en el Toolbar',
+          verifyToolbarDesc: 'Deberia aparecer un boton "AI" en la barra de herramientas del editor.',
+          verifyAutoload: 'AutoLoad Registrado',
+          verifyAutoloadDesc: 'AIServiceAutoload deberia aparecer en Project Settings -> AutoLoad.',
+          verifyConsole: 'Mensaje en Consola',
+          verifyConsoleDesc: 'Busca "OhMyDialogSystem: Plugin loaded" en la consola de Godot.',
+          structAI: 'APIs de HuggingFace, descarga de modelos, parseo GGUF',
+          structAutoload: 'Singleton AIServiceAutoload para runtime',
+          structCore: 'AIService, DialogueManager, ContextManager, ejecutores',
+          structEditor: 'DialogueGraphEditor, inspectors personalizados, ventanas',
+          structResources: 'CharacterIdentity, DialogueGraph, ModelConfig, AIPreset',
+          structGDExt: 'Binarios nativos de llama.cpp por plataforma',
+          autoloadTitle: 'Registro Automatico',
+          autoloadDesc: 'El plugin registra automaticamente el AutoLoad "AIServiceAutoload" al activarse. No necesitas configurarlo manualmente.',
+          autoloadNote: 'Si desactivas el plugin, el AutoLoad permanece registrado. Puedes eliminarlo manualmente en Project Settings -> AutoLoad si lo deseas.',
+          nextSteps: 'Siguientes Pasos',
+          nextQuickstart: 'Sigue la guia Quick Start para descargar un modelo y probar tu primera conversacion con IA.',
+          backToGuides: 'Volver a Guides',
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
           navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
           pageTitle: 'Installation',
-          comingSoon: 'Coming Soon',
-          comingSoonDesc: 'This section is under development.',
-          viewIssue: 'View issue #183'
+          pageDesc: 'Complete guide to install OhMyDialogSystem in your Godot project.',
+          hRequirements: 'Requirements',
+          hPlatforms: 'Supported Platforms',
+          hInstall: 'Installation',
+          hVerify: 'Verify Installation',
+          hStructure: 'Addon Structure',
+          hAutoload: 'Automatic AutoLoad',
+          reqGodot: 'Godot 4.5 or higher',
+          reqGodotDesc: 'The addon uses GDExtension with minimum compatibility 4.5.',
+          reqRAM: '8GB+ RAM recommended',
+          reqRAMDesc: 'LLM models consume significant memory. Small models (~2GB) work with less.',
+          reqGPU: 'GPU optional',
+          reqGPUDesc: 'llama.cpp can use CPU. GPU accelerates generation but is not required.',
+          platWin: 'Windows x86_64',
+          platLinux: 'Linux x86_64',
+          platMac: 'macOS (Universal)',
+          stepDownload: 'Download the Addon',
+          stepDownloadDesc: 'Download the latest version from GitHub Releases.',
+          stepCopy: 'Copy to Project',
+          stepCopyDesc: 'Extract the file and copy the addons/ohmydialog folder to your project.',
+          stepEnable: 'Enable the Plugin',
+          stepEnableDesc: 'Go to Project -> Project Settings -> Plugins and enable "OhMyDialogSystem".',
+          stepRestart: 'Restart Editor',
+          stepRestartDesc: 'Godot will ask to restart. Accept to load the GDExtension.',
+          verifyToolbar: 'AI Button in Toolbar',
+          verifyToolbarDesc: 'An "AI" button should appear in the editor toolbar.',
+          verifyAutoload: 'AutoLoad Registered',
+          verifyAutoloadDesc: 'AIServiceAutoload should appear in Project Settings -> AutoLoad.',
+          verifyConsole: 'Console Message',
+          verifyConsoleDesc: 'Look for "OhMyDialogSystem: Plugin loaded" in Godot console.',
+          structAI: 'HuggingFace APIs, model download, GGUF parsing',
+          structAutoload: 'AIServiceAutoload singleton for runtime',
+          structCore: 'AIService, DialogueManager, ContextManager, executors',
+          structEditor: 'DialogueGraphEditor, custom inspectors, windows',
+          structResources: 'CharacterIdentity, DialogueGraph, ModelConfig, AIPreset',
+          structGDExt: 'Native llama.cpp binaries per platform',
+          autoloadTitle: 'Automatic Registration',
+          autoloadDesc: 'The plugin automatically registers the "AIServiceAutoload" AutoLoad when enabled. No manual configuration needed.',
+          autoloadNote: 'If you disable the plugin, the AutoLoad remains registered. You can manually remove it in Project Settings -> AutoLoad if desired.',
+          nextSteps: 'Next Steps',
+          nextQuickstart: 'Follow the Quick Start guide to download a model and test your first AI conversation.',
+          backToGuides: 'Back to Guides',
         }
       },
       init() {
@@ -44,10 +118,7 @@
         document.documentElement.lang = this.lang;
         document.querySelectorAll('[data-i18n]').forEach(el => {
           const key = el.dataset.i18n;
-          if (this.t[this.lang][key]) {
-            if (el.dataset.i18nHtml) el.innerHTML = this.t[this.lang][key];
-            else el.textContent = this.t[this.lang][key];
-          }
+          if (this.t[this.lang][key]) el.textContent = this.t[this.lang][key];
         });
         document.querySelectorAll('[data-lang-switch]').forEach(btn => {
           const isActive = btn.dataset.langSwitch === this.lang;
@@ -71,86 +142,154 @@
   </script>
 
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
-    .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #0a0d12; }
-    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #a855f7, #00d4ff); border-radius: 4px; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
   </style>
 </head>
+
 <body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-
   <div class="flex min-h-screen relative z-10">
     <!-- Sidebar -->
-    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
-      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
-
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
+      </div>
       <div class="p-6 text-center border-b border-border-default">
-        <div class="w-16 h-16 mx-auto mb-4">
-          <img src="../logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]">
-        </div>
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
         <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
         <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
-
       <div class="px-6 py-3 border-b border-border-default flex gap-2">
-        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
-        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
-
       <div class="p-4">
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> General</div>
-          <ul><li><a href="../home.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3E0;</span> Home</a></li></ul>
-        </div>
-
-        <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
           <ul>
-            <li><a href="quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
-            <li><a href="installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalación</span></a></li>
-            <li><a href="first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
           </ul>
         </div>
-
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started
+          </div>
           <ul>
-            <li><a href="../API/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
-            <li><a href="../API/llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
-            <li><a href="../API/dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
-            <li><a href="../API/memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
-            <li><a href="../API/tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
-            <li><a href="../API/resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+            <li><a href="installation.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="quickstart.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="first-npc.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="visual-editor.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
           </ul>
         </div>
-
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
           <ul>
-            <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
-            <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
-            <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
-            <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
-            <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+            <li><a href="../API/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
           </ul>
         </div>
-
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
           <ul>
-            <li><a href="visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
-            <li><a href="character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
-            <li><a href="tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="../Technical/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span
+                  data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="../Technical/dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> Memory System</a></li>
+            <li><a href="../Technical/localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> <span data-i18n="navLocalization">Localizacion</span></a></li>
+            <li><a href="../Technical/gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
           </ul>
         </div>
-
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
           <ul>
-            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
-            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+            <li><a href="character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="csharp-bindings.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External
+          </div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
           </ul>
         </div>
       </div>
@@ -158,39 +297,244 @@
 
     <!-- Main Content -->
     <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <!-- Breadcrumb -->
       <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
         <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
         <span class="mx-2 text-ai-purple">/</span>
         <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Guides</a>
         <span class="mx-2 text-ai-purple">/</span>
-        <span data-i18n="navInstallation">Instalación</span>
+        <span data-i18n="navInstallation">Instalacion</span>
       </div>
 
-      <h1 class="text-4xl font-bold mb-8 pb-4 border-b border-border-default relative">
-        <span class="text-gradient-ai" data-i18n="pageTitle">Instalación</span>
-        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      <!-- Page Title -->
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">Instalacion</span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
       </h1>
 
-      <div class="relative p-12 rounded-xl border border-border-default mb-8 overflow-hidden text-center
-                  bg-gradient-to-br from-ai-cyan/5 to-ai-purple/5
-                  shadow-[0_0_30px_rgba(0,212,255,0.1),inset_0_0_60px_rgba(0,0,0,0.2)]">
-        <p class="text-6xl mb-4">&#x1F6A7;</p>
-        <h2 class="text-2xl font-bold text-ai-cyan mb-2" data-i18n="comingSoon">Próximamente</h2>
-        <p class="text-gray-400 mb-6" data-i18n="comingSoonDesc">Esta sección está en desarrollo.</p>
-        <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/183" target="_blank"
-           class="inline-block px-4 py-2 rounded-lg bg-ai-cyan/10 text-ai-cyan border border-ai-cyan hover:bg-ai-cyan/20 transition-colors">
-          <span data-i18n="viewIssue">Ver issue #183</span>
+      <!-- Description -->
+      <p class="text-gray-400 mb-8 text-lg" data-i18n="pageDesc">
+        Guia completa para instalar OhMyDialogSystem en tu proyecto Godot.
+      </p>
+
+      <!-- Requirements Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-cyan mb-4 flex items-center gap-2">
+          <span>&#x2699;</span>
+          <span data-i18n="hRequirements">Requisitos</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-5 rounded-xl border border-ai-green/30 bg-gradient-to-br from-ai-green/5 to-transparent">
+            <div class="text-2xl mb-2">&#x1F3AE;</div>
+            <h3 class="font-bold text-ai-green" data-i18n="reqGodot">Godot 4.5 o superior</h3>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="reqGodotDesc">El addon usa GDExtension con compatibilidad
+              minima 4.5.</p>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-purple/30 bg-gradient-to-br from-ai-purple/5 to-transparent">
+            <div class="text-2xl mb-2">&#x1F4BE;</div>
+            <h3 class="font-bold text-ai-purple" data-i18n="reqRAM">8GB+ RAM recomendado</h3>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="reqRAMDesc">Los modelos LLM consumen memoria significativa.
+              Modelos pequenos (~2GB) funcionan con menos.</p>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-cyan/30 bg-gradient-to-br from-ai-cyan/5 to-transparent">
+            <div class="text-2xl mb-2">&#x1F5A5;</div>
+            <h3 class="font-bold text-ai-cyan" data-i18n="reqGPU">GPU opcional</h3>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="reqGPUDesc">llama.cpp puede usar CPU. GPU acelera la
+              generacion pero no es obligatorio.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Platforms Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4 flex items-center gap-2">
+          <span>&#x1F4BB;</span>
+          <span data-i18n="hPlatforms">Plataformas Soportadas</span>
+        </h2>
+        <div class="flex flex-wrap gap-3">
+          <span
+            class="px-4 py-2 rounded-lg bg-ai-cyan/10 text-ai-cyan border border-ai-cyan/30 font-mono text-sm flex items-center gap-2">
+            <span>&#x1FA9F;</span>
+            <span data-i18n="platWin">Windows x86_64</span>
+          </span>
+          <span
+            class="px-4 py-2 rounded-lg bg-ai-orange/10 text-ai-orange border border-ai-orange/30 font-mono text-sm flex items-center gap-2">
+            <span>&#x1F427;</span>
+            <span data-i18n="platLinux">Linux x86_64</span>
+          </span>
+          <span
+            class="px-4 py-2 rounded-lg bg-gray-500/10 text-gray-400 border border-gray-500/30 font-mono text-sm flex items-center gap-2">
+            <span>&#x1F34E;</span>
+            <span data-i18n="platMac">macOS (Universal)</span>
+          </span>
+        </div>
+      </section>
+
+      <!-- Installation Steps -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-green mb-6 flex items-center gap-2">
+          <span>&#x1F4E6;</span>
+          <span data-i18n="hInstall">Instalacion</span>
+        </h2>
+        <div class="space-y-4">
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30 flex gap-4">
+            <div
+              class="w-10 h-10 rounded-full bg-ai-green/20 text-ai-green flex items-center justify-center font-bold shrink-0">
+              1</div>
+            <div>
+              <h3 class="font-bold text-ai-green" data-i18n="stepDownload">Descargar el Addon</h3>
+              <p class="text-gray-400 text-sm mt-1" data-i18n="stepDownloadDesc">Descarga la ultima version desde GitHub
+                Releases.</p>
+              <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/releases" target="_blank"
+                class="inline-block mt-2 px-3 py-1 text-xs rounded bg-ai-cyan/10 text-ai-cyan border border-ai-cyan/30 hover:bg-ai-cyan/20 transition-colors font-mono">
+                GitHub Releases &#x2192;
+              </a>
+            </div>
+          </div>
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30 flex gap-4">
+            <div
+              class="w-10 h-10 rounded-full bg-ai-purple/20 text-ai-purple flex items-center justify-center font-bold shrink-0">
+              2</div>
+            <div>
+              <h3 class="font-bold text-ai-purple" data-i18n="stepCopy">Copiar al Proyecto</h3>
+              <p class="text-gray-400 text-sm mt-1" data-i18n="stepCopyDesc">Extrae el archivo y copia la carpeta
+                addons/ohmydialog a tu proyecto.</p>
+              <div
+                class="mt-2 p-3 rounded-lg bg-bg-primary border border-border-default font-mono text-sm text-gray-300">
+                tu_proyecto/<br>
+                &#x2514;&#x2500; addons/<br>
+                &nbsp;&nbsp;&nbsp;&#x2514;&#x2500; ohmydialog/ &#x2190; <span class="text-ai-cyan">Copiar aqui</span>
+              </div>
+            </div>
+          </div>
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30 flex gap-4">
+            <div
+              class="w-10 h-10 rounded-full bg-ai-cyan/20 text-ai-cyan flex items-center justify-center font-bold shrink-0">
+              3</div>
+            <div>
+              <h3 class="font-bold text-ai-cyan" data-i18n="stepEnable">Activar el Plugin</h3>
+              <p class="text-gray-400 text-sm mt-1" data-i18n="stepEnableDesc">Ve a Project -> Project Settings ->
+                Plugins y activa "OhMyDialogSystem".</p>
+            </div>
+          </div>
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30 flex gap-4">
+            <div
+              class="w-10 h-10 rounded-full bg-ai-orange/20 text-ai-orange flex items-center justify-center font-bold shrink-0">
+              4</div>
+            <div>
+              <h3 class="font-bold text-ai-orange" data-i18n="stepRestart">Reiniciar Editor</h3>
+              <p class="text-gray-400 text-sm mt-1" data-i18n="stepRestartDesc">Godot pedira reiniciar. Acepta para
+                cargar el GDExtension.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Verify Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-pink mb-4 flex items-center gap-2">
+          <span>&#x2705;</span>
+          <span data-i18n="hVerify">Verificar Instalacion</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30">
+            <div class="text-xl mb-2 text-ai-green">&#x2713;</div>
+            <h3 class="font-bold text-white text-sm" data-i18n="verifyToolbar">Boton AI en el Toolbar</h3>
+            <p class="text-gray-500 text-xs mt-1" data-i18n="verifyToolbarDesc">Deberia aparecer un boton "AI" en la
+              barra de herramientas del editor.</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30">
+            <div class="text-xl mb-2 text-ai-green">&#x2713;</div>
+            <h3 class="font-bold text-white text-sm" data-i18n="verifyAutoload">AutoLoad Registrado</h3>
+            <p class="text-gray-500 text-xs mt-1" data-i18n="verifyAutoloadDesc">AIServiceAutoload deberia aparecer en
+              Project Settings -> AutoLoad.</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30">
+            <div class="text-xl mb-2 text-ai-green">&#x2713;</div>
+            <h3 class="font-bold text-white text-sm" data-i18n="verifyConsole">Mensaje en Consola</h3>
+            <p class="text-gray-500 text-xs mt-1" data-i18n="verifyConsoleDesc">Busca "OhMyDialogSystem: Plugin loaded"
+              en la consola de Godot.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- AutoLoad Info -->
+      <section class="mb-12">
+        <div
+          class="relative p-6 rounded-xl border border-ai-purple/30 bg-gradient-to-br from-ai-purple/5 to-transparent">
+          <div class="flex items-start gap-4">
+            <div class="text-3xl">&#x1F504;</div>
+            <div>
+              <h3 class="font-bold text-ai-purple" data-i18n="autoloadTitle">Registro Automatico</h3>
+              <p class="text-gray-300 text-sm mt-1" data-i18n="autoloadDesc">El plugin registra automaticamente el
+                AutoLoad "AIServiceAutoload" al activarse. No necesitas configurarlo manualmente.</p>
+              <p class="text-gray-500 text-xs mt-3" data-i18n="autoloadNote">Si desactivas el plugin, el AutoLoad
+                permanece registrado. Puedes eliminarlo manualmente en Project Settings -> AutoLoad si lo deseas.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Addon Structure -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-orange mb-4 flex items-center gap-2">
+          <span>&#x1F4C2;</span>
+          <span data-i18n="hStructure">Estructura del Addon</span>
+        </h2>
+        <div class="p-4 rounded-xl border border-border-default bg-bg-tertiary font-mono text-sm overflow-x-auto">
+          <div class="text-gray-400">addons/ohmydialog/</div>
+          <div class="pl-4 mt-2 space-y-1">
+            <div><span class="text-ai-cyan">ai/</span> <span class="text-gray-500 text-xs"
+                data-i18n="structAI">APIs de HuggingFace, descarga de modelos, parseo GGUF</span></div>
+            <div><span class="text-ai-purple">autoload/</span> <span class="text-gray-500 text-xs"
+                data-i18n="structAutoload">Singleton AIServiceAutoload para runtime</span></div>
+            <div><span class="text-ai-green">core/</span> <span class="text-gray-500 text-xs"
+                data-i18n="structCore">AIService, DialogueManager, ContextManager, ejecutores</span></div>
+            <div><span class="text-ai-orange">editor/</span> <span class="text-gray-500 text-xs"
+                data-i18n="structEditor">DialogueGraphEditor, inspectors personalizados, ventanas</span></div>
+            <div><span class="text-ai-pink">resources/</span> <span class="text-gray-500 text-xs"
+                data-i18n="structResources">CharacterIdentity, DialogueGraph, ModelConfig, AIPreset</span></div>
+            <div><span class="text-gray-400">gdextension/</span> <span class="text-gray-500 text-xs"
+                data-i18n="structGDExt">Binarios nativos de llama.cpp por plataforma</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Next Steps -->
+      <section class="mb-12">
+        <div class="relative p-6 rounded-xl border border-ai-cyan/30 bg-gradient-to-br from-ai-cyan/5 to-transparent">
+          <h3 class="font-bold text-ai-cyan mb-2" data-i18n="nextSteps">Siguientes Pasos</h3>
+          <p class="text-gray-300" data-i18n="nextQuickstart">Sigue la guia Quick Start para descargar un modelo y
+            probar tu primera conversacion con IA.</p>
+          <a href="quickstart.html"
+            class="inline-block mt-4 px-4 py-2 rounded-lg bg-ai-cyan/10 text-ai-cyan border border-ai-cyan hover:bg-ai-cyan/20 transition-colors font-mono">
+            Quick Start &#x2192;
+          </a>
+        </div>
+      </section>
+
+      <!-- Back Link -->
+      <div class="mt-12 pt-8 border-t border-border-default">
+        <a href="index.html"
+          class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors font-mono">
+          <span>&#x2190;</span>
+          <span data-i18n="backToGuides">Volver a Guides</span>
         </a>
       </div>
 
+      <!-- Footer -->
       <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
-        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
         <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
-
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>

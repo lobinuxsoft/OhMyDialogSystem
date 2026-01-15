@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
   <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../base.css">
 
   <script>
@@ -18,20 +21,110 @@
         es: {
           navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
           navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
-          pageTitle: 'Editor Visual', comingSoon: 'Proximamente',
-          comingSoonDesc: 'Esta seccion esta en desarrollo.', viewIssue: 'Ver issue #186',
-          meanwhileText: 'Mientras tanto, consulta la documentacion de',
+          pageTitle: 'Editor Visual',
+          pageDesc: 'El editor visual basado en nodos te permite crear dialogos complejos arrastrando y conectando nodos. Soporta los 11 tipos de nodos del sistema.',
+          hOverview: 'Vision General',
+          pOverview: 'DialogueGraphEditor es un editor visual integrado en Godot que usa GraphEdit para crear y editar grafos de dialogo. Cada grafo se guarda como un recurso .tres que puede ser ejecutado por el DialogueManager en runtime.',
+          tipTitle: 'Acceso rapido',
+          tipDesc: 'Haz doble click en un archivo .tres de DialogueGraph en el FileSystem para abrirlo en el editor.',
+          hToolbar: 'Barra de Herramientas',
+          hContextMenu: 'Menu Contextual (Click Derecho)',
+          hFeatures: 'Caracteristicas del Editor',
+          hKeyboard: 'Atajos de Teclado',
+          hWorkflow: 'Flujo de Trabajo Basico',
+          tblButton: 'Boton', tblAction: 'Accion', tblDesc: 'Descripcion',
+          tblOption: 'Opcion', tblFeature: 'Caracteristica', tblShortcut: 'Atajo',
+          btnNew: 'New', btnNewDesc: 'Crea un nuevo grafo con un StartNode. Abre dialogo para guardar.',
+          btnSave: 'Save', btnSaveDesc: 'Guarda el grafo actual. Si no tiene ruta, abre dialogo Save As.',
+          btnClear: 'Clear', btnClearDesc: 'Cierra el grafo actual sin guardar.',
+          btnAddNode: 'Add Node', btnAddNodeDesc: 'Menu desplegable con los 11 tipos de nodos disponibles.',
+          btnValidate: 'Validate', btnValidateDesc: 'Ejecuta validacion del grafo y muestra errores en consola.',
+          ctxAddNode: 'Add Node', ctxAddNodeDesc: 'Submenu con todos los tipos de nodos. Agrega en la posicion del click.',
+          ctxDelete: 'Delete Selected', ctxDeleteDesc: 'Elimina el nodo seleccionado y sus conexiones.',
+          ctxDuplicate: 'Duplicate Selected', ctxDuplicateDesc: 'Crea una copia del nodo seleccionado.',
+          ctxValidate: 'Validate Graph', ctxValidateDesc: 'Valida el grafo completo.',
+          ctxCenter: 'Center View', ctxCenterDesc: 'Centra la vista en el origen del grafo.',
+          featMinimap: 'Minimap', featMinimapDesc: 'Vista en miniatura del grafo completo en la esquina.',
+          featSnapping: 'Snapping', featSnappingDesc: 'Los nodos se alinean a una grilla de 20px.',
+          featZoom: 'Zoom', featZoomDesc: 'Controles de zoom con indicador de nivel.',
+          featInspector: 'Inspector', featInspectorDesc: 'Al seleccionar un nodo, sus propiedades aparecen en el Inspector de Godot.',
+          featConnections: 'Conexiones', featConnectionsDesc: 'Arrastra desde un slot de salida a uno de entrada para conectar.',
+          featDisconnect: 'Desconectar', featDisconnectDesc: 'Arrastra desde un slot conectado hacia afuera para desconectar.',
+          keyDelete: 'Delete', keyDeleteDesc: 'Eliminar nodos seleccionados',
+          keyScroll: 'Mouse Wheel', keyScrollDesc: 'Zoom in/out',
+          keyPan: 'Middle Mouse / Space + Drag', keyPanDesc: 'Desplazar vista',
+          keySelect: 'Click', keySelectDesc: 'Seleccionar nodo',
+          keyMulti: 'Shift + Click', keyMultiDesc: 'Seleccion multiple',
+          step1Title: '1. Crear Grafo',
+          step1Desc: 'Click en "New" para crear un grafo vacio con un StartNode.',
+          step2Title: '2. Agregar Nodos',
+          step2Desc: 'Usa el boton "Add Node" o click derecho para agregar nodos.',
+          step3Title: '3. Conectar Nodos',
+          step3Desc: 'Arrastra desde los slots de salida (derecha) hacia los de entrada (izquierda).',
+          step4Title: '4. Configurar Nodos',
+          step4Desc: 'Selecciona un nodo para editar sus propiedades en el Inspector.',
+          step5Title: '5. Validar',
+          step5Desc: 'Click en "Validate" para verificar errores antes de guardar.',
+          step6Title: '6. Guardar',
+          step6Desc: 'Click en "Save" para guardar el grafo como recurso .tres.',
+          nodeTypesTitle: 'Tipos de Nodos Disponibles',
+          nodeTypesDesc: 'El editor soporta los 11 tipos de nodos del sistema. Para documentacion detallada de cada tipo, consulta',
           dialogueNodesLink: 'Dialogue Nodes',
-          meanwhileText2: 'para conocer los tipos de nodos disponibles.'
+          backToGuides: 'Volver a Guides',
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
           navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
-          pageTitle: 'Visual Editor', comingSoon: 'Coming Soon',
-          comingSoonDesc: 'This section is under development.', viewIssue: 'View issue #186',
-          meanwhileText: 'Meanwhile, check the',
+          pageTitle: 'Visual Editor',
+          pageDesc: 'The node-based visual editor lets you create complex dialogues by dragging and connecting nodes. Supports all 11 system node types.',
+          hOverview: 'Overview',
+          pOverview: 'DialogueGraphEditor is a visual editor integrated into Godot that uses GraphEdit to create and edit dialogue graphs. Each graph is saved as a .tres resource that can be executed by DialogueManager at runtime.',
+          tipTitle: 'Quick Access',
+          tipDesc: 'Double-click a DialogueGraph .tres file in the FileSystem to open it in the editor.',
+          hToolbar: 'Toolbar',
+          hContextMenu: 'Context Menu (Right Click)',
+          hFeatures: 'Editor Features',
+          hKeyboard: 'Keyboard Shortcuts',
+          hWorkflow: 'Basic Workflow',
+          tblButton: 'Button', tblAction: 'Action', tblDesc: 'Description',
+          tblOption: 'Option', tblFeature: 'Feature', tblShortcut: 'Shortcut',
+          btnNew: 'New', btnNewDesc: 'Creates a new graph with a StartNode. Opens save dialog.',
+          btnSave: 'Save', btnSaveDesc: 'Saves current graph. If no path, opens Save As dialog.',
+          btnClear: 'Clear', btnClearDesc: 'Closes current graph without saving.',
+          btnAddNode: 'Add Node', btnAddNodeDesc: 'Dropdown menu with all 11 available node types.',
+          btnValidate: 'Validate', btnValidateDesc: 'Runs graph validation and shows errors in console.',
+          ctxAddNode: 'Add Node', ctxAddNodeDesc: 'Submenu with all node types. Adds at click position.',
+          ctxDelete: 'Delete Selected', ctxDeleteDesc: 'Deletes selected node and its connections.',
+          ctxDuplicate: 'Duplicate Selected', ctxDuplicateDesc: 'Creates a copy of the selected node.',
+          ctxValidate: 'Validate Graph', ctxValidateDesc: 'Validates the complete graph.',
+          ctxCenter: 'Center View', ctxCenterDesc: 'Centers view at graph origin.',
+          featMinimap: 'Minimap', featMinimapDesc: 'Thumbnail view of the complete graph in the corner.',
+          featSnapping: 'Snapping', featSnappingDesc: 'Nodes align to a 20px grid.',
+          featZoom: 'Zoom', featZoomDesc: 'Zoom controls with level indicator.',
+          featInspector: 'Inspector', featInspectorDesc: 'When selecting a node, its properties appear in Godot Inspector.',
+          featConnections: 'Connections', featConnectionsDesc: 'Drag from an output slot to an input slot to connect.',
+          featDisconnect: 'Disconnect', featDisconnectDesc: 'Drag from a connected slot outward to disconnect.',
+          keyDelete: 'Delete', keyDeleteDesc: 'Delete selected nodes',
+          keyScroll: 'Mouse Wheel', keyScrollDesc: 'Zoom in/out',
+          keyPan: 'Middle Mouse / Space + Drag', keyPanDesc: 'Pan view',
+          keySelect: 'Click', keySelectDesc: 'Select node',
+          keyMulti: 'Shift + Click', keyMultiDesc: 'Multi-select',
+          step1Title: '1. Create Graph',
+          step1Desc: 'Click "New" to create an empty graph with a StartNode.',
+          step2Title: '2. Add Nodes',
+          step2Desc: 'Use "Add Node" button or right-click to add nodes.',
+          step3Title: '3. Connect Nodes',
+          step3Desc: 'Drag from output slots (right) to input slots (left).',
+          step4Title: '4. Configure Nodes',
+          step4Desc: 'Select a node to edit its properties in the Inspector.',
+          step5Title: '5. Validate',
+          step5Desc: 'Click "Validate" to check for errors before saving.',
+          step6Title: '6. Save',
+          step6Desc: 'Click "Save" to save the graph as a .tres resource.',
+          nodeTypesTitle: 'Available Node Types',
+          nodeTypesDesc: 'The editor supports all 11 system node types. For detailed documentation of each type, see',
           dialogueNodesLink: 'Dialogue Nodes',
-          meanwhileText2: 'documentation to learn about available node types.'
+          backToGuides: 'Back to Guides',
         }
       },
       init() {
@@ -63,78 +156,162 @@
   </script>
 
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
-    .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
   </style>
 </head>
+
 <body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
   <div class="flex min-h-screen relative z-10">
-    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
-      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
+    <!-- Sidebar -->
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
+      </div>
       <div class="p-6 text-center border-b border-border-default">
-        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
         <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
         <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
       <div class="px-6 py-3 border-b border-border-default flex gap-2">
-        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
-        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
       <div class="p-4">
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> General</div>
-          <ul><li><a href="../home.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3E0;</span> Home</a></li></ul>
-        </div>
-        <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
           <ul>
-            <li><a href="quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
-            <li><a href="installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
-            <li><a href="first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started
+          </div>
           <ul>
-            <li><a href="../API/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
-            <li><a href="../API/llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
-            <li><a href="../API/dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
-            <li><a href="../API/memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
-            <li><a href="../API/tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
-            <li><a href="../API/resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+            <li><a href="installation.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="quickstart.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="first-npc.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="visual-editor.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
           <ul>
-            <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
-            <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
-            <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
-            <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
-            <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+            <li><a href="../API/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
           <ul>
-            <li><a href="index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4D6;</span> Overview</a></li>
-            <li><a href="visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
-            <li><a href="character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
-            <li><a href="tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="../Technical/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span
+                  data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="../Technical/dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> Memory System</a></li>
+            <li><a href="../Technical/localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> <span data-i18n="navLocalization">Localizacion</span></a></li>
+            <li><a href="../Technical/gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
           <ul>
-            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
-            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+            <li><a href="character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="csharp-bindings.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External
+          </div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
           </ul>
         </div>
       </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <!-- Breadcrumb -->
       <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
         <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
         <span class="mx-2 text-ai-purple">/</span>
@@ -143,33 +320,326 @@
         <span data-i18n="navVisualEditor">Editor Visual</span>
       </div>
 
-      <h1 class="text-4xl font-bold mb-8 pb-4 border-b border-border-default relative">
+      <!-- Page Title -->
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
         <span class="text-gradient-ai" data-i18n="pageTitle">Editor Visual</span>
-        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
       </h1>
 
-      <div class="relative p-12 rounded-xl border border-border-default mb-8 overflow-hidden text-center bg-gradient-to-br from-ai-cyan/5 to-ai-purple/5 shadow-[0_0_30px_rgba(0,212,255,0.1),inset_0_0_60px_rgba(0,0,0,0.2)]">
-        <p class="text-6xl mb-4">&#x1F6A7;</p>
-        <h2 class="text-2xl font-bold text-ai-cyan mb-2" data-i18n="comingSoon">Proximamente</h2>
-        <p class="text-gray-400 mb-6" data-i18n="comingSoonDesc">Esta seccion esta en desarrollo.</p>
-        <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/186" target="_blank" class="inline-block px-4 py-2 rounded-lg bg-ai-cyan/10 text-ai-cyan border border-ai-cyan hover:bg-ai-cyan/20 transition-colors">
-          <span data-i18n="viewIssue">Ver issue #186</span>
+      <!-- Description -->
+      <p class="text-gray-400 mb-8 text-lg" data-i18n="pageDesc">
+        El editor visual basado en nodos te permite crear dialogos complejos arrastrando y conectando nodos. Soporta los
+        11 tipos de nodos del sistema.
+      </p>
+
+      <!-- Overview Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-cyan mb-4" data-i18n="hOverview">Vision General</h2>
+        <p class="text-gray-300 mb-6" data-i18n="pOverview">
+          DialogueGraphEditor es un editor visual integrado en Godot que usa GraphEdit para crear y editar grafos de
+          dialogo. Cada grafo se guarda como un recurso .tres que puede ser ejecutado por el DialogueManager en runtime.
+        </p>
+
+        <!-- Tip Box -->
+        <div
+          class="relative p-6 rounded-xl border border-ai-cyan/30 bg-gradient-to-br from-ai-cyan/5 to-transparent mb-8">
+          <div class="flex items-start gap-4">
+            <div class="text-3xl">&#x1F4A1;</div>
+            <div>
+              <h3 class="font-bold text-ai-cyan mb-1" data-i18n="tipTitle">Acceso rapido</h3>
+              <p class="text-sm text-gray-300" data-i18n="tipDesc">Haz doble click en un archivo .tres de DialogueGraph
+                en el FileSystem para abrirlo en el editor.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Toolbar Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4 flex items-center gap-2">
+          <span>&#x1F6E0;</span>
+          <span data-i18n="hToolbar">Barra de Herramientas</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblButton">Boton</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-green" data-i18n="btnNew">New</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="btnNewDesc">Crea un nuevo grafo con un StartNode. Abre
+                  dialogo para guardar.</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="btnSave">Save</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="btnSaveDesc">Guarda el grafo actual. Si no tiene ruta,
+                  abre dialogo Save As.</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-error" data-i18n="btnClear">Clear</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="btnClearDesc">Cierra el grafo actual sin guardar.</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-purple" data-i18n="btnAddNode">Add Node</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="btnAddNodeDesc">Menu desplegable con los 11 tipos de
+                  nodos disponibles.</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-warning" data-i18n="btnValidate">Validate</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="btnValidateDesc">Ejecuta validacion del grafo y muestra
+                  errores en consola.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Context Menu Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-orange mb-4 flex items-center gap-2">
+          <span>&#x1F5B1;</span>
+          <span data-i18n="hContextMenu">Menu Contextual (Click Derecho)</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblOption">Opcion</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-purple" data-i18n="ctxAddNode">Add Node</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="ctxAddNodeDesc">Submenu con todos los tipos de nodos.
+                  Agrega en la posicion del click.</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-error" data-i18n="ctxDelete">Delete Selected</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="ctxDeleteDesc">Elimina el nodo seleccionado y sus
+                  conexiones.</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="ctxDuplicate">Duplicate Selected</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="ctxDuplicateDesc">Crea una copia del nodo seleccionado.
+                </td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-warning" data-i18n="ctxValidate">Validate Graph</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="ctxValidateDesc">Valida el grafo completo.</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-gray-400" data-i18n="ctxCenter">Center View</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="ctxCenterDesc">Centra la vista en el origen del grafo.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-green mb-4 flex items-center gap-2">
+          <span>&#x2728;</span>
+          <span data-i18n="hFeatures">Caracteristicas del Editor</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
+            class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x1F5FA;</span>
+              <code class="text-ai-cyan font-mono" data-i18n="featMinimap">Minimap</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featMinimapDesc">Vista en miniatura del grafo completo en la
+              esquina.</p>
+          </div>
+          <div
+            class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x1F9F2;</span>
+              <code class="text-ai-cyan font-mono" data-i18n="featSnapping">Snapping</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featSnappingDesc">Los nodos se alinean a una grilla de 20px.</p>
+          </div>
+          <div
+            class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x1F50D;</span>
+              <code class="text-ai-cyan font-mono" data-i18n="featZoom">Zoom</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featZoomDesc">Controles de zoom con indicador de nivel.</p>
+          </div>
+          <div
+            class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x1F50E;</span>
+              <code class="text-ai-cyan font-mono" data-i18n="featInspector">Inspector</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featInspectorDesc">Al seleccionar un nodo, sus propiedades
+              aparecen en el Inspector de Godot.</p>
+          </div>
+          <div
+            class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x1F517;</span>
+              <code class="text-ai-cyan font-mono" data-i18n="featConnections">Conexiones</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featConnectionsDesc">Arrastra desde un slot de salida a uno de
+              entrada para conectar.</p>
+          </div>
+          <div
+            class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x2702;</span>
+              <code class="text-ai-cyan font-mono" data-i18n="featDisconnect">Desconectar</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featDisconnectDesc">Arrastra desde un slot conectado hacia
+              afuera para desconectar.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Keyboard Shortcuts -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-pink mb-4 flex items-center gap-2">
+          <span>&#x2328;</span>
+          <span data-i18n="hKeyboard">Atajos de Teclado</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblShortcut">Atajo</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="keyDelete">Delete</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="keyDeleteDesc">Eliminar nodos seleccionados</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="keyScroll">Mouse Wheel</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="keyScrollDesc">Zoom in/out</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="keyPan">Middle Mouse / Space + Drag</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="keyPanDesc">Desplazar vista</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="keySelect">Click</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="keySelectDesc">Seleccionar nodo</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="keyMulti">Shift + Click</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="keyMultiDesc">Seleccion multiple</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Workflow Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+          <span>&#x1F4DD;</span>
+          <span data-i18n="hWorkflow">Flujo de Trabajo Basico</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="p-5 rounded-xl border border-ai-green/30 bg-gradient-to-br from-ai-green/5 to-transparent">
+            <div class="text-3xl text-ai-green mb-3">&#x2460;</div>
+            <h3 class="font-bold text-ai-green mb-2" data-i18n="step1Title">1. Crear Grafo</h3>
+            <p class="text-gray-400 text-sm" data-i18n="step1Desc">Click en "New" para crear un grafo vacio con un
+              StartNode.</p>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-purple/30 bg-gradient-to-br from-ai-purple/5 to-transparent">
+            <div class="text-3xl text-ai-purple mb-3">&#x2461;</div>
+            <h3 class="font-bold text-ai-purple mb-2" data-i18n="step2Title">2. Agregar Nodos</h3>
+            <p class="text-gray-400 text-sm" data-i18n="step2Desc">Usa el boton "Add Node" o click derecho para agregar
+              nodos.</p>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-cyan/30 bg-gradient-to-br from-ai-cyan/5 to-transparent">
+            <div class="text-3xl text-ai-cyan mb-3">&#x2462;</div>
+            <h3 class="font-bold text-ai-cyan mb-2" data-i18n="step3Title">3. Conectar Nodos</h3>
+            <p class="text-gray-400 text-sm" data-i18n="step3Desc">Arrastra desde los slots de salida (derecha) hacia
+              los de entrada (izquierda).</p>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-orange/30 bg-gradient-to-br from-ai-orange/5 to-transparent">
+            <div class="text-3xl text-ai-orange mb-3">&#x2463;</div>
+            <h3 class="font-bold text-ai-orange mb-2" data-i18n="step4Title">4. Configurar Nodos</h3>
+            <p class="text-gray-400 text-sm" data-i18n="step4Desc">Selecciona un nodo para editar sus propiedades en el
+              Inspector.</p>
+          </div>
+          <div class="p-5 rounded-xl border border-warning/30 bg-gradient-to-br from-warning/5 to-transparent">
+            <div class="text-3xl text-warning mb-3">&#x2464;</div>
+            <h3 class="font-bold text-warning mb-2" data-i18n="step5Title">5. Validar</h3>
+            <p class="text-gray-400 text-sm" data-i18n="step5Desc">Click en "Validate" para verificar errores antes de
+              guardar.</p>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-pink/30 bg-gradient-to-br from-ai-pink/5 to-transparent">
+            <div class="text-3xl text-ai-pink mb-3">&#x2465;</div>
+            <h3 class="font-bold text-ai-pink mb-2" data-i18n="step6Title">6. Guardar</h3>
+            <p class="text-gray-400 text-sm" data-i18n="step6Desc">Click en "Save" para guardar el grafo como recurso
+              .tres.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Node Types Reference -->
+      <section class="mb-12">
+        <div
+          class="relative p-6 rounded-xl border border-ai-purple/30 bg-gradient-to-br from-ai-purple/5 to-transparent">
+          <h3 class="font-bold text-ai-purple mb-2" data-i18n="nodeTypesTitle">Tipos de Nodos Disponibles</h3>
+          <p class="text-gray-300">
+            <span data-i18n="nodeTypesDesc">El editor soporta los 11 tipos de nodos del sistema. Para documentacion
+              detallada de cada tipo, consulta</span>
+            <a href="../Technical/dialogue-nodes.html"
+              class="text-ai-cyan hover:text-ai-pink transition-colors font-mono" data-i18n="dialogueNodesLink">Dialogue
+              Nodes</a>.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-green/20 text-ai-green border border-ai-green/30">StartNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-error/20 text-error border border-error/30">EndNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30">AIResponseNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-gray-500/20 text-gray-400 border border-gray-500/30">StaticResponseNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-warning/20 text-warning border border-warning/30">PlayerChoiceNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-orange/20 text-ai-orange border border-ai-orange/30">ConditionNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-purple/20 text-ai-purple border border-ai-purple/30">EventNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30">SetVariableNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-pink/20 text-ai-pink border border-ai-pink/30">JumpNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30">JumpToFreeNode</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-ai-purple/20 text-ai-purple border border-ai-purple/30">ReturnToGraphNode</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Back Link -->
+      <div class="mt-12 pt-8 border-t border-border-default">
+        <a href="index.html"
+          class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors font-mono">
+          <span>&#x2190;</span>
+          <span data-i18n="backToGuides">Volver a Guides</span>
         </a>
       </div>
 
-      <p class="text-gray-400 mb-8">
-        <span data-i18n="meanwhileText">Mientras tanto, consulta la documentacion de</span>
-        <a href="../Technical/dialogue-nodes.html" class="text-ai-cyan hover:text-ai-pink transition-colors" data-i18n="dialogueNodesLink">Dialogue Nodes</a>
-        <span data-i18n="meanwhileText2">para conocer los tipos de nodos disponibles.</span>
-      </p>
-
+      <!-- Footer -->
       <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
-        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
         <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>

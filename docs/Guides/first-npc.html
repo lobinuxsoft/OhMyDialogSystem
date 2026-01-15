@@ -16,16 +16,138 @@
       lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
       t: {
         es: {
-          navInstallation: 'Instalación', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
           navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
-          pageTitle: 'Tu Primer NPC', comingSoon: 'Próximamente',
-          comingSoonDesc: 'Esta sección está en desarrollo.', viewIssue: 'Ver issue #183'
+          pageTitle: 'Tu Primer NPC',
+          pageSubtitle: 'Aprende a crear un NPC con diálogos dinámicos generados por IA en menos de 10 minutos.',
+          prereqTitle: 'Prerrequisitos',
+          prereqDesc: 'Antes de comenzar, asegúrate de tener:',
+          prereq1: 'OhMyDialogSystem instalado correctamente',
+          prereq2: 'Un modelo GGUF descargado y cargado',
+          prereq3: 'Godot 4.5 o superior',
+          prereqTip: 'Si no tienes un modelo cargado, sigue primero la',
+          prereqTipLink: 'Guía de Inicio Rápido',
+          step1Title: 'Paso 1: Crear CharacterIdentity',
+          step1Desc: 'El recurso CharacterIdentity define la personalidad de tu NPC. Esta información se convierte en el system prompt que instruye al LLM.',
+          step1a: 'En FileSystem, click derecho y selecciona',
+          step1aNew: 'New Resource',
+          step1b: 'Busca y selecciona',
+          step1c: 'Guarda el archivo como',
+          step1d: 'Configura los campos en el Inspector:',
+          step1Col1: 'Campo', step1Col2: 'Valor de Ejemplo',
+          step1Name: 'Nombre del personaje',
+          step1Personality: 'Rasgos de personalidad',
+          step1Background: 'Historia del personaje',
+          step1Style: 'Estilo de habla',
+          step1Patterns: 'Muletillas o expresiones',
+          step1Knowledge: 'Temas que conoce',
+          step2Title: 'Paso 2: Script del NPC',
+          step2Desc: 'Crea un script que use AIService para generar respuestas dinámicas basadas en la identidad del personaje.',
+          step2Create: 'Crea un nuevo script llamado',
+          step2Explain: 'Este script hace lo siguiente:',
+          step2Exp1: 'Carga el CharacterIdentity como recurso',
+          step2Exp2: 'Obtiene el singleton AIService',
+          step2Exp3: 'Usa to_system_prompt() para generar instrucciones para el LLM',
+          step2Exp4: 'Llama a generate() con el mensaje del jugador',
+          step3Title: 'Paso 3: Configurar la Escena',
+          step3Desc: 'Configura la escena con un Area3D para detectar cuando el jugador se acerca al NPC.',
+          step3Struct: 'Estructura de la escena:',
+          step3a: 'Agrega el script',
+          step3aTo: 'al nodo raíz',
+          step3b: 'Asigna la ruta del CharacterIdentity en',
+          step3c: 'Conecta las señales',
+          step3cAnd: 'y',
+          step3cTo: 'para detectar al jugador',
+          step4Title: 'Paso 4: Probar el Diálogo',
+          step4Desc: 'Ejecuta la escena y prueba la interacción con tu NPC.',
+          step4a: 'Presiona F5 o ejecuta la escena',
+          step4b: 'Acércate al NPC para activar el diálogo',
+          step4c: 'Observa la consola para ver la respuesta generada',
+          step4d: 'Experimenta con diferentes mensajes de entrada',
+          step4Note: 'Nota',
+          step4NoteDesc: 'La primera generación puede tardar unos segundos mientras el modelo se calienta. Las siguientes respuestas serán más rápidas.',
+          tipsTitle: 'Tips para Mejores Resultados',
+          tip1Title: 'Personalidad Detallada',
+          tip1Desc: 'Cuanto más detallada sea la personalidad en CharacterIdentity, más consistentes serán las respuestas del NPC.',
+          tip2Title: 'Patrones de Habla',
+          tip2Desc: 'Usa speech_patterns para agregar muletillas o expresiones únicas que hagan al personaje memorable.',
+          tip3Title: 'Contexto del Mundo',
+          tip3Desc: 'Combina CharacterIdentity con WorldContext para que el NPC conozca el lore de tu juego.',
+          tip4Title: 'Presets de IA',
+          tip4Desc: 'Usa AIPreset para ajustar la creatividad (temperature) según el tipo de NPC.',
+          nextTitle: 'Siguientes Pasos',
+          nextDesc: 'Ahora que tienes tu primer NPC funcionando, explora estas guías:',
+          next1: 'Visual Editor - Crea diálogos ramificados',
+          next2: 'Character Identity - Personalización avanzada',
+          next3: 'Resources - Todos los recursos disponibles',
+          backToHome: 'Volver al Inicio'
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
           navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
-          pageTitle: 'Your First NPC', comingSoon: 'Coming Soon',
-          comingSoonDesc: 'This section is under development.', viewIssue: 'View issue #183'
+          pageTitle: 'Your First NPC',
+          pageSubtitle: 'Learn to create an NPC with AI-generated dynamic dialogues in less than 10 minutes.',
+          prereqTitle: 'Prerequisites',
+          prereqDesc: 'Before starting, make sure you have:',
+          prereq1: 'OhMyDialogSystem correctly installed',
+          prereq2: 'A GGUF model downloaded and loaded',
+          prereq3: 'Godot 4.5 or higher',
+          prereqTip: 'If you dont have a model loaded, first follow the',
+          prereqTipLink: 'Quick Start Guide',
+          step1Title: 'Step 1: Create CharacterIdentity',
+          step1Desc: 'The CharacterIdentity resource defines your NPCs personality. This information becomes the system prompt that instructs the LLM.',
+          step1a: 'In FileSystem, right-click and select',
+          step1aNew: 'New Resource',
+          step1b: 'Search and select',
+          step1c: 'Save the file as',
+          step1d: 'Configure the fields in the Inspector:',
+          step1Col1: 'Field', step1Col2: 'Example Value',
+          step1Name: 'Character name',
+          step1Personality: 'Personality traits',
+          step1Background: 'Character backstory',
+          step1Style: 'Speech style',
+          step1Patterns: 'Catchphrases or expressions',
+          step1Knowledge: 'Topics they know',
+          step2Title: 'Step 2: NPC Script',
+          step2Desc: 'Create a script that uses AIService to generate dynamic responses based on the character identity.',
+          step2Create: 'Create a new script called',
+          step2Explain: 'This script does the following:',
+          step2Exp1: 'Loads CharacterIdentity as a resource',
+          step2Exp2: 'Gets the AIService singleton',
+          step2Exp3: 'Uses to_system_prompt() to generate LLM instructions',
+          step2Exp4: 'Calls generate() with the player message',
+          step3Title: 'Step 3: Configure the Scene',
+          step3Desc: 'Set up the scene with an Area3D to detect when the player approaches the NPC.',
+          step3Struct: 'Scene structure:',
+          step3a: 'Add the script',
+          step3aTo: 'to the root node',
+          step3b: 'Assign the CharacterIdentity path in',
+          step3c: 'Connect the signals',
+          step3cAnd: 'and',
+          step3cTo: 'to detect the player',
+          step4Title: 'Step 4: Test the Dialogue',
+          step4Desc: 'Run the scene and test the interaction with your NPC.',
+          step4a: 'Press F5 or run the scene',
+          step4b: 'Approach the NPC to trigger dialogue',
+          step4c: 'Check the console to see the generated response',
+          step4d: 'Experiment with different input messages',
+          step4Note: 'Note',
+          step4NoteDesc: 'The first generation may take a few seconds while the model warms up. Subsequent responses will be faster.',
+          tipsTitle: 'Tips for Better Results',
+          tip1Title: 'Detailed Personality',
+          tip1Desc: 'The more detailed the personality in CharacterIdentity, the more consistent the NPC responses will be.',
+          tip2Title: 'Speech Patterns',
+          tip2Desc: 'Use speech_patterns to add unique catchphrases or expressions that make the character memorable.',
+          tip3Title: 'World Context',
+          tip3Desc: 'Combine CharacterIdentity with WorldContext so the NPC knows your games lore.',
+          tip4Title: 'AI Presets',
+          tip4Desc: 'Use AIPreset to adjust creativity (temperature) based on NPC type.',
+          nextTitle: 'Next Steps',
+          nextDesc: 'Now that you have your first NPC working, explore these guides:',
+          next1: 'Visual Editor - Create branching dialogues',
+          next2: 'Character Identity - Advanced customization',
+          next3: 'Resources - All available resources',
+          backToHome: 'Back to Home'
         }
       },
       init() {
@@ -59,6 +181,9 @@
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
     .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .code-block { background: linear-gradient(135deg, rgba(10,13,18,0.9) 0%, rgba(22,27,34,0.9) 100%); border: 1px solid #30363d; }
+    pre code { font-family: 'JetBrains Mono', monospace; }
+    .step-number { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg, #00d4ff 0%, #a855f7 100%); color: #0a0d12; font-weight: 700; font-size: 0.875rem; flex-shrink: 0; }
   </style>
 </head>
 <body class="min-h-screen">
@@ -83,9 +208,10 @@
         <div class="mb-6">
           <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
           <ul>
+            <li><a href="installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
             <li><a href="quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
-            <li><a href="installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalación</span></a></li>
             <li><a href="first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
           </ul>
         </div>
         <div class="mb-6">
@@ -105,6 +231,8 @@
             <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
             <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
             <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/memory-system.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> Memory System</a></li>
+            <li><a href="../Technical/localization.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F310;</span> <span data-i18n="navLocalization">Localizacion</span></a></li>
             <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
             <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
           </ul>
@@ -112,9 +240,9 @@
         <div class="mb-6">
           <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
           <ul>
-            <li><a href="visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
             <li><a href="character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
             <li><a href="tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="csharp-bindings.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
           </ul>
         </div>
         <div class="mb-6">
@@ -131,22 +259,312 @@
       <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
         <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
         <span class="mx-2 text-ai-purple">/</span>
-        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Guides</a>
+        <a href="quickstart.html" class="text-gray-400 hover:text-ai-cyan">Getting Started</a>
         <span class="mx-2 text-ai-purple">/</span>
         <span data-i18n="navFirstNpc">Tu Primer NPC</span>
       </div>
 
-      <h1 class="text-4xl font-bold mb-8 pb-4 border-b border-border-default relative">
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
         <span class="text-gradient-ai" data-i18n="pageTitle">Tu Primer NPC</span>
         <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
       </h1>
 
-      <div class="relative p-12 rounded-xl border border-border-default mb-8 overflow-hidden text-center bg-gradient-to-br from-ai-cyan/5 to-ai-purple/5 shadow-[0_0_30px_rgba(0,212,255,0.1),inset_0_0_60px_rgba(0,0,0,0.2)]">
-        <p class="text-6xl mb-4">&#x1F6A7;</p>
-        <h2 class="text-2xl font-bold text-ai-cyan mb-2" data-i18n="comingSoon">Próximamente</h2>
-        <p class="text-gray-400 mb-6" data-i18n="comingSoonDesc">Esta sección está en desarrollo.</p>
-        <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/183" target="_blank" class="inline-block px-4 py-2 rounded-lg bg-ai-cyan/10 text-ai-cyan border border-ai-cyan hover:bg-ai-cyan/20 transition-colors">
-          <span data-i18n="viewIssue">Ver issue #183</span>
+      <p class="text-lg text-gray-400 mb-12" data-i18n="pageSubtitle">Aprende a crear un NPC con dialogos dinamicos generados por IA en menos de 10 minutos.</p>
+
+      <!-- Prerequisites -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4" data-i18n="prereqTitle">Prerrequisitos</h2>
+        <p class="text-gray-400 mb-4" data-i18n="prereqDesc">Antes de comenzar, asegurate de tener:</p>
+        <ul class="space-y-2 mb-6">
+          <li class="flex items-center gap-3 text-gray-300">
+            <span class="text-node-start">&#x2714;</span>
+            <span data-i18n="prereq1">OhMyDialogSystem instalado correctamente</span>
+          </li>
+          <li class="flex items-center gap-3 text-gray-300">
+            <span class="text-node-start">&#x2714;</span>
+            <span data-i18n="prereq2">Un modelo GGUF descargado y cargado</span>
+          </li>
+          <li class="flex items-center gap-3 text-gray-300">
+            <span class="text-node-start">&#x2714;</span>
+            <span data-i18n="prereq3">Godot 4.5 o superior</span>
+          </li>
+        </ul>
+        <div class="p-4 rounded-lg bg-ai-cyan/10 border border-ai-cyan/30">
+          <span class="text-ai-cyan font-medium" data-i18n="prereqTip">Si no tienes un modelo cargado, sigue primero la</span>
+          <a href="quickstart.html" class="text-ai-cyan underline hover:text-ai-pink ml-1" data-i18n="prereqTipLink">Guia de Inicio Rapido</a>.
+        </div>
+      </section>
+
+      <!-- Step 1: Create CharacterIdentity -->
+      <section class="mb-12">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="step-number">1</div>
+          <h2 class="text-2xl font-bold text-ai-cyan" data-i18n="step1Title">Paso 1: Crear CharacterIdentity</h2>
+        </div>
+        <p class="text-gray-400 mb-6" data-i18n="step1Desc">El recurso CharacterIdentity define la personalidad de tu NPC. Esta informacion se convierte en el system prompt que instruye al LLM.</p>
+
+        <ol class="space-y-3 mb-6 text-gray-300">
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">1.</span>
+            <span><span data-i18n="step1a">En FileSystem, click derecho y selecciona</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-ai-cyan text-sm" data-i18n="step1aNew">New Resource</code></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">2.</span>
+            <span><span data-i18n="step1b">Busca y selecciona</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-ai-cyan text-sm">CharacterIdentity</code></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">3.</span>
+            <span><span data-i18n="step1c">Guarda el archivo como</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-ai-cyan text-sm">merchant.tres</code></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">4.</span>
+            <span data-i18n="step1d">Configura los campos en el Inspector:</span>
+          </li>
+        </ol>
+
+        <div class="overflow-x-auto rounded-lg border border-border-default">
+          <table class="w-full text-sm">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="text-left px-4 py-3 text-ai-cyan font-medium" data-i18n="step1Col1">Campo</th>
+                <th class="text-left px-4 py-3 text-ai-cyan font-medium" data-i18n="step1Col2">Valor de Ejemplo</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr>
+                <td class="px-4 py-3 font-mono text-ai-purple">character_name</td>
+                <td class="px-4 py-3 text-gray-300"><span data-i18n="step1Name">Nombre del personaje</span>: <code class="text-node-start">Marcus the Merchant</code></td>
+              </tr>
+              <tr class="bg-bg-tertiary/30">
+                <td class="px-4 py-3 font-mono text-ai-purple">personality</td>
+                <td class="px-4 py-3 text-gray-300"><span data-i18n="step1Personality">Rasgos de personalidad</span>: <code class="text-node-start">Friendly, shrewd, loves to haggle</code></td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-ai-purple">background</td>
+                <td class="px-4 py-3 text-gray-300"><span data-i18n="step1Background">Historia del personaje</span>: <code class="text-node-start">Former adventurer turned shopkeeper</code></td>
+              </tr>
+              <tr class="bg-bg-tertiary/30">
+                <td class="px-4 py-3 font-mono text-ai-purple">speech_style</td>
+                <td class="px-4 py-3 text-gray-300"><span data-i18n="step1Style">Estilo de habla</span>: <code class="text-node-start">MEDIEVAL</code></td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 font-mono text-ai-purple">speech_patterns</td>
+                <td class="px-4 py-3 text-gray-300"><span data-i18n="step1Patterns">Muletillas o expresiones</span>: <code class="text-node-start">["By the coin!", "A fair deal..."]</code></td>
+              </tr>
+              <tr class="bg-bg-tertiary/30">
+                <td class="px-4 py-3 font-mono text-ai-purple">knowledge</td>
+                <td class="px-4 py-3 text-gray-300"><span data-i18n="step1Knowledge">Temas que conoce</span>: <code class="text-node-start">Weapons, potions, local rumors</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Step 2: NPC Script -->
+      <section class="mb-12">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="step-number">2</div>
+          <h2 class="text-2xl font-bold text-ai-cyan" data-i18n="step2Title">Paso 2: Script del NPC</h2>
+        </div>
+        <p class="text-gray-400 mb-6" data-i18n="step2Desc">Crea un script que use AIService para generar respuestas dinamicas basadas en la identidad del personaje.</p>
+
+        <p class="text-gray-300 mb-4"><span data-i18n="step2Create">Crea un nuevo script llamado</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-ai-cyan text-sm">npc_merchant.gd</code>:</p>
+
+        <div class="code-block rounded-lg overflow-hidden mb-6">
+          <div class="flex items-center justify-between px-4 py-2 bg-bg-tertiary border-b border-border-default">
+            <span class="text-xs text-gray-500 font-mono">npc_merchant.gd</span>
+            <span class="text-xs text-ai-purple font-mono">GDScript</span>
+          </div>
+          <pre class="p-4 overflow-x-auto text-sm"><code class="text-gray-300">extends CharacterBody3D
+
+<span class="text-ai-purple">@export_file</span>(<span class="text-node-start">"*.tres"</span>) <span class="text-ai-cyan">var</span> character_identity_path: String
+
+<span class="text-ai-cyan">var</span> _character: CharacterIdentity
+<span class="text-ai-cyan">var</span> _ai_service: AIService
+<span class="text-ai-cyan">var</span> _player_nearby: <span class="text-ai-purple">bool</span> = <span class="text-node-end">false</span>
+
+
+<span class="text-ai-cyan">func</span> _ready() -> <span class="text-ai-purple">void</span>:
+    <span class="text-gray-500"># Load character identity resource</span>
+    _character = <span class="text-ai-purple">load</span>(character_identity_path)
+
+    <span class="text-gray-500"># Get AIService singleton</span>
+    _ai_service = AIService.get_singleton()
+
+    <span class="text-ai-cyan">if</span> _character == <span class="text-node-end">null</span>:
+        <span class="text-ai-purple">push_error</span>(<span class="text-node-start">"CharacterIdentity not found!"</span>)
+
+
+<span class="text-ai-cyan">func</span> _input(event: InputEvent) -> <span class="text-ai-purple">void</span>:
+    <span class="text-ai-cyan">if</span> event.is_action_pressed(<span class="text-node-start">"interact"</span>) <span class="text-ai-cyan">and</span> _player_nearby:
+        <span class="text-gray-500"># Start dialogue with a greeting</span>
+        talk_to_player(<span class="text-node-start">"Hello, what do you have for sale?"</span>)
+
+
+<span class="text-ai-cyan">func</span> talk_to_player(player_message: String) -> <span class="text-ai-purple">void</span>:
+    <span class="text-ai-cyan">if</span> <span class="text-ai-cyan">not</span> _ai_service.is_model_loaded():
+        <span class="text-ai-purple">push_error</span>(<span class="text-node-start">"No model loaded!"</span>)
+        <span class="text-ai-cyan">return</span>
+
+    <span class="text-gray-500"># Build the prompt with character identity</span>
+    <span class="text-ai-cyan">var</span> system_prompt = _character.to_system_prompt()
+    <span class="text-ai-cyan">var</span> llama = _ai_service.get_llama()
+
+    <span class="text-gray-500"># Generate response</span>
+    <span class="text-ai-cyan">var</span> response = llama.generate(player_message, system_prompt)
+
+    <span class="text-ai-purple">print</span>(<span class="text-node-start">"[%s]: %s"</span> % [_character.character_name, response])
+
+
+<span class="text-ai-cyan">func</span> _on_detection_area_body_entered(body: Node3D) -> <span class="text-ai-purple">void</span>:
+    <span class="text-ai-cyan">if</span> body.is_in_group(<span class="text-node-start">"player"</span>):
+        _player_nearby = <span class="text-node-start">true</span>
+
+
+<span class="text-ai-cyan">func</span> _on_detection_area_body_exited(body: Node3D) -> <span class="text-ai-purple">void</span>:
+    <span class="text-ai-cyan">if</span> body.is_in_group(<span class="text-node-start">"player"</span>):
+        _player_nearby = <span class="text-node-end">false</span></code></pre>
+        </div>
+
+        <p class="text-gray-400 mb-3" data-i18n="step2Explain">Este script hace lo siguiente:</p>
+        <ul class="space-y-2 text-gray-300">
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple">&#x25B8;</span>
+            <span data-i18n="step2Exp1">Carga el CharacterIdentity como recurso</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple">&#x25B8;</span>
+            <span data-i18n="step2Exp2">Obtiene el singleton AIService</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple">&#x25B8;</span>
+            <span><span data-i18n="step2Exp3">Usa to_system_prompt() para generar instrucciones para el LLM</span></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple">&#x25B8;</span>
+            <span><span data-i18n="step2Exp4">Llama a generate() con el mensaje del jugador</span></span>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Step 3: Configure Scene -->
+      <section class="mb-12">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="step-number">3</div>
+          <h2 class="text-2xl font-bold text-ai-cyan" data-i18n="step3Title">Paso 3: Configurar la Escena</h2>
+        </div>
+        <p class="text-gray-400 mb-6" data-i18n="step3Desc">Configura la escena con un Area3D para detectar cuando el jugador se acerca al NPC.</p>
+
+        <p class="text-gray-300 mb-4" data-i18n="step3Struct">Estructura de la escena:</p>
+        <div class="code-block rounded-lg overflow-hidden mb-6">
+          <pre class="p-4 overflow-x-auto text-sm"><code class="text-gray-300"><span class="text-ai-cyan">Merchant</span> (CharacterBody3D)
+  <span class="text-ai-purple">&#x2514;</span> MeshInstance3D <span class="text-gray-500"># Visual representation</span>
+  <span class="text-ai-purple">&#x2514;</span> CollisionShape3D <span class="text-gray-500"># Physics collision</span>
+  <span class="text-ai-purple">&#x2514;</span> <span class="text-node-event">DetectionArea</span> (Area3D)
+      <span class="text-ai-purple">&#x2514;</span> CollisionShape3D <span class="text-gray-500"># Interaction range (SphereShape3D, radius ~3m)</span></code></pre>
+        </div>
+
+        <ol class="space-y-3 text-gray-300">
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">1.</span>
+            <span><span data-i18n="step3a">Agrega el script</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-ai-cyan text-sm">npc_merchant.gd</code> <span data-i18n="step3aTo">al nodo raiz</span></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">2.</span>
+            <span><span data-i18n="step3b">Asigna la ruta del CharacterIdentity en</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-ai-cyan text-sm">character_identity_path</code></span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">3.</span>
+            <span><span data-i18n="step3c">Conecta las senales</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-node-event text-sm">body_entered</code> <span data-i18n="step3cAnd">y</span> <code class="px-2 py-0.5 rounded bg-bg-tertiary text-node-event text-sm">body_exited</code> <span data-i18n="step3cTo">para detectar al jugador</span></span>
+          </li>
+        </ol>
+      </section>
+
+      <!-- Step 4: Test -->
+      <section class="mb-12">
+        <div class="flex items-center gap-4 mb-6">
+          <div class="step-number">4</div>
+          <h2 class="text-2xl font-bold text-ai-cyan" data-i18n="step4Title">Paso 4: Probar el Dialogo</h2>
+        </div>
+        <p class="text-gray-400 mb-6" data-i18n="step4Desc">Ejecuta la escena y prueba la interaccion con tu NPC.</p>
+
+        <ol class="space-y-3 mb-6 text-gray-300">
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">1.</span>
+            <span data-i18n="step4a">Presiona F5 o ejecuta la escena</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">2.</span>
+            <span data-i18n="step4b">Acercate al NPC para activar el dialogo</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">3.</span>
+            <span data-i18n="step4c">Observa la consola para ver la respuesta generada</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-ai-purple font-mono">4.</span>
+            <span data-i18n="step4d">Experimenta con diferentes mensajes de entrada</span>
+          </li>
+        </ol>
+
+        <div class="p-4 rounded-lg bg-node-choice/10 border border-node-choice/30">
+          <p class="text-node-choice font-medium mb-1" data-i18n="step4Note">Nota</p>
+          <p class="text-gray-400 text-sm" data-i18n="step4NoteDesc">La primera generacion puede tardar unos segundos mientras el modelo se calienta. Las siguientes respuestas seran mas rapidas.</p>
+        </div>
+      </section>
+
+      <!-- Tips -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-6" data-i18n="tipsTitle">Tips para Mejores Resultados</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-lg bg-bg-tertiary border border-border-default">
+            <p class="text-ai-cyan font-medium mb-2" data-i18n="tip1Title">Personalidad Detallada</p>
+            <p class="text-gray-400 text-sm" data-i18n="tip1Desc">Cuanto mas detallada sea la personalidad en CharacterIdentity, mas consistentes seran las respuestas del NPC.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-bg-tertiary border border-border-default">
+            <p class="text-ai-cyan font-medium mb-2" data-i18n="tip2Title">Patrones de Habla</p>
+            <p class="text-gray-400 text-sm" data-i18n="tip2Desc">Usa speech_patterns para agregar muletillas o expresiones unicas que hagan al personaje memorable.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-bg-tertiary border border-border-default">
+            <p class="text-ai-cyan font-medium mb-2" data-i18n="tip3Title">Contexto del Mundo</p>
+            <p class="text-gray-400 text-sm" data-i18n="tip3Desc">Combina CharacterIdentity con WorldContext para que el NPC conozca el lore de tu juego.</p>
+          </div>
+          <div class="p-4 rounded-lg bg-bg-tertiary border border-border-default">
+            <p class="text-ai-cyan font-medium mb-2" data-i18n="tip4Title">Presets de IA</p>
+            <p class="text-gray-400 text-sm" data-i18n="tip4Desc">Usa AIPreset para ajustar la creatividad (temperature) segun el tipo de NPC.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Next Steps -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4" data-i18n="nextTitle">Siguientes Pasos</h2>
+        <p class="text-gray-400 mb-6" data-i18n="nextDesc">Ahora que tienes tu primer NPC funcionando, explora estas guias:</p>
+        <ul class="space-y-3">
+          <li>
+            <a href="visual-editor.html" class="flex items-center gap-3 text-gray-300 hover:text-ai-cyan transition-colors">
+              <span class="text-ai-purple">&#x25B8;</span>
+              <span data-i18n="next1">Visual Editor - Crea dialogos ramificados</span>
+            </a>
+          </li>
+          <li>
+            <a href="character-identity.html" class="flex items-center gap-3 text-gray-300 hover:text-ai-cyan transition-colors">
+              <span class="text-ai-purple">&#x25B8;</span>
+              <span data-i18n="next2">Character Identity - Personalizacion avanzada</span>
+            </a>
+          </li>
+          <li>
+            <a href="../API/resources.html" class="flex items-center gap-3 text-gray-300 hover:text-ai-cyan transition-colors">
+              <span class="text-ai-purple">&#x25B8;</span>
+              <span data-i18n="next3">Resources - Todos los recursos disponibles</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <div class="text-center">
+        <a href="../home.html" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-ai-cyan/10 text-ai-cyan border border-ai-cyan hover:bg-ai-cyan/20 transition-colors">
+          &#x2190; <span data-i18n="backToHome">Volver al Inicio</span>
         </a>
       </div>
 

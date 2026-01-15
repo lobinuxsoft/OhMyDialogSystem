@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
   <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../base.css">
 
   <script>
@@ -18,14 +21,112 @@
         es: {
           navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
           navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
-          pageTitle: 'Character Identity', comingSoon: 'Proximamente',
-          comingSoonDesc: 'Esta seccion esta en desarrollo.', viewIssue: 'Ver issue #186'
+          pageTitle: 'Character Identity',
+          pageDesc: 'Define la identidad y personalidad de tus NPCs. Este recurso contiene toda la informacion necesaria para que la IA genere dialogos consistentes con la personalidad del personaje.',
+          hOverview: 'Vision General',
+          pOverview: 'CharacterIdentity es un Resource de Godot que encapsula la personalidad completa de un NPC. Cuando el LLM genera respuestas, usa el metodo to_system_prompt() para convertir estos datos en instrucciones que guian su comportamiento.',
+          tipTitle: 'Flujo de datos',
+          tipDesc: 'CharacterIdentity -> to_system_prompt() -> LlamaInterface -> Respuesta con personalidad',
+          hIdentity: 'Grupo: Identity',
+          hPersonality: 'Grupo: Personality',
+          hKnowledge: 'Grupo: Knowledge & Motivations',
+          hSocial: 'Grupo: Social',
+          hSpeechStyles: 'Estilos de Habla (SpeechStyle)',
+          hMethods: 'Metodos Principales',
+          hUsage: 'Ejemplo de Uso',
+          tblProperty: 'Propiedad', tblType: 'Tipo', tblDesc: 'Descripcion',
+          tblStyle: 'Estilo', tblEffect: 'Efecto en el dialogo',
+          tblMethod: 'Metodo', tblReturn: 'Retorno',
+          propId: 'Identificador unico del personaje (para saves y referencias)',
+          propName: 'Nombre visible en dialogos',
+          propPortrait: 'Textura opcional para UI',
+          propPersonality: 'Rasgos de personalidad y tendencias',
+          propBackground: 'Historia, origen y experiencias',
+          propSpeechStyle: 'Preset de estilo de habla',
+          propSpeechPatterns: 'Patrones de habla personalizados',
+          propKnowledge: 'Temas que el personaje conoce',
+          propGoals: 'Objetivos del personaje',
+          propFears: 'Miedos y cosas que evita',
+          propSecrets: 'Informacion oculta',
+          propRelationships: 'Diccionario character_id -> descripcion',
+          propExamples: 'Dialogos de ejemplo que muestran su voz',
+          styleCasual: 'Relajado, usa contracciones e informalidad',
+          styleFormal: 'Profesional, gramatica correcta',
+          styleMedieval: 'Arcaico, usa "vos", "habeis", etc.',
+          styleScientific: 'Tecnico, terminologia precisa',
+          styleStreet: 'Jerga callejera, expresiones coloquiales',
+          stylePoetic: 'Metaforico, lenguaje florido',
+          styleMilitary: 'Directo, oraciones cortas',
+          styleChildish: 'Simple, jugueton',
+          styleElderly: 'Sabio, pausado, usa proverbios',
+          styleRobotic: 'Mecanico, literal, sin emociones',
+          methodPrompt: 'Convierte los datos a system prompt para el LLM',
+          methodDict: 'Serializa a diccionario para JSON/storage',
+          methodFromDict: 'Crea CharacterIdentity desde diccionario',
+          methodValid: 'Verifica si tiene datos minimos requeridos',
+          methodSummary: 'Resumen corto para debugging',
+          methodTokens: 'Estima tokens que usara el prompt (~4 chars/token)',
+          codeComment1: '# Crear una identidad de personaje',
+          codeComment2: '# Configurar identidad',
+          codeComment3: '# Configurar personalidad',
+          codeComment4: '# Conocimiento y motivaciones',
+          codeComment5: '# Usar con DialogueManager',
+          backToGuides: 'Volver a Guides',
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
           navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
-          pageTitle: 'Character Identity', comingSoon: 'Coming Soon',
-          comingSoonDesc: 'This section is under development.', viewIssue: 'View issue #186'
+          pageTitle: 'Character Identity',
+          pageDesc: 'Define the identity and personality of your NPCs. This resource contains all the information needed for the AI to generate dialogues consistent with the character personality.',
+          hOverview: 'Overview',
+          pOverview: 'CharacterIdentity is a Godot Resource that encapsulates the complete personality of an NPC. When the LLM generates responses, it uses the to_system_prompt() method to convert this data into instructions that guide its behavior.',
+          tipTitle: 'Data Flow',
+          tipDesc: 'CharacterIdentity -> to_system_prompt() -> LlamaInterface -> Personality-driven response',
+          hIdentity: 'Group: Identity',
+          hPersonality: 'Group: Personality',
+          hKnowledge: 'Group: Knowledge & Motivations',
+          hSocial: 'Group: Social',
+          hSpeechStyles: 'Speech Styles (SpeechStyle)',
+          hMethods: 'Main Methods',
+          hUsage: 'Usage Example',
+          tblProperty: 'Property', tblType: 'Type', tblDesc: 'Description',
+          tblStyle: 'Style', tblEffect: 'Effect on dialogue',
+          tblMethod: 'Method', tblReturn: 'Return',
+          propId: 'Unique character identifier (for saves and references)',
+          propName: 'Display name shown in dialogues',
+          propPortrait: 'Optional texture for UI',
+          propPersonality: 'Personality traits and tendencies',
+          propBackground: 'History, origin and experiences',
+          propSpeechStyle: 'Speech style preset',
+          propSpeechPatterns: 'Custom speech patterns',
+          propKnowledge: 'Topics the character knows about',
+          propGoals: 'Character goals',
+          propFears: 'Fears and things to avoid',
+          propSecrets: 'Hidden information',
+          propRelationships: 'Dictionary character_id -> description',
+          propExamples: 'Example dialogues showing their voice',
+          styleCasual: 'Relaxed, uses contractions and informal language',
+          styleFormal: 'Professional, proper grammar',
+          styleMedieval: 'Archaic, uses "thee", "thou", "hath"',
+          styleScientific: 'Technical, precise terminology',
+          styleStreet: 'Street slang, colloquial expressions',
+          stylePoetic: 'Metaphorical, flowery language',
+          styleMilitary: 'Direct, short sentences',
+          styleChildish: 'Simple, playful',
+          styleElderly: 'Wise, slow-paced, uses proverbs',
+          styleRobotic: 'Mechanical, literal, no emotions',
+          methodPrompt: 'Converts data to system prompt for LLM',
+          methodDict: 'Serializes to dictionary for JSON/storage',
+          methodFromDict: 'Creates CharacterIdentity from dictionary',
+          methodValid: 'Checks if minimum required data exists',
+          methodSummary: 'Short summary for debugging',
+          methodTokens: 'Estimates tokens the prompt will use (~4 chars/token)',
+          codeComment1: '# Create a character identity',
+          codeComment2: '# Configure identity',
+          codeComment3: '# Configure personality',
+          codeComment4: '# Knowledge and motivations',
+          codeComment5: '# Use with DialogueManager',
+          backToGuides: 'Back to Guides',
         }
       },
       init() {
@@ -57,78 +158,162 @@
   </script>
 
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
-    .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
   </style>
 </head>
+
 <body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
   <div class="flex min-h-screen relative z-10">
-    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
-      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
+    <!-- Sidebar -->
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
+      </div>
       <div class="p-6 text-center border-b border-border-default">
-        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
         <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
         <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
       <div class="px-6 py-3 border-b border-border-default flex gap-2">
-        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
-        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
       <div class="p-4">
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> General</div>
-          <ul><li><a href="../home.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3E0;</span> Home</a></li></ul>
-        </div>
-        <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
           <ul>
-            <li><a href="quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
-            <li><a href="installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
-            <li><a href="first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started
+          </div>
           <ul>
-            <li><a href="../API/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
-            <li><a href="../API/llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
-            <li><a href="../API/dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
-            <li><a href="../API/memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
-            <li><a href="../API/tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
-            <li><a href="../API/resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+            <li><a href="installation.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="quickstart.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="first-npc.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="visual-editor.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
           <ul>
-            <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
-            <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
-            <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
-            <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
-            <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+            <li><a href="../API/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
           <ul>
-            <li><a href="index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4D6;</span> Overview</a></li>
-            <li><a href="visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
-            <li><a href="character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
-            <li><a href="tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="../Technical/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span
+                  data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="../Technical/dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> Memory System</a></li>
+            <li><a href="../Technical/localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> <span data-i18n="navLocalization">Localizacion</span></a></li>
+            <li><a href="../Technical/gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
           <ul>
-            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
-            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+            <li><a href="character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="csharp-bindings.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External
+          </div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
           </ul>
         </div>
       </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <!-- Breadcrumb -->
       <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
         <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
         <span class="mx-2 text-ai-purple">/</span>
@@ -137,27 +322,370 @@
         <span>Character Identity</span>
       </div>
 
-      <h1 class="text-4xl font-bold mb-8 pb-4 border-b border-border-default relative">
+      <!-- Page Title -->
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
         <span class="text-gradient-ai" data-i18n="pageTitle">Character Identity</span>
-        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
       </h1>
 
-      <div class="relative p-12 rounded-xl border border-border-default mb-8 overflow-hidden text-center bg-gradient-to-br from-ai-cyan/5 to-ai-purple/5 shadow-[0_0_30px_rgba(0,212,255,0.1),inset_0_0_60px_rgba(0,0,0,0.2)]">
-        <p class="text-6xl mb-4">&#x1F6A7;</p>
-        <h2 class="text-2xl font-bold text-ai-cyan mb-2" data-i18n="comingSoon">Proximamente</h2>
-        <p class="text-gray-400 mb-6" data-i18n="comingSoonDesc">Esta seccion esta en desarrollo.</p>
-        <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/186" target="_blank" class="inline-block px-4 py-2 rounded-lg bg-ai-cyan/10 text-ai-cyan border border-ai-cyan hover:bg-ai-cyan/20 transition-colors">
-          <span data-i18n="viewIssue">Ver issue #186</span>
+      <!-- Description -->
+      <p class="text-gray-400 mb-8 text-lg" data-i18n="pageDesc">
+        Define la identidad y personalidad de tus NPCs. Este recurso contiene toda la informacion necesaria para que la
+        IA genere dialogos consistentes con la personalidad del personaje.
+      </p>
+
+      <!-- Overview Section -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-cyan mb-4" data-i18n="hOverview">Vision General</h2>
+        <p class="text-gray-300 mb-6" data-i18n="pOverview">
+          CharacterIdentity es un Resource de Godot que encapsula la personalidad completa de un NPC. Cuando el LLM
+          genera respuestas, usa el metodo to_system_prompt() para convertir estos datos en instrucciones que guian su
+          comportamiento.
+        </p>
+
+        <!-- Tip Box -->
+        <div
+          class="relative p-6 rounded-xl border border-ai-cyan/30 bg-gradient-to-br from-ai-cyan/5 to-transparent mb-8">
+          <div class="flex items-start gap-4">
+            <div class="text-3xl">&#x1F4A1;</div>
+            <div>
+              <h3 class="font-bold text-ai-cyan mb-1" data-i18n="tipTitle">Flujo de datos</h3>
+              <code class="text-sm text-gray-300 font-mono" data-i18n="tipDesc">CharacterIdentity -> to_system_prompt()
+                -> LlamaInterface -> Respuesta con personalidad</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Identity Group -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4 flex items-center gap-2">
+          <span>&#x1F4CB;</span>
+          <span data-i18n="hIdentity">Grupo: Identity</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblProperty">Propiedad</th>
+                <th class="px-4 py-3 text-left text-ai-purple font-mono" data-i18n="tblType">Tipo</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">character_id</td>
+                <td class="px-4 py-3 font-mono text-gray-400">String</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propId">Identificador unico del personaje (para saves y
+                  referencias)</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">character_name</td>
+                <td class="px-4 py-3 font-mono text-gray-400">String</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propName">Nombre visible en dialogos</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">portrait</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Texture2D</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propPortrait">Textura opcional para UI</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Personality Group -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4 flex items-center gap-2">
+          <span>&#x1F3AD;</span>
+          <span data-i18n="hPersonality">Grupo: Personality</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblProperty">Propiedad</th>
+                <th class="px-4 py-3 text-left text-ai-purple font-mono" data-i18n="tblType">Tipo</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">personality</td>
+                <td class="px-4 py-3 font-mono text-gray-400">String</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propPersonality">Rasgos de personalidad y tendencias</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">background</td>
+                <td class="px-4 py-3 font-mono text-gray-400">String</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propBackground">Historia, origen y experiencias</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">speech_style</td>
+                <td class="px-4 py-3 font-mono text-gray-400">SpeechStyle</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propSpeechStyle">Preset de estilo de habla</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">speech_patterns</td>
+                <td class="px-4 py-3 font-mono text-gray-400">String</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propSpeechPatterns">Patrones de habla personalizados</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Knowledge Group -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4 flex items-center gap-2">
+          <span>&#x1F9E0;</span>
+          <span data-i18n="hKnowledge">Grupo: Knowledge & Motivations</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblProperty">Propiedad</th>
+                <th class="px-4 py-3 text-left text-ai-purple font-mono" data-i18n="tblType">Tipo</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">knowledge</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Array[String]</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propKnowledge">Temas que el personaje conoce</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">goals</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Array[String]</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propGoals">Objetivos del personaje</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">fears</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Array[String]</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propFears">Miedos y cosas que evita</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">secrets</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Array[String]</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propSecrets">Informacion oculta</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Social Group -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4 flex items-center gap-2">
+          <span>&#x1F465;</span>
+          <span data-i18n="hSocial">Grupo: Social</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblProperty">Propiedad</th>
+                <th class="px-4 py-3 text-left text-ai-purple font-mono" data-i18n="tblType">Tipo</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">relationships</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Dictionary</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propRelationships">Diccionario character_id ->
+                  descripcion</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">example_dialogues</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Array[String]</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="propExamples">Dialogos de ejemplo que muestran su voz
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Speech Styles -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-orange mb-4 flex items-center gap-2">
+          <span>&#x1F5E3;</span>
+          <span data-i18n="hSpeechStyles">Estilos de Habla (SpeechStyle)</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">CASUAL</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleCasual">Relajado, usa contracciones e informalidad</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">FORMAL</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleFormal">Profesional, gramatica correcta</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">MEDIEVAL</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleMedieval">Arcaico, usa "vos", "habeis", etc.</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">SCIENTIFIC</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleScientific">Tecnico, terminologia precisa</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">STREET</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleStreet">Jerga callejera, expresiones coloquiales</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">POETIC</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="stylePoetic">Metaforico, lenguaje florido</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">MILITARY</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleMilitary">Directo, oraciones cortas</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">CHILDISH</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleChildish">Simple, jugueton</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">ELDERLY</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleElderly">Sabio, pausado, usa proverbios</p>
+          </div>
+          <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors">
+            <code class="text-ai-cyan font-mono">ROBOTIC</code>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="styleRobotic">Mecanico, literal, sin emociones</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Methods -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-green mb-4 flex items-center gap-2">
+          <span>&#x1F527;</span>
+          <span data-i18n="hMethods">Metodos Principales</span>
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm border border-border-default rounded-lg overflow-hidden">
+            <thead class="bg-bg-tertiary">
+              <tr>
+                <th class="px-4 py-3 text-left text-ai-cyan font-mono" data-i18n="tblMethod">Metodo</th>
+                <th class="px-4 py-3 text-left text-ai-purple font-mono" data-i18n="tblReturn">Retorno</th>
+                <th class="px-4 py-3 text-left text-gray-400" data-i18n="tblDesc">Descripcion</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border-default">
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">to_system_prompt()</td>
+                <td class="px-4 py-3 font-mono text-gray-400">String</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="methodPrompt">Convierte los datos a system prompt para el
+                  LLM</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">to_dict()</td>
+                <td class="px-4 py-3 font-mono text-gray-400">Dictionary</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="methodDict">Serializa a diccionario para JSON/storage
+                </td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">from_dict(dict)</td>
+                <td class="px-4 py-3 font-mono text-gray-400">CharacterIdentity</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="methodFromDict">Crea CharacterIdentity desde diccionario
+                </td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">is_valid()</td>
+                <td class="px-4 py-3 font-mono text-gray-400">bool</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="methodValid">Verifica si tiene datos minimos requeridos
+                </td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">get_summary()</td>
+                <td class="px-4 py-3 font-mono text-gray-400">String</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="methodSummary">Resumen corto para debugging</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-cyan">estimate_tokens()</td>
+                <td class="px-4 py-3 font-mono text-gray-400">int</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="methodTokens">Estima tokens que usara el prompt (~4
+                  chars/token)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Usage Example -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-pink mb-4 flex items-center gap-2">
+          <span>&#x1F4DD;</span>
+          <span data-i18n="hUsage">Ejemplo de Uso</span>
+        </h2>
+        <div class="relative rounded-xl border border-border-default bg-bg-tertiary overflow-hidden">
+          <div class="absolute top-0 right-0 bg-gradient-to-l from-ai-cyan to-ai-purple text-bg-primary text-xs px-3 py-1 rounded-bl-lg font-mono font-bold">
+            GDScript
+          </div>
+          <pre class="p-6 pt-10 overflow-x-auto text-sm font-mono text-gray-300 leading-relaxed"><code><span class="text-gray-500"># Crear una identidad de personaje</span>
+<span class="text-ai-purple">var</span> blacksmith = <span class="text-ai-cyan">CharacterIdentity</span>.new()
+
+<span class="text-gray-500"># Configurar identidad</span>
+blacksmith.character_id = <span class="text-ai-green">"blacksmith_01"</span>
+blacksmith.character_name = <span class="text-ai-green">"Grondar"</span>
+blacksmith.portrait = <span class="text-ai-cyan">preload</span>(<span class="text-ai-green">"res://portraits/grondar.png"</span>)
+
+<span class="text-gray-500"># Configurar personalidad</span>
+blacksmith.personality = <span class="text-ai-green">"Gruñon pero con buen corazon. Perfeccionista con su trabajo."</span>
+blacksmith.background = <span class="text-ai-green">"Ex-soldado que perdio su brazo en batalla. Ahora forja armas."</span>
+blacksmith.speech_style = <span class="text-ai-cyan">CharacterIdentity</span>.SpeechStyle.<span class="text-ai-orange">MILITARY</span>
+blacksmith.speech_patterns = <span class="text-ai-green">"Usa metaforas de batalla. Dice 'muchacho' a menudo."</span>
+
+<span class="text-gray-500"># Conocimiento y motivaciones</span>
+blacksmith.knowledge = [<span class="text-ai-green">"forja"</span>, <span class="text-ai-green">"metales"</span>, <span class="text-ai-green">"guerra del norte"</span>, <span class="text-ai-green">"armas legendarias"</span>]
+blacksmith.goals = [<span class="text-ai-green">"forjar su obra maestra"</span>, <span class="text-ai-green">"encontrar aprendiz digno"</span>]
+blacksmith.fears = [<span class="text-ai-green">"perder su otro brazo"</span>, <span class="text-ai-green">"ser olvidado"</span>]
+blacksmith.secrets = [<span class="text-ai-green">"Sabe donde esta la Espada del Rey"</span>]
+
+<span class="text-gray-500"># Relaciones</span>
+blacksmith.relationships = {
+    <span class="text-ai-green">"mayor_01"</span>: <span class="text-ai-green">"Viejo amigo de guerra, le debe la vida"</span>,
+    <span class="text-ai-green">"merchant_01"</span>: <span class="text-ai-green">"Rival comercial, desconfia de el"</span>
+}
+
+<span class="text-gray-500"># Ejemplos de dialogo</span>
+blacksmith.example_dialogues = [
+    <span class="text-ai-green">"Escucha, muchacho, el acero no miente."</span>,
+    <span class="text-ai-green">"Esta espada? Tardare tres lunas. La perfeccion no se apura."</span>
+]
+
+<span class="text-gray-500"># Usar con DialogueManager</span>
+<span class="text-ai-purple">var</span> dialogue_manager = <span class="text-ai-cyan">DialogueManager</span>.new()
+dialogue_manager.character_identity = blacksmith
+dialogue_manager.start_dialogue()</code></pre>
+        </div>
+      </section>
+
+      <!-- Back Link -->
+      <div class="mt-12 pt-8 border-t border-border-default">
+        <a href="index.html"
+          class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors font-mono">
+          <span>&#x2190;</span>
+          <span data-i18n="backToGuides">Volver a Guides</span>
         </a>
       </div>
 
+      <!-- Footer -->
       <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
-        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
         <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>
