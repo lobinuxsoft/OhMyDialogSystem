@@ -80,6 +80,16 @@
           quickNavTech: 'Documentación Técnica',
           quickNavGuides: 'Guías Prácticas',
           infoText: 'Para una guía completa de instalación y configuración, visita',
+          // Roadmap
+          roadmapTitle: 'Roadmap',
+          roadmapLoading: 'Cargando datos del roadmap...',
+          roadmapUpdatedFrom: 'Datos actualizados desde el',
+          roadmapProjectBoard: 'Project Board en GitHub',
+          roadmapPending: 'Pendientes',
+          roadmapCompleted: 'Completadas',
+          roadmapNoTasks: 'No hay tareas registradas para este milestone.',
+          roadmapTasksOf: 'tareas completadas en',
+          roadmapMilestones: 'milestones',
           // Donate
           supportTitle: 'Apoya el Proyecto',
           supportDesc: 'Si este proyecto te resulta útil, considera apoyar su desarrollo:',
@@ -112,6 +122,16 @@
           quickNavTech: 'Technical Docs',
           quickNavGuides: 'Practical Guides',
           infoText: 'For a complete installation and setup guide, visit',
+          // Roadmap
+          roadmapTitle: 'Roadmap',
+          roadmapLoading: 'Loading roadmap data...',
+          roadmapUpdatedFrom: 'Data updated from',
+          roadmapProjectBoard: 'Project Board on GitHub',
+          roadmapPending: 'Pending',
+          roadmapCompleted: 'Completed',
+          roadmapNoTasks: 'No tasks registered for this milestone.',
+          roadmapTasksOf: 'tasks completed in',
+          roadmapMilestones: 'milestones',
           // Donate
           supportTitle: 'Support the Project',
           supportDesc: 'If you find this project useful, consider supporting its development:',
@@ -481,6 +501,58 @@ func start_conversation() -&gt; void:
         <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-primary px-4 text-ai-purple text-xs">&#x2726;</span>
       </div>
 
+      <!-- Roadmap Section -->
+      <h2 class="text-2xl font-semibold text-ai-cyan border-b border-border-default pb-2 mb-6 mt-8" data-i18n="roadmapTitle">Roadmap</h2>
+
+      <p id="roadmap-summary" class="text-gray-400 text-sm mb-4" data-i18n="roadmapLoading">Cargando datos del roadmap...</p>
+
+      <div id="milestone-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <!-- Milestones se cargan dinámicamente -->
+        <div class="p-4 rounded-xl border border-border-default bg-bg-card opacity-50 animate-pulse">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-semibold text-gray-400">Cargando...</span>
+          </div>
+          <div class="h-1.5 bg-gray-700 rounded-full overflow-hidden mb-2">
+            <div class="h-full bg-gradient-to-r from-ai-cyan to-ai-purple w-0"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info callout -->
+      <div class="p-4 rounded-r-lg border-l-4 border-ai-cyan bg-ai-cyan/5 mb-8">
+        <div class="text-xs font-mono text-ai-cyan mb-2 tracking-widest">&#x2139; INFO</div>
+        <p class="text-gray-400 text-sm">
+          <span data-i18n="roadmapUpdatedFrom">Datos actualizados desde el</span>
+          <a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="text-ai-cyan hover:text-ai-pink" data-i18n="roadmapProjectBoard">Project Board en GitHub</a>.
+          <span id="roadmap-updated" class="text-xs opacity-70 ml-2"></span>
+        </p>
+      </div>
+
+      <!-- Milestone Lightbox -->
+      <div id="milestoneLightbox" class="fixed inset-0 bg-black/90 z-[100] hidden items-center justify-center p-8">
+        <div class="bg-bg-card border border-ai-cyan rounded-xl max-w-xl w-full max-h-[80vh] overflow-hidden shadow-[0_0_50px_rgba(0,212,255,0.3)]">
+          <div class="p-5 bg-gradient-to-r from-ai-cyan/10 to-ai-purple/10 border-b border-border-default flex justify-between items-center">
+            <span id="lightboxMilestoneTitle" class="text-xl font-semibold text-ai-cyan">Milestone</span>
+            <button onclick="closeMilestoneLightbox()" class="text-gray-400 hover:text-ai-cyan text-2xl leading-none">&times;</button>
+          </div>
+          <div class="p-5 max-h-[60vh] overflow-y-auto">
+            <p id="lightboxMilestoneDesc" class="text-gray-400 text-sm mb-4 pb-4 border-b border-border-default"></p>
+            <div class="flex items-center gap-4 mb-4">
+              <div class="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div id="lightboxProgressFill" class="h-full bg-gradient-to-r from-ai-cyan to-ai-purple rounded-full transition-all duration-500" style="width: 0%;"></div>
+              </div>
+              <span id="lightboxProgressText" class="font-mono text-sm text-ai-cyan min-w-[45px]">0%</span>
+            </div>
+            <div id="lightboxTasksContainer"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HR -->
+      <div class="relative my-12 h-px bg-gradient-to-r from-transparent via-ai-purple to-transparent">
+        <span class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-primary px-4 text-ai-purple text-xs">&#x2726;</span>
+      </div>
+
       <!-- Support Section -->
       <h2 class="text-2xl font-semibold text-ai-purple border-b border-border-default pb-2 mb-6 mt-8" data-i18n="supportTitle">Apoya el Proyecto</h2>
       <p class="text-gray-400 mb-8" data-i18n="supportDesc">Si este proyecto te resulta útil, considera apoyar su desarrollo:</p>
@@ -554,6 +626,172 @@ func start_conversation() -&gt; void:
       document.body.style.overflow = '';
     }
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+  </script>
+
+  <!-- Roadmap Data Loader -->
+  <script>
+    (function() {
+      const REPO_URL = 'https://github.com/lobinuxsoft/OhMyDialogSystem';
+      const DATA_URL = 'roadmap-data.json';
+      let roadmapData = null;
+
+      // Clean title (remove [Component] prefix)
+      function cleanTitle(title) {
+        return title.replace(/^\[(Core|Editor|AI|GDExtension|Memory|TTS|CSharp|Localization|Infra|QA|Docs|Examples|Wiki)\]\s*/i, '').replace(/^(feat|fix|docs|refactor):\s*/i, '');
+      }
+
+      // Extract milestone number from title
+      function getMilestoneNum(title) {
+        const match = title.match(/^M(\d+)/i);
+        return match ? match[1] : '?';
+      }
+
+      // Get clean milestone name
+      function getMilestoneName(title) {
+        return title.replace(/^M\d+[:\s-]*/i, '');
+      }
+
+      // Render milestones
+      function renderMilestones(milestones) {
+        const container = document.getElementById('milestone-grid');
+        if (!milestones || milestones.length === 0) {
+          container.innerHTML = '<p class="text-gray-500">No hay milestones configurados.</p>';
+          return;
+        }
+
+        const totalTasks = milestones.reduce((acc, m) => acc + m.open + m.closed, 0);
+        const completedTasks = milestones.reduce((acc, m) => acc + m.closed, 0);
+        const tasksOf = I18n.t[I18n.lang].roadmapTasksOf || 'tareas completadas en';
+        const milestonesText = I18n.t[I18n.lang].roadmapMilestones || 'milestones';
+        document.getElementById('roadmap-summary').textContent =
+          `${completedTasks}/${totalTasks} ${tasksOf} ${milestones.length} ${milestonesText}.`;
+
+        container.innerHTML = milestones.map((m, index) => {
+          const milestoneNum = getMilestoneNum(m.title);
+          const cleanName = getMilestoneName(m.title);
+          const badgeClass = m.progress > 50 ? 'bg-ai-cyan/20 text-ai-cyan border-ai-cyan' : 'bg-ai-purple/20 text-ai-purple border-ai-purple';
+          return `
+            <div class="p-4 rounded-xl border border-border-default bg-bg-card hover:border-ai-cyan hover:shadow-glow-cyan hover:-translate-y-1 transition-all cursor-pointer"
+                 onclick="openMilestoneLightbox(${index})">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-semibold text-gray-200">M${milestoneNum}: ${cleanName}</span>
+                <span class="px-2 py-0.5 text-xs font-mono rounded border ${badgeClass}">${m.progress}%</span>
+              </div>
+              <div class="h-1.5 bg-gray-700 rounded-full overflow-hidden mb-2">
+                <div class="h-full bg-gradient-to-r from-ai-cyan to-ai-purple rounded-full transition-all" style="width: ${m.progress}%;"></div>
+              </div>
+              <p class="text-xs text-gray-500">${m.description || `${m.closed}/${m.open + m.closed} completadas`}</p>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Open milestone lightbox
+      window.openMilestoneLightbox = function(index) {
+        if (!roadmapData) return;
+        const milestone = roadmapData.milestones[index];
+        if (!milestone) return;
+
+        const milestoneNum = getMilestoneNum(milestone.title);
+        const cleanName = getMilestoneName(milestone.title);
+
+        document.getElementById('lightboxMilestoneTitle').textContent = `M${milestoneNum}: ${cleanName}`;
+        document.getElementById('lightboxMilestoneDesc').textContent = milestone.description || '';
+        document.getElementById('lightboxProgressFill').style.width = `${milestone.progress}%`;
+        document.getElementById('lightboxProgressText').textContent = `${milestone.progress}%`;
+
+        // Get issues for this milestone
+        const milestoneIssues = (roadmapData.issues || []).filter(issue => {
+          const issueMilestone = issue.milestone || '';
+          return issueMilestone.includes(milestone.title) || issueMilestone.includes(`M${milestoneNum}`);
+        });
+
+        const pendingIssues = milestoneIssues.filter(i => i.state !== 'CLOSED');
+        const doneIssues = milestoneIssues.filter(i => i.state === 'CLOSED');
+
+        const pendingText = I18n.t[I18n.lang].roadmapPending || 'Pendientes';
+        const completedText = I18n.t[I18n.lang].roadmapCompleted || 'Completadas';
+        const noTasksText = I18n.t[I18n.lang].roadmapNoTasks || 'No hay tareas registradas para este milestone.';
+
+        let tasksHtml = '';
+
+        if (pendingIssues.length > 0) {
+          tasksHtml += `<div class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-4 mb-2">${pendingText} (${pendingIssues.length})</div>`;
+          tasksHtml += pendingIssues.map(issue => `
+            <div class="flex items-center gap-3 py-2 border-b border-border-default/50 text-sm">
+              <span class="w-5 h-5 rounded flex items-center justify-center bg-yellow-500/20 text-yellow-500 text-xs">○</span>
+              <span class="flex-1 text-gray-300">${cleanTitle(issue.title)}</span>
+              <a href="${REPO_URL}/issues/${issue.number}" target="_blank" class="font-mono text-xs text-gray-500 hover:text-ai-cyan">#${issue.number}</a>
+            </div>
+          `).join('');
+        }
+
+        if (doneIssues.length > 0) {
+          tasksHtml += `<div class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-4 mb-2">${completedText} (${doneIssues.length})</div>`;
+          tasksHtml += doneIssues.map(issue => `
+            <div class="flex items-center gap-3 py-2 border-b border-border-default/50 text-sm opacity-50">
+              <span class="w-5 h-5 rounded flex items-center justify-center bg-green-500/20 text-green-500 text-xs">✓</span>
+              <span class="flex-1 text-gray-400 line-through">${cleanTitle(issue.title)}</span>
+              <a href="${REPO_URL}/issues/${issue.number}" target="_blank" class="font-mono text-xs text-gray-500 hover:text-ai-cyan">#${issue.number}</a>
+            </div>
+          `).join('');
+        }
+
+        if (milestoneIssues.length === 0) {
+          tasksHtml = `<p class="text-gray-500 italic py-2">${noTasksText}</p>`;
+        }
+
+        document.getElementById('lightboxTasksContainer').innerHTML = tasksHtml;
+        document.getElementById('milestoneLightbox').classList.remove('hidden');
+        document.getElementById('milestoneLightbox').classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      };
+
+      // Close milestone lightbox
+      window.closeMilestoneLightbox = function() {
+        document.getElementById('milestoneLightbox').classList.add('hidden');
+        document.getElementById('milestoneLightbox').classList.remove('flex');
+        document.body.style.overflow = '';
+      };
+
+      // Close on background click
+      document.getElementById('milestoneLightbox').addEventListener('click', function(e) {
+        if (e.target === this) closeMilestoneLightbox();
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeMilestoneLightbox();
+      });
+
+      // Format date
+      function formatDate(isoDate) {
+        if (!isoDate) return '';
+        const date = new Date(isoDate);
+        const locale = I18n.lang === 'es' ? 'es-ES' : 'en-US';
+        return date.toLocaleDateString(locale, {
+          day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+      }
+
+      // Load data
+      fetch(DATA_URL)
+        .then(res => {
+          if (!res.ok) throw new Error('No roadmap data available');
+          return res.json();
+        })
+        .then(data => {
+          roadmapData = data;
+          renderMilestones(data.milestones);
+          document.getElementById('roadmap-updated').textContent = formatDate(data.updated_at);
+        })
+        .catch(err => {
+          console.warn('Roadmap data not available:', err);
+          document.getElementById('roadmap-summary').innerHTML =
+            'No se pudieron cargar los datos. <a href="' + REPO_URL + '/issues" target="_blank" class="text-ai-cyan hover:text-ai-pink">Ver issues en GitHub</a>';
+          document.getElementById('milestone-grid').innerHTML = '';
+        });
+    })();
   </script>
 </body>
 </html>
