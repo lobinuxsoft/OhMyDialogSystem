@@ -51,6 +51,7 @@
           hDiff: 'Lo Que Nos Diferencia',
           thFeature: 'Caracteristica', thDialogic: 'Dialogic', thClyde: 'Clyde', thNobody: 'NobodyWho', thOMDS: 'OhMyDialogSystem',
           fEditor: 'Editor visual', fAI: 'Generacion IA', fFree: 'Modo libre + grafos', fTrans: 'Transiciones fluidas', fMem: 'Memorias persistentes', fTTS: 'TTS Integrado', fGraph: 'Sistema de Grafos',
+          tblSupported: 'Soportado', tblFreeOnly: 'Solo modo libre (sin grafos)', tblNotSupported: 'No soportado',
           backToTech: 'Volver a Technical',
           // Lightbox content
           lbDesc: 'Descripcion', lbConn: 'Conexiones', lbParams: 'Parametros', lbValid: 'Validacion',
@@ -58,7 +59,17 @@
           lbStartDesc2: 'Opcionalmente, puede configurarse un trigger que permite iniciar este dialogo automaticamente.',
           slIn: 'Entrada', slOut: 'Salida',
           paramParam: 'Parametro', paramType: 'Tipo', paramDesc: 'Descripcion', paramReq: 'requerido', paramOpt: 'opcional',
-          // ... (Add more specific strings for lightboxes as needed, keeping generic ones)
+          // Lightbox subtitles
+          lbSubStart: 'Punto de entrada del grafo', lbSubEnd: 'Termina la ejecucion',
+          lbSubAI: 'Generacion Dinamica', lbSubStatic: 'Texto Fijo', lbSubChoice: 'Opciones',
+          lbSubCond: 'Bifurcacion logica', lbSubEvent: 'Emite senales al juego', lbSubVar: 'Modifica estado del contexto',
+          lbSubJump: 'Salta entre grafos', lbSubFree: 'Escapa a conversacion libre', lbSubReturn: 'Retorna al grafo estructurado',
+          // Lightbox descriptions
+          lbFreeDesc: 'Concepto unico: Permite salir del grafo estructurado a una conversacion 100% libre con la IA, manteniendo el contexto del personaje. El jugador puede hablar de cualquier tema hasta que se detecte una condicion de retorno.',
+          lbReturnDesc: 'Complemento de JumpToFreeNode. Cuando se detecta la condicion de retorno durante el modo libre, este nodo se activa automaticamente para continuar el flujo del grafo.',
+          // Example graph
+          exAIGreeting: 'AI: Saludo', exPlayerHello: 'Player: "Hola"', exNPCWelcome: 'NPC: "Bienvenido"',
+          exDetectWork: 'Detect: "trabajo" -> Return', exAIOffer: 'AI: Ofrecer',
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navNodes: 'Dialogue Nodes',
@@ -93,6 +104,7 @@
           hDiff: 'What Sets Us Apart',
           thFeature: 'Feature', thDialogic: 'Dialogic', thClyde: 'Clyde', thNobody: 'NobodyWho', thOMDS: 'OhMyDialogSystem',
           fEditor: 'Visual Editor', fAI: 'AI Generation', fFree: 'Free Mode + Graphs', fTrans: 'Fluid Transitions', fMem: 'Persistent Memories', fTTS: 'Integrated TTS', fGraph: 'Graph System',
+          tblSupported: 'Supported', tblFreeOnly: 'Free mode only (no graphs)', tblNotSupported: 'Not supported',
           backToTech: 'Back to Technical',
           // Lightbox content
           lbDesc: 'Description', lbConn: 'Connections', lbParams: 'Parameters', lbValid: 'Validation',
@@ -100,6 +112,17 @@
           lbStartDesc2: 'Optionally, a trigger can be configured to start this dialogue automatically.',
           slIn: 'Input', slOut: 'Output',
           paramParam: 'Parameter', paramType: 'Type', paramDesc: 'Description', paramReq: 'required', paramOpt: 'optional',
+          // Lightbox subtitles
+          lbSubStart: 'Graph entry point', lbSubEnd: 'Ends execution',
+          lbSubAI: 'Dynamic Generation', lbSubStatic: 'Fixed Text', lbSubChoice: 'Options',
+          lbSubCond: 'Logical Branching', lbSubEvent: 'Emits signals to game', lbSubVar: 'Modifies context state',
+          lbSubJump: 'Jumps between graphs', lbSubFree: 'Escapes to free conversation', lbSubReturn: 'Returns to structured graph',
+          // Lightbox descriptions
+          lbFreeDesc: 'Unique concept: Allows exiting the structured graph to a 100% free conversation with the AI, maintaining character context. The player can talk about any topic until a return condition is detected.',
+          lbReturnDesc: 'Complement to JumpToFreeNode. When the return condition is detected during free mode, this node activates automatically to continue the graph flow.',
+          // Example graph
+          exAIGreeting: 'AI: Greeting', exPlayerHello: 'Player: "Hello"', exNPCWelcome: 'NPC: "Welcome"',
+          exDetectWork: 'Detect: "work" -> Return', exAIOffer: 'AI: Offer',
         }
       },
       init() {
@@ -633,7 +656,7 @@
               &#x25B6;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">StartNode</h3>
-              <p class="text-gray-400">Punto de entrada del grafo</p>
+              <p class="text-gray-400" data-i18n="lbSubStart">Punto de entrada del grafo</p>
             </div>
           </div>
 
@@ -673,7 +696,7 @@
               &#x25A0;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">EndNode</h3>
-              <p class="text-gray-400">Termina la ejecucion</p>
+              <p class="text-gray-400" data-i18n="lbSubEnd">Termina la ejecucion</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -710,7 +733,7 @@
               &#x1F9E0;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">AIResponseNode</h3>
-              <p class="text-gray-400">Generacion Dinamica</p>
+              <p class="text-gray-400" data-i18n="lbSubAI">Generacion Dinamica</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -761,7 +784,7 @@
               &#x1F4AC;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">StaticResponseNode</h3>
-              <p class="text-gray-400">Texto Fijo</p>
+              <p class="text-gray-400" data-i18n="lbSubStatic">Texto Fijo</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -808,7 +831,7 @@
               &#x2630;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">PlayerChoiceNode</h3>
-              <p class="text-gray-400">Opciones</p>
+              <p class="text-gray-400" data-i18n="lbSubChoice">Opciones</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -853,7 +876,7 @@
             <div class="w-16 h-16 rounded-xl bg-orange-500/10 flex items-center justify-center text-3xl text-orange-500">&#x25C7;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">ConditionNode</h3>
-              <p class="text-gray-400">Bifurcacion logica</p>
+              <p class="text-gray-400" data-i18n="lbSubCond">Bifurcacion logica</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -903,7 +926,7 @@
             <div class="w-16 h-16 rounded-xl bg-purple-500/10 flex items-center justify-center text-3xl text-purple-500">&#x26A1;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">EventNode</h3>
-              <p class="text-gray-400">Emite senales al juego</p>
+              <p class="text-gray-400" data-i18n="lbSubEvent">Emite senales al juego</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -935,7 +958,7 @@
             <div class="w-16 h-16 rounded-xl bg-cyan-500/10 flex items-center justify-center text-3xl text-cyan-500">X=</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">SetVariableNode</h3>
-              <p class="text-gray-400">Modifica estado del contexto</p>
+              <p class="text-gray-400" data-i18n="lbSubVar">Modifica estado del contexto</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -968,7 +991,7 @@
             <div class="w-16 h-16 rounded-xl bg-green-500/10 flex items-center justify-center text-3xl text-green-500">&#x21AA;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">JumpNode</h3>
-              <p class="text-gray-400">Salta entre grafos</p>
+              <p class="text-gray-400" data-i18n="lbSubJump">Salta entre grafos</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
@@ -1002,12 +1025,12 @@
             <div class="w-16 h-16 rounded-xl bg-violet-500/10 flex items-center justify-center text-3xl text-violet-500">&#x221E;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">JumpToFreeNode</h3>
-              <p class="text-gray-400">Escapa a conversacion libre</p>
+              <p class="text-gray-400" data-i18n="lbSubFree">Escapa a conversacion libre</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
             <div class="bg-violet-500/10 border border-violet-500/30 rounded-lg p-4">
-              <p class="text-violet-400 text-sm"><strong>Concepto unico:</strong> Permite salir del grafo estructurado a una conversacion 100% libre con la IA, manteniendo el contexto del personaje. El jugador puede hablar de cualquier tema hasta que se detecte una condicion de retorno.</p>
+              <p class="text-violet-400 text-sm" data-i18n="lbFreeDesc">Concepto unico: Permite salir del grafo estructurado a una conversacion 100% libre con la IA, manteniendo el contexto del personaje. El jugador puede hablar de cualquier tema hasta que se detecte una condicion de retorno.</p>
             </div>
             <div>
               <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbParams">Parametros</span></h4>
@@ -1037,11 +1060,11 @@
             <div class="w-16 h-16 rounded-xl bg-teal-500/10 flex items-center justify-center text-3xl text-teal-500">&#x21A9;</div>
             <div>
               <h3 class="text-2xl font-bold text-white mb-1">ReturnToGraphNode</h3>
-              <p class="text-gray-400">Retorna al grafo estructurado</p>
+              <p class="text-gray-400" data-i18n="lbSubReturn">Retorna al grafo estructurado</p>
             </div>
           </div>
           <div class="p-8 space-y-8">
-            <p class="text-gray-400 text-sm leading-relaxed">Complemento de JumpToFreeNode. Cuando se detecta la condicion de retorno durante el modo libre, este nodo se activa automaticamente para continuar el flujo del grafo.</p>
+            <p class="text-gray-400 text-sm leading-relaxed" data-i18n="lbReturnDesc">Complemento de JumpToFreeNode. Cuando se detecta la condicion de retorno durante el modo libre, este nodo se activa automaticamente para continuar el flujo del grafo.</p>
             <div>
               <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbConn">Conexiones</span></h4>
               <div class="bg-bg-tertiary rounded-lg p-6 flex justify-around">
@@ -1079,7 +1102,7 @@
             <div class="text-gray-600">&#x2192;</div>
             <div
               class="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500 text-blue-500 font-mono text-xs whitespace-nowrap">
-              &#x1F9E0; AI: Saludo</div>
+              &#x1F9E0; <span data-i18n="exAIGreeting">AI: Saludo</span></div>
             <div class="text-gray-600">&#x2192;</div>
             <div
               class="px-4 py-2 rounded-lg bg-violet-500/10 border border-violet-500 text-violet-500 font-mono text-xs whitespace-nowrap">
@@ -1090,10 +1113,9 @@
             <div class="p-6 bg-violet-500/5 border-2 border-dashed border-violet-500/30 rounded-xl text-center">
               <h4 class="text-violet-500 font-bold text-xs mb-2" data-i18n="modeFreeTitle">MODO FREE</h4>
               <div class="text-xs space-y-1">
-                <div class="text-emerald-500">Player: "Hola"</div>
-                <div class="text-ai-purple">NPC: "Bienvenido"</div>
-                <div class="text-orange-500 italic mt-2 pt-2 border-t border-dashed border-gray-700">Detect: "trabajo"
-                  -> Return</div>
+                <div class="text-emerald-500" data-i18n="exPlayerHello">Player: "Hola"</div>
+                <div class="text-ai-purple" data-i18n="exNPCWelcome">NPC: "Bienvenido"</div>
+                <div class="text-orange-500 italic mt-2 pt-2 border-t border-dashed border-gray-700" data-i18n="exDetectWork">Detect: "trabajo" -> Return</div>
               </div>
             </div>
           </div>
@@ -1105,7 +1127,7 @@
             <div class="text-gray-600">&#x2192;</div>
             <div
               class="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500 text-blue-500 font-mono text-xs whitespace-nowrap">
-              &#x1F9E0; AI: Ofrecer</div>
+              &#x1F9E0; <span data-i18n="exAIOffer">AI: Ofrecer</span></div>
           </div>
         </div>
       </div>
@@ -1179,9 +1201,9 @@
           </tbody>
         </table>
         <div class="bg-bg-tertiary px-6 py-3 text-xs text-gray-500 border-t border-border-default">
-          <span class="text-emerald-500">&#x2713;</span> = Soportado |
-          <span class="text-yellow-500">~</span> = Solo modo libre (sin grafos) |
-          <span class="text-red-500">&#x2717;</span> = No soportado
+          <span class="text-emerald-500">&#x2713;</span> = <span data-i18n="tblSupported">Soportado</span> |
+          <span class="text-yellow-500">~</span> = <span data-i18n="tblFreeOnly">Solo modo libre (sin grafos)</span> |
+          <span class="text-red-500">&#x2717;</span> = <span data-i18n="tblNotSupported">No soportado</span>
         </div>
       </div>
 
