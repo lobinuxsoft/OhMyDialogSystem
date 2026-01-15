@@ -1,45 +1,19 @@
 # Build Workflow
+**ALWAYS use build scripts. NEVER run tools manually.**
 
-## Golden Rule
-**ALWAYS use build scripts. NEVER run build tools directly.**
+## Process
+1. Find `build.sh` / `build.bat`.
+2. Run it.
+3. Missing? Create it.
 
-## Build Process
-1. **First:** Look for `build.sh` (Linux/macOS) or `build.bat` (Windows)
-2. **If exists:** Use it with appropriate arguments
-3. **If not exists:** Create the build script before proceeding
+## Scripts
+- **Linux (`build.sh`):** Check deps, platform, targets, usage.
+- **Windows (`build.bat`):** Same.
 
-## Script Requirements
-When creating build scripts:
+## Why
+Reproducibility. Documentation. No "works on my machine".
 
-### build.sh (Linux/macOS)
-```bash
-#!/bin/bash
-set -e
-# Must include:
-# - Dependency checks (compilers, tools)
-# - Platform detection
-# - Configurable targets (debug, release, editor)
-# - Parallel jobs support (-j flag)
-# - Clear usage/help output
-```
-
-### build.bat (Windows)
-```batch
-@echo off
-:: Must include:
-:: - Dependency checks
-:: - Configurable targets
-:: - Clear usage output
-```
-
-## Why This Matters
-- Reproducible builds across environments
-- Documents build requirements and options
-- Prevents "works on my machine" issues
-- Easier onboarding for new contributors
-
-## Anti-Patterns (DO NOT)
-- Run `scons`, `cmake`, `msbuild` directly
-- Assume build configuration from memory
-- Skip dependency checks
-- Hardcode paths or settings
+## Anti-Patterns
+- Manual `scons`/`cmake`/`msbuild`.
+- Assuming config.
+- Hardcoded paths.

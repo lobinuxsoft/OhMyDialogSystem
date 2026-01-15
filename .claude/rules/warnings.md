@@ -1,31 +1,20 @@
-# Warning Protocol
+# Warnings
+Report problems using this format:
 
-When identifying potential problems, use this format:
-
-```markdown
-**WARNING: [Problem Type]**
-
-**Problem:** [Clear description]
-**Impact:** [Consequences]
-**Fix difficulty:** Trivial / Easy / Moderate / Difficult / Very Difficult
-
-**Alternatives:**
-1. [Option A] - Pros/Cons
-2. [Option B] - Pros/Cons
-
-**Recommendation:** [Your technical opinion]
+```
+**WARNING: [Type]**
+**Prob:** [Desc]
+**Imp:** [Impact]
+**Fix:** [Difficulty]
+**Alts:** 1. [A], 2. [B]
+**Rec:** [Opinion]
 ```
 
-## Problem Types to Flag
-| Category | Examples |
-|----------|----------|
-| Architecture | SOLID violations, excessive coupling, tech debt |
-| Performance | O(n²) loops, memory leaks, blocking main thread |
-| Security | Vulnerabilities, missing validation |
-| Maintainability | Duplicated code, missing tests, hardcoded values |
-| Scalability | Non-scalable solutions, rigid limits |
+## Types
+- **Architecture:** SOLID, coupling.
+- **Performance:** O(n²), leaks.
+- **Security:** Validation.
+- **Scale/Maint:** Hardcoding, duplicates.
 
-## When Unsure
-- **ASK** before implementing
-- Propose options with pros/cons
-- Don't guess if you can ask
+## Rule
+**Unsure? ASK.** Propose options. Don't guess.

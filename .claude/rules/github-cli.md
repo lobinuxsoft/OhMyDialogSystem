@@ -1,74 +1,32 @@
-# GitHub CLI Guidelines
+# GitHub CLI
 
-## Issue-First Development
-**ALWAYS create issue BEFORE coding.**
-
-Flow: `Create Issue → Add to Project → Create Branch → Develop → PR to development → Pre-close Check → Close Issue`
-
-## Project Management
-**ALWAYS add new issues to the project board.**
-
-```bash
-# Add issue to project (run immediately after creating issue)
-gh project item-add 5 --owner lobinuxsoft --url https://github.com/lobinuxsoft/OhMyDialogSystem/issues/<NUMBER>
-```
-
-Project ID: `5` (OhMyDialogSystem Development)
-
-## Pre-Close Checklist
-Before closing ANY issue:
-1. **Check body for checkboxes/sub-issues** → Mark completed ones as `[x]`
-2. **Verify sub-issues are closed** → Close them first if done
-3. **Out-of-scope work?** → Add comment listing extra items implemented
-4. **Update project dates** → Set Start/End fields
+## Rules
+- **Issue-First:** Create Issue -> Project -> Branch -> PR -> Close.
+- **Projects:** Add to `OhMyDialogSystem Development` (ID: 5).
+- **Pre-Close:** Check sub-issues, update dates.
 
 ## Labels
-| Category | Values |
-|----------|--------|
-| Priority | `priority:critical`, `priority:high`, `priority:medium`, `priority:low` |
-| Difficulty | `difficulty:easy`, `difficulty:medium`, `difficulty:hard`, `difficulty:expert` |
-| Component | `gdextension`, `editor`, `core`, `memory`, `tts`, `localization`, `csharp` |
-| Session | `next-session` |
-
-## Session Management
-Use `next-session` label to mark issues for the next work session.
-
-**At session START:**
-```bash
-gh issue list --label next-session
-```
-
-**At session END:**
-- Remove `next-session` from completed issues
-- Add `next-session` to issues queued for next session
-```bash
-gh issue edit <number> --remove-label next-session
-gh issue edit <number> --add-label next-session
-```
+- `priority:*`, `difficulty:*`, `component:*`
+- `next-session`: Queue for next work session.
 
 ## Commands
 ```bash
-# Branch from issue
-gh issue develop <number> --base development --checkout
+# Add to Project (ID 5)
+gh project item-add 5 --owner lobinuxsoft --url <ISSUE_URL>
 
-# PR (always to development!)
+# Branch & PR
+gh issue develop <NUM> --base development --checkout
 gh pr create --base development --title "Title" --body "Closes #XX"
 
-# Update issue body (checkboxes)
-gh issue edit <number> --body "updated markdown"
+# Session Mgmt
+gh issue list --label next-session
+gh issue edit <NUM> --add-label next-session
+gh issue edit <NUM> --remove-label next-session
 
-# Add out-of-scope comment
-gh issue comment <number> --body "Additional work: ..."
-
-# Project dates
-gh project item-edit --project-id PVT_kwHOAVGx6s4BLOYT --id <ITEM_ID> \
-  --field-id PVTF_lAHOAVGx6s4BLOYTzg63ghM --date YYYY-MM-DD  # Start
-gh project item-edit --project-id PVT_kwHOAVGx6s4BLOYT --id <ITEM_ID> \
-  --field-id PVTF_lAHOAVGx6s4BLOYTzg63ghQ --date YYYY-MM-DD  # End
+# Dates
+gh project item-edit --id <ID> --field-id <START/END_ID> --date YYYY-MM-DD
 ```
 
-## Critical Rules
-- NO coding without issue
-- NO working on `development` or `main` directly
-- NO closing without pre-close checklist
-- NO PRs to `main` (except MAJOR releases)
+## Critical
+- NO direct `development`/`main` work.
+- NO PRs to `main` (except MAJOR).

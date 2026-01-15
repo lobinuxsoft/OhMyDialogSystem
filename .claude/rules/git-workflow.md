@@ -1,42 +1,24 @@
 # Git Workflow
 
 ## Commits
-| Rule | Value |
-|------|-------|
-| Language | Spanish |
-| Format | Conventional Commits (feat:, fix:, docs:, refactor:) |
-| Signatures | **NEVER** include Claude signatures or Co-Authored-By |
+- **Lang:** Spanish.
+- **Fmt:** Conventional (`feat:`, `fix:`, `docs:`).
+- **Sig:** NO Claude signatures.
 
-## Branching Strategy
-```
-main (production - stable releases only)
-└── development (integration)
-     └── feature/issue-XX-description
-     └── fix/issue-XX-description
-     └── docs/issue-XX-description
-```
+## Branches
+`main` (releases) ← `development` (integration) ← `feat/issue-ID`
 
-## Semantic Versioning
-| Type | When | Merge to main? |
-|------|------|----------------|
-| MAJOR (X.0.0) | Breaking changes, major features | YES + tag |
-| MINOR (0.X.0) | New backwards-compatible features | NO |
-| PATCH (0.0.X) | Bug fixes | NO |
+## Versioning (SemVer)
+- **MAJOR (X.0.0):** Breaks. Merge to `main` + Tag.
+- **MINOR (0.X.0):** Features.
+- **PATCH (0.0.X):** Fixes.
 
-**Critical:** Only merge to `main` for MAJOR version increments with tag `vX.0.0`
-
-## Release Workflow
-```bash
-# 1. PR from development -> main
-gh pr create --base main --head development --title "Release vX.0.0"
-# 2. Merge
-gh pr merge <number> --merge
-# 3. Tag
-git tag -a vX.0.0 origin/main -m "Release vX.0.0: [description]"
-git push origin vX.0.0
-```
+## Release
+1. PR `development` -> `main`.
+2. Merge.
+3. Tag `vX.0.0` & Push.
 
 ## Safety
-- NEVER force push to main/master
-- NEVER skip hooks (--no-verify)
-- ALWAYS verify before amend
+- NO Force Push `main`.
+- NO `--no-verify`.
+- Verify before amend.
