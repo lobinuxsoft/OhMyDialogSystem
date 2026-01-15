@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,9 @@
   <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="../base.css">
 
   <script>
@@ -35,7 +38,13 @@
           sampling: 'Parametros de Sampling',
           stopSeq: 'Stop Sequences',
           timeout: 'Timeout',
-          methodDesc: 'Descripciones de Metodos'
+          methodDesc: 'Descripciones de Metodos',
+          // New keys
+          loadModelDesc: 'Carga un modelo GGUF desde la ruta especificada.',
+          paramsTitle: 'Parámetros',
+          pTableParam: 'Parámetro', pTableType: 'Tipo', pTableDesc: 'Descripción',
+          paramPathDesc: 'Ruta al archivo .gguf. Soporta res:// y user://',
+          paramParamsDesc: 'Parámetros opcionales de configuración'
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
@@ -57,7 +66,13 @@
           sampling: 'Sampling Parameters',
           stopSeq: 'Stop Sequences',
           timeout: 'Timeout',
-          methodDesc: 'Method Descriptions'
+          methodDesc: 'Method Descriptions',
+          // New keys
+          loadModelDesc: 'Loads a GGUF model from the specified path.',
+          paramsTitle: 'Parameters',
+          pTableParam: 'Parameter', pTableType: 'Type', pTableDesc: 'Description',
+          paramPathDesc: 'Path to .gguf file. Supports res:// and user://',
+          paramParamsDesc: 'Optional configuration parameters'
         }
       },
       init() {
@@ -89,72 +104,147 @@
   </script>
 
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
-    .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
   </style>
 </head>
+
 <body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
   <div class="flex min-h-screen relative z-10">
-    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
-      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
+      </div>
       <div class="p-6 text-center border-b border-border-default">
-        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
         <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
         <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
       <div class="px-6 py-3 border-b border-border-default flex gap-2">
-        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
-        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
       <div class="p-4">
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> General</div>
-          <ul><li><a href="../home.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3E0;</span> Home</a></li></ul>
-        </div>
-        <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
           <ul>
-            <li><a href="../Guides/quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
-            <li><a href="../Guides/installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
-            <li><a href="../Guides/first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started
+          </div>
           <ul>
-            <li><a href="index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
-            <li><a href="llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
-            <li><a href="dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
-            <li><a href="memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
-            <li><a href="tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
-            <li><a href="resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+            <li><a href="../Guides/quickstart.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="../Guides/installation.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="../Guides/first-npc.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
           <ul>
-            <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
-            <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
-            <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
-            <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
-            <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+            <li><a href="index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
           <ul>
-            <li><a href="../Guides/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4D6;</span> Overview</a></li>
-            <li><a href="../Guides/visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
-            <li><a href="../Guides/character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
-            <li><a href="../Guides/tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="../Technical/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a>
+            </li>
+            <li><a href="../Technical/dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
           </ul>
         </div>
         <div class="mb-6">
-          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
           <ul>
-            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
-            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+            <li><a href="../Guides/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4D6;</span> Overview</a></li>
+            <li><a href="../Guides/visual-editor.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+            <li><a href="../Guides/character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="../Guides/tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External
+          </div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
           </ul>
         </div>
       </div>
@@ -171,15 +261,23 @@
 
       <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
         <span class="text-gradient-ai" data-i18n="pageTitle">LlamaInterface</span>
-        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
       </h1>
 
-      <p class="mb-6"><span class="inline-block px-2 py-1 text-xs rounded bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30">GDExtension</span> <span class="inline-block px-2 py-1 text-xs rounded bg-ai-purple/20 text-ai-purple border border-ai-purple/30">C++</span></p>
+      <p class="mb-6"><span
+          class="inline-block px-2 py-1 text-xs rounded bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30">GDExtension</span>
+        <span
+          class="inline-block px-2 py-1 text-xs rounded bg-ai-purple/20 text-ai-purple border border-ai-purple/30">C++</span>
+      </p>
 
-      <p class="text-xl text-gray-300 mb-8" data-i18n="pageSubtitle">Interfaz de bajo nivel para llama.cpp. Carga modelos GGUF y gestione su ciclo de vida.</p>
+      <p class="text-xl text-gray-300 mb-8" data-i18n="pageSubtitle">Interfaz de bajo nivel para llama.cpp. Carga
+        modelos GGUF y gestione su ciclo de vida.</p>
 
       <div class="p-4 rounded-lg bg-ai-cyan/5 border border-ai-cyan/20 mb-12">
-        <strong class="text-ai-cyan">Nota:</strong> <span class="text-gray-300" data-i18n="notenative">Esta clase es parte del módulo GDExtension nativo. Requiere que el addon esté correctamente compilado para tu plataforma.</span>
+        <strong class="text-ai-cyan">Nota:</strong> <span class="text-gray-300" data-i18n="notenative">Esta clase es
+          parte del módulo GDExtension nativo. Requiere que el addon esté correctamente compilado para tu
+          plataforma.</span>
       </div>
 
       <hr class="border-border-default mb-12">
@@ -189,7 +287,8 @@
         <span data-i18n="inheritance">Herencia</span>
       </h2>
 
-      <p class="font-mono text-gray-400 mb-12"><span class="text-ai-purple">RefCounted</span> &#x2192; <span class="text-ai-cyan">LlamaInterface</span></p>
+      <p class="font-mono text-gray-400 mb-12"><span class="text-ai-purple">RefCounted</span> &#x2192; <span
+          class="text-ai-cyan">LlamaInterface</span></p>
 
       <hr class="border-border-default mb-12">
 
@@ -198,15 +297,20 @@
         <span data-i18n="descTitle">Descripcion</span>
       </h2>
 
-      <p class="text-gray-300 mb-4" data-i18n="descContent">LlamaInterface proporciona una API de bajo nivel para cargar modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
-      
-      <p class="text-gray-300 mb-8" data-i18n="descSub">Es la base sobre la cual se construyen los componentes de más alto nivel como AIService y DialogueManager.</p>
+      <p class="text-gray-300 mb-4" data-i18n="descContent">LlamaInterface proporciona una API de bajo nivel para cargar
+        modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del
+        backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
+
+      <p class="text-gray-300 mb-8" data-i18n="descSub">Es la base sobre la cual se construyen los componentes de más
+        alto nivel como AIService y DialogueManager.</p>
 
       <div class="p-6 rounded-xl border border-border-default bg-bg-card/50 mb-12">
         <h3 class="text-lg font-bold text-white mb-4" data-i18n="usageTitle">Uso Recomendado</h3>
-        <p class="text-gray-400 mb-4" data-i18n="usageContent">Para la mayoría de casos, usar AIService en lugar de instanciar LlamaInterface directamente:</p>
-        
-        <pre class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-gray-500"># Forma recomendada - usar AIService singleton</span>
+        <p class="text-gray-400 mb-4" data-i18n="usageContent">Para la mayoría de casos, usar AIService en lugar de
+          instanciar LlamaInterface directamente:</p>
+
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-gray-500"># Forma recomendada - usar AIService singleton</span>
 <span class="text-ai-purple">var</span> ai_service := <span class="text-ai-cyan">AIService</span>.get_singleton()
 <span class="text-ai-purple">if</span> ai_service <span class="text-ai-purple">and</span> ai_service.is_model_loaded():
     <span class="text-gray-500"># El modelo ya está disponible globalmente</span>
@@ -216,7 +320,8 @@
 <span class="text-ai-purple">var</span> llama := <span class="text-ai-cyan">LlamaInterface</span>.new()
 llama.load_model(<span class="text-ai-orange">"res://models/model.gguf"</span>)</code></pre>
 
-        <p class="text-gray-400" data-i18n="usageSub">AIService gestiona el ciclo de vida del modelo, integra con ModelManager para descarga de modelos, y proporciona señales para cambios de estado.</p>
+        <p class="text-gray-400" data-i18n="usageSub">AIService gestiona el ciclo de vida del modelo, integra con
+          ModelManager para descarga de modelos, y proporciona señales para cambios de estado.</p>
       </div>
 
       <hr class="border-border-default mb-12">
@@ -235,15 +340,53 @@ llama.load_model(<span class="text-ai-orange">"res://models/model.gguf"</span>)<
             </tr>
           </thead>
           <tbody class="text-sm">
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">Error</td><td class="py-3 px-4 font-mono"><a href="#load_model" class="text-gray-300 hover:text-ai-cyan transition-colors">load_model</a>(path: String, params: Dictionary = {})</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">void</td><td class="py-3 px-4 font-mono"><a href="#unload_model" class="text-gray-300 hover:text-ai-cyan transition-colors">unload_model</a>()</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">bool</td><td class="py-3 px-4 font-mono"><a href="#is_model_loaded" class="text-gray-300 hover:text-ai-cyan transition-colors">is_model_loaded</a>() const</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">Dictionary</td><td class="py-3 px-4 font-mono"><a href="#get_model_info" class="text-gray-300 hover:text-ai-cyan transition-colors">get_model_info</a>() const</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">String</td><td class="py-3 px-4 font-mono"><a href="#get_model_path" class="text-gray-300 hover:text-ai-cyan transition-colors">get_model_path</a>() const</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">String</td><td class="py-3 px-4 font-mono"><a href="#get_system_info" class="text-gray-300 hover:text-ai-cyan transition-colors">get_system_info</a>() const</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">String</td><td class="py-3 px-4 font-mono"><a href="#get_chat_template" class="text-gray-300 hover:text-ai-cyan transition-colors">get_chat_template</a>() const</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">String</td><td class="py-3 px-4 font-mono"><a href="#apply_chat_template" class="text-gray-300 hover:text-ai-cyan transition-colors">apply_chat_template</a>(messages: Array, add_generation_prompt: bool = true)</td></tr>
-            <tr><td class="py-3 px-4 font-mono text-ai-purple">int</td><td class="py-3 px-4 font-mono"><a href="#count_tokens" class="text-gray-300 hover:text-ai-cyan transition-colors">count_tokens</a>(text: String) const</td></tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Error</td>
+              <td class="py-3 px-4 font-mono"><a href="#load_model"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">load_model</a>(path: String, params:
+                Dictionary = {})</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#unload_model"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">unload_model</a>()</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#is_model_loaded"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">is_model_loaded</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Dictionary</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_model_info"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_model_info</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_model_path"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_model_path</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_system_info"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_system_info</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_chat_template"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_chat_template</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#apply_chat_template"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">apply_chat_template</a>(messages: Array,
+                add_generation_prompt: bool = true)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono"><a href="#count_tokens"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">count_tokens</a>(text: String) const</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -258,9 +401,21 @@ llama.load_model(<span class="text-ai-orange">"res://models/model.gguf"</span>)<
             </tr>
           </thead>
           <tbody class="text-sm">
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">String</td><td class="py-3 px-4 font-mono"><a href="#generate" class="text-gray-300 hover:text-ai-cyan transition-colors">generate</a>(prompt: String)</td></tr>
-            <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">void</td><td class="py-3 px-4 font-mono"><a href="#generate_async" class="text-gray-300 hover:text-ai-cyan transition-colors">generate_async</a>(prompt: String)</td></tr>
-            <tr><td class="py-3 px-4 font-mono text-ai-purple">void</td><td class="py-3 px-4 font-mono"><a href="#generate_streaming" class="text-gray-300 hover:text-ai-cyan transition-colors">generate_streaming</a>(prompt: String)</td></tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#generate"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">generate</a>(prompt: String)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#generate_async"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">generate_async</a>(prompt: String)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#generate_streaming"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">generate_streaming</a>(prompt: String)</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -268,52 +423,87 @@ llama.load_model(<span class="text-ai-orange">"res://models/model.gguf"</span>)<
       <h3 class="text-lg font-bold text-white mb-4" data-i18n="asyncCtrl">Control de Generacion Asincrona</h3>
       <div class="overflow-x-auto mb-8">
         <table class="w-full border-collapse">
-            <thead>
-              <tr class="border-b border-border-default">
-                <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
-                <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
-              </tr>
-            </thead>
-            <tbody class="text-sm">
-                <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">bool</td><td class="py-3 px-4 font-mono"><a href="#is_generating" class="text-gray-300 hover:text-ai-cyan transition-colors">is_generating</a>() const</td></tr>
-                <tr class="border-b border-border-default/50"><td class="py-3 px-4 font-mono text-ai-purple">float</td><td class="py-3 px-4 font-mono"><a href="#get_generation_progress" class="text-gray-300 hover:text-ai-cyan transition-colors">get_generation_progress</a>() const</td></tr>
-                <tr><td class="py-3 px-4 font-mono text-ai-purple">void</td><td class="py-3 px-4 font-mono"><a href="#cancel_generation" class="text-gray-300 hover:text-ai-cyan transition-colors">cancel_generation</a>()</td></tr>
-            </tbody>
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#is_generating"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">is_generating</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_generation_progress"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_generation_progress</a>() const</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#cancel_generation"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">cancel_generation</a>()</td>
+            </tr>
+          </tbody>
         </table>
       </div>
 
       <h3 class="text-lg font-bold text-white mb-4" data-i18n="methodDesc">Descripciones de Metodos</h3>
-      
+
       <div id="load_model" class="mb-12">
         <h4 class="text-xl font-bold text-gray-200 mb-4">load_model</h4>
-        <pre class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">Error</span> load_model(path: <span class="text-ai-cyan">String</span>, params: <span class="text-ai-cyan">Dictionary</span> = {})</code></pre>
-        <p class="text-gray-400 mb-4">Carga un modelo GGUF desde la ruta especificada.</p>
-        
-        <h5 class="text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider">Parámetros</h5>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">Error</span> load_model(path: <span class="text-ai-cyan">String</span>, params: <span class="text-ai-cyan">Dictionary</span> = {})</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="loadModelDesc">Carga un modelo GGUF desde la ruta especificada.</p>
+
+        <h5 class="text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider" data-i18n="paramsTitle">Parámetros
+        </h5>
         <div class="overflow-x-auto mb-4">
-            <table class="w-full border-collapse">
-                <thead><tr class="border-b border-border-default"><th class="text-left py-2 px-4 text-ai-cyan text-sm">Parámetro</th><th class="text-left py-2 px-4 text-ai-cyan text-sm">Tipo</th><th class="text-left py-2 px-4 text-ai-cyan text-sm">Descripción</th></tr></thead>
-                <tbody class="text-sm">
-                    <tr class="border-b border-border-default/50"><td class="py-2 px-4 font-mono text-ai-purple">path</td><td class="py-2 px-4 font-mono text-gray-400">String</td><td class="py-2 px-4 text-gray-300">Ruta al archivo .gguf. Soporta res:// y user://</td></tr>
-                    <tr><td class="py-2 px-4 font-mono text-ai-purple">params</td><td class="py-2 px-4 font-mono text-gray-400">Dictionary</td><td class="py-2 px-4 text-gray-300">Parámetros opcionales de configuración</td></tr>
-                </tbody>
-            </table>
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="border-b border-border-default">
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableParam">Parámetro</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableType">Tipo</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableDesc">Descripción</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">path</td>
+                <td class="py-2 px-4 font-mono text-gray-400">String</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="paramPathDesc">Ruta al archivo .gguf. Soporta res:// y
+                  user://</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono text-ai-purple">params</td>
+                <td class="py-2 px-4 font-mono text-gray-400">Dictionary</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="paramParamsDesc">Parámetros opcionales de configuración
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-       <!-- Back Link -->
-       <a href="../home.html" class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors mb-8">
+      <!-- Back Link -->
+      <a href="../home.html"
+        class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors mb-8">
         <span>&#x2190;</span>
         <span data-i18n="backToHome">Volver a Home</span>
       </a>
 
       <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
-        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
         <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>

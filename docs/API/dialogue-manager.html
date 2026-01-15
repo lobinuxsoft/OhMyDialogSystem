@@ -1,1209 +1,953 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DialogueManager - OhMyDialogSystem Wiki</title>
-  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
+          pageTitle: 'DialogueManager',
+          pageSubtitle: 'Orquestador principal del sistema de diálogos. Gestiona grafos y generación de IA.',
+          descTitle: 'Descripcion',
+          descContent: 'DialogueManager es el componente central que coordina todos los aspectos del sistema de diálogos:',
+          descListGraph: 'Ejecución de grafos', descListGraphContent: 'Navega por nodos de diálogo definidos visualmente',
+          descListAI: 'Generación de IA', descListAIContent: 'Integra con LlamaInterface para respuestas dinámicas',
+          descListContext: 'Gestión de contexto', descListContextContent: 'Mantiene variables, historial y estado de conversación',
+          descListQuery: 'Sistema de consultas', descListQueryContent: 'Permite que la lógica del juego responda a condiciones y acciones',
+
+          noteEntry: 'Esta clase es el punto de entrada principal para el sistema de diálogos. Maneja automáticamente la carga/descarga de modelos de IA, historial de conversación, y ejecución de grafos.',
+          modesTitle: 'Modos de Dialogo',
+          modeFree: 'Conversación abierta con IA, sin estructura de grafo',
+          modeScripted: 'Ejecución estricta del grafo de diálogo',
+          modeHybrid: 'Combina ambos, permitiendo transiciones entre grafo y conversación libre',
+
+          enumsTitle: 'Enumeraciones',
+          propsTitle: 'Propiedades',
+          methodsTitle: 'Metodos',
+          signalsTitle: 'Señales',
+          backToHome: 'Volver a Home',
+          inheritance: 'Herencia',
+
+          exportedProps: 'Propiedades Exportadas',
+          readOnlyProps: 'Propiedades de Solo Lectura',
+
+          // Properties
+          propDefaultChar: 'Personaje interactivo por defecto',
+          propWorldContext: 'Contexto mundial compartido',
+          propStreaming: 'Habilitar respuestas en streaming',
+          propMaxTokens: 'Tokens máximos de contexto',
+          propReserveTokens: 'Tokens reservados para respuesta',
+          propCurrentMode: 'Modo actual (FREE/SCRIPTED/HYBRID)',
+          propCurrentGraph: 'Grafo activo',
+          propActiveChar: 'Personaje activo actual',
+
+          // Methods Categories
+          dialogueControl: 'Control de Dialogo',
+          playerInteraction: 'Interaccion del Jugador',
+          config: 'Configuracion',
+          varsAndContext: 'Variables y Contexto',
+          querySystem: 'Query System',
+          utilities: 'Utilidades',
+          lifeCycle: 'Ciclo de Vida',
+          npcResponses: 'Respuestas del NPC',
+          eventsAndVars: 'Eventos y Variables',
+          modelLoading: 'Carga de Modelo',
+          errors: 'Errores',
+          methodDesc: 'Descripciones de Metodos',
+
+          // Methods Detailed
+          startDialogueDesc: 'Inicia una nueva sesión de diálogo. Si hay un diálogo activo, lo termina primero.',
+          startDialogueL1: 'Carga automáticamente el modelo de IA si el grafo especifica model_path',
+          startDialogueL2: 'Aplica el AIPreset del grafo si está definido',
+          startDialogueL3: 'Inicializa variables locales desde el grafo',
+          sendPlayerMessageDesc: 'Envía un mensaje del jugador al sistema. En modo FREE genera respuesta IA, en SCRIPTED pasa al grafo.',
+
+          getVariableDesc: 'Obtiene una variable del contexto de diálogo.',
+          setVariableDesc: 'Establece una variable en el contexto de diálogo.',
+          queryConditionDesc: 'Consulta una condición al código del juego. Emite condition_query_requested y espera respuesta.',
+          getDebugInfoDesc: 'Retorna información de debug sobre el estado actual del diálogo.',
+
+          // Signals Descriptions
+          sigDialogueStarted: 'Emitida cuando inicia una sesión de diálogo',
+          sigDialogueEnded: 'Emitida cuando termina el diálogo',
+          sigModeChanged: 'Emitida cuando cambia el modo de diálogo',
+          sigNpcSpeaking: 'Emitida cuando el NPC comienza a hablar. Si is_streaming es true, el texto se completará progresivamente.',
+          sigNpcResponseToken: 'Emitida para cada token durante streaming',
+          sigNpcResponseCompleted: 'Emitida cuando la respuesta del NPC está completa',
+          sigPlayerChoices: 'Emitida cuando hay opciones disponibles para el jugador.',
+          sigWaitingInput: 'Emitida cuando se espera entrada de texto del jugador',
+          sigEventTriggered: 'Emitida cuando un nodo de evento se ejecuta',
+          sigVarChanged: 'Emitida cuando una variable del contexto cambia',
+          sigModelLoadStart: 'Emitida cuando comienza la carga del modelo de IA',
+          sigModelLoadComp: 'Emitida cuando el modelo está listo',
+          sigCondQuery: 'El diálogo necesita verificar una condición. Llamar callback.call(result: bool).',
+          sigActionQuery: 'El diálogo necesita ejecutar una acción. Llamar callback.call() cuando termine.',
+          sigValueQuery: 'El diálogo necesita obtener un valor. Llamar callback.call(value).',
+          sigError: 'Emitida cuando ocurre un error durante la ejecución'
+        },
+        en: {
+          navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
+          pageTitle: 'DialogueManager',
+          pageSubtitle: 'Main dialogue system orchestrator. Manages graphs and AI generation.',
+          descTitle: 'Description',
+          descContent: 'DialogueManager is the central component coordinating all aspects of the dialogue system:',
+          descListGraph: 'Graph Execution', descListGraphContent: 'Navigates visually defined dialogue nodes',
+          descListAI: 'AI Generation', descListAIContent: 'Integrates with LlamaInterface for dynamic responses',
+          descListContext: 'Context Management', descListContextContent: 'Maintains variables, history, and conversation state',
+          descListQuery: 'Query System', descListQueryContent: 'Allows game logic to respond to conditions and actions',
+
+          noteEntry: 'This class is the main entry point for the dialogue system. It automatically handles AI model loading/unloading, conversation history, and graph execution.',
+          modesTitle: 'Dialogue Modes',
+          modeFree: 'Open conversation with AI, no graph structure',
+          modeScripted: 'Strict execution of the dialogue graph',
+          modeHybrid: 'Combines both, allowing transitions between graph and free conversation',
+
+          enumsTitle: 'Enumerations',
+          propsTitle: 'Properties',
+          methodsTitle: 'Methods',
+          signalsTitle: 'Signals',
+          backToHome: 'Back to Home',
+          inheritance: 'Inheritance',
+
+          exportedProps: 'Exported Properties',
+          readOnlyProps: 'Read-Only Properties',
+
+          // Properties
+          propDefaultChar: 'Default interactive character',
+          propWorldContext: 'Shared world context',
+          propStreaming: 'Enable streaming responses',
+          propMaxTokens: 'Max context tokens',
+          propReserveTokens: 'Tokens reserved for response',
+          propCurrentMode: 'Current mode (FREE/SCRIPTED/HYBRID)',
+          propCurrentGraph: 'Active graph',
+          propActiveChar: 'Current active character',
+
+          // Methods Categories
+          dialogueControl: 'Dialogue Control',
+          playerInteraction: 'Player Interaction',
+          config: 'Configuration',
+          varsAndContext: 'Variables & Context',
+          querySystem: 'Query System',
+          utilities: 'Utilities',
+          lifeCycle: 'Lifecycle',
+          npcResponses: 'NPC Responses',
+          eventsAndVars: 'Events & Variables',
+          modelLoading: 'Model Loading',
+          errors: 'Errors',
+          methodDesc: 'Method Descriptions',
+
+          // Methods Detailed
+          startDialogueDesc: 'Starts a new dialogue session. If there is an active dialogue, it ends it first.',
+          startDialogueL1: 'Automatically loads AI model if graph specifies model_path',
+          startDialogueL2: 'Applies graph AIPreset if defined',
+          startDialogueL3: 'Initializes local variables from graph',
+          sendPlayerMessageDesc: 'Sends a player message to the system. In FREE mode generates AI response, in SCRIPTED mode passes to graph.',
+
+          getVariableDesc: 'Gets a variable from the dialogue context.',
+          setVariableDesc: 'Sets a variable in the dialogue context.',
+          queryConditionDesc: 'Queries a condition to the game code. Emits condition_query_requested and waits for response.',
+          getDebugInfoDesc: 'Returns debug information about the current dialogue state.',
+
+          // Signals Descriptions
+          sigDialogueStarted: 'Emitted when a dialogue session starts',
+          sigDialogueEnded: 'Emitted when the dialogue ends',
+          sigModeChanged: 'Emitted when the dialogue mode changes',
+          sigNpcSpeaking: 'Emitted when the NPC starts speaking. If is_streaming is true, text will complete progressively.',
+          sigNpcResponseToken: 'Emitted for each token during streaming',
+          sigNpcResponseCompleted: 'Emitted when the NPC response is complete',
+          sigPlayerChoices: 'Emitted when choices are available for the player.',
+          sigWaitingInput: 'Emitted when waiting for player text input',
+          sigEventTriggered: 'Emitted when an event node is executed',
+          sigVarChanged: 'Emitted when a context variable changes',
+          sigModelLoadStart: 'Emitted when AI model loading starts',
+          sigModelLoadComp: 'Emitted when the model is ready',
+          sigCondQuery: 'Dialogue needs to verify a condition. Call callback.call(result: bool).',
+          sigActionQuery: 'Dialogue needs to execute an action. Call callback.call() when finished.',
+          sigValueQuery: 'Dialogue needs to get a value. Call callback.call(value).',
+          sigError: 'Emitted when an execution error occurs'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) el.textContent = this.t[this.lang][key];
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
 </head>
-<body>
+
+<body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-
-  <div class="wiki-container">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
-        <div class="sidebar-logo">OhMyDialogSystem</div>
-        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+  <div class="flex min-h-screen relative z-10">
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">General</div>
-        <ul class="nav-links">
-          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
-        </ul>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Getting Started</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
-          <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
-          <li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
-        </ul>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">API Reference</div>
-        <ul class="nav-links">
-          <li><a href="index.html"><span class="icon">📚</span> Overview</a></li>
-          <li><a href="llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
-          <li><a href="dialogue-manager.html" class="active"><span class="icon">💬</span> DialogueManager</a></li>
-          <li><a href="memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
-          <li><a href="tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
-          <li><a href="resources.html"><span class="icon">📄</span> Resources</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Technical</div>
-        <ul class="nav-links">
-          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
-          <li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
-          <li><a href="../Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
-          <li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
-          <li><a href="../Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li>
-          <li><a href="../Technical/localization.html"><span class="icon">🌐</span> Localization</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Guides</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/index.html"><span class="icon">📖</span> Overview</a></li>
-          <li><a href="../Guides/visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
-          <li><a href="../Guides/character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
-          <li><a href="../Guides/tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
-          <li><a href="../Guides/csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Examples</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
-          <li><a href="../Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
-          <li><a href="../Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">External Links</div>
-        <ul class="nav-links">
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
-          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li>
-        </ul>
+      <!-- Navbar content same as before -->
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General</div>
+          <ul>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <ul>
+            <li><a href="../Guides/quickstart.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="../Guides/installation.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="../Guides/first-npc.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <ul>
+            <li><a href="index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <ul>
+            <li><a href="../Technical/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a>
+            </li>
+            <li><a href="../Technical/dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <ul>
+            <li><a href="../Guides/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4D6;</span> Overview</a></li>
+            <li><a href="../Guides/visual-editor.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+            <li><a href="../Guides/character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="../Guides/tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <main class="main-content">
-      <div class="breadcrumbs">
-        <a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">API Reference</a> <span>/</span> <span>DialogueManager</span>
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">API Reference</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>DialogueManager</span>
       </div>
 
-      <h1>💬 DialogueManager</h1>
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">DialogueManager</span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
 
-      <p><span class="badge badge-green">GDScript</span> <span class="badge badge-purple">Core</span></p>
+      <p class="mb-6"><span
+          class="inline-block px-2 py-1 text-xs rounded bg-ai-green/20 text-ai-green border border-ai-green/30">GDScript</span>
+        <span
+          class="inline-block px-2 py-1 text-xs rounded bg-ai-purple/20 text-ai-purple border border-ai-purple/30">Core</span>
+      </p>
 
-      <p>Orquestador principal del sistema de diálogos. Gestiona la ejecución de conversaciones en múltiples modos, integrando grafos de diálogo con generación de IA.</p>
+      <p class="text-xl text-gray-300 mb-8" data-i18n="pageSubtitle">Orquestador principal del sistema de diálogos.
+        Gestiona la ejecución de conversaciones en múltiples modos, integrando grafos de diálogo con generación de IA.
+      </p>
 
-      <blockquote>
-        <strong>Nota:</strong> Esta clase es el punto de entrada principal para el sistema de diálogos. Maneja automáticamente la carga/descarga de modelos de IA, historial de conversación, y ejecución de grafos.
-      </blockquote>
+      <div class="p-4 rounded-lg bg-ai-cyan/5 border border-ai-cyan/20 mb-12">
+        <strong class="text-ai-cyan">Nota:</strong> <span class="text-gray-300" data-i18n="noteEntry">Esta clase es el
+          punto de entrada principal para el sistema de diálogos. Maneja automáticamente la carga/descarga de modelos de
+          IA, historial de conversación, y ejecución de grafos.</span>
+      </div>
 
-      <hr>
+      <hr class="border-border-default mb-12">
 
-      <h2>Herencia</h2>
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="inheritance">Herencia</span>
+      </h2>
 
-      <p><code>Node</code> → <code>DialogueManager</code></p>
+      <p class="font-mono text-gray-400 mb-12"><span class="text-ai-purple">Node</span> &#x2192; <span
+          class="text-ai-cyan">DialogueManager</span></p>
 
-      <hr>
+      <hr class="border-border-default mb-12">
 
-      <h2>Descripción</h2>
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="descTitle">Descripcion</span>
+      </h2>
 
-      <p><code>DialogueManager</code> es el componente central que coordina todos los aspectos del sistema de diálogos:</p>
+      <p class="text-gray-300 mb-4" data-i18n="descContent">DialogueManager es el componente central que coordina todos
+        los aspectos del sistema de diálogos:</p>
 
-      <ul>
-        <li><strong>Ejecución de grafos</strong> - Navega por nodos de diálogo definidos visualmente</li>
-        <li><strong>Generación de IA</strong> - Integra con <code>LlamaInterface</code> para respuestas dinámicas</li>
-        <li><strong>Gestión de contexto</strong> - Mantiene variables, historial y estado de conversación</li>
-        <li><strong>Sistema de consultas</strong> - Permite que la lógica del juego responda a condiciones y acciones</li>
+      <ul class="list-disc pl-6 text-gray-300 mb-8 space-y-2">
+        <li><strong class="text-ai-orange" data-i18n="descListGraph">Ejecución de grafos</strong>: <span
+            data-i18n="descListGraphContent">Navega por nodos de diálogo definidos visualmente</span></li>
+        <li><strong class="text-ai-orange" data-i18n="descListAI">Generación de IA</strong>: <span
+            data-i18n="descListAIContent">Integra con LlamaInterface para respuestas dinámicas</span></li>
+        <li><strong class="text-ai-orange" data-i18n="descListContext">Gestión de contexto</strong>: <span
+            data-i18n="descListContextContent">Mantiene variables, historial y estado de conversación</span></li>
+        <li><strong class="text-ai-orange" data-i18n="descListQuery">Sistema de consultas</strong>: <span
+            data-i18n="descListQueryContent">Permite que la lógica del juego responda a condiciones y acciones</span>
+        </li>
       </ul>
 
-      <div class="callout-info" style="margin: 1.5rem 0;">
-        <p><strong>Modos de Diálogo:</strong> El sistema soporta tres modos de operación:</p>
-        <ul style="margin-top: 0.5rem;">
-          <li><strong>FREE</strong> - Conversación abierta con IA, sin estructura de grafo</li>
-          <li><strong>SCRIPTED</strong> - Ejecución estricta del grafo de diálogo</li>
-          <li><strong>HYBRID</strong> - Combina ambos, permitiendo transiciones entre grafo y conversación libre</li>
+      <div class="p-6 rounded-xl border border-border-default bg-bg-card/50 mb-12">
+        <h3 class="text-lg font-bold text-white mb-4" data-i18n="modesTitle">Modos de Diálogo</h3>
+        <ul class="space-y-4">
+          <li class="flex items-start gap-3">
+            <span
+              class="uppercase text-xs font-bold px-2 py-1 rounded bg-bg-tertiary border border-border-default text-ai-cyan w-20 text-center">Free</span>
+            <span class="text-gray-400 text-sm pt-0.5" data-i18n="modeFree">Conversación abierta con IA, sin estructura
+              de grafo</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span
+              class="uppercase text-xs font-bold px-2 py-1 rounded bg-bg-tertiary border border-border-default text-ai-purple w-20 text-center">Scripted</span>
+            <span class="text-gray-400 text-sm pt-0.5" data-i18n="modeScripted">Ejecución estricta del grafo de
+              diálogo</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span
+              class="uppercase text-xs font-bold px-2 py-1 rounded bg-bg-tertiary border border-border-default text-ai-pink w-20 text-center">Hybrid</span>
+            <span class="text-gray-400 text-sm pt-0.5" data-i18n="modeHybrid">Combina ambos, permitiendo transiciones
+              entre grafo y conversación libre</span>
+          </li>
         </ul>
       </div>
 
-      <hr>
-
-      <h2>Enumeraciones</h2>
-
-      <h3 id="DialogueMode">DialogueMode</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Valor</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>FREE</code></td>
-            <td>Conversación abierta con IA. El jugador puede escribir libremente y el NPC responde dinámicamente.</td>
-          </tr>
-          <tr>
-            <td><code>SCRIPTED</code></td>
-            <td>Ejecución basada exclusivamente en el grafo de diálogo. Solo opciones predefinidas.</td>
-          </tr>
-          <tr>
-            <td><code>HYBRID</code></td>
-            <td>Permite transiciones entre modo libre y scripted. Nodos especiales controlan las transiciones.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <hr>
-
-      <h2>Propiedades</h2>
-
-      <h3>Propiedades Exportadas</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Propiedad</th>
-            <th>Default</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>CharacterIdentity</code></td>
-            <td><a href="#default_character">default_character</a></td>
-            <td><code>null</code></td>
-            <td>Personaje por defecto para respuestas de IA</td>
-          </tr>
-          <tr>
-            <td><code>WorldContext</code></td>
-            <td><a href="#world_context">world_context</a></td>
-            <td><code>null</code></td>
-            <td>Contexto del mundo para generación de IA</td>
-          </tr>
-          <tr>
-            <td><code>bool</code></td>
-            <td><a href="#streaming_enabled">streaming_enabled</a></td>
-            <td><code>true</code></td>
-            <td>Habilitar respuestas en streaming</td>
-          </tr>
-          <tr>
-            <td><code>int</code></td>
-            <td><a href="#max_context_tokens">max_context_tokens</a></td>
-            <td><code>4096</code></td>
-            <td>Tokens máximos de contexto para LLM</td>
-          </tr>
-          <tr>
-            <td><code>int</code></td>
-            <td><a href="#response_reserve_tokens">response_reserve_tokens</a></td>
-            <td><code>512</code></td>
-            <td>Tokens reservados para la respuesta</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Propiedades de Solo Lectura</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Propiedad</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>DialogueMode</code></td>
-            <td>current_mode</td>
-            <td>Modo de diálogo actual</td>
-          </tr>
-          <tr>
-            <td><code>DialogueGraph</code></td>
-            <td>current_graph</td>
-            <td>Grafo de diálogo activo</td>
-          </tr>
-          <tr>
-            <td><code>CharacterIdentity</code></td>
-            <td>active_character</td>
-            <td>Personaje activo (puede diferir del default)</td>
-          </tr>
-          <tr>
-            <td><code>GraphRunner</code></td>
-            <td>graph_runner</td>
-            <td>Ejecutor de grafos interno</td>
-          </tr>
-          <tr>
-            <td><code>PromptBuilder</code></td>
-            <td>prompt_builder</td>
-            <td>Constructor de prompts para LLM</td>
-          </tr>
-          <tr>
-            <td><code>ConversationHistory</code></td>
-            <td>conversation_history</td>
-            <td>Historial de conversación</td>
-          </tr>
-          <tr>
-            <td><code>ContextManager</code></td>
-            <td>context_manager</td>
-            <td>Gestor de variables y contexto</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <hr>
-
-      <h2>Métodos</h2>
-
-      <h3>Control de Diálogo</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#start_dialogue">start_dialogue</a>(graph: DialogueGraph = null, mode: DialogueMode = HYBRID)</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#end_dialogue">end_dialogue</a>(reason: String = "ended")</td>
-          </tr>
-          <tr>
-            <td><code>bool</code></td>
-            <td><a href="#is_active">is_active</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_mode">set_mode</a>(mode: DialogueMode)</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Interacción del Jugador</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#send_player_message">send_player_message</a>(text: String)</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#select_choice">select_choice</a>(choice_index: int)</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Configuración</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_character">set_character</a>(character: CharacterIdentity)</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_world_context">set_world_context</a>(context: WorldContext)</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_llama_interface">set_llama_interface</a>(interface: Object)</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_streaming_enabled">set_streaming_enabled</a>(enabled: bool)</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Variables y Contexto</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>Variant</code></td>
-            <td><a href="#get_variable">get_variable</a>(name: String, default: Variant = null)</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_variable">set_variable</a>(name: String, value: Variant, scope: String = "local")</td>
-          </tr>
-          <tr>
-            <td><code>bool</code></td>
-            <td><a href="#evaluate_condition">evaluate_condition</a>(expression: String)</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Query System</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>bool</code></td>
-            <td><a href="#query_condition">query_condition</a>(key: String, expected_value: Variant = true, default_value: bool = false)</td>
-          </tr>
-          <tr>
-            <td><code>bool</code></td>
-            <td><a href="#query_action">query_action</a>(key: String, value: Variant = null)</td>
-          </tr>
-          <tr>
-            <td><code>Variant</code></td>
-            <td><a href="#query_value">query_value</a>(key: String, default_value: Variant = null)</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Utilidades</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>ConversationHistory</code></td>
-            <td><a href="#get_conversation_history">get_conversation_history</a>()</td>
-          </tr>
-          <tr>
-            <td><code>ContextManager</code></td>
-            <td><a href="#get_context_manager">get_context_manager</a>()</td>
-          </tr>
-          <tr>
-            <td><code>PromptBuilder</code></td>
-            <td><a href="#get_prompt_builder">get_prompt_builder</a>()</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#clear_history">clear_history</a>()</td>
-          </tr>
-          <tr>
-            <td><code>Dictionary</code></td>
-            <td><a href="#get_debug_info">get_debug_info</a>()</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <hr>
-
-      <h2>Señales</h2>
-
-      <h3>Ciclo de Vida</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>dialogue_started(graph: DialogueGraph)</code></td>
-            <td>Emitida cuando inicia una sesión de diálogo</td>
-          </tr>
-          <tr>
-            <td><code>dialogue_ended(reason: String)</code></td>
-            <td>Emitida cuando termina el diálogo</td>
-          </tr>
-          <tr>
-            <td><code>mode_changed(old_mode: DialogueMode, new_mode: DialogueMode)</code></td>
-            <td>Emitida cuando cambia el modo de diálogo</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Respuestas del NPC</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>npc_speaking(speaker: String, text: String, is_streaming: bool)</code></td>
-            <td>Emitida cuando el NPC comienza a hablar. Si <code>is_streaming</code> es true, el texto se completará progresivamente.</td>
-          </tr>
-          <tr>
-            <td><code>npc_response_token(token: String)</code></td>
-            <td>Emitida para cada token durante streaming</td>
-          </tr>
-          <tr>
-            <td><code>npc_response_completed(full_text: String)</code></td>
-            <td>Emitida cuando la respuesta del NPC está completa</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Interacción del Jugador</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>player_choices_available(choices: Array[Dictionary])</code></td>
-            <td>Emitida cuando hay opciones disponibles para el jugador. Cada diccionario contiene <code>text</code> e <code>index</code>.</td>
-          </tr>
-          <tr>
-            <td><code>waiting_for_player_input</code></td>
-            <td>Emitida cuando se espera entrada de texto del jugador</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Eventos y Variables</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>event_triggered(event_name: String, data: Dictionary)</code></td>
-            <td>Emitida cuando un nodo de evento se ejecuta</td>
-          </tr>
-          <tr>
-            <td><code>variable_changed(name: String, old_value: Variant, new_value: Variant)</code></td>
-            <td>Emitida cuando una variable del contexto cambia</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Carga de Modelo</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>model_loading_started(model_path: String)</code></td>
-            <td>Emitida cuando comienza la carga del modelo de IA</td>
-          </tr>
-          <tr>
-            <td><code>model_loading_completed()</code></td>
-            <td>Emitida cuando el modelo está listo</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Query System (Integración con Juego)</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>condition_query_requested(key: String, expected_value: Variant, callback: Callable)</code></td>
-            <td>El diálogo necesita verificar una condición. Llamar <code>callback.call(result: bool)</code>.</td>
-          </tr>
-          <tr>
-            <td><code>action_query_requested(key: String, value: Variant, callback: Callable)</code></td>
-            <td>El diálogo necesita ejecutar una acción. Llamar <code>callback.call()</code> cuando termine.</td>
-          </tr>
-          <tr>
-            <td><code>value_query_requested(key: String, callback: Callable)</code></td>
-            <td>El diálogo necesita obtener un valor. Llamar <code>callback.call(value)</code>.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Errores</h3>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>error_occurred(message: String)</code></td>
-            <td>Emitida cuando ocurre un error durante la ejecución</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <hr>
-
-      <h2>Descripciones de Métodos</h2>
-
-      <h3 id="start_dialogue">start_dialogue</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = HYBRID)</code></pre>
-
-      <p>Inicia una nueva sesión de diálogo. Si hay un diálogo activo, lo termina primero.</p>
-
-      <h4>Parámetros</h4>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Parámetro</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>graph</code></td>
-            <td>DialogueGraph</td>
-            <td>Grafo de diálogo a ejecutar. Si es <code>null</code>, inicia en modo FREE.</td>
-          </tr>
-          <tr>
-            <td><code>mode</code></td>
-            <td>DialogueMode</td>
-            <td>Modo de ejecución inicial</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h4>Comportamiento</h4>
-
-      <ul>
-        <li>Carga automáticamente el modelo de IA si el grafo especifica <code>model_path</code></li>
-        <li>Aplica el <code>AIPreset</code> del grafo si está definido</li>
-        <li>Inicializa variables locales desde el grafo</li>
-        <li>Emite <code>dialogue_started</code></li>
-      </ul>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code># Iniciar con grafo predefinido
-var graph = load("res://dialogues/merchant.tres")
-dialogue_manager.start_dialogue(graph, DialogueManager.DialogueMode.SCRIPTED)
-
-# Iniciar conversación libre sin grafo
-dialogue_manager.start_dialogue(null, DialogueManager.DialogueMode.FREE)</code></pre>
-
-      <hr>
-
-      <h3 id="end_dialogue">end_dialogue</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void end_dialogue(reason: String = "ended")</code></pre>
-
-      <p>Termina la sesión de diálogo actual y libera recursos.</p>
-
-      <h4>Comportamiento</h4>
-
-      <ul>
-        <li>Detiene la ejecución del grafo</li>
-        <li>Limpia variables locales</li>
-        <li>Descarga el modelo de IA si fue cargado para este diálogo</li>
-        <li>Emite <code>dialogue_ended</code> con la razón especificada</li>
-      </ul>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code># Terminar por decisión del jugador
-dialogue_manager.end_dialogue("player_left")
-
-# Terminar por completar el grafo (automático)
-# reason será "graph_completed"</code></pre>
-
-      <hr>
-
-      <h3 id="send_player_message">send_player_message</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void send_player_message(text: String)</code></pre>
-
-      <p>Envía un mensaje del jugador al sistema de diálogos.</p>
-
-      <h4>Comportamiento</h4>
-
-      <ul>
-        <li>En modo FREE: Procesa el mensaje y genera respuesta de IA</li>
-        <li>En modo SCRIPTED con nodo de texto: Pasa el texto al grafo</li>
-        <li>Añade el mensaje al historial de conversación</li>
-      </ul>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code># Cuando el jugador envía un mensaje
-func _on_send_button_pressed():
-    var text = input_field.text.strip_edges()
-    if not text.is_empty():
-        dialogue_manager.send_player_message(text)
-        input_field.text = ""</code></pre>
-
-      <hr>
-
-      <h3 id="select_choice">select_choice</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void select_choice(choice_index: int)</code></pre>
-
-      <p>Selecciona una opción por su índice cuando hay opciones disponibles.</p>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code># Crear botones para opciones
-func _on_choices_available(choices: Array[Dictionary]):
-    for i in choices.size():
-        var button = Button.new()
-        button.text = choices[i].text
-        button.pressed.connect(func(): dialogue_manager.select_choice(i))
-        choices_container.add_child(button)</code></pre>
-
-      <hr>
-
-      <h3 id="get_variable">get_variable</h3>
-
-      <pre data-lang="GDSCRIPT"><code>Variant get_variable(name: String, default: Variant = null)</code></pre>
-
-      <p>Obtiene una variable del contexto de diálogo.</p>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code>var gold = dialogue_manager.get_variable("player_gold", 0)
-var has_key = dialogue_manager.get_variable("has_dungeon_key", false)</code></pre>
-
-      <hr>
-
-      <h3 id="set_variable">set_variable</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_variable(name: String, value: Variant, scope: String = "local")</code></pre>
-
-      <p>Establece una variable en el contexto de diálogo.</p>
-
-      <h4>Parámetros</h4>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Parámetro</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>scope</code></td>
-            <td><code>"local"</code> = solo este diálogo, <code>"global"</code> = persiste entre diálogos</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code># Variable local (se pierde al terminar diálogo)
-dialogue_manager.set_variable("merchant_mood", "happy", "local")
-
-# Variable global (persiste)
-dialogue_manager.set_variable("times_talked_to_merchant", 3, "global")</code></pre>
-
-      <hr>
-
-      <h3 id="query_condition">query_condition</h3>
-
-      <pre data-lang="GDSCRIPT"><code>bool query_condition(key: String, expected_value: Variant = true, default_value: bool = false)</code></pre>
-
-      <p>Consulta una condición al código del juego. Emite <code>condition_query_requested</code> y espera respuesta.</p>
-
-      <h4>Ejemplo en el Juego</h4>
-
-      <pre data-lang="GDSCRIPT"><code># En tu script de juego
-func _ready():
-    dialogue_manager.condition_query_requested.connect(_on_condition_query)
-
-func _on_condition_query(key: String, expected_value: Variant, callback: Callable):
-    match key:
-        "has_item":
-            callback.call(inventory.has_item(expected_value))
-        "player_level_above":
-            callback.call(player.level >= expected_value)
-        _:
-            callback.call(false)  # Default para condiciones desconocidas</code></pre>
-
-      <hr>
-
-      <h3 id="get_debug_info">get_debug_info</h3>
-
-      <pre data-lang="GDSCRIPT"><code>Dictionary get_debug_info()</code></pre>
-
-      <p>Retorna información de debug sobre el estado actual del diálogo.</p>
-
-      <h4>Retorno</h4>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>is_active</code></td>
-            <td>bool</td>
-            <td>Si hay un diálogo activo</td>
-          </tr>
-          <tr>
-            <td><code>mode</code></td>
-            <td>String</td>
-            <td>"FREE", "SCRIPTED", o "HYBRID"</td>
-          </tr>
-          <tr>
-            <td><code>graph</code></td>
-            <td>String</td>
-            <td>ID del grafo actual o "none"</td>
-          </tr>
-          <tr>
-            <td><code>model</code></td>
-            <td>String</td>
-            <td>Nombre del modelo cargado</td>
-          </tr>
-          <tr>
-            <td><code>character</code></td>
-            <td>String</td>
-            <td>Nombre del personaje activo</td>
-          </tr>
-          <tr>
-            <td><code>world</code></td>
-            <td>String</td>
-            <td>Nombre del mundo</td>
-          </tr>
-          <tr>
-            <td><code>history</code></td>
-            <td>String</td>
-            <td>Resumen del historial</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <hr>
-
-      <h2>Ejemplo Completo</h2>
-
-      <pre data-lang="GDSCRIPT"><code>extends Control
-## Example: NPC dialogue interaction
-
-@onready var dialogue_panel: PanelContainer = %DialoguePanel
-@onready var speaker_label: Label = %SpeakerLabel
-@onready var dialogue_text: RichTextLabel = %DialogueText
-@onready var choices_container: VBoxContainer = %ChoicesContainer
-@onready var input_field: LineEdit = %InputField
-
-var dialogue_manager: DialogueManager
-
-func _ready():
-    # Crear e inicializar DialogueManager
-    dialogue_manager = DialogueManager.new()
-    add_child(dialogue_manager)
-
-    # Configurar personaje y mundo
-    dialogue_manager.default_character = load("res://npcs/merchant.tres")
-    dialogue_manager.world_context = load("res://worlds/fantasy.tres")
-
-    # Conectar señales
-    dialogue_manager.dialogue_started.connect(_on_dialogue_started)
-    dialogue_manager.dialogue_ended.connect(_on_dialogue_ended)
-    dialogue_manager.npc_speaking.connect(_on_npc_speaking)
-    dialogue_manager.npc_response_completed.connect(_on_npc_response_completed)
-    dialogue_manager.player_choices_available.connect(_on_choices_available)
-    dialogue_manager.waiting_for_player_input.connect(_on_waiting_for_input)
-    dialogue_manager.error_occurred.connect(_on_error)
-
-    # Conectar Query System para integración con juego
-    dialogue_manager.condition_query_requested.connect(_on_condition_query)
-    dialogue_manager.action_query_requested.connect(_on_action_query)
-
-
-func start_conversation():
-    var graph = load("res://dialogues/merchant_dialogue.tres")
-    dialogue_manager.start_dialogue(graph, DialogueManager.DialogueMode.HYBRID)
-
-
-func _on_dialogue_started(_graph: DialogueGraph):
-    dialogue_panel.visible = true
-    print("Dialogue started!")
-
-
-func _on_dialogue_ended(reason: String):
-    dialogue_panel.visible = false
-    print("Dialogue ended: ", reason)
-
-
-func _on_npc_speaking(speaker: String, text: String, is_streaming: bool):
-    speaker_label.text = speaker
-    if is_streaming:
-        dialogue_text.text = ""  # Se llenará con tokens
-    else:
-        dialogue_text.text = text
-
-
-func _on_npc_response_completed(full_text: String):
-    dialogue_text.text = full_text
-
-
-func _on_choices_available(choices: Array[Dictionary]):
-    # Limpiar opciones anteriores
-    for child in choices_container.get_children():
-        child.queue_free()
-
-    # Crear botones para cada opción
-    for i in choices.size():
-        var button = Button.new()
-        button.text = "%d. %s" % [i + 1, choices[i].text]
-        var index = choices[i].get("index", i)
-        button.pressed.connect(func(): dialogue_manager.select_choice(index))
-        choices_container.add_child(button)
-
-    choices_container.visible = true
-    input_field.visible = false
-
-
-func _on_waiting_for_input():
-    choices_container.visible = false
-    input_field.visible = true
-    input_field.grab_focus()
-
-
-func _on_input_submitted(text: String):
-    if not text.strip_edges().is_empty():
-        dialogue_manager.send_player_message(text)
-        input_field.text = ""
-
-
-func _on_error(message: String):
-    push_error("Dialogue error: " + message)
-
-
-# ==================== Query System Handlers ====================
-
-func _on_condition_query(key: String, expected: Variant, callback: Callable):
-    match key:
-        "has_gold":
-            callback.call(player_gold >= expected)
-        "quest_completed":
-            callback.call(completed_quests.has(expected))
-        _:
-            callback.call(false)
-
-
-func _on_action_query(key: String, value: Variant, callback: Callable):
-    match key:
-        "give_item":
-            inventory.add_item(value)
-            callback.call()
-        "take_gold":
-            player_gold -= value
-            callback.call()
-        "start_quest":
-            quest_manager.start_quest(value)
-            callback.call()
-        _:
-            callback.call()  # Siempre llamar callback</code></pre>
-
-      <hr>
-
-      <h2>Flujo de Ejecución</h2>
-
-      <style>
-        .flow-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0;
-          padding: 1.5rem;
-          background: var(--bg-card);
-          border-radius: 12px;
-          border: 1px solid var(--border-color);
-        }
-        .flow-box {
-          background: var(--bg-tertiary);
-          border: 2px solid var(--ai-cyan);
-          border-radius: 8px;
-          padding: 1rem 1.5rem;
-          text-align: center;
-          width: 100%;
-          max-width: 500px;
-          box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
-        }
-        .flow-box-title {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: var(--ai-cyan);
-        }
-        .flow-box-content {
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-          margin-top: 0.5rem;
-          text-align: left;
-        }
-        .flow-box-content li {
-          margin-bottom: 0.25rem;
-        }
-        .flow-arrow {
-          width: 2px;
-          height: 30px;
-          background: linear-gradient(180deg, var(--ai-cyan), var(--ai-purple));
-          position: relative;
-        }
-        .flow-arrow::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          border-left: 8px solid transparent;
-          border-right: 8px solid transparent;
-          border-top: 10px solid var(--ai-purple);
-        }
-        .flow-branch {
-          display: flex;
-          justify-content: center;
-          gap: 2rem;
-          width: 100%;
-          position: relative;
-        }
-        .flow-branch::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 60%;
-          height: 2px;
-          background: var(--ai-purple);
-        }
-        .flow-branch-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          flex: 1;
-          max-width: 200px;
-        }
-        .flow-branch-arrow {
-          width: 2px;
-          height: 20px;
-          background: var(--ai-purple);
-        }
-        .flow-mode-box {
-          background: var(--bg-tertiary);
-          border: 2px solid var(--ai-purple);
-          border-radius: 8px;
-          padding: 0.75rem 1rem;
-          text-align: center;
-          width: 100%;
-        }
-        .flow-mode-title {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: var(--ai-purple);
-        }
-        .flow-mode-desc {
-          font-size: 0.7rem;
-          color: var(--text-muted);
-          margin-top: 0.25rem;
-        }
-        .flow-interaction-box {
-          background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), rgba(168, 85, 247, 0.05));
-          border: 2px solid var(--ai-green);
-          border-radius: 8px;
-          padding: 1rem 1.5rem;
-          width: 100%;
-          max-width: 500px;
-        }
-        .flow-interaction-title {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: var(--ai-green);
-          text-align: center;
-          margin-bottom: 0.75rem;
-        }
-        .flow-interaction-row {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.75rem;
-          color: var(--text-secondary);
-          margin-bottom: 0.25rem;
-        }
-        .flow-interaction-method {
-          font-family: 'JetBrains Mono', monospace;
-          color: var(--ai-cyan);
-        }
-        .flow-interaction-signal {
-          font-family: 'JetBrains Mono', monospace;
-          color: var(--ai-purple);
-        }
-        .flow-end-box {
-          background: var(--bg-tertiary);
-          border: 2px solid #ef4444;
-          border-radius: 8px;
-          padding: 1rem 1.5rem;
-          text-align: center;
-          width: 100%;
-          max-width: 500px;
-        }
-        .flow-end-title {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: #ef4444;
-        }
-      </style>
-
-      <div class="flow-container">
-        <!-- Start -->
-        <div class="flow-box">
-          <div class="flow-box-title">start_dialogue()</div>
-        </div>
-
-        <div class="flow-arrow"></div>
-
-        <!-- Initialization -->
-        <div class="flow-box">
-          <div class="flow-box-title">Inicialización</div>
-          <ol class="flow-box-content">
-            <li>Cargar modelo IA (si graph.model_path definido)</li>
-            <li>Aplicar AIPreset</li>
-            <li>Inicializar variables desde grafo</li>
-            <li>Emitir <code>dialogue_started</code></li>
-          </ol>
-        </div>
-
-        <div class="flow-arrow"></div>
-
-        <!-- Branch -->
-        <div class="flow-branch">
-          <div class="flow-branch-item">
-            <div class="flow-branch-arrow"></div>
-            <div class="flow-mode-box">
-              <div class="flow-mode-title">MODE: FREE</div>
-              <div class="flow-mode-desc">waiting_for_player_input</div>
-            </div>
-          </div>
-          <div class="flow-branch-item">
-            <div class="flow-branch-arrow"></div>
-            <div class="flow-mode-box">
-              <div class="flow-mode-title">MODE: SCRIPTED / HYBRID</div>
-              <div class="flow-mode-desc">Execute graph</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="flow-arrow"></div>
-
-        <!-- Player Interaction Loop -->
-        <div class="flow-interaction-box">
-          <div class="flow-interaction-title">Player Interaction Loop</div>
-          <div class="flow-interaction-row">
-            <span class="flow-interaction-method">send_player_message()</span>
-            <span>→</span>
-            <span class="flow-interaction-signal">npc_speaking</span>
-            <span>→</span>
-            <span>AI generates</span>
-          </div>
-          <div class="flow-interaction-row">
-            <span class="flow-interaction-method">select_choice()</span>
-            <span>→</span>
-            <span>navigate graph</span>
-          </div>
-          <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); font-size: 0.7rem; color: var(--text-muted);">
-            Signals: <span class="flow-interaction-signal">npc_response_completed</span>, <span class="flow-interaction-signal">player_choices_available</span>
-          </div>
-        </div>
-
-        <div class="flow-arrow"></div>
-
-        <!-- End -->
-        <div class="flow-end-box">
-          <div class="flow-end-title">end_dialogue()</div>
-          <ol class="flow-box-content" style="margin-top: 0.5rem;">
-            <li>Detener GraphRunner</li>
-            <li>Limpiar variables locales</li>
-            <li>Descargar modelo IA</li>
-            <li>Emitir <code>dialogue_ended</code></li>
-          </ol>
-        </div>
+      <hr class="border-border-default mb-12">
+
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="propsTitle">Propiedades</span>
+      </h2>
+
+      <h3 class="text-xl font-bold text-white mb-6" data-i18n="exportedProps">Propiedades Exportadas</h3>
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Tipo</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Propiedad</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Default</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripcion</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">CharacterIdentity</td>
+              <td class="py-3 px-4 font-mono">default_character</td>
+              <td class="py-3 px-4 font-mono text-gray-500">null</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propDefaultChar">Personaje interactivo por defecto</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">WorldContext</td>
+              <td class="py-3 px-4 font-mono">world_context</td>
+              <td class="py-3 px-4 font-mono text-gray-500">null</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propWorldContext">Contexto mundial compartido</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono">streaming_enabled</td>
+              <td class="py-3 px-4 font-mono text-gray-500">true</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propStreaming">Habilitar respuestas en streaming</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono">max_context_tokens</td>
+              <td class="py-3 px-4 font-mono text-gray-500">4096</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propMaxTokens">Tokens máximos de contexto</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono">response_reserve_tokens</td>
+              <td class="py-3 px-4 font-mono text-gray-500">512</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propReserveTokens">Tokens reservados para respuesta</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <hr>
+      <h3 class="text-xl font-bold text-white mb-6" data-i18n="readOnlyProps">Propiedades de Solo Lectura</h3>
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Tipo</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Propiedad</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripcion</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">DialogueMode</td>
+              <td class="py-3 px-4 font-mono">current_mode</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propCurrentMode">Modo actual (FREE/SCRIPTED/HYBRID)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">DialogueGraph</td>
+              <td class="py-3 px-4 font-mono">current_graph</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propCurrentGraph">Grafo activo</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">CharacterIdentity</td>
+              <td class="py-3 px-4 font-mono">active_character</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="propActiveChar">Personaje activo actual</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h2>Notas Técnicas</h2>
+      <hr class="border-border-default mb-12">
 
-      <ul>
-        <li><strong>Auto-gestión de modelos:</strong> DialogueManager carga y descarga automáticamente los modelos de IA según el grafo especifique. Esto libera memoria cuando el diálogo termina.</li>
-        <li><strong>Thread safety:</strong> La generación de IA se ejecuta en un thread separado para no bloquear el juego.</li>
-        <li><strong>Streaming:</strong> Cuando <code>streaming_enabled</code> es true, los tokens se emiten progresivamente via <code>npc_response_token</code>.</li>
-        <li><strong>Query System:</strong> Inspirado en Questify, permite que la lógica del juego responda a condiciones y ejecute acciones desde el diálogo.</li>
-      </ul>
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="methodsTitle">Metodos</span>
+      </h2>
 
-      <hr>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="dialogueControl">Control de Dialogo</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#start_dialogue"
+                  class="text-gray-300 hover:text-ai-cyan">start_dialogue</a>(graph, mode)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#end_dialogue"
+                  class="text-gray-300 hover:text-ai-cyan">end_dialogue</a>(reason)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#is_active"
+                  class="text-gray-300 hover:text-ai-cyan">is_active</a>() const</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <a href="index.html">← Volver a API Reference</a>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="playerInteraction">Interaccion del Jugador</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#send_player_message"
+                  class="text-gray-300 hover:text-ai-cyan">send_player_message</a>(text)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#select_choice"
+                  class="text-gray-300 hover:text-ai-cyan">select_choice</a>(index)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <footer class="wiki-footer">
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="config">Configuracion</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#set_character"
+                  class="text-gray-300 hover:text-ai-cyan">set_character</a>(character)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#set_world_context"
+                  class="text-gray-300 hover:text-ai-cyan">set_world_context</a>(context)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#set_streaming_enabled"
+                  class="text-gray-300 hover:text-ai-cyan">set_streaming_enabled</a>(enabled)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="varsAndContext">Variables y Contexto</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Variant</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_variable"
+                  class="text-gray-300 hover:text-ai-cyan">get_variable</a>(name, default)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#set_variable"
+                  class="text-gray-300 hover:text-ai-cyan">set_variable</a>(name, value, scope)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#evaluate_condition"
+                  class="text-gray-300 hover:text-ai-cyan">evaluate_condition</a>(expression)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="querySystem">Query System</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#query_condition"
+                  class="text-gray-300 hover:text-ai-cyan">query_condition</a>(key, expected, default)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#query_action"
+                  class="text-gray-300 hover:text-ai-cyan">query_action</a>(key, value)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Variant</td>
+              <td class="py-3 px-4 font-mono"><a href="#query_value"
+                  class="text-gray-300 hover:text-ai-cyan">query_value</a>(key, default)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="utilities">Utilidades</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">History</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_conversation_history"
+                  class="text-gray-300 hover:text-ai-cyan">get_conversation_history</a>()</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Context</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_context_manager"
+                  class="text-gray-300 hover:text-ai-cyan">get_context_manager</a>()</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#clear_history"
+                  class="text-gray-300 hover:text-ai-cyan">clear_history</a>()</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Dictionary</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_debug_info"
+                  class="text-gray-300 hover:text-ai-cyan">get_debug_info</a>()</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="border-border-default mb-12">
+
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="signalsTitle">Señales</span>
+      </h2>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="lifeCycle">Ciclo de Vida</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">dialogue_started(graph)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigDialogueStarted">Emitida cuando inicia una sesión de
+                diálogo</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">dialogue_ended(reason)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigDialogueEnded">Emitida cuando termina el diálogo</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">mode_changed(old, new)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigModeChanged">Emitida cuando cambia el modo de diálogo
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="npcResponses">Respuestas del NPC</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">npc_speaking(speaker, text, stream)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigNpcSpeaking">Emitida cuando el NPC comienza a hablar.
+              </td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">npc_response_token(token)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigNpcResponseToken">Emitida para cada token durante
+                streaming</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">npc_response_completed(text)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigNpcResponseCompleted">Emitida cuando la respuesta está
+                completa</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="playerInteraction">Interaccion del Jugador</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">player_choices_available(choices)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigPlayerChoices">Emitida cuando hay opciones disponibles.
+              </td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">waiting_for_player_input</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigWaitingInput">Emitida cuando se espera entrada del
+                jugador</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="eventsAndVars">Eventos y Variables</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">event_triggered(name, data)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigEventTriggered">Emitida cuando un nodo de evento se
+                ejecuta</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">variable_changed(name, old, new)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigVarChanged">Emitida cuando una variable cambia</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="modelLoading">Carga de Modelo</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">model_loading_started(path)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigModelLoadStart">Emitida cuando comienza la carga de IA
+              </td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">model_loading_completed()</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigModelLoadComp">Emitida cuando el modelo está listo</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="querySystem">Query System</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">condition_query_requested(key, ...)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigCondQuery">Verificar condición: callback.call(bool)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">action_query_requested(key, ...)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigActionQuery">Ejecutar acción: callback.call()</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">value_query_requested(key, ...)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigValueQuery">Obtener valor: callback.call(value)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="errors">Errores</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">error_occurred(message)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigError">Emitida cuando ocurre un error</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="methodDesc">Descripciones de Metodos</h3>
+
+      <div id="start_dialogue" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">start_dialogue</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> start_dialogue(graph: <span class="text-ai-cyan">DialogueGraph</span> = null, mode: <span class="text-ai-cyan">DialogueMode</span> = HYBRID)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="startDialogueDesc">Inicia una nueva sesión de diálogo. Si hay un
+          diálogo activo, lo termina primero.</p>
+        <ul class="list-disc pl-6 text-gray-400 mb-4 space-y-1 text-sm">
+          <li data-i18n="startDialogueL1">Carga automáticamente el modelo de IA si el grafo especifica
+            <code>model_path</code></li>
+          <li data-i18n="startDialogueL2">Aplica el <code>AIPreset</code> del grafo si está definido</li>
+          <li data-i18n="startDialogueL3">Inicializa variables locales desde el grafo</li>
+        </ul>
+      </div>
+
+      <div id="send_player_message" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">send_player_message</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> send_player_message(text: <span class="text-ai-cyan">String</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="sendPlayerMessageDesc">Envía un mensaje del jugador al sistema. En modo
+          FREE genera respuesta IA, en SCRIPTED pasa al grafo.</p>
+      </div>
+
+      <div id="get_variable" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_variable</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">Variant</span> get_variable(name: <span class="text-ai-cyan">String</span>, default: <span class="text-ai-cyan">Variant</span> = null)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getVariableDesc">Obtiene una variable del contexto de diálogo.</p>
+      </div>
+
+      <div id="query_condition" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">query_condition</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">bool</span> query_condition(key: <span class="text-ai-cyan">String</span>, expected: <span class="text-ai-cyan">Variant</span> = true, default: <span class="text-ai-cyan">bool</span> = false)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="queryConditionDesc">Consulta una condición al código del juego. Emite
+          condition_query_requested y espera respuesta.</p>
+      </div>
+
+      <div id="get_debug_info" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_debug_info</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">Dictionary</span> get_debug_info()</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getDebugInfoDesc">Retorna información de debug sobre el estado actual
+          del diálogo.</p>
+      </div>
+
+      <!-- Back Link -->
+      <a href="../home.html"
+        class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors mb-8">
+        <span>&#x2190;</span>
+        <span data-i18n="backToHome">Volver a Home</span>
+      </a>
+
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
-
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>
