@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="DialogueGraph" load_steps=38 format=3 uid="uid://i1sbtg72xp43"]
 
 [ext_resource type="Resource" uid="uid://cmq5w2y3jwple" path="res://examples/resources/merchant_character.tres" id="1_p5lqr"]
-[ext_resource type="Resource" uid="uid://cbw8qettp41jh" path="res://presets/qwen2_1.5b_q4_k_s_gguf_q4_k_s_preset.tres" id="1_v4s23"]
+[ext_resource type="Resource" uid="uid://by2uvbmxtdacg" path="res://presets/qwen3_1.7b_gguf_q5_k_m_preset.tres" id="1_v4s23"]
 [ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="2_euopo"]
 [ext_resource type="Resource" path="res://examples/resources/fantasy_world.tres" id="4_1mjo3"]
 [ext_resource type="Script" uid="uid://reckn0fl8oqw" path="res://addons/ohmydialog/resources/nodes/start_node_data.gd" id="5_start"]
@@ -223,7 +223,7 @@ description = "Complex dialogue testing all node types: CHOICE, AI_RESPONSE, STA
 default_character = ExtResource("1_p5lqr")
 world_context = ExtResource("4_1mjo3")
 ai_preset = ExtResource("1_v4s23")
-model_path = "res://models/qwen2-1.5b-q4_k_s.gguf"
+model_path = "res://models/Qwen3-1.7B.Q5_K_M.gguf"
 local_variables = {
 "merchant_visits": 0,
 "player_reputation": 60,
