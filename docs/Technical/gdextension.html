@@ -54,6 +54,18 @@
           optNative: 'Optimizaciones nativas de CPU (no portable)',
           optAvx2: 'Instrucciones AVX2 (x86_64)',
           optRebuild: 'Forzar rebuild de llama.cpp',
+          optAllBackends: 'Compilar todos los backends (CPU + Vulkan en Linux/Win, CPU + Metal en macOS)',
+          optDynamic: 'Carga dinamica de backends (deteccion en runtime)',
+          hBuildFlow: 'Flujo de Compilacion',
+          hBackendModes: 'Modos de Backend',
+          thMode: 'Modo', thCommand: 'Comando',
+          modeSingle: 'Compila solo un backend. Mas simple, menos dependencias.',
+          modeAllStatic: 'CPU + Vulkan (o Metal en macOS) enlazados estaticamente.',
+          modeAllDynamic: 'Backends como .so/.dll separados. Deteccion en runtime.',
+          recommended: 'Recomendado',
+          commentBuildAll: '# Compilar los 3 targets de una vez',
+          commentBuildAllOpt: '# CPU + Vulkan + optimizaciones',
+          commentWinBuildAll: '# Windows - Compilar los 3 targets',
           hGodotOptions: 'Opciones estandar de godot-cpp',
           optPlatform: 'Plataforma objetivo',
           optTarget: 'Tipo de build',
@@ -111,6 +123,18 @@
           optNative: 'Native CPU optimizations (not portable)',
           optAvx2: 'AVX2 instructions (x86_64)',
           optRebuild: 'Force llama.cpp rebuild',
+          optAllBackends: 'Build all backends (CPU + Vulkan on Linux/Win, CPU + Metal on macOS)',
+          optDynamic: 'Dynamic backend loading (runtime detection)',
+          hBuildFlow: 'Build Flow',
+          hBackendModes: 'Backend Modes',
+          thMode: 'Mode', thCommand: 'Command',
+          modeSingle: 'Builds only one backend. Simpler, fewer dependencies.',
+          modeAllStatic: 'CPU + Vulkan (or Metal on macOS) statically linked.',
+          modeAllDynamic: 'Backends as separate .so/.dll files. Runtime detection.',
+          recommended: 'Recommended',
+          commentBuildAll: '# Build all 3 targets at once',
+          commentBuildAllOpt: '# CPU + Vulkan + optimizations',
+          commentWinBuildAll: '# Windows - Build all 3 targets',
           hGodotOptions: 'Standard godot-cpp options',
           optPlatform: 'Target platform',
           optTarget: 'Build type',
@@ -410,6 +434,64 @@
             class="bg-bg-tertiary px-2 py-0.5 rounded text-sm">brew install cmake ninja</code></li>
       </ul>
 
+      <!-- Build Flow -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hBuildFlow">Flujo de Compilacion</span>
+      </h2>
+
+      <div class="binary-tree bg-gradient-to-br from-ai-cyan/5 to-ai-purple/5 border border-ai-cyan/30 rounded-xl p-6 font-mono text-sm mb-12">
+        <div class="flex items-center gap-2 text-ai-cyan font-bold mb-4 pb-3 border-b border-border-default/50">
+          <span class="text-lg">&#x1F6E0;&#xFE0F;</span>
+          <span>build_all.sh / build_all.bat</span>
+        </div>
+        <div class="platform-group">
+          <div class="flex items-center gap-2 mb-2 text-gray-300">
+            <span class="text-ai-purple">&#x25B6;</span>
+            <span class="font-bold">build.sh / build.bat</span>
+            <span class="ml-2 px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs">editor</span>
+          </div>
+          <ul class="binary-list">
+            <li class="binary-item">
+              <span class="text-ai-green">&#x25B6;</span>
+              <span class="text-gray-400">build_llama.sh</span>
+              <span class="text-gray-500 text-xs ml-2">(CMake)</span>
+            </li>
+            <li class="binary-item">
+              <span class="text-ai-purple">&#x25B6;</span>
+              <span class="text-gray-400">SCons + llama.py</span>
+              <span class="text-gray-500 text-xs ml-2">(GDExtension)</span>
+            </li>
+          </ul>
+        </div>
+        <div class="platform-group">
+          <div class="flex items-center gap-2 mb-2 text-gray-300">
+            <span class="text-ai-purple">&#x25B6;</span>
+            <span class="font-bold">build.sh / build.bat</span>
+            <span class="ml-2 px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded text-xs">release</span>
+          </div>
+          <ul class="binary-list">
+            <li class="binary-item">
+              <span class="text-ai-purple">&#x25B6;</span>
+              <span class="text-gray-400">SCons + llama.py</span>
+            </li>
+          </ul>
+        </div>
+        <div class="platform-group">
+          <div class="flex items-center gap-2 mb-2 text-gray-300">
+            <span class="text-ai-purple">&#x25B6;</span>
+            <span class="font-bold">build.sh / build.bat</span>
+            <span class="ml-2 px-2 py-0.5 bg-yellow-500/20 text-yellow-400 rounded text-xs">debug</span>
+          </div>
+          <ul class="binary-list">
+            <li class="binary-item">
+              <span class="text-ai-purple">&#x25B6;</span>
+              <span class="text-gray-400">SCons + llama.py</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
       <!-- Compilation -->
       <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
         <span class="text-ai-purple">//</span>
@@ -451,13 +533,18 @@ build.bat editor          <span class="text-gray-500"># Para desarrollo en el ed
 build.bat debug           <span class="text-gray-500"># Para exportar en modo debug</span>
 build.bat release         <span class="text-gray-500"># Para exportar en modo release</span>
 
-<span class="text-gray-500"># Compilar las 3 configuraciones de una vez (Windows)</span>
-build_all.bat
-
 <span class="text-gray-500"># Linux/macOS</span>
 ./build.sh editor
 ./build.sh debug
-./build.sh release</code></pre>
+./build.sh release
+
+<span class="text-gray-500" data-i18n="commentBuildAll"># Compilar los 3 targets de una vez</span>
+./build_all.sh                              <span class="text-gray-500"># (CPU + Vulkan)</span>
+./build_all.sh --all-backends --native      <span class="text-gray-500" data-i18n="commentBuildAllOpt"># CPU + Vulkan + optimizaciones</span>
+
+<span class="text-gray-500" data-i18n="commentWinBuildAll"># Windows - Compilar los 3 targets</span>
+build_all.bat
+build_all.bat --all-backends --native</code></pre>
 
       <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 rounded-r-lg mb-8">
         <p class="text-gray-300" data-i18n="warnEditor" data-i18n-html="true">Importante: Para abrir el proyecto en el
@@ -556,13 +643,62 @@ scons platform=macos target=editor</code></pre>
               <td class="py-3 px-4">no</td>
               <td class="py-3 px-4 font-sans" data-i18n="optRebuild">Forzar rebuild de llama.cpp</td>
             </tr>
+            <tr class="border-b border-border-default/30">
+              <td class="py-3 px-4 text-ai-purple">llama_all_backends</td>
+              <td class="py-3 px-4">yes, no</td>
+              <td class="py-3 px-4">no</td>
+              <td class="py-3 px-4 font-sans" data-i18n="optAllBackends">Compilar todos los backends (CPU + Vulkan en Linux/Win, CPU + Metal en macOS)</td>
+            </tr>
+            <tr class="border-b border-border-default/30">
+              <td class="py-3 px-4 text-ai-purple">llama_dynamic</td>
+              <td class="py-3 px-4">yes, no</td>
+              <td class="py-3 px-4">no</td>
+              <td class="py-3 px-4 font-sans" data-i18n="optDynamic">Carga dinamica de backends (deteccion en runtime)</td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <p class="text-gray-400 mb-2">Ejemplo:</p>
+      <p class="text-gray-400 mb-2">Ejemplos:</p>
       <pre
-        class="bg-bg-tertiary border border-border-default rounded-lg p-4 overflow-x-auto mb-8 font-mono text-sm"><code class="text-gray-300">scons platform=linux target=template_release llama_backend=vulkan llama_native=yes</code></pre>
+        class="bg-bg-tertiary border border-border-default rounded-lg p-4 overflow-x-auto mb-8 font-mono text-sm"><code class="text-gray-300"><span class="text-gray-500"># Backend unico con optimizaciones</span>
+scons platform=linux target=template_release llama_backend=vulkan llama_native=yes
+
+<span class="text-gray-500"># Todos los backends (CPU + Vulkan)</span>
+scons platform=linux target=editor llama_all_backends=yes
+
+<span class="text-gray-500"># Carga dinamica de backends</span>
+scons platform=linux target=editor llama_all_backends=yes llama_dynamic=yes</code></pre>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="hBackendModes">Modos de Backend</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="thMode">Modo</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="thCommand">Comando</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="thDesc">Descripcion</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-400">
+            <tr class="border-b border-border-default/30">
+              <td class="py-3 px-4 font-mono text-ai-purple">Single Backend</td>
+              <td class="py-3 px-4 font-mono"><code class="bg-bg-tertiary px-2 py-0.5 rounded">--vulkan</code> / <code class="bg-bg-tertiary px-2 py-0.5 rounded">--cpu</code></td>
+              <td class="py-3 px-4" data-i18n="modeSingle">Compila solo un backend. Mas simple, menos dependencias.</td>
+            </tr>
+            <tr class="border-b border-border-default/30">
+              <td class="py-3 px-4 font-mono text-ai-purple">All Backends (Static)</td>
+              <td class="py-3 px-4 font-mono"><code class="bg-bg-tertiary px-2 py-0.5 rounded">--all-backends</code></td>
+              <td class="py-3 px-4"><span data-i18n="modeAllStatic">CPU + Vulkan (o Metal en macOS) enlazados estaticamente.</span> <strong class="text-ai-green" data-i18n="recommended">Recomendado.</strong></td>
+            </tr>
+            <tr class="border-b border-border-default/30">
+              <td class="py-3 px-4 font-mono text-ai-purple">All Backends (Dynamic)</td>
+              <td class="py-3 px-4 font-mono"><code class="bg-bg-tertiary px-2 py-0.5 rounded">--all-backends --dynamic</code></td>
+              <td class="py-3 px-4" data-i18n="modeAllDynamic">Backends como .so/.dll separados. Deteccion en runtime.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <h3 class="text-lg font-bold text-white mb-4" data-i18n="hGodotOptions">Opciones estandar de godot-cpp</h3>
       <div class="overflow-x-auto mb-12">
