@@ -215,6 +215,7 @@ def _configure_linking(env, build_dir):
     platform = env.get("platform", sys.platform)
     backend = env.get("llama_backend", "cpu")
     dynamic = env.get("llama_dynamic", False)
+    all_backends = env.get("llama_all_backends", False)
 
     # Add all library directories
     lib_dirs = _find_all_library_dirs(build_dir, platform)
@@ -235,30 +236,48 @@ def _configure_linking(env, build_dir):
         core_libs = ["llama", "common", "ggml", "ggml-cpu", "ggml-base"]
         env.Append(LIBS=core_libs)
 
-        # Backend-specific libraries (static linking only)
-        if backend == "cuda":
-            if platform == "windows":
-                env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
-            else:
-                env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
+        # All backends mode: link all available backend libraries
+        if all_backends:
+            print("[llama.py] All backends mode - linking all available backends")
+            # Vulkan backend (Linux/Windows)
+            if platform != "macos":
+                env.Append(LIBS=["ggml-vulkan"])
+                if platform == "windows":
+                    env.Append(LIBS=["vulkan-1"])
+                    vulkan_sdk = os.environ.get("VULKAN_SDK", "")
+                    if vulkan_sdk:
+                        env.Append(LIBPATH=[os.path.join(vulkan_sdk, "Lib")])
+                else:
+                    env.Append(LIBS=["vulkan"])
+            # Metal backend (macOS)
+            if platform == "macos":
+                env.Append(LIBS=["ggml-metal"])
+                env.Append(FRAMEWORKS=["Metal", "Foundation", "MetalPerformanceShaders"])
+        else:
+            # Single backend mode
+            if backend == "cuda":
+                if platform == "windows":
+                    env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
+                else:
+                    env.Append(LIBS=["ggml-cuda", "cudart", "cublas", "cublasLt"])
 
-        elif backend == "vulkan":
-            env.Append(LIBS=["ggml-vulkan"])
-            if platform == "windows":
-                env.Append(LIBS=["vulkan-1"])
-                # Add Vulkan SDK library path
-                vulkan_sdk = os.environ.get("VULKAN_SDK", "")
-                if vulkan_sdk:
-                    env.Append(LIBPATH=[os.path.join(vulkan_sdk, "Lib")])
-            else:
-                env.Append(LIBS=["vulkan"])
+            elif backend == "vulkan":
+                env.Append(LIBS=["ggml-vulkan"])
+                if platform == "windows":
+                    env.Append(LIBS=["vulkan-1"])
+                    # Add Vulkan SDK library path
+                    vulkan_sdk = os.environ.get("VULKAN_SDK", "")
+                    if vulkan_sdk:
+                        env.Append(LIBPATH=[os.path.join(vulkan_sdk, "Lib")])
+                else:
+                    env.Append(LIBS=["vulkan"])
 
-        elif backend == "metal":
-            env.Append(LIBS=["ggml-metal"])
-            env.Append(FRAMEWORKS=["Metal", "Foundation", "MetalPerformanceShaders"])
+            elif backend == "metal":
+                env.Append(LIBS=["ggml-metal"])
+                env.Append(FRAMEWORKS=["Metal", "Foundation", "MetalPerformanceShaders"])
 
-        elif backend == "sycl":
-            env.Append(LIBS=["ggml-sycl", "sycl"])
+            elif backend == "sycl":
+                env.Append(LIBS=["ggml-sycl", "sycl"])
 
     # Platform-specific system libraries (always needed)
     if platform == "linux":

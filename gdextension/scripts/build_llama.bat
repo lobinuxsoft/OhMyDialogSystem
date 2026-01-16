@@ -181,18 +181,18 @@ echo AVX2:            %AVX2%
 echo Jobs:            %JOBS%
 echo.
 
-REM Build CMake flags
+REM Build CMake flags (explicit defaults to avoid cache contamination)
 set CMAKE_FLAGS=-DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
 set CMAKE_FLAGS=%CMAKE_FLAGS% -DLLAMA_CURL=OFF -DLLAMA_BUILD_TOOLS=OFF
 set CMAKE_FLAGS=%CMAKE_FLAGS% -DGGML_NATIVE=%NATIVE% -DGGML_AVX2=%AVX2%
+set CMAKE_FLAGS=%CMAKE_FLAGS% -DBUILD_SHARED_LIBS=OFF -DGGML_BACKEND_DL=OFF -DGGML_CPU_ALL_VARIANTS=OFF
 
 REM Configure dynamic backend loading
+REM Note: We override the defaults set above (CMake uses last value for duplicate flags)
 if %DYNAMIC_BACKENDS%==1 (
     echo [INFO] Enabling dynamic backend loading ^(GGML_BACKEND_DL^)...
     set CMAKE_FLAGS=!CMAKE_FLAGS! -DBUILD_SHARED_LIBS=ON -DGGML_BACKEND_DL=ON
     set CMAKE_FLAGS=!CMAKE_FLAGS! -DGGML_CPU_ALL_VARIANTS=ON
-) else (
-    set CMAKE_FLAGS=!CMAKE_FLAGS! -DBUILD_SHARED_LIBS=OFF
 )
 
 REM Use static CRT to match godot-cpp (/MT instead of /MD)

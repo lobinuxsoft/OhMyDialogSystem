@@ -10,23 +10,24 @@ Supports llama.cpp integration with multiple backends:
   llama_rebuild=yes|no (default: no)
   llama_all_backends=yes|no (default: no) - Build all available backends
   llama_dynamic=yes|no (default: no) - Enable dynamic backend loading (runtime detection)
+
+Note: SCons may show "Unknown variables" warnings for llama_* options.
+This is cosmetic - the variables work correctly via ARGUMENTS.get().
 """
 
 import os
 import sys
 
 # Add tools directory to path for custom SCons tools
-# In SCons, use Dir('.').abspath instead of __file__
 script_dir = Dir('.').srcnode().abspath
 sys.path.insert(0, os.path.join(script_dir, "tools"))
 
+# Load godot-cpp environment
 env = SConscript("godot-cpp/SConstruct")
 
 # ============================================================================
 # Platform-specific fixes
 # ============================================================================
-# Remove static libstdc++ linking on Linux if static library not available
-# This allows building without libstdc++-static package
 if env["platform"] == "linux":
     static_libstdcpp = "/usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.a"
     if not os.path.exists(static_libstdcpp):
@@ -36,32 +37,28 @@ if env["platform"] == "linux":
 # ============================================================================
 # llama.cpp Integration
 # ============================================================================
-# Parse llama.cpp options from command line
-llama_backend = ARGUMENTS.get("llama_backend", "cpu")
-llama_native = ARGUMENTS.get("llama_native", "yes") == "yes"
-llama_avx2 = ARGUMENTS.get("llama_avx2", "yes") == "yes"
-llama_rebuild = ARGUMENTS.get("llama_rebuild", "no") == "yes"
-llama_all_backends = ARGUMENTS.get("llama_all_backends", "no") == "yes"
-llama_dynamic = ARGUMENTS.get("llama_dynamic", "no") == "yes"
-
-# Store options in environment for the tool to use
-env["llama_backend"] = llama_backend
-env["llama_native"] = llama_native
-env["llama_avx2"] = llama_avx2
-env["llama_rebuild"] = llama_rebuild
-env["llama_all_backends"] = llama_all_backends
-env["llama_dynamic"] = llama_dynamic
+# Read llama.cpp options from command line and store in environment
+env["llama_backend"] = ARGUMENTS.get("llama_backend", "cpu")
+env["llama_native"] = ARGUMENTS.get("llama_native", "yes") == "yes"
+env["llama_avx2"] = ARGUMENTS.get("llama_avx2", "yes") == "yes"
+env["llama_rebuild"] = ARGUMENTS.get("llama_rebuild", "no") == "yes"
+env["llama_all_backends"] = ARGUMENTS.get("llama_all_backends", "no") == "yes"
+env["llama_dynamic"] = ARGUMENTS.get("llama_dynamic", "no") == "yes"
 
 # Load and apply llama.cpp tool
 from llama import generate as llama_generate
 llama_generate(env)
 
-print(f"[SConstruct] llama.cpp backend: {llama_backend}")
+print(f"[SConstruct] llama.cpp backend: {env['llama_backend']}")
+if env["llama_all_backends"]:
+    print("[SConstruct] All backends mode enabled")
+if env["llama_dynamic"]:
+    print("[SConstruct] Dynamic backend loading enabled")
 
-# Add source directory to include path
+# ============================================================================
+# Source files
+# ============================================================================
 env.Append(CPPPATH=["src/"])
-
-# Gather all source files
 sources = Glob("src/*.cpp")
 
 # Generate documentation data for editor builds
@@ -69,10 +66,11 @@ if env["target"] in ["editor", "template_debug"]:
     doc_data = env.GodotCPPDocData("src/gen/doc_data.gen.cpp", source=Glob("doc_classes/*.xml"))
     sources.append(doc_data)
 
-# Output directory - binaries go to addon's gdextension folder
+# ============================================================================
+# Build library
+# ============================================================================
 output_dir = "../addons/ohmydialog/gdextension/"
 
-# Build library based on platform
 if env["platform"] == "macos":
     library = env.SharedLibrary(
         "{}libohmydialog.{}.{}.framework/libohmydialog.{}.{}".format(

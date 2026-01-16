@@ -18,9 +18,11 @@ JOBS=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
 ALL_BACKENDS=false
 DYNAMIC_BACKENDS=false
 
-# CMake flags
+# CMake flags (explicit defaults to avoid cache contamination)
 CMAKE_FLAGS=(
     -DBUILD_SHARED_LIBS=OFF
+    -DGGML_BACKEND_DL=OFF
+    -DGGML_CPU_ALL_VARIANTS=OFF
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
     -DLLAMA_BUILD_TESTS=OFF
     -DLLAMA_BUILD_EXAMPLES=OFF
@@ -179,10 +181,9 @@ CMAKE_FLAGS+=(-DGGML_NATIVE=$NATIVE)
 CMAKE_FLAGS+=(-DGGML_AVX2=$AVX2)
 
 # Configure dynamic backend loading
+# Note: We override the defaults set above (CMake uses last value for duplicate flags)
 if [ "$DYNAMIC_BACKENDS" = true ]; then
     echo "[INFO] Enabling dynamic backend loading (GGML_BACKEND_DL)..."
-    # Remove the default BUILD_SHARED_LIBS=OFF and add the dynamic flags
-    CMAKE_FLAGS=("${CMAKE_FLAGS[@]/-DBUILD_SHARED_LIBS=OFF/}")
     CMAKE_FLAGS+=(-DBUILD_SHARED_LIBS=ON)
     CMAKE_FLAGS+=(-DGGML_BACKEND_DL=ON)
     CMAKE_FLAGS+=(-DGGML_CPU_ALL_VARIANTS=ON)
@@ -312,7 +313,7 @@ if [ "$BUILD_SUCCESS" = true ]; then
     if [ "$DYNAMIC_BACKENDS" = true ]; then
         echo ""
         echo "Backend libraries generated:"
-        for lib in "$LIB_LOCATION"/libggml-*.so "$LIB_LOCATION"/libggml-*.dylib 2>/dev/null; do
+        for lib in "$LIB_LOCATION"/libggml-*.so "$LIB_LOCATION"/libggml-*.dylib; do
             if [ -f "$lib" ]; then
                 echo "  - $(basename "$lib")"
             fi
