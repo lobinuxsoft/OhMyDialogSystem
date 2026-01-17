@@ -48,14 +48,14 @@ set "FULL_TIMESTAMP=%DATESTAMP% %TIMESTAMP%"
 
 :: Determine progress bar class
 if %PERCENT_INT% LSS 60 (
-    set "PROGRESS_CLASS=progress-safe"
+    set "STATUS_CLASS=bg-ai-green"
 ) else if %PERCENT_INT% LSS 80 (
-    set "PROGRESS_CLASS=progress-warn"
+    set "STATUS_CLASS=bg-warning"
 ) else (
-    set "PROGRESS_CLASS=progress-danger"
+    set "STATUS_CLASS=bg-error"
 )
 
-:: Generate HTML
+:: Generate HTML with Tailwind
 (
 echo ^<!DOCTYPE html^>
 echo ^<html lang="es"^>
@@ -63,195 +63,131 @@ echo ^<head^>
 echo     ^<meta charset="UTF-8"^>
 echo     ^<meta name="viewport" content="width=device-width, initial-scale=1.0"^>
 echo     ^<title^>Token Report - Claude Config^</title^>
+echo.
+echo     ^<!-- Tailwind CSS Play CDN --^>
+echo     ^<script src="https://cdn.tailwindcss.com"^>^</script^>
+echo     ^<script src="../tailwind.config.js"^>^</script^>
+echo.
+echo     ^<!-- Google Fonts --^>
+echo     ^<link rel="preconnect" href="https://fonts.googleapis.com"^>
+echo     ^<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin^>
+echo     ^<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700^&family=JetBrains+Mono:wght@400;500^&display=swap" rel="stylesheet"^>
+echo.
+echo     ^<!-- Base styles --^>
+echo     ^<link rel="stylesheet" href="../base.css"^>
+echo.
 echo     ^<style^>
-echo         :root {
-echo             --bg-primary: #0a0d12;
-echo             --bg-secondary: #0f1419;
-echo             --bg-tertiary: #161b22;
-echo             --border: #21262d;
-echo             --text-primary: #e6edf3;
-echo             --text-secondary: #8b949e;
-echo             --start: #10b981;
-echo             --end: #ef4444;
-echo             --ai: #3b82f6;
-echo             --static: #6b7280;
-echo             --choice: #eab308;
-echo             --cond: #f97316;
-echo             --event: #a855f7;
-echo             --var: #06b6d4;
-echo         }
-echo         * { box-sizing: border-box; margin: 0; padding: 0; }
 echo         body {
-echo             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-echo             background: var(--bg-primary^);
-echo             color: var(--text-primary^);
-echo             min-height: 100vh;
-echo             padding: 2rem;
-echo         }
-echo         .container { max-width: 900px; margin: 0 auto; }
-echo         h1 {
-echo             font-size: 2rem;
-echo             margin-bottom: 0.5rem;
-echo             background: linear-gradient(135deg, var(--var^), var(--event^)^);
-echo             -webkit-background-clip: text;
-echo             -webkit-text-fill-color: transparent;
-echo             background-clip: text;
-echo         }
-echo         .subtitle { color: var(--text-secondary^); margin-bottom: 2rem; font-size: 0.9rem; }
-echo         .card {
-echo             background: var(--bg-secondary^);
-echo             border: 1px solid var(--border^);
-echo             border-radius: 12px;
-echo             padding: 1.5rem;
-echo             margin-bottom: 1.5rem;
-echo         }
-echo         .card-title {
-echo             font-size: 1.1rem;
-echo             color: var(--var^);
-echo             margin-bottom: 1rem;
-echo             display: flex;
-echo             align-items: center;
-echo             gap: 0.5rem;
-echo         }
-echo         .progress-container {
-echo             background: var(--bg-tertiary^);
-echo             border-radius: 8px;
-echo             height: 32px;
-echo             overflow: hidden;
-echo             position: relative;
-echo             margin: 1rem 0;
-echo         }
-echo         .progress-bar { height: 100%%; border-radius: 8px; transition: width 0.5s ease; }
-echo         .progress-safe { background: linear-gradient(90deg, var(--start^), var(--ai^)^); }
-echo         .progress-warn { background: linear-gradient(90deg, var(--choice^), var(--cond^)^); }
-echo         .progress-danger { background: linear-gradient(90deg, var(--cond^), var(--end^)^); }
-echo         .progress-label {
-echo             position: absolute;
-echo             top: 50%%;
-echo             left: 50%%;
-echo             transform: translate(-50%%, -50%%^);
-echo             font-weight: 600;
-echo             font-size: 0.85rem;
-echo             text-shadow: 0 1px 2px rgba(0,0,0,0.8^);
-echo         }
-echo         .stats-grid {
-echo             display: grid;
-echo             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr^)^);
-echo             gap: 1rem;
-echo             margin-top: 1rem;
-echo         }
-echo         .stat-box {
-echo             background: var(--bg-tertiary^);
-echo             border-radius: 8px;
-echo             padding: 1rem;
-echo             text-align: center;
-echo         }
-echo         .stat-value { font-size: 1.8rem; font-weight: 700; }
-echo         .stat-value.tokens { color: var(--event^); }
-echo         .stat-value.system { color: var(--ai^); }
-echo         .stat-value.available { color: var(--start^); }
-echo         .stat-value.percent { color: var(--var^); }
-echo         .stat-label { font-size: 0.8rem; color: var(--text-secondary^); margin-top: 0.25rem; }
-echo         table { width: 100%%; border-collapse: collapse; margin-top: 1rem; }
-echo         th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border^); }
-echo         th { color: var(--text-secondary^); font-weight: 500; font-size: 0.85rem; }
-echo         td.file { color: var(--var^); font-family: monospace; }
-echo         td.tokens { color: var(--event^); text-align: right; }
-echo         td.chars { color: var(--text-secondary^); text-align: right; }
-echo         .zone-indicator { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.75rem; }
-echo         .zone { padding: 0.25rem 0.5rem; border-radius: 4px; }
-echo         .zone-safe { background: rgba(16, 185, 129, 0.2^); color: var(--start^); }
-echo         .zone-warn { background: rgba(234, 179, 8, 0.2^); color: var(--choice^); }
-echo         .zone-danger { background: rgba(239, 68, 68, 0.2^); color: var(--end^); }
-echo         .timestamp {
-echo             text-align: center;
-echo             color: var(--text-secondary^);
-echo             font-size: 0.8rem;
-echo             margin-top: 2rem;
-echo             padding-top: 1rem;
-echo             border-top: 1px solid var(--border^);
-echo         }
-echo         .note {
-echo             background: rgba(6, 182, 212, 0.1^);
-echo             border-left: 3px solid var(--var^);
-echo             padding: 1rem;
-echo             margin-top: 1rem;
-echo             border-radius: 0 8px 8px 0;
-echo             font-size: 0.9rem;
+echo             font-family: 'Inter', system-ui, sans-serif;
+echo             background-color: #0a0d12;
+echo             color: #e6edf3;
 echo         }
 echo     ^</style^>
 echo ^</head^>
-echo ^<body^>
-echo     ^<div class="container"^>
-echo         ^<h1^>📊 Reporte de Tokens^</h1^>
-echo         ^<p class="subtitle"^>Consumo de contexto de configuración Claude (.claude/^)^</p^>
-echo         ^<div class="card"^>
-echo             ^<div class="card-title"^>⚡ Resumen de Consumo^</div^>
-echo             ^<div class="progress-container"^>
-echo                 ^<div class="progress-bar !PROGRESS_CLASS!" style="width: !PERCENT_INT!%%"^>^</div^>
-echo                 ^<span class="progress-label"^>!PERCENT_INT!%% usado^</span^>
+echo ^<body class="min-h-screen p-8"^>
+echo     ^<div class="max-w-4xl mx-auto"^>
+echo         ^<!-- Header --^>
+echo         ^<div class="mb-8"^>
+echo             ^<h1 class="text-3xl font-bold mb-2"^>
+echo                 ^<span class="text-gradient-cyan-purple"^>Reporte de Tokens^</span^>
+echo             ^</h1^>
+echo             ^<p class="text-gray-400"^>Consumo de contexto de configuración Claude (^<code class="text-ai-cyan"^>.claude/^</code^>)^</p^>
+echo         ^</div^>
+echo.
+echo         ^<!-- Summary Card --^>
+echo         ^<div class="bg-bg-card border border-border-default rounded-xl p-6 mb-6"^>
+echo             ^<h2 class="text-lg font-semibold text-ai-cyan mb-4 flex items-center gap-2"^>
+echo                 ^<span^>⚡^</span^> Resumen de Consumo
+echo             ^</h2^>
+echo.
+echo             ^<!-- Progress Bar --^>
+echo             ^<div class="bg-bg-tertiary rounded-lg h-8 overflow-hidden relative mb-2"^>
+echo                 ^<div class="!STATUS_CLASS! h-full rounded-lg transition-all duration-500" style="width: !PERCENT_INT!%%"^>^</div^>
+echo                 ^<span class="absolute inset-0 flex items-center justify-center text-sm font-semibold"^>!PERCENT_INT!%% usado^</span^>
 echo             ^</div^>
-echo             ^<div class="zone-indicator"^>
-echo                 ^<span class="zone zone-safe"^>0-60%% Seguro^</span^>
-echo                 ^<span class="zone zone-warn"^>60-80%% Precaución^</span^>
-echo                 ^<span class="zone zone-danger"^>^>80%% Riesgo^</span^>
+echo.
+echo             ^<!-- Zone Indicators --^>
+echo             ^<div class="flex justify-between text-xs mb-6"^>
+echo                 ^<span class="px-2 py-1 rounded bg-ai-green/20 text-ai-green"^>0-60%% Seguro^</span^>
+echo                 ^<span class="px-2 py-1 rounded bg-warning/20 text-warning"^>60-80%% Precaución^</span^>
+echo                 ^<span class="px-2 py-1 rounded bg-error/20 text-error"^>^>80%% Riesgo^</span^>
 echo             ^</div^>
-echo             ^<div class="stats-grid"^>
-echo                 ^<div class="stat-box"^>
-echo                     ^<div class="stat-value tokens"^>!TOTAL_TOKENS!^</div^>
-echo                     ^<div class="stat-label"^>Tokens Reglas^</div^>
+echo.
+echo             ^<!-- Stats Grid --^>
+echo             ^<div class="grid grid-cols-2 md:grid-cols-4 gap-4"^>
+echo                 ^<div class="bg-bg-tertiary rounded-lg p-4 text-center"^>
+echo                     ^<div class="text-2xl font-bold text-ai-purple"^>!TOTAL_TOKENS!^</div^>
+echo                     ^<div class="text-xs text-gray-400 mt-1"^>Tokens Reglas^</div^>
 echo                 ^</div^>
-echo                 ^<div class="stat-box"^>
-echo                     ^<div class="stat-value system"^>~!SYSTEM_OVERHEAD!^</div^>
-echo                     ^<div class="stat-label"^>Sistema Base^</div^>
+echo                 ^<div class="bg-bg-tertiary rounded-lg p-4 text-center"^>
+echo                     ^<div class="text-2xl font-bold text-ai-cyan"^>~!SYSTEM_OVERHEAD!^</div^>
+echo                     ^<div class="text-xs text-gray-400 mt-1"^>Sistema Base^</div^>
 echo                 ^</div^>
-echo                 ^<div class="stat-box"^>
-echo                     ^<div class="stat-value available"^>~!AVAILABLE!^</div^>
-echo                     ^<div class="stat-label"^>Disponible^</div^>
+echo                 ^<div class="bg-bg-tertiary rounded-lg p-4 text-center"^>
+echo                     ^<div class="text-2xl font-bold text-ai-green"^>~!AVAILABLE!^</div^>
+echo                     ^<div class="text-xs text-gray-400 mt-1"^>Disponible^</div^>
 echo                 ^</div^>
-echo                 ^<div class="stat-box"^>
-echo                     ^<div class="stat-value percent"^>200K^</div^>
-echo                     ^<div class="stat-label"^>Límite Contexto^</div^>
+echo                 ^<div class="bg-bg-tertiary rounded-lg p-4 text-center"^>
+echo                     ^<div class="text-2xl font-bold text-ai-orange"^>200K^</div^>
+echo                     ^<div class="text-xs text-gray-400 mt-1"^>Límite Contexto^</div^>
 echo                 ^</div^>
 echo             ^</div^>
 echo         ^</div^>
-echo         ^<div class="card"^>
-echo             ^<div class="card-title"^>📁 Desglose por Archivo^</div^>
-echo             ^<table^>
-echo                 ^<thead^>
-echo                     ^<tr^>
-echo                         ^<th^>Archivo^</th^>
-echo                         ^<th style="text-align:right"^>Caracteres^</th^>
-echo                         ^<th style="text-align:right"^>Tokens (est.^)^</th^>
-echo                     ^</tr^>
-echo                 ^</thead^>
-echo                 ^<tbody^>
+echo.
+echo         ^<!-- Files Table --^>
+echo         ^<div class="bg-bg-card border border-border-default rounded-xl p-6 mb-6"^>
+echo             ^<h2 class="text-lg font-semibold text-ai-cyan mb-4 flex items-center gap-2"^>
+echo                 ^<span^>📁^</span^> Desglose por Archivo
+echo             ^</h2^>
+echo.
+echo             ^<div class="overflow-x-auto"^>
+echo                 ^<table class="w-full"^>
+echo                     ^<thead^>
+echo                         ^<tr class="text-left text-sm text-gray-400 border-b border-border-default"^>
+echo                             ^<th class="pb-3"^>Archivo^</th^>
+echo                             ^<th class="pb-3 text-right"^>Caracteres^</th^>
+echo                             ^<th class="pb-3 text-right"^>Tokens (est.^)^</th^>
+echo                         ^</tr^>
+echo                     ^</thead^>
+echo                     ^<tbody class="text-sm"^>
 ) > "%OUTPUT_FILE%"
 
 :: Add file rows from temp data
 if exist "%TEMP_DATA%" (
     for /f "tokens=1-3 delims=|" %%a in (%TEMP_DATA%) do (
-        echo                     ^<tr^>>> "%OUTPUT_FILE%"
-        echo                         ^<td class="file"^>%%a^</td^>>> "%OUTPUT_FILE%"
-        echo                         ^<td class="chars"^>%%b^</td^>>> "%OUTPUT_FILE%"
-        echo                         ^<td class="tokens"^>%%c^</td^>>> "%OUTPUT_FILE%"
-        echo                     ^</tr^>>> "%OUTPUT_FILE%"
+        echo                         ^<tr class="border-b border-border-default/50"^>>> "%OUTPUT_FILE%"
+        echo                             ^<td class="py-3 font-mono text-ai-cyan"^>%%a^</td^>>> "%OUTPUT_FILE%"
+        echo                             ^<td class="py-3 text-right text-gray-400"^>%%b^</td^>>> "%OUTPUT_FILE%"
+        echo                             ^<td class="py-3 text-right text-ai-purple"^>%%c^</td^>>> "%OUTPUT_FILE%"
+        echo                         ^</tr^>>> "%OUTPUT_FILE%"
     )
     del "%TEMP_DATA%"
 )
 
 :: Close HTML
 (
-echo                 ^</tbody^>
-echo             ^</table^>
-echo             ^<div class="note"^>
-echo                 ^<strong^>Nota:^</strong^> Estimación basada en ~4 caracteres por token.
+echo                     ^</tbody^>
+echo                 ^</table^>
+echo             ^</div^>
+echo.
+echo             ^<!-- Note --^>
+echo             ^<div class="mt-4 p-4 bg-ai-cyan/5 border-l-2 border-ai-cyan rounded-r-lg text-sm text-gray-300"^>
+echo                 ^<strong class="text-ai-cyan"^>Nota:^</strong^> Estimación basada en ~4 caracteres por token.
 echo                 Los tokens reales pueden variar según el tokenizer de Claude.
-echo                 Los skills (.claude/skills/^) solo se cargan bajo demanda.
+echo                 Los skills (^<code class="text-ai-purple"^>.claude/skills/^</code^>) solo se cargan bajo demanda.
 echo             ^</div^>
 echo         ^</div^>
-echo         ^<div class="timestamp"^>
+echo.
+echo         ^<!-- Timestamp --^>
+echo         ^<div class="text-center text-sm text-gray-500 pt-4 border-t border-border-default"^>
 echo             Generado: %FULL_TIMESTAMP%
+echo         ^</div^>
+echo.
+echo         ^<!-- Back Link --^>
+echo         ^<div class="text-center mt-4"^>
+echo             ^<a href="../home.html" class="text-ai-cyan hover:text-ai-purple transition-colors text-sm"^>
+echo                 ← Volver a la documentación
+echo             ^</a^>
 echo         ^</div^>
 echo     ^</div^>
 echo ^</body^>
