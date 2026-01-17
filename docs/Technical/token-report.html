@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Report - Claude Config</title>
+    <style>
+        :root {
+            --bg-primary: #0a0d12;
+            --bg-secondary: #0f1419;
+            --bg-tertiary: #161b22;
+            --border: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --start: #10b981;
+            --end: #ef4444;
+            --ai: #3b82f6;
+            --static: #6b7280;
+            --choice: #eab308;
+            --cond: #f97316;
+            --event: #a855f7;
+            --var: #06b6d4;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--var), var(--event));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            color: var(--var);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            height: 32px;
+            overflow: hidden;
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-safe { background: linear-gradient(90deg, var(--start), var(--ai)); }
+        .progress-warn { background: linear-gradient(90deg, var(--choice), var(--cond)); }
+        .progress-danger { background: linear-gradient(90deg, var(--cond), var(--end)); }
+
+        .progress-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-box {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .stat-value.tokens { color: var(--event); }
+        .stat-value.system { color: var(--ai); }
+        .stat-value.available { color: var(--start); }
+        .stat-value.percent { color: var(--var); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        td.file { color: var(--var); font-family: monospace; }
+        td.tokens { color: var(--event); text-align: right; }
+        td.chars { color: var(--text-secondary); text-align: right; }
+
+        .zone-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .zone { padding: 0.25rem 0.5rem; border-radius: 4px; }
+        .zone-safe { background: rgba(16, 185, 129, 0.2); color: var(--start); }
+        .zone-warn { background: rgba(234, 179, 8, 0.2); color: var(--choice); }
+        .zone-danger { background: rgba(239, 68, 68, 0.2); color: var(--end); }
+
+        .timestamp {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .note {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 3px solid var(--var);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Reporte de Tokens</h1>
+        <p class="subtitle">Consumo de contexto de configuración Claude (.claude/)</p>
+        <div class="card">
+            <div class="card-title">⚡ Resumen de Consumo</div>
+            <div class="progress-container">
+                <div class="progress-bar progress-safe" style="width: 7.42%"></div>
+                <span class="progress-label">7.42% usado</span>
+            </div>
+            <div class="zone-indicator">
+                <span class="zone zone-safe">0-60% Seguro</span>
+                <span class="zone zone-warn">60-80% Precaución</span>
+                <span class="zone zone-danger">>80% Riesgo</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value tokens">848</div>
+                    <div class="stat-label">Tokens Reglas</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value system">~14000</div>
+                    <div class="stat-label">Sistema Base</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value available">~185152</div>
+                    <div class="stat-label">Disponible</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value percent">200K</div>
+                    <div class="stat-label">Límite Contexto</div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">📁 Desglose por Archivo</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Archivo</th>
+                        <th style="text-align:right">Caracteres</th>
+                        <th style="text-align:right">Tokens (est.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="file">CLAUDE.md</td>
+                        <td class="chars">545</td>
+                        <td class="tokens">136</td>
+                    </tr>
+                    <tr>
+                        <td class="file">rules/standards.md</td>
+                        <td class="chars">371</td>
+                        <td class="tokens">92</td>
+                    </tr>
+                    <tr>
+                        <td class="file">rules/wiki.md</td>
+                        <td class="chars">275</td>
+                        <td class="tokens">68</td>
+                    </tr>
+                    <tr>
+                        <td class="file">rules/workflow.md</td>
+                        <td class="chars">860</td>
+                        <td class="tokens">215</td>
+                    </tr>
+                    <tr>
+                        <td class="file">skills/godot_dev/SKILL.md</td>
+                        <td class="chars">759</td>
+                        <td class="tokens">189</td>
+                    </tr>
+                    <tr>
+                        <td class="file">skills/software_design/SKILL.md</td>
+                        <td class="chars">582</td>
+                        <td class="tokens">145</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note">
+                <strong>Nota:</strong> Estimación basada en ~4 caracteres por token.
+                Los tokens reales pueden variar según el tokenizer de Claude.
+                Los skills (.claude/skills/) solo se cargan bajo demanda.
+            </div>
+        </div>
+
+        <div class="timestamp">
+            Generado: 2026-01-17 13:03:13
+        </div>
+    </div>
+</body>
+</html>

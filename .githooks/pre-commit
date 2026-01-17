@@ -1,0 +1,21 @@
+#!/bin/bash
+# Pre-commit hook: Regenerate token report if .claude/ files changed
+
+# Check if any .claude/ files are staged
+if git diff --cached --name-only | grep -q "^\.claude/"; then
+    echo "📊 .claude/ files changed, regenerating token report..."
+
+    # Run the appropriate script based on OS
+    if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+        ./tools/generate_token_report.bat
+    else
+        ./tools/generate_token_report.sh
+    fi
+
+    # Stage the generated report
+    git add docs/Technical/token-report.html 2>/dev/null || true
+
+    echo "✓ Token report updated and staged"
+fi
+
+exit 0
