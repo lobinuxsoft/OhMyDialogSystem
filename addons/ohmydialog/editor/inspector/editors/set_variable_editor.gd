@@ -7,6 +7,11 @@ extends BaseNodeEditor
 
 
 const OPERATION_SYMBOLS: Array[String] = ["=", "+=", "-=", "*=", "/=", "toggle"]
+const SCOPE_COLORS: Dictionary = {
+	SetVariableNodeData.VariableScope.LOCAL: "#22c55e",    # Green
+	SetVariableNodeData.VariableScope.SESSION: "#06b6d4", # Cyan
+	SetVariableNodeData.VariableScope.GLOBAL: "#f59e0b"   # Orange
+}
 
 var _info_label: RichTextLabel
 
@@ -47,5 +52,10 @@ func _refresh_info() -> void:
 		else:
 			var display_value: String = str(var_node.value) if var_node.value != null else "null"
 			text += "[color=#06b6d4]%s %s %s[/color]" % [var_node.variable, op_symbol, display_value]
+
+		# Show scope
+		var scope_name := SetVariableNodeData.VariableScope.keys()[var_node.scope]
+		var scope_color: String = SCOPE_COLORS.get(var_node.scope, "#22c55e")
+		text += "\n\n[b]Scope:[/b] [color=%s]%s[/color]" % [scope_color, scope_name]
 
 	_info_label.text = text

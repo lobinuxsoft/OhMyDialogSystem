@@ -9,12 +9,16 @@ extends BaseNodeExecutor
 ## Operation names matching DialogueNodeData.VariableOperation enum order.
 const OPERATION_NAMES := ["set", "add", "subtract", "multiply", "divide", "toggle"]
 
+## Scope names matching SetVariableNodeData.VariableScope enum order.
+const SCOPE_NAMES := ["local", "session", "global"]
+
 
 func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	var setvar_node := node_data as SetVariableNodeData
 	var variable_name: String = setvar_node.variable if setvar_node else ""
 	var value: Variant = setvar_node.value if setvar_node else null
 	var operation: String = _normalize_operation(setvar_node.operation if setvar_node else 0)
+	var scope: String = _scope_to_string(setvar_node.scope if setvar_node else 0)
 
 	if variable_name.is_empty():
 		return error("SetVariableExecutor: No variable name specified")
@@ -22,16 +26,17 @@ func execute(node_data: DialogueNodeData, context: Object) -> Dictionary:
 	# Calculate final value based on operation
 	var final_value: Variant = _calculate_value(variable_name, value, operation, context)
 
-	# Set the variable in context
+	# Set the variable in context with scope
 	if context and context.has_method("set_variable"):
-		context.set_variable(variable_name, final_value)
+		context.set_variable(variable_name, final_value, scope)
 
 	return {
 		RESULT_NEXT_NODE: "",
 		RESULT_OUTPUT_SLOT: 0,
 		RESULT_VARIABLE: variable_name,
 		RESULT_VALUE: final_value,
-		"operation": operation
+		"operation": operation,
+		"scope": scope
 	}
 
 
@@ -111,3 +116,14 @@ func _normalize_operation(op: Variant) -> String:
 	elif op is String:
 		return op.to_lower()
 	return "set"
+
+
+## Converts scope enum to string.
+func _scope_to_string(scope: Variant) -> String:
+	if scope is int:
+		if scope >= 0 and scope < SCOPE_NAMES.size():
+			return SCOPE_NAMES[scope]
+		return "local"
+	elif scope is String:
+		return scope.to_lower()
+	return "local"

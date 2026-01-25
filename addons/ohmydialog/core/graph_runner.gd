@@ -437,7 +437,9 @@ func get_variable(name: String) -> Variant:
 
 
 ## Sets a variable value.
-func set_variable(name: String, value: Variant) -> void:
+## Note: scope is currently stored locally. For full scope support,
+## use DialogueManager which delegates to ContextManager.
+func set_variable(name: String, value: Variant, _scope: String = "local") -> void:
 	_variables[name] = value
 
 
@@ -562,8 +564,8 @@ class GraphRunnerContext extends RefCounted:
 	func get_variable(name: String) -> Variant:
 		return _runner.get_variable(name)
 
-	func set_variable(name: String, value: Variant) -> void:
-		_runner.set_variable(name, value)
+	func set_variable(name: String, value: Variant, scope: String = "local") -> void:
+		_runner.set_variable(name, value, scope)
 
 	func evaluate_condition(expression: String) -> bool:
 		return _runner.evaluate_condition(expression)
