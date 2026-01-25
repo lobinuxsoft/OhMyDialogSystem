@@ -50,9 +50,10 @@ func _refresh_info() -> void:
 			var display_value: String = str(var_node.value) if var_node.value != null else "null"
 			text += "[color=#06b6d4]%s %s %s[/color]" % [var_node.variable, op_symbol, display_value]
 
-		# Show scope
+		# Show scope (LOCAL=0, SESSION=1, GLOBAL=2)
 		var scope_idx: int = var_node.scope
-		var scope_name := SetVariableNodeData.VariableScope.keys()[scope_idx]
+		var scope_names: Array[String] = ["LOCAL", "SESSION", "GLOBAL"]
+		var scope_name: String = scope_names[scope_idx] if scope_idx < scope_names.size() else "LOCAL"
 		var scope_color: String = SCOPE_COLORS[scope_idx] if scope_idx < SCOPE_COLORS.size() else "#22c55e"
 		text += "\n\n[b]Scope:[/b] [color=%s]%s[/color]" % [scope_color, scope_name]
 
