@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://bvirxw54wgi03"]
+[gd_scene load_steps=5 format=3 uid="uid://bvirxw54wgi03"]
 
 [ext_resource type="Script" uid="uid://poksx1f252dk" path="res://examples/dialogue_test_scene.gd" id="1"]
+[ext_resource type="Resource" uid="uid://cmq5w2y3jwple" path="res://examples/resources/merchant_character.tres" id="2_hk1sm"]
+[ext_resource type="Resource" path="res://examples/resources/fantasy_world.tres" id="3_kk6dh"]
+[ext_resource type="Resource" uid="uid://c2vjxlm7hk8qr" path="res://examples/resources/tests/test_02_jump_target.tres" id="4_hk1sm"]
 
 [node name="DialogueTestScene" type="Control"]
 layout_mode = 3
@@ -10,6 +13,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
+test_character = ExtResource("2_hk1sm")
+test_world = ExtResource("3_kk6dh")
+test_dialogue = ExtResource("4_hk1sm")
 
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
