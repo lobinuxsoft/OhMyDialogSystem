@@ -23,16 +23,18 @@ func _create_content_ui() -> void:
 	_add_info("Op", BaseDialogueNode.operation_to_string(operation_int), Color("#06b6d4"))
 	_add_info("Value", str(value))
 
-	var scope_name := SetVariableNodeData.VariableScope.keys()[scope_val]
+	var scope_names := ["LOCAL", "SESSION", "GLOBAL"]
+	var scope_name: String = scope_names[scope_val] if scope_val < scope_names.size() else "LOCAL"
 	var scope_color := _get_scope_color(scope_val)
 	_add_info("Scope", scope_name, scope_color)
 
 
 func _get_scope_color(scope: int) -> Color:
+	# LOCAL=0, SESSION=1, GLOBAL=2
 	match scope:
-		SetVariableNodeData.VariableScope.GLOBAL:
-			return Color("#f59e0b")  # Orange (ai-orange)
-		SetVariableNodeData.VariableScope.SESSION:
-			return Color("#06b6d4")  # Cyan (ai-cyan)
-		_:
-			return Color("#22c55e")  # Green (ai-green) for LOCAL
+		2:  # GLOBAL
+			return Color("#f59e0b")
+		1:  # SESSION
+			return Color("#06b6d4")
+		_:  # LOCAL
+			return Color("#22c55e")
