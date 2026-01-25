@@ -55,6 +55,9 @@
           keyPan: 'Middle Mouse / Space + Drag', keyPanDesc: 'Desplazar vista',
           keySelect: 'Click', keySelectDesc: 'Seleccionar nodo',
           keyMulti: 'Shift + Click', keyMultiDesc: 'Seleccion multiple',
+          keySearch: 'Ctrl + F', keySearchDesc: 'Buscar nodos por ID, tipo o contenido',
+          featSearch: 'Busqueda', featSearchDesc: 'Ctrl+F abre barra de busqueda. Los nodos coincidentes se resaltan en amarillo. Enter navega al primer resultado.',
+          featSessionCache: 'Session Cache', featSessionCacheDesc: 'El ultimo grafo abierto se restaura automaticamente al reabrir Godot.',
           step1Title: '1. Crear Grafo',
           step1Desc: 'Click en "New" para crear un grafo vacio con un StartNode.',
           step2Title: '2. Agregar Nodos',
@@ -109,6 +112,9 @@
           keyPan: 'Middle Mouse / Space + Drag', keyPanDesc: 'Pan view',
           keySelect: 'Click', keySelectDesc: 'Select node',
           keyMulti: 'Shift + Click', keyMultiDesc: 'Multi-select',
+          keySearch: 'Ctrl + F', keySearchDesc: 'Search nodes by ID, type or content',
+          featSearch: 'Search', featSearchDesc: 'Ctrl+F opens search bar. Matching nodes highlight in yellow. Enter navigates to first result.',
+          featSessionCache: 'Session Cache', featSessionCacheDesc: 'Last opened graph is automatically restored when reopening Godot.',
           step1Title: '1. Create Graph',
           step1Desc: 'Click "New" to create an empty graph with a StartNode.',
           step2Title: '2. Add Nodes',
@@ -502,6 +508,22 @@
             <p class="text-gray-400 text-sm" data-i18n="featDisconnectDesc">Arrastra desde un slot conectado hacia
               afuera para desconectar.</p>
           </div>
+          <div
+            class="p-4 rounded-lg border border-ai-green/30 bg-bg-tertiary/30 hover:border-ai-green/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x1F50D;</span>
+              <code class="text-ai-green font-mono" data-i18n="featSearch">Busqueda</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featSearchDesc">Ctrl+F abre barra de busqueda. Los nodos coincidentes se resaltan en amarillo. Enter navega al primer resultado.</p>
+          </div>
+          <div
+            class="p-4 rounded-lg border border-ai-purple/30 bg-bg-tertiary/30 hover:border-ai-purple/50 transition-colors">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xl">&#x1F4BE;</span>
+              <code class="text-ai-purple font-mono" data-i18n="featSessionCache">Session Cache</code>
+            </div>
+            <p class="text-gray-400 text-sm" data-i18n="featSessionCacheDesc">El ultimo grafo abierto se restaura automaticamente al reabrir Godot.</p>
+          </div>
         </div>
       </section>
 
@@ -539,6 +561,10 @@
               <tr class="hover:bg-bg-tertiary/50 transition-colors">
                 <td class="px-4 py-3 font-mono text-ai-cyan" data-i18n="keyMulti">Shift + Click</td>
                 <td class="px-4 py-3 text-gray-300" data-i18n="keyMultiDesc">Seleccion multiple</td>
+              </tr>
+              <tr class="hover:bg-bg-tertiary/50 transition-colors">
+                <td class="px-4 py-3 font-mono text-ai-green" data-i18n="keySearch">Ctrl + F</td>
+                <td class="px-4 py-3 text-gray-300" data-i18n="keySearchDesc">Buscar nodos por ID, tipo o contenido</td>
               </tr>
             </tbody>
           </table>
