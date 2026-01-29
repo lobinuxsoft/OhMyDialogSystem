@@ -1,0 +1,109 @@
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=15 format=3 uid="uid://wb1ro840h4br"]
+
+[ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="1_graph"]
+[ext_resource type="Script" uid="uid://reckn0fl8oqw" path="res://addons/ohmydialog/resources/nodes/start_node_data.gd" id="2_start"]
+[ext_resource type="Script" uid="uid://csx5x0eq6vwvk" path="res://addons/ohmydialog/resources/nodes/end_node_data.gd" id="3_end"]
+[ext_resource type="Script" uid="uid://crtfmbxjvqyo2" path="res://addons/ohmydialog/resources/nodes/static_response_node_data.gd" id="4_static"]
+[ext_resource type="Script" uid="uid://cqyrip3w786hr" path="res://addons/ohmydialog/resources/nodes/player_choice_node_data.gd" id="5_choice"]
+[ext_resource type="Script" uid="uid://bwu44xjwalhb1" path="res://addons/ohmydialog/resources/nodes/ai_response_node_data.gd" id="6_ai"]
+[ext_resource type="Script" uid="uid://o4cv1xthgph0" path="res://addons/ohmydialog/resources/nodes/jump_node_data.gd" id="7_jump"]
+
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_start")
+node_id = "start"
+editor_position = Vector2(0, 200)
+
+[sub_resource type="Resource" id="node_intro"]
+script = ExtResource("4_static")
+speaker = "Sistema"
+text = "Test 03: Prueba de JUMP y AI_RESPONSE. Elige una opcion."
+emotion = "neutral"
+node_id = "intro"
+editor_position = Vector2(300, 200)
+
+[sub_resource type="Resource" id="node_choice"]
+script = ExtResource("5_choice")
+choices = PackedStringArray("Probar AI_RESPONSE", "Saltar a otro grafo (JUMP)", "Terminar")
+node_id = "main_choice"
+editor_position = Vector2(600, 200)
+output_count = 3
+
+[sub_resource type="Resource" id="node_ai"]
+script = ExtResource("6_ai")
+prompt_template = "Eres un asistente de pruebas. Responde brevemente confirmando que el nodo AI_RESPONSE funciona correctamente. Se amable y conciso."
+emotion_hint = "friendly"
+max_tokens = 50
+node_id = "ai_test"
+editor_position = Vector2(950, 50)
+
+[sub_resource type="Resource" id="node_ai_done"]
+script = ExtResource("4_static")
+speaker = "Sistema"
+text = "AI_RESPONSE completado exitosamente. La generacion de texto funciona."
+emotion = "happy"
+node_id = "ai_done"
+editor_position = Vector2(1250, 50)
+
+[sub_resource type="Resource" id="node_jump"]
+script = ExtResource("7_jump")
+node_id = "jump_to_graph2"
+editor_position = Vector2(950, 200)
+output_count = 0
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("3_end")
+node_id = "end"
+editor_position = Vector2(1550, 200)
+output_count = 0
+
+[resource]
+script = ExtResource("1_graph")
+graph_id = "test_jump_and_ai"
+display_name = "Test 03: Jump y AI Response"
+description = "Prueba JUMP (salto a otro grafo) y AI_RESPONSE (generacion con LLM)"
+nodes = {
+"ai_done": SubResource("node_ai_done"),
+"ai_test": SubResource("node_ai"),
+"end": SubResource("node_end"),
+"intro": SubResource("node_intro"),
+"jump_to_graph2": SubResource("node_jump"),
+"main_choice": SubResource("node_choice"),
+"start": SubResource("node_start")
+}
+connections = Array[Dictionary]([{
+"from_node": "start",
+"from_slot": 0,
+"to_node": "intro",
+"to_slot": 0
+}, {
+"from_node": "intro",
+"from_slot": 0,
+"to_node": "main_choice",
+"to_slot": 0
+}, {
+"from_node": "main_choice",
+"from_slot": 0,
+"to_node": "ai_test",
+"to_slot": 0
+}, {
+"from_node": "main_choice",
+"from_slot": 1,
+"to_node": "jump_to_graph2",
+"to_slot": 0
+}, {
+"from_node": "main_choice",
+"from_slot": 2,
+"to_node": "end",
+"to_slot": 0
+}, {
+"from_node": "ai_test",
+"from_slot": 0,
+"to_node": "ai_done",
+"to_slot": 0
+}, {
+"from_node": "ai_done",
+"from_slot": 0,
+"to_node": "end",
+"to_slot": 0
+}])
+start_node_id = "start"

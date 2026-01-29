@@ -114,6 +114,9 @@ func _setup_toolbar() -> void:
 	popup.clear()
 
 	for i in DialogueNodeData.NodeType.size():
+		# Skip internal-only nodes (RETURN_TO_GRAPH is handled internally by JUMP_TO_FREE)
+		if i == DialogueNodeData.NodeType.RETURN_TO_GRAPH:
+			continue
 		var type_name := DialogueNodeData.get_type_name_static(i)
 		popup.add_item(type_name, i)
 		# Add icon color indicator
@@ -129,6 +132,9 @@ func _setup_context_menu() -> void:
 	# Add Node submenu
 	add_node_submenu.clear()
 	for i in DialogueNodeData.NodeType.size():
+		# Skip internal-only nodes (RETURN_TO_GRAPH is handled internally by JUMP_TO_FREE)
+		if i == DialogueNodeData.NodeType.RETURN_TO_GRAPH:
+			continue
 		var type_name := DialogueNodeData.get_type_name_static(i)
 		add_node_submenu.add_item(type_name, i)
 	add_node_submenu.id_pressed.connect(_on_add_node_submenu_id_pressed)

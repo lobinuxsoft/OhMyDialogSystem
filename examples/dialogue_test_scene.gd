@@ -18,14 +18,15 @@ extends Control
 
 var dialogue_manager: DialogueManager
 
+# Test configuration - set these in the Inspector
+@export_group("Test Resources")
+@export var test_character: CharacterIdentity
+@export var test_world: WorldContext
+@export var test_dialogue: DialogueGraph
+
 # Debug tracking
 var last_player_input: String = ""
 var pending_choices: Array[Dictionary] = []
-
-# Resources
-var merchant_character: CharacterIdentity
-var fantasy_world: WorldContext
-var merchant_dialogue: DialogueGraph
 
 
 func _ready() -> void:
@@ -55,14 +56,18 @@ func _check_ai_service() -> void:
 
 
 func _load_resources() -> void:
-	merchant_character = load("res://examples/resources/merchant_character.tres")
-	fantasy_world = load("res://examples/resources/fantasy_world.tres")
-	merchant_dialogue = load("res://examples/resources/merchant_dialogue.tres")
+	# Use exported resources if set, otherwise load defaults
+	if not test_character:
+		test_character = load("res://examples/resources/merchant_character.tres")
+	if not test_world:
+		test_world = load("res://examples/resources/fantasy_world.tres")
+	if not test_dialogue:
+		test_dialogue = load("res://examples/resources/merchant_dialogue.tres")
 
-	if merchant_character:
-		dialogue_manager.default_character = merchant_character
-	if fantasy_world:
-		dialogue_manager.world_context = fantasy_world
+	if test_character:
+		dialogue_manager.default_character = test_character
+	if test_world:
+		dialogue_manager.world_context = test_world
 	# Note: ai_preset is now set on DialogueGraph, not DialogueManager
 
 
@@ -187,8 +192,8 @@ func _update_debug() -> void:
 
 
 func _on_start_pressed() -> void:
-	if merchant_dialogue:
-		dialogue_manager.start_dialogue(merchant_dialogue, DialogueManager.DialogueMode.SCRIPTED)
+	if test_dialogue:
+		dialogue_manager.start_dialogue(test_dialogue, DialogueManager.DialogueMode.SCRIPTED)
 	else:
 		push_error("No dialogue graph loaded!")
 
