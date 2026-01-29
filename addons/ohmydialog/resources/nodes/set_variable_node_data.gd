@@ -4,6 +4,14 @@ extends DialogueNodeData
 ## Node that modifies a dialogue variable.
 
 
+## Scope determines variable persistence level.
+enum VariableScope {
+	LOCAL,    ## Only during this graph execution
+	SESSION,  ## Persists during the game session
+	GLOBAL    ## Persists between sessions (saved)
+}
+
+
 ## Name of the variable to modify.
 @export var variable: String = "":
 	set(v):
@@ -20,6 +28,12 @@ extends DialogueNodeData
 @export var value: Variant:
 	set(v):
 		value = v
+		emit_changed()
+
+## Scope determines how long the variable persists.
+@export var scope: VariableScope = VariableScope.LOCAL:
+	set(v):
+		scope = v
 		emit_changed()
 
 
@@ -43,6 +57,7 @@ func to_dict() -> Dictionary:
 	dict["variable"] = variable
 	dict["operation"] = operation
 	dict["value"] = value
+	dict["scope"] = scope
 	return dict
 
 
@@ -50,6 +65,7 @@ func _load_from_dict(dict: Dictionary) -> void:
 	variable = dict.get("variable", "")
 	operation = dict.get("operation", DialogueNodeData.VariableOperation.SET)
 	value = dict.get("value", null)
+	scope = dict.get("scope", VariableScope.LOCAL)
 	super._load_from_dict(dict)
 
 

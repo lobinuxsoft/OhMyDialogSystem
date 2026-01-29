@@ -7,6 +7,7 @@ extends EditorPlugin
 
 const AUTOLOAD_NAME := "AIServiceAutoload"
 const AUTOLOAD_PATH := "res://addons/ohmydialog/autoload/ai_service_autoload.gd"
+const SESSION_CACHE_KEY := "ohmydialog/editor/last_graph_path"
 
 ## Reference to the toolbar menu button with icon.
 var _toolbar_menu: MenuButton
@@ -147,6 +148,9 @@ func _exit_tree() -> void:
 		remove_export_plugin(_model_export_plugin)
 		_model_export_plugin = null
 
+	# Save session cache before cleanup
+	_save_session_cache()
+
 	# Clean up dialogue graph window
 	if _dialogue_graph_window:
 		_dialogue_graph_window.queue_free()
@@ -194,6 +198,9 @@ func _on_dialogue_graph_window_ready() -> void:
 		editor.set_inspector_plugin(_node_inspector_plugin)
 	if _dialogue_graph_inspector_plugin:
 		_dialogue_graph_inspector_plugin.setup(_dialogue_graph_window)
+
+	# Restore last opened graph from session cache
+	_restore_session_cache()
 
 
 ## Called when a toolbar menu item is pressed.
@@ -260,3 +267,37 @@ func _on_model_loaded(config: ModelConfig) -> void:
 ## Called when a model is unloaded.
 func _on_model_unloaded() -> void:
 	_update_status_indicator(false, null)
+
+
+## Saves the current graph path to editor settings for session persistence.
+func _save_session_cache() -> void:
+	if not _dialogue_graph_window:
+		return
+
+	var editor := _dialogue_graph_window.get_editor()
+	if not editor:
+		return
+
+	var graph := editor.current_graph
+	if graph and not graph.resource_path.is_empty():
+		EditorInterface.get_editor_settings().set_setting(
+			SESSION_CACHE_KEY,
+			graph.resource_path
+		)
+
+
+## Restores the last opened graph from editor settings.
+func _restore_session_cache() -> void:
+	var settings := EditorInterface.get_editor_settings()
+	if not settings.has_setting(SESSION_CACHE_KEY):
+		return
+
+	var path: String = settings.get_setting(SESSION_CACHE_KEY)
+	if path.is_empty() or not FileAccess.file_exists(path):
+		return
+
+	var graph := load(path) as DialogueGraph
+	if graph and _dialogue_graph_window:
+		var editor := _dialogue_graph_window.get_editor()
+		if editor:
+			editor.edit_graph(graph)
