@@ -152,16 +152,12 @@ func resume() -> void:
 
 ## Provides player input (for choice selection or text input).
 func provide_input(input: Variant) -> void:
-	print("[DEBUG] GraphRunner.provide_input called with: ", input)
-	print("[DEBUG] GraphRunner state: ", State.keys()[state])
-
 	# Allow input in WAITING_INPUT or FREE_MODE states
 	if state != State.WAITING_INPUT and state != State.FREE_MODE:
 		push_warning("GraphRunner: Not waiting for input (state: %s)" % State.keys()[state])
 		return
 
 	if input is int:
-		print("[DEBUG] Processing int input (choice)")
 		# Choice selection - only valid in WAITING_INPUT state
 		if state != State.WAITING_INPUT:
 			push_warning("GraphRunner: Integer input not valid in FREE_MODE")
@@ -172,14 +168,11 @@ func provide_input(input: Variant) -> void:
 		_pending_choices.clear()
 		_advance_to_next_node(input)
 	elif input is String:
-		print("[DEBUG] Processing string input")
 		# Text input - store in context
 		_context["player_input"] = input
 		if state == State.FREE_MODE:
-			print("[DEBUG] In FREE_MODE -> _process_free_mode_input")
 			_process_free_mode_input(input)
 		else:
-			print("[DEBUG] Not FREE_MODE -> _advance_to_next_node")
 			_advance_to_next_node(0)
 
 

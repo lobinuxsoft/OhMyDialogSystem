@@ -242,11 +242,6 @@ func end_dialogue(reason: String = "ended") -> void:
 
 ## Sends a player message (for FREE mode or text input nodes).
 func send_player_message(text: String) -> void:
-	print("[DEBUG] send_player_message called with: ", text)
-	print("[DEBUG] _is_active: ", _is_active)
-	print("[DEBUG] current_mode: ", current_mode, " FREE=", DialogueMode.FREE)
-	print("[DEBUG] graph_runner.is_in_free_mode(): ", graph_runner.is_in_free_mode() if graph_runner else "null")
-
 	if not _is_active:
 		push_warning("DialogueManager: No active dialogue")
 		return
@@ -254,11 +249,13 @@ func send_player_message(text: String) -> void:
 	# Add to history
 	conversation_history.add_user(text)
 
-	if current_mode == DialogueMode.FREE or graph_runner.is_in_free_mode():
-		print("[DEBUG] Taking FREE mode path -> _process_free_mode_message")
+	if graph_runner and graph_runner.is_in_free_mode():
+		# HYBRID mode: pass through GraphRunner to check exit keywords
+		graph_runner.provide_input(text)
+	elif current_mode == DialogueMode.FREE:
+		# Pure FREE mode (no graph): go directly to inference
 		_process_free_mode_message(text)
 	else:
-		print("[DEBUG] Taking GRAPH mode path -> graph_runner.provide_input")
 		graph_runner.provide_input(text)
 
 
@@ -415,14 +412,10 @@ func _start_graph_execution() -> void:
 
 ## Processes a message in free mode.
 func _process_free_mode_message(text: String) -> void:
-	print("[DEBUG] _process_free_mode_message called with: ", text)
-	print("[DEBUG] llama_interface: ", llama_interface)
-
 	if not llama_interface:
 		_emit_error("No LlamaInterface configured for AI responses")
 		return
 
-	print("[DEBUG] Building prompt...")
 	# Build prompt
 	var memories: Array[String] = []  # TODO: Integrate memory system
 	var prompt := prompt_builder.build_prompt(
@@ -434,7 +427,6 @@ func _process_free_mode_message(text: String) -> void:
 		max_context_tokens
 	)
 
-	print("[DEBUG] Calling _request_inference")
 	# Request inference
 	_request_inference(prompt)
 
