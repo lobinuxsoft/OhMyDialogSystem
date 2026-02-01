@@ -264,8 +264,12 @@ func _on_npc_speaking(speaker: String, text: String, is_streaming: bool) -> void
 
 func _on_npc_response_completed(full_text: String) -> void:
 	dialogue_text.text = full_text
-	# Show continue button after AI response completes
-	_show_continue()
+	# In free mode, show input field to continue conversation
+	# Otherwise show continue button for confirmation
+	if dialogue_manager.is_in_free_mode():
+		_show_input()
+	else:
+		_show_continue()
 	_update_debug()
 
 

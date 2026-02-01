@@ -307,6 +307,11 @@ func is_active() -> bool:
 	return _is_active
 
 
+## Returns whether currently in free conversation mode (within a graph).
+func is_in_free_mode() -> bool:
+	return graph_runner.is_in_free_mode() if graph_runner else false
+
+
 ## Gets a variable from context.
 func get_variable(name: String, default: Variant = null) -> Variant:
 	return context_manager.get_variable(name, default)
@@ -524,8 +529,8 @@ func _complete_inference(response: String) -> void:
 
 	# Check if in free mode within graph
 	if graph_runner.is_in_free_mode():
-		# Let graph runner handle return conditions
-		graph_runner.provide_input(response)
+		# Notify graph runner of AI response (don't process as player input)
+		graph_runner.notify_ai_response(response)
 	elif current_mode == DialogueMode.FREE:
 		# Pure free mode - continue conversation
 		waiting_for_player_input.emit()

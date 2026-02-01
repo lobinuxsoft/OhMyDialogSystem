@@ -152,12 +152,16 @@ func resume() -> void:
 
 ## Provides player input (for choice selection or text input).
 func provide_input(input: Variant) -> void:
-	if state != State.WAITING_INPUT:
-		push_warning("GraphRunner: Not waiting for input")
+	# Allow input in WAITING_INPUT or FREE_MODE states
+	if state != State.WAITING_INPUT and state != State.FREE_MODE:
+		push_warning("GraphRunner: Not waiting for input (state: %s)" % State.keys()[state])
 		return
 
 	if input is int:
-		# Choice selection - get text and store as player_input
+		# Choice selection - only valid in WAITING_INPUT state
+		if state != State.WAITING_INPUT:
+			push_warning("GraphRunner: Integer input not valid in FREE_MODE")
+			return
 		if input >= 0 and input < _pending_choices.size():
 			var selected_choice: Dictionary = _pending_choices[input]
 			_context["player_input"] = selected_choice.get("text", "")
@@ -390,6 +394,16 @@ func _process_free_mode_input(input: String) -> void:
 		"history": _conversation_state.messages,
 		"player_input": input
 	})
+
+
+## Notifies that AI has responded in free mode.
+## This is separate from provide_input() to avoid processing AI response as player input.
+func notify_ai_response(response: String) -> void:
+	if state != State.FREE_MODE:
+		return
+	_conversation_state.add_npc_message(response)
+	# Wait for next player input
+	waiting_for_input.emit("text", {"mode": "free"})
 
 
 ## Exits free conversation mode.
