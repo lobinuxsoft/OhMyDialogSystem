@@ -10,8 +10,8 @@ echo ========================================
 
 cd /d "%~dp0"
 
-REM Check if scons is available
-where scons >nul 2>&1
+REM Check if scons is available (use python -m to avoid Device Guard blocks)
+python -m SCons --version >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] SCons not found. Install with: pip install scons
     exit /b 1
@@ -188,7 +188,7 @@ set SCONS_ARGS=platform=%PLATFORM% target=%TARGET% llama_backend=%LLAMA_BACKEND%
 set SCONS_ARGS=%SCONS_ARGS% llama_native=%LLAMA_NATIVE% llama_avx2=%LLAMA_AVX2% llama_rebuild=%LLAMA_REBUILD%
 if "%LLAMA_ALL_BACKENDS%"=="yes" set SCONS_ARGS=%SCONS_ARGS% llama_all_backends=yes
 if "%LLAMA_DYNAMIC%"=="yes" set SCONS_ARGS=%SCONS_ARGS% llama_dynamic=yes
-scons %SCONS_ARGS% -j%JOBS%
+python -m SCons %SCONS_ARGS% -j%JOBS%
 
 if %ERRORLEVEL% neq 0 (
     echo.
