@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=13 format=3 uid="uid://c2vjxlm7hk8qr"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=14 format=3 uid="uid://c2vjxlm7hk8qr"]
 
 [ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="1_graph"]
 [ext_resource type="Script" uid="uid://reckn0fl8oqw" path="res://addons/ohmydialog/resources/nodes/start_node_data.gd" id="2_start"]
@@ -6,34 +6,6 @@
 [ext_resource type="Script" uid="uid://crtfmbxjvqyo2" path="res://addons/ohmydialog/resources/nodes/static_response_node_data.gd" id="4_static"]
 [ext_resource type="Script" uid="uid://cqyrip3w786hr" path="res://addons/ohmydialog/resources/nodes/player_choice_node_data.gd" id="5_choice"]
 [ext_resource type="Script" uid="uid://c4akvhu8851x2" path="res://addons/ohmydialog/resources/nodes/jump_to_free_node_data.gd" id="6_free"]
-
-[sub_resource type="Resource" id="node_start"]
-script = ExtResource("2_start")
-node_id = "start"
-editor_position = Vector2(0, 200)
-
-[sub_resource type="Resource" id="node_arrived"]
-script = ExtResource("4_static")
-speaker = "Sistema"
-text = "Has llegado al GRAFO 2 mediante JUMP. El salto funciono correctamente."
-emotion = "happy"
-node_id = "arrived"
-editor_position = Vector2(300, 200)
-
-[sub_resource type="Resource" id="node_choice"]
-script = ExtResource("5_choice")
-choices = PackedStringArray("Probar JUMP_TO_FREE (modo libre)", "Info sobre RETURN_TO_GRAPH", "Terminar aqui con END")
-node_id = "mode_choice"
-editor_position = Vector2(650, 200)
-output_count = 3
-
-[sub_resource type="Resource" id="node_free"]
-script = ExtResource("6_free")
-context_prompt = "Eres un asistente de pruebas en modo conversacion libre. Responde brevemente. Cuando el usuario diga 'salir', 'volver' o 'exit', despidete."
-return_keywords = PackedStringArray("salir", "volver", "exit")
-max_exchanges = 3
-node_id = "go_free"
-editor_position = Vector2(1000, 50)
 
 [sub_resource type="Resource" id="node_after_free"]
 script = ExtResource("4_static")
@@ -43,6 +15,35 @@ emotion = "happy"
 node_id = "after_free"
 editor_position = Vector2(1300, 50)
 
+[sub_resource type="Resource" id="node_arrived"]
+script = ExtResource("4_static")
+speaker = "Sistema"
+text = "Has llegado al GRAFO 2 mediante JUMP. El salto funciono correctamente."
+emotion = "happy"
+node_id = "arrived"
+editor_position = Vector2(300, 200)
+
+[sub_resource type="Resource" id="node_end"]
+script = ExtResource("3_end")
+node_id = "end"
+editor_position = Vector2(1600, 200)
+output_count = 0
+
+[sub_resource type="Resource" id="node_free"]
+script = ExtResource("6_free")
+context_prompt = "Eres un asistente de pruebas en modo conversacion libre. Responde brevemente. Cuando el usuario diga 'salir', 'volver' o 'exit', despidete."
+return_keywords = PackedStringArray("salir", "volver", "exit")
+max_exchanges = 3
+node_id = "go_free"
+editor_position = Vector2(1000, 50)
+
+[sub_resource type="Resource" id="node_choice"]
+script = ExtResource("5_choice")
+choices = PackedStringArray("Probar JUMP_TO_FREE (modo libre)", "Info sobre RETURN_TO_GRAPH", "Terminar aqui con END")
+node_id = "mode_choice"
+editor_position = Vector2(650, 200)
+output_count = 3
+
 [sub_resource type="Resource" id="node_return_info"]
 script = ExtResource("4_static")
 speaker = "Sistema"
@@ -51,11 +52,10 @@ emotion = "neutral"
 node_id = "return_info"
 editor_position = Vector2(1000, 200)
 
-[sub_resource type="Resource" id="node_end"]
-script = ExtResource("3_end")
-node_id = "end"
-editor_position = Vector2(1600, 200)
-output_count = 0
+[sub_resource type="Resource" id="node_start"]
+script = ExtResource("2_start")
+node_id = "start"
+editor_position = Vector2(0, 200)
 
 [resource]
 script = ExtResource("1_graph")

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=38 format=3 uid="uid://i1sbtg72xp43"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=39 format=3 uid="uid://i1sbtg72xp43"]
 
 [ext_resource type="Resource" uid="uid://cmq5w2y3jwple" path="res://examples/resources/merchant_character.tres" id="1_p5lqr"]
 [ext_resource type="Resource" uid="uid://by2uvbmxtdacg" path="res://presets/qwen3_1.7b_gguf_q5_k_m_preset.tres" id="1_v4s23"]
@@ -215,6 +215,13 @@ emotion = "happy"
 node_id = "welcome_static"
 editor_position = Vector2(-100, 200)
 
+[sub_resource type="Resource" id="Resource_v4s23"]
+script = ExtResource("12_setvar")
+value = null
+scope = 1
+node_id = "2dcded74-09db-4345-86dc-0a21a15ff75a"
+editor_position = Vector2(125.80538, -58.689114)
+
 [resource]
 script = ExtResource("2_euopo")
 graph_id = "merchant_demo_complex"
@@ -230,6 +237,7 @@ local_variables = {
 "talked_to_merchant": false
 }
 nodes = {
+"2dcded74-09db-4345-86dc-0a21a15ff75a": SubResource("Resource_v4s23"),
 "after_sample_ai_response": SubResource("node_after_sample_ai"),
 "bow_ai_response": SubResource("node_bow_ai"),
 "bow_purchase_event": SubResource("node_bow_event"),

@@ -337,15 +337,19 @@ func _rebuild_connections() -> void:
 		return
 
 	for conn in current_graph.connections:
-		var from_node: String = conn.from_node
-		var to_node: String = conn.to_node
+		var from_id: String = conn.from_node
+		var to_id: String = conn.to_node
 
 		# Verify both nodes exist visually
-		if _visual_nodes.has(from_node) and _visual_nodes.has(to_node):
+		if _visual_nodes.has(from_id) and _visual_nodes.has(to_id):
+			# Use the actual GraphNode name (may differ from node_id due to Godot naming)
+			var from_name: StringName = _visual_nodes[from_id].name
+			var to_name: StringName = _visual_nodes[to_id].name
+
 			graph_edit.connect_node(
-				from_node,
+				from_name,
 				conn.from_slot,
-				to_node,
+				to_name,
 				conn.to_slot
 			)
 
@@ -415,10 +419,11 @@ func _remove_node(node_id: String) -> void:
 	# Remove visual node
 	if _visual_nodes.has(node_id):
 		var visual_node: BaseDialogueNode = _visual_nodes[node_id]
+		var visual_name: StringName = visual_node.name
 
-		# Remove connections involving this node
+		# Remove connections involving this node (compare by GraphEdit name)
 		for conn in graph_edit.get_connection_list():
-			if conn.from_node == node_id or conn.to_node == node_id:
+			if conn.from_node == visual_name or conn.to_node == visual_name:
 				graph_edit.disconnect_node(
 					conn.from_node,
 					conn.from_port,
@@ -446,9 +451,17 @@ func _on_connection_request(from_node: StringName, from_port: int, to_node: Stri
 	if not current_graph:
 		return
 
-	# Try to create connection in data
-	if current_graph.connect_nodes(String(from_node), from_port, String(to_node), to_port):
-		# Visual connection
+	# Get actual node_id from visual nodes (GraphEdit may send incorrect names)
+	var from_id := _get_node_id_from_visual(from_node)
+	var to_id := _get_node_id_from_visual(to_node)
+
+	if from_id.is_empty() or to_id.is_empty():
+		push_error("DialogueGraphEditor: Could not resolve node IDs for connection")
+		return
+
+	# Create connection in data using real node_id
+	if current_graph.connect_nodes(from_id, from_port, to_id, to_port):
+		# Visual connection uses GraphEdit's node names
 		graph_edit.connect_node(from_node, from_port, to_node, to_port)
 		graph_modified.emit()
 
@@ -457,12 +470,26 @@ func _on_disconnection_request(from_node: StringName, from_port: int, to_node: S
 	if not current_graph:
 		return
 
+	# Get actual node_id from visual nodes
+	var from_id := _get_node_id_from_visual(from_node)
+	var to_id := _get_node_id_from_visual(to_node)
+
 	# Remove from data
-	current_graph.disconnect_nodes(String(from_node), from_port, String(to_node), to_port)
+	current_graph.disconnect_nodes(from_id, from_port, to_id, to_port)
 
 	# Remove visual connection
 	graph_edit.disconnect_node(from_node, from_port, to_node, to_port)
 	graph_modified.emit()
+
+
+## Resolves the actual node_id from a GraphEdit node name.
+## GraphEdit may report incorrect names (e.g., @GraphNode@XXXXX) when the
+## visual node's name property doesn't match its node_data.node_id.
+func _get_node_id_from_visual(node_name: StringName) -> String:
+	var visual_node := graph_edit.get_node_or_null(NodePath(node_name))
+	if visual_node is BaseDialogueNode:
+		return visual_node.node_data.node_id
+	return String(node_name)
 
 
 func _on_node_selected(node: Node) -> void:
