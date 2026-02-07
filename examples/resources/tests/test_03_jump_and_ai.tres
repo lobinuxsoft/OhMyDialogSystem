@@ -44,7 +44,7 @@ editor_position = Vector2(300, 200)
 [sub_resource type="Resource" id="node_jump"]
 script = ExtResource("7_jump")
 node_id = "jump_to_graph2"
-editor_position = Vector2(950, 200)
+editor_position = Vector2(960, 360)
 output_count = 0
 
 [sub_resource type="Resource" id="node_choice"]

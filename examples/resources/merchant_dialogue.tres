@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=38 format=3 uid="uid://i1sbtg72xp43"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=39 format=3 uid="uid://i1sbtg72xp43"]
 
 [ext_resource type="Resource" uid="uid://cmq5w2y3jwple" path="res://examples/resources/merchant_character.tres" id="1_p5lqr"]
-[ext_resource type="Resource" uid="uid://by2uvbmxtdacg" path="res://presets/qwen3_1.7b_gguf_q5_k_m_preset.tres" id="1_v4s23"]
+[ext_resource type="Resource" uid="uid://ck3pm0u53hrr6" path="res://presets/qwen2.5_3b_instruct_q4_preset.tres" id="1_v4s23"]
 [ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="2_euopo"]
 [ext_resource type="Resource" path="res://examples/resources/fantasy_world.tres" id="4_1mjo3"]
 [ext_resource type="Script" uid="uid://reckn0fl8oqw" path="res://addons/ohmydialog/resources/nodes/start_node_data.gd" id="5_start"]
@@ -12,6 +12,13 @@
 [ext_resource type="Script" uid="uid://5ea8tirgd5bk" path="res://addons/ohmydialog/resources/nodes/condition_node_data.gd" id="10_condition"]
 [ext_resource type="Script" uid="uid://cghxg1us5y4mm" path="res://addons/ohmydialog/resources/nodes/event_node_data.gd" id="11_event"]
 [ext_resource type="Script" uid="uid://d10r24nxqwapt" path="res://addons/ohmydialog/resources/nodes/set_variable_node_data.gd" id="12_setvar"]
+
+[sub_resource type="Resource" id="Resource_v4s23"]
+script = ExtResource("12_setvar")
+value = null
+scope = 1
+node_id = "2dcded74-09db-4345-86dc-0a21a15ff75a"
+editor_position = Vector2(125.80538, -58.689114)
 
 [sub_resource type="Resource" id="node_after_sample_ai"]
 script = ExtResource("7_ai")
@@ -223,13 +230,14 @@ description = "Complex dialogue testing all node types: CHOICE, AI_RESPONSE, STA
 default_character = ExtResource("1_p5lqr")
 world_context = ExtResource("4_1mjo3")
 ai_preset = ExtResource("1_v4s23")
-model_path = "res://models/Qwen3-1.7B.Q5_K_M.gguf"
+model_path = "res://models/qwen2.5-3b-instruct-q4_k_m.gguf"
 local_variables = {
 "merchant_visits": 0,
 "player_reputation": 60,
 "talked_to_merchant": false
 }
 nodes = {
+"2dcded74-09db-4345-86dc-0a21a15ff75a": SubResource("Resource_v4s23"),
 "after_sample_ai_response": SubResource("node_after_sample_ai"),
 "bow_ai_response": SubResource("node_bow_ai"),
 "bow_purchase_event": SubResource("node_bow_event"),

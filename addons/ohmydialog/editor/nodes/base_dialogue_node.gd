@@ -41,6 +41,12 @@ var _content_container: VBoxContainer
 func setup(data: DialogueNodeData, graph: DialogueGraph = null) -> void:
 	node_data = data
 	dialogue_graph = graph
+
+	# Ensure node_id is never empty (prevents GraphEdit naming issues)
+	if data.node_id.is_empty():
+		push_error("BaseDialogueNode: node_id is empty, generating fallback UUID")
+		data.node_id = data._generate_uuid()
+
 	name = data.node_id
 	position_offset = data.editor_position
 
