@@ -249,7 +249,11 @@ func send_player_message(text: String) -> void:
 	# Add to history
 	conversation_history.add_user(text)
 
-	if current_mode == DialogueMode.FREE or graph_runner.is_in_free_mode():
+	if graph_runner and graph_runner.is_in_free_mode():
+		# HYBRID mode: pass through GraphRunner to check exit keywords
+		graph_runner.provide_input(text)
+	elif current_mode == DialogueMode.FREE:
+		# Pure FREE mode (no graph): go directly to inference
 		_process_free_mode_message(text)
 	else:
 		graph_runner.provide_input(text)
@@ -305,6 +309,11 @@ func set_mode(mode: DialogueMode) -> void:
 ## Returns whether dialogue is currently active.
 func is_active() -> bool:
 	return _is_active
+
+
+## Returns whether currently in free conversation mode (within a graph).
+func is_in_free_mode() -> bool:
+	return graph_runner.is_in_free_mode() if graph_runner else false
 
 
 ## Gets a variable from context.
@@ -524,8 +533,8 @@ func _complete_inference(response: String) -> void:
 
 	# Check if in free mode within graph
 	if graph_runner.is_in_free_mode():
-		# Let graph runner handle return conditions
-		graph_runner.provide_input(response)
+		# Notify graph runner of AI response (don't process as player input)
+		graph_runner.notify_ai_response(response)
 	elif current_mode == DialogueMode.FREE:
 		# Pure free mode - continue conversation
 		waiting_for_player_input.emit()

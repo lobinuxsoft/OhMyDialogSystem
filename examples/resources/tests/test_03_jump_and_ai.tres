@@ -1,12 +1,15 @@
-[gd_resource type="Resource" script_class="DialogueGraph" load_steps=15 format=3 uid="uid://wb1ro840h4br"]
+[gd_resource type="Resource" script_class="DialogueGraph" load_steps=18 format=3 uid="uid://wb1ro840h4br"]
 
 [ext_resource type="Script" uid="uid://bltsjidn3ba3t" path="res://addons/ohmydialog/resources/dialogue_graph.gd" id="1_graph"]
+[ext_resource type="Resource" uid="uid://ck3pm0u53hrr6" path="res://presets/qwen2.5_3b_instruct_q4_preset.tres" id="1_vskis"]
+[ext_resource type="Resource" uid="uid://cmq5w2y3jwple" path="res://examples/resources/merchant_character.tres" id="2_qu00x"]
 [ext_resource type="Script" uid="uid://reckn0fl8oqw" path="res://addons/ohmydialog/resources/nodes/start_node_data.gd" id="2_start"]
 [ext_resource type="Script" uid="uid://csx5x0eq6vwvk" path="res://addons/ohmydialog/resources/nodes/end_node_data.gd" id="3_end"]
 [ext_resource type="Script" uid="uid://crtfmbxjvqyo2" path="res://addons/ohmydialog/resources/nodes/static_response_node_data.gd" id="4_static"]
 [ext_resource type="Script" uid="uid://cqyrip3w786hr" path="res://addons/ohmydialog/resources/nodes/player_choice_node_data.gd" id="5_choice"]
 [ext_resource type="Script" uid="uid://bwu44xjwalhb1" path="res://addons/ohmydialog/resources/nodes/ai_response_node_data.gd" id="6_ai"]
 [ext_resource type="Script" uid="uid://o4cv1xthgph0" path="res://addons/ohmydialog/resources/nodes/jump_node_data.gd" id="7_jump"]
+[ext_resource type="Resource" path="res://examples/resources/fantasy_world.tres" id="10_nfuy6"]
 
 [sub_resource type="Resource" id="node_ai_done"]
 script = ExtResource("4_static")
@@ -41,7 +44,7 @@ editor_position = Vector2(300, 200)
 [sub_resource type="Resource" id="node_jump"]
 script = ExtResource("7_jump")
 node_id = "jump_to_graph2"
-editor_position = Vector2(950, 200)
+editor_position = Vector2(960, 360)
 output_count = 0
 
 [sub_resource type="Resource" id="node_choice"]
@@ -61,6 +64,10 @@ script = ExtResource("1_graph")
 graph_id = "test_jump_and_ai"
 display_name = "Test 03: Jump y AI Response"
 description = "Prueba JUMP (salto a otro grafo) y AI_RESPONSE (generacion con LLM)"
+default_character = ExtResource("2_qu00x")
+world_context = ExtResource("10_nfuy6")
+ai_preset = ExtResource("1_vskis")
+model_path = "res://models/qwen2.5-3b-instruct-q4_k_m.gguf"
 nodes = {
 "ai_done": SubResource("node_ai_done"),
 "ai_test": SubResource("node_ai"),
