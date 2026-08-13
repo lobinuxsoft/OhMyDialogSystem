@@ -20,7 +20,7 @@
       t: {
         es: {
           navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
-          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual', navLocalization: 'Localizacion',
           pageTitle: 'Quick Start',
           pageDesc: 'En 5 minutos tendras tu primera conversacion con IA funcionando en Godot.',
           hPrereq: 'Prerequisitos',
@@ -36,7 +36,7 @@
           hStep3: 'Paso 3: Descargar el Modelo',
           step3Desc: 'Selecciona el modelo en la lista y haz click en "Download Model".',
           step3Progress: 'El progreso de descarga aparece en el panel inferior. Puedes cancelar en cualquier momento.',
-          step3Location: 'Los modelos se guardan en user://models/ por defecto.',
+          step3Location: 'Los modelos se guardan en res://models/ para que queden incluidos al exportar el juego.',
           hStep4: 'Paso 4: Cargar el Modelo',
           step4Desc: 'Una vez descargado, el estado cambia a "Ready". Haz click en "Load Model".',
           step4Status: 'El estado cambiara a "Loaded" (verde) cuando este listo.',
@@ -59,6 +59,32 @@
           tip2: 'Usa "Generate AI Preset" para crear configuraciones optimas automaticamente.',
           tip3: 'La temperatura controla creatividad: 0.1 = determinista, 1.0 = creativo.',
           tip4: 'Revisa la consola de Godot si algo falla - los errores aparecen ahi.',
+          hTrouble: 'Troubleshooting',
+          troubleDesc: 'Los errores mas comunes al empezar, con el mensaje exacto que veras en la consola de Godot.',
+          troubleCause: 'Causa',
+          troubleFix: 'Solucion',
+          faq1Q: 'El boton "AI" no aparece en el toolbar',
+          faq1Cause: 'El plugin no esta activado, o lo activaste sin reiniciar el editor.',
+          faq1Fix: 'Project > Project Settings > Plugins, activa ohmydialog y reinicia Godot. El toolbar solo se registra al arrancar el editor.',
+          faq2Q: 'El modelo no se encuentra al cargarlo',
+          faq2Cause: 'El addon busca el .gguf en res://models/. Si moviste el archivo o cancelaste la descarga, la ruta no resuelve.',
+          faq2Fix: 'Abri el Model Manager y verifica que el estado sea "Ready". Si guardaste el modelo en otra carpeta, asigna la ruta completa en el campo model_path del ModelConfig.',
+          faq3Q: 'La carga del modelo falla',
+          faq3Cause: 'RAM insuficiente, o el .gguf quedo corrupto por una descarga interrumpida.',
+          faq3Fix: 'Borra el archivo y descargalo de nuevo. Si el problema persiste, usa una cuantizacion menor (Q4_K_M) o un modelo mas chico: un modelo de 2GB necesita ~2.5GB de RAM libre.',
+          faq4Q: 'El prompt supera el contexto del modelo',
+          faq4Cause: 'La suma de system prompt + CharacterIdentity + historial excede el n_ctx del modelo.',
+          faq4Fix: 'Sube n_ctx en el ModelConfig, acorta la descripcion del personaje, o cambia a un modelo con ventana de contexto mayor.',
+          faq5Q: 'La generacion es extremadamente lenta',
+          faq5Cause: 'El modelo corre 100% en CPU porque n_gpu_layers esta en 0.',
+          faq5Fix: 'La pestaña Generation muestra "GPU Layers: X/Y on <backend>". Si dice 0 o CPU, sube n_gpu_layers en el ModelConfig hasta que la VRAM alcance.',
+          faq6Q: 'Godot no reconoce la clase LlamaInterface',
+          faq6Cause: 'Falta el binario de GDExtension para tu plataforma.',
+          faq6Fix: 'Verifica que exista la libreria de tu sistema en addons/ohmydialog/gdextension/ y reinicia Godot. Se distribuyen binarios para Windows, Linux (x86_64) y macOS.',
+          faq7Q: 'Las respuestas son incoherentes o se repiten',
+          faq7Cause: 'Los parametros de sampling no estan ajustados al modelo.',
+          faq7Fix: 'Baja la temperatura para respuestas mas estables o subila para mas variedad. Revisa la guia de parametros de sampling.',
+          faqSamplingLink: 'Ver guia de sampling',
           hNext: 'Siguientes Pasos',
           nextNpc: 'Aprende a crear tu primer NPC con personalidad.',
           nextEditor: 'Usa el editor visual para crear dialogos complejos.',
@@ -67,7 +93,7 @@
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
-          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor', navLocalization: 'Localization',
           pageTitle: 'Quick Start',
           pageDesc: 'In 5 minutes you will have your first AI conversation running in Godot.',
           hPrereq: 'Prerequisites',
@@ -83,7 +109,7 @@
           hStep3: 'Step 3: Download the Model',
           step3Desc: 'Select the model in the list and click "Download Model".',
           step3Progress: 'Download progress appears in the bottom panel. You can cancel anytime.',
-          step3Location: 'Models are saved to user://models/ by default.',
+          step3Location: 'Models are saved to res://models/ so they ship with your exported game.',
           hStep4: 'Step 4: Load the Model',
           step4Desc: 'Once downloaded, status changes to "Ready". Click "Load Model".',
           step4Status: 'Status will change to "Loaded" (green) when ready.',
@@ -106,6 +132,32 @@
           tip2: 'Use "Generate AI Preset" to automatically create optimal configurations.',
           tip3: 'Temperature controls creativity: 0.1 = deterministic, 1.0 = creative.',
           tip4: 'Check Godot console if something fails - errors appear there.',
+          hTrouble: 'Troubleshooting',
+          troubleDesc: 'The most common errors when starting out, with the exact message you will see in the Godot console.',
+          troubleCause: 'Cause',
+          troubleFix: 'Fix',
+          faq1Q: 'The "AI" button does not appear in the toolbar',
+          faq1Cause: 'The plugin is not enabled, or you enabled it without restarting the editor.',
+          faq1Fix: 'Go to Project > Project Settings > Plugins, enable ohmydialog and restart Godot. The toolbar is only registered on editor startup.',
+          faq2Q: 'The model is not found when loading',
+          faq2Cause: 'The addon looks for the .gguf in res://models/. If you moved the file or cancelled the download, the path does not resolve.',
+          faq2Fix: 'Open the Model Manager and check the status reads "Ready". If you stored the model elsewhere, set the full path in the ModelConfig model_path field.',
+          faq3Q: 'Model loading fails',
+          faq3Cause: 'Not enough RAM, or the .gguf is corrupted from an interrupted download.',
+          faq3Fix: 'Delete the file and download it again. If it persists, use a smaller quantization (Q4_K_M) or a smaller model: a 2GB model needs ~2.5GB of free RAM.',
+          faq4Q: 'The prompt exceeds the model context',
+          faq4Cause: 'System prompt + CharacterIdentity + history together exceed the model n_ctx.',
+          faq4Fix: 'Raise n_ctx in the ModelConfig, shorten the character description, or switch to a model with a larger context window.',
+          faq5Q: 'Generation is extremely slow',
+          faq5Cause: 'The model runs fully on CPU because n_gpu_layers is 0.',
+          faq5Fix: 'The Generation tab shows "GPU Layers: X/Y on <backend>". If it reads 0 or CPU, raise n_gpu_layers in the ModelConfig as far as your VRAM allows.',
+          faq6Q: 'Godot does not recognize the LlamaInterface class',
+          faq6Cause: 'The GDExtension binary for your platform is missing.',
+          faq6Fix: 'Check that your platform library exists under addons/ohmydialog/gdextension/ and restart Godot. Binaries ship for Windows, Linux (x86_64) and macOS.',
+          faq7Q: 'Responses are incoherent or repetitive',
+          faq7Cause: 'Sampling parameters are not tuned for the model.',
+          faq7Fix: 'Lower the temperature for steadier answers or raise it for more variety. See the sampling parameters guide.',
+          faqSamplingLink: 'See sampling guide',
           hNext: 'Next Steps',
           nextNpc: 'Learn to create your first NPC with personality.',
           nextEditor: 'Use the visual editor to create complex dialogues.',
@@ -541,6 +593,132 @@
             <span class="text-warning">&#x2713;</span>
             <span class="text-gray-300 text-sm" data-i18n="tip4">Revisa la consola de Godot si algo falla - los errores
               aparecen ahi.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Troubleshooting -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-pink mb-4 flex items-center gap-2">
+          <span>&#x1F527;</span>
+          <span data-i18n="hTrouble">Troubleshooting</span>
+        </h2>
+        <p class="text-gray-400 mb-6" data-i18n="troubleDesc">Los errores mas comunes al empezar, con el mensaje exacto
+          que veras en la consola de Godot.</p>
+
+        <div class="space-y-4">
+          <!-- FAQ 1 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq1Q">El boton "AI" no aparece en el toolbar</h3>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq1Cause">El plugin no esta activado, o lo activaste sin reiniciar el editor.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq1Fix">Project &gt; Project Settings &gt; Plugins, activa ohmydialog y reinicia Godot.
+                El toolbar solo se registra al arrancar el editor.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq2Q">El modelo no se encuentra al cargarlo</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">AIService: Model file not found at res://models/&lt;archivo&gt;.gguf</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq2Cause">El addon busca el .gguf en res://models/. Si moviste el archivo o cancelaste
+                la descarga, la ruta no resuelve.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq2Fix">Abri el Model Manager y verifica que el estado sea "Ready". Si guardaste el
+                modelo en otra carpeta, asigna la ruta completa en el campo model_path del ModelConfig.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq3Q">La carga del modelo falla</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">AIService: Failed to load model: &lt;error&gt;</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq3Cause">RAM insuficiente, o el .gguf quedo corrupto por una descarga
+                interrumpida.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq3Fix">Borra el archivo y descargalo de nuevo. Si el problema persiste, usa una
+                cuantizacion menor (Q4_K_M) o un modelo mas chico: un modelo de 2GB necesita ~2.5GB de RAM libre.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 4 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq4Q">El prompt supera el contexto del modelo</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">DialogueManager: Prompt too long (3200 tokens) for model context (2048 tokens). Reduce prompt or use larger model.</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq4Cause">La suma de system prompt + CharacterIdentity + historial excede el n_ctx del
+                modelo.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq4Fix">Sube n_ctx en el ModelConfig, acorta la descripcion del personaje, o cambia a un
+                modelo con ventana de contexto mayor.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 5 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq5Q">La generacion es extremadamente lenta</h3>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq5Cause">El modelo corre 100% en CPU porque n_gpu_layers esta en 0.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq5Fix">La pestaña Generation muestra "GPU Layers: X/Y on &lt;backend&gt;". Si dice 0 o
+                CPU, sube n_gpu_layers en el ModelConfig hasta que la VRAM alcance.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 6 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq6Q">Godot no reconoce la clase LlamaInterface</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">Identifier "LlamaInterface" not declared in the current scope.</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq6Cause">Falta el binario de GDExtension para tu plataforma.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq6Fix">Verifica que exista la libreria de tu sistema en addons/ohmydialog/gdextension/
+                y reinicia Godot. Se distribuyen binarios para Windows, Linux (x86_64) y macOS.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 7 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq7Q">Las respuestas son incoherentes o se repiten</h3>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq7Cause">Los parametros de sampling no estan ajustados al modelo.</span>
+            </p>
+            <p class="text-gray-300 text-sm mb-3">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq7Fix">Baja la temperatura para respuestas mas estables o subila para mas variedad.
+                Revisa la guia de parametros de sampling.</span>
+            </p>
+            <a href="sampling-parameters.html"
+              class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors text-sm font-mono">
+              <span data-i18n="faqSamplingLink">Ver guia de sampling</span>
+              <span>&#x2192;</span>
+            </a>
           </div>
         </div>
       </section>
