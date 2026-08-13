@@ -3,7 +3,7 @@ extends Node
 ## Downloads GGUF models from HuggingFace during development.
 ##
 ## Handles large file downloads with progress tracking.
-## Models are saved to user://models/ directory.
+## Models are saved to res://models/ so they ship with exported projects.
 
 ## Emitted when download starts
 signal download_started(model_id: String)
