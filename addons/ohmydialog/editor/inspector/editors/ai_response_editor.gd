@@ -71,8 +71,8 @@ func _refresh_info() -> void:
 		return
 
 	var config := _current_config()
-	var prompt := _prompt_text(ai_node)
-	var exact := TokenCounter.count(_model_path(), prompt)
+	var prompt := ai_node.to_prompt_text(_dialogue_graph)
+	var exact := TokenCounter.count(TokenCounter.path_for(_dialogue_graph), prompt)
 	var is_exact := exact >= 0
 	var base_tokens := CHATML_BASE_TOKENS + (exact if is_exact else ceili(prompt.length() / 4.0))
 
@@ -92,33 +92,6 @@ func _current_config() -> ModelConfig:
 		return null
 
 	return ai_service.get_current_config()
-
-
-## The text sent to the model before it writes a single token.
-func _prompt_text(ai_node: AIResponseNodeData) -> String:
-	var parts := PackedStringArray()
-
-	if _dialogue_graph:
-		if _dialogue_graph.default_character:
-			parts.append(_dialogue_graph.default_character.to_system_prompt())
-		if _dialogue_graph.world_context:
-			parts.append(_dialogue_graph.world_context.to_context_prompt())
-
-	if not ai_node.prompt_template.is_empty():
-		parts.append(ai_node.prompt_template)
-
-	return "\n".join(parts)
-
-
-## Vocabulary used for counting: the model assigned to the graph, or the
-## loaded one when the graph does not pin a specific model.
-func _model_path() -> String:
-	if _dialogue_graph and not _dialogue_graph.model_path.is_empty():
-		return _dialogue_graph.model_path
-
-	var config := _current_config()
-
-	return config.get_effective_path() if config else ""
 
 
 func _text_with_model(ai_node: AIResponseNodeData, base_tokens: int, config: ModelConfig, is_exact: bool) -> String:
@@ -141,18 +114,21 @@ func _text_with_model(ai_node: AIResponseNodeData, base_tokens: int, config: Mod
 ## so no percentage is shown: a made-up budget reads as a passing check.
 func _text_without_model(ai_node: AIResponseNodeData, base_tokens: int, is_exact: bool) -> String:
 	var text := "[b]%s%d tokens base[/b]" % ["" if is_exact else "~", base_tokens]
-	text += "\n[color=#f97316]⚠ Sin modelo cargado - no se puede validar el contexto[/color]"
+	text += "\n[color=#f97316]⚠ Ningún modelo cargado para generar - sin ventana de contexto que validar[/color]"
 
 	return text + _counting_text(is_exact) + _validation_text(ai_node)
 
 
-## States which of the two counts is on screen, so a number is never
-## mistaken for a precision it does not have.
+## States which of the two counts is on screen, and with which vocabulary, so
+## a number is never mistaken for a precision it does not have. Counting only
+## needs the vocabulary; generating needs the whole model.
 func _counting_text(is_exact: bool) -> String:
-	if is_exact:
-		return "\n[color=#484f58]Prompt tokenizado con el vocabulario del modelo (+%d del chat template)[/color]" % CHATML_BASE_TOKENS
+	if not is_exact:
+		return "\n[color=#484f58]Conteo aproximado (~4 caracteres por token)[/color]"
 
-	return "\n[color=#484f58]Conteo aproximado (~4 caracteres por token)[/color]"
+	var vocab := TokenCounter.path_for(_dialogue_graph).get_file()
+
+	return "\n[color=#484f58]Contado con el vocabulario de %s (+%d del chat template)[/color]" % [vocab, CHATML_BASE_TOKENS]
 
 
 ## Prompt checks that do not depend on the loaded model.

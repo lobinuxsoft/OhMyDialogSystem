@@ -26,6 +26,21 @@ static func count(model_path: String, text: String) -> int:
 	return llama.count_tokens(text)
 
 
+## Vocabulary to count with for a graph: the model the graph pins, or the
+## loaded one when it pins none. Empty when neither is available.
+static func path_for(graph: DialogueGraph) -> String:
+	if graph and not graph.model_path.is_empty():
+		return graph.model_path
+
+	var ai_service := AIService.get_singleton()
+	if ai_service and ai_service.is_model_loaded():
+		var config := ai_service.get_current_config()
+		if config:
+			return config.get_effective_path()
+
+	return ""
+
+
 ## Drops the cached vocabularies. Call when the models on disk change.
 static func clear_cache() -> void:
 	_handles.clear()
