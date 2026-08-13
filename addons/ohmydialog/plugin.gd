@@ -86,6 +86,9 @@ func _enter_tree() -> void:
 	_model_manager_window = manager_scene.instantiate()
 	EditorInterface.get_base_control().add_child(_model_manager_window)
 
+	# Let AI Response nodes send the user here when no model is loaded
+	_node_inspector_plugin.set_model_manager(_model_manager_window)
+
 	# Create toolbar MenuButton with icon and text
 	_toolbar_menu = MenuButton.new()
 	_toolbar_menu.text = "AI"

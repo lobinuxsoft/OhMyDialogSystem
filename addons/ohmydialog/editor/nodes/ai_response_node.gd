@@ -9,6 +9,39 @@ extends BaseDialogueNode
 const CHATML_BASE_TOKENS: int = 100
 
 
+## The context bar depends on the loaded model, not only on node data, so this
+## node follows AIService too. Graph-level changes (model_path) already arrive
+## through the graph.changed connection made in BaseDialogueNode.setup().
+func _enter_tree() -> void:
+	var ai_service := AIService.get_singleton()
+	if not ai_service:
+		return
+
+	if not ai_service.model_loaded.is_connected(_on_model_loaded):
+		ai_service.model_loaded.connect(_on_model_loaded)
+	if not ai_service.model_unloaded.is_connected(_on_model_unloaded):
+		ai_service.model_unloaded.connect(_on_model_unloaded)
+
+
+func _exit_tree() -> void:
+	var ai_service := AIService.get_singleton()
+	if not ai_service:
+		return
+
+	if ai_service.model_loaded.is_connected(_on_model_loaded):
+		ai_service.model_loaded.disconnect(_on_model_loaded)
+	if ai_service.model_unloaded.is_connected(_on_model_unloaded):
+		ai_service.model_unloaded.disconnect(_on_model_unloaded)
+
+
+func _on_model_loaded(_config: ModelConfig) -> void:
+	refresh()
+
+
+func _on_model_unloaded() -> void:
+	refresh()
+
+
 func _configure_slots() -> void:
 	clear_all_slots()
 	# One input, one output
@@ -34,15 +67,28 @@ func _add_context_bar() -> void:
 	var tokens_info := _calculate_tokens()
 	var total_tokens: int = tokens_info.total
 	var model_ctx: int = tokens_info.model_ctx
-	var usage_percent: float = (total_tokens * 100.0) / model_ctx
+	var prefix: String = "" if tokens_info.is_exact else "~"
 
 	# Container for the bar
 	var bar_container := VBoxContainer.new()
 	bar_container.add_theme_constant_override("separation", 2)
 
+	# No model loaded: show the cost, but no bar - there is no budget to fill
+	if model_ctx <= 0:
+		var plain_label := Label.new()
+		plain_label.text = "%s%d tokens" % [prefix, total_tokens]
+		plain_label.add_theme_font_size_override("font_size", 10)
+		plain_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		plain_label.add_theme_color_override("font_color", Color(0.55, 0.55, 0.55))
+		bar_container.add_child(plain_label)
+		_content_container.add_child(bar_container)
+		return
+
+	var usage_percent: float = (total_tokens * 100.0) / model_ctx
+
 	# Token info label
 	var info_label := Label.new()
-	info_label.text = "~%d / %d tokens" % [total_tokens, model_ctx]
+	info_label.text = "%s%d / %d tokens" % [prefix, total_tokens, model_ctx]
 	info_label.add_theme_font_size_override("font_size", 10)
 	info_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
@@ -92,38 +138,26 @@ func _add_context_bar() -> void:
 	_content_container.add_child(bar_container)
 
 
-## Calculates token estimates for this node.
+## Counts the tokens this node costs. model_ctx is 0 when no model is loaded:
+## there is no context window to measure against, and inventing one would
+## render a usage bar that validates against nothing.
 func _calculate_tokens() -> Dictionary:
-	var template_tokens := 0
-	var char_tokens := 0
-	var world_tokens := 0
-
-	# Prompt template tokens
 	var ai_node := node_data as AIResponseNodeData
-	var prompt_template: String = ai_node.prompt_template if ai_node else ""
-	template_tokens = ceili(prompt_template.length() / 4.0)
+	var prompt: String = ai_node.to_prompt_text(dialogue_graph) if ai_node else ""
 
-	# Character and world tokens from graph
-	if dialogue_graph:
-		if dialogue_graph.default_character:
-			char_tokens = dialogue_graph.default_character.estimate_tokens()
-		if dialogue_graph.world_context:
-			world_tokens = dialogue_graph.world_context.estimate_tokens()
+	var exact := TokenCounter.count(TokenCounter.path_for(dialogue_graph), prompt)
+	var is_exact := exact >= 0
+	var total := CHATML_BASE_TOKENS + (exact if is_exact else ceili(prompt.length() / 4.0))
 
-	var total := CHATML_BASE_TOKENS + char_tokens + world_tokens + template_tokens
-
-	# Get model context
-	var model_ctx := 4096
+	var model_ctx := 0
 	var ai_service := AIService.get_singleton()
-	if ai_service:
+	if ai_service and ai_service.is_model_loaded():
 		var config := ai_service.get_current_config()
 		if config:
 			model_ctx = config.n_ctx
 
 	return {
-		"template": template_tokens,
-		"character": char_tokens,
-		"world": world_tokens,
 		"total": total,
-		"model_ctx": model_ctx
+		"model_ctx": model_ctx,
+		"is_exact": is_exact,
 	}
