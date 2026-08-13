@@ -9,6 +9,39 @@ extends BaseDialogueNode
 const CHATML_BASE_TOKENS: int = 100
 
 
+## The context bar depends on the loaded model, not only on node data, so this
+## node follows AIService too. Graph-level changes (model_path) already arrive
+## through the graph.changed connection made in BaseDialogueNode.setup().
+func _enter_tree() -> void:
+	var ai_service := AIService.get_singleton()
+	if not ai_service:
+		return
+
+	if not ai_service.model_loaded.is_connected(_on_model_loaded):
+		ai_service.model_loaded.connect(_on_model_loaded)
+	if not ai_service.model_unloaded.is_connected(_on_model_unloaded):
+		ai_service.model_unloaded.connect(_on_model_unloaded)
+
+
+func _exit_tree() -> void:
+	var ai_service := AIService.get_singleton()
+	if not ai_service:
+		return
+
+	if ai_service.model_loaded.is_connected(_on_model_loaded):
+		ai_service.model_loaded.disconnect(_on_model_loaded)
+	if ai_service.model_unloaded.is_connected(_on_model_unloaded):
+		ai_service.model_unloaded.disconnect(_on_model_unloaded)
+
+
+func _on_model_loaded(_config: ModelConfig) -> void:
+	refresh()
+
+
+func _on_model_unloaded() -> void:
+	refresh()
+
+
 func _configure_slots() -> void:
 	clear_all_slots()
 	# One input, one output
