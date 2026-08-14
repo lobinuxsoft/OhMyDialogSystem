@@ -23,7 +23,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 2048,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	{
@@ -39,7 +39,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 4096,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	# ===== SMALL MODELS (500MB-1.5GB) - Limited hardware =====
@@ -56,7 +56,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	{
@@ -72,7 +72,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	{
@@ -88,7 +88,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	# ===== MEDIUM MODELS (1.5GB-3GB) - Recommended =====
@@ -105,7 +105,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	{
@@ -121,7 +121,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	{
@@ -137,7 +137,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	# ===== LARGE MODELS (>3GB) - Best quality =====
@@ -154,7 +154,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	{
@@ -170,7 +170,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	},
 	{
@@ -186,7 +186,7 @@ const PREDEFINED_MODELS: Array[Dictionary] = [
 		"default_repeat_penalty": 1.1,
 		"default_min_p": 0.05,
 		"n_ctx": 8192,
-		"n_gpu_layers": 0,
+		"n_gpu_layers": -1,
 		"n_batch": 512
 	}
 ]
@@ -297,7 +297,7 @@ func _create_config_from_dict(data: Dictionary) -> ModelConfig:
 
 	# Context settings
 	config.n_ctx = data.get("n_ctx", 2048)
-	config.n_gpu_layers = data.get("n_gpu_layers", 0)
+	config.n_gpu_layers = data.get("n_gpu_layers", -1)
 	config.n_batch = data.get("n_batch", 512)
 
 	return config

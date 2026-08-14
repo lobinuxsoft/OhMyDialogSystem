@@ -64,6 +64,28 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "No graph loaded"
 
+[node name="VSeparator3" type="VSeparator" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+
+[node name="SearchContainer" type="HBoxContainer" parent="VBoxContainer/Toolbar"]
+layout_mode = 2
+
+[node name="SearchIcon" type="Label" parent="VBoxContainer/Toolbar/SearchContainer"]
+layout_mode = 2
+text = "🔍"
+
+[node name="SearchBar" type="LineEdit" parent="VBoxContainer/Toolbar/SearchContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+placeholder_text = "Buscar nodos (Ctrl+F)"
+clear_button_enabled = true
+
+[node name="SearchResultsLabel" type="Label" parent="VBoxContainer/Toolbar/SearchContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+
 [node name="GraphEdit" type="GraphEdit" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2

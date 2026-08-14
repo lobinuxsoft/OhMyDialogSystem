@@ -234,7 +234,20 @@ func update_loaded_model_info() -> void:
 		text += "[color=#a855f7]Layers:[/color] %d\n" % info["n_layer"]
 
 	text += "\n[color=#10b981][b]Configuration[/b][/color]\n"
-	text += "[color=#8b949e]GPU Layers:[/color] %d\n" % config.n_gpu_layers
+
+	# Show actual GPU layers from loaded model info
+	if info.has("n_gpu_layers") and info.has("n_layer"):
+		var gpu_layers: int = info["n_gpu_layers"]
+		var total_layers: int = info["n_layer"]
+		var backend_name: String = info.get("gpu_backend_name", "")
+
+		if gpu_layers > 0 and not backend_name.is_empty() and backend_name != "CPU":
+			text += "[color=#8b949e]GPU Layers:[/color] [color=#10b981]%d/%d[/color] on %s\n" % [gpu_layers, total_layers, backend_name]
+		else:
+			text += "[color=#8b949e]GPU Layers:[/color] [color=#f97316]CPU only[/color]\n"
+	else:
+		text += "[color=#8b949e]GPU Layers:[/color] %d\n" % config.n_gpu_layers
+
 	text += "[color=#8b949e]Batch Size:[/color] %d\n" % config.n_batch
 
 	var path = config.get_effective_path()

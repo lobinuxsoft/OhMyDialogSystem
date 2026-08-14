@@ -1,128 +1,779 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quick Start - OhMyDialogSystem Wiki</title>
-  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual', navLocalization: 'Localizacion',
+          pageTitle: 'Quick Start',
+          pageDesc: 'En 5 minutos tendras tu primera conversacion con IA funcionando en Godot.',
+          hPrereq: 'Prerequisitos',
+          prereqDesc: 'Asegurate de haber completado la instalacion del addon.',
+          prereqLink: 'Ver guia de instalacion',
+          hStep1: 'Paso 1: Abrir el Model Manager',
+          step1Desc: 'En el toolbar de Godot, haz click en el boton "AI" y selecciona "AI Models".',
+          step1Tip: 'El boton AI aparece despues de activar el plugin y reiniciar el editor.',
+          hStep2: 'Paso 2: Buscar un Modelo',
+          step2Desc: 'Haz click en "Browse HuggingFace" para explorar modelos disponibles.',
+          step2Tip: 'Recomendamos empezar con modelos pequenos (1-2GB) como Qwen2.5-1.5B o Phi-3-mini.',
+          step2Search: 'Busca por nombre o filtra por tamaño. Los modelos Q4_K_M ofrecen buen balance calidad/tamaño.',
+          hStep3: 'Paso 3: Descargar el Modelo',
+          step3Desc: 'Selecciona el modelo en la lista y haz click en "Download Model".',
+          step3Progress: 'El progreso de descarga aparece en el panel inferior. Puedes cancelar en cualquier momento.',
+          step3Location: 'Los modelos se guardan en res://models/ para que queden incluidos al exportar el juego.',
+          hStep4: 'Paso 4: Cargar el Modelo',
+          step4Desc: 'Una vez descargado, el estado cambia a "Ready". Haz click en "Load Model".',
+          step4Status: 'El estado cambiara a "Loaded" (verde) cuando este listo.',
+          step4RAM: 'Cargar un modelo consume RAM. Un modelo de 2GB necesita ~2.5GB de RAM disponible.',
+          hStep5: 'Paso 5: Probar Generacion',
+          step5Desc: 'Ve a la pestaña "Generation" para probar el modelo.',
+          step5Fields: 'System Prompt define el comportamiento. User Input es tu mensaje. Haz click en "Generate".',
+          step5Stream: 'La respuesta aparece en tiempo real (streaming) en el panel de salida.',
+          hCode: 'Uso desde Codigo',
+          codeDesc: 'Tambien puedes usar AIService directamente desde GDScript.',
+          hModels: 'Modelos Recomendados para Empezar',
+          modelSmall: 'Pequeno (~1GB)',
+          modelSmallDesc: 'Rapido, bajo consumo de RAM. Ideal para pruebas.',
+          modelMedium: 'Mediano (~2-4GB)',
+          modelMediumDesc: 'Mejor calidad de respuestas. Balance rendimiento/calidad.',
+          modelLarge: 'Grande (~7GB+)',
+          modelLargeDesc: 'Maxima calidad. Requiere GPU recomendada.',
+          hTips: 'Tips',
+          tip1: 'Empieza con modelos pequenos para verificar que todo funciona.',
+          tip2: 'Usa "Generate AI Preset" para crear configuraciones optimas automaticamente.',
+          tip3: 'La temperatura controla creatividad: 0.1 = determinista, 1.0 = creativo.',
+          tip4: 'Revisa la consola de Godot si algo falla - los errores aparecen ahi.',
+          hTrouble: 'Troubleshooting',
+          troubleDesc: 'Los errores mas comunes al empezar, con el mensaje exacto que veras en la consola de Godot.',
+          troubleCause: 'Causa',
+          troubleFix: 'Solucion',
+          faq1Q: 'El boton "AI" no aparece en el toolbar',
+          faq1Cause: 'El plugin no esta activado, o lo activaste sin reiniciar el editor.',
+          faq1Fix: 'Project > Project Settings > Plugins, activa ohmydialog y reinicia Godot. El toolbar solo se registra al arrancar el editor.',
+          faq2Q: 'El modelo no se encuentra al cargarlo',
+          faq2Cause: 'El addon busca el .gguf en res://models/. Si moviste el archivo o cancelaste la descarga, la ruta no resuelve.',
+          faq2Fix: 'Abri el Model Manager y verifica que el estado sea "Ready". Si guardaste el modelo en otra carpeta, asigna la ruta completa en el campo model_path del ModelConfig.',
+          faq3Q: 'La carga del modelo falla',
+          faq3Cause: 'RAM insuficiente, o el .gguf quedo corrupto por una descarga interrumpida.',
+          faq3Fix: 'Borra el archivo y descargalo de nuevo. Si el problema persiste, usa una cuantizacion menor (Q4_K_M) o un modelo mas chico: un modelo de 2GB necesita ~2.5GB de RAM libre.',
+          faq4Q: 'El prompt supera el contexto del modelo',
+          faq4Cause: 'La suma de system prompt + CharacterIdentity + historial excede el n_ctx del modelo.',
+          faq4Fix: 'Sube n_ctx en el ModelConfig, acorta la descripcion del personaje, o cambia a un modelo con ventana de contexto mayor.',
+          faq5Q: 'La generacion es extremadamente lenta',
+          faq5Cause: 'El modelo corre 100% en CPU porque n_gpu_layers esta en 0.',
+          faq5Fix: 'La pestaña Generation muestra "GPU Layers: X/Y on <backend>". Si dice 0 o CPU, sube n_gpu_layers en el ModelConfig hasta que la VRAM alcance.',
+          faq6Q: 'Godot no reconoce la clase LlamaInterface',
+          faq6Cause: 'Falta el binario de GDExtension para tu plataforma.',
+          faq6Fix: 'Verifica que exista la libreria de tu sistema en addons/ohmydialog/gdextension/ y reinicia Godot. Se distribuyen binarios para Windows, Linux (x86_64) y macOS.',
+          faq7Q: 'Las respuestas son incoherentes o se repiten',
+          faq7Cause: 'Los parametros de sampling no estan ajustados al modelo.',
+          faq7Fix: 'Baja la temperatura para respuestas mas estables o subila para mas variedad. Revisa la guia de parametros de sampling.',
+          faqSamplingLink: 'Ver guia de sampling',
+          hNext: 'Siguientes Pasos',
+          nextNpc: 'Aprende a crear tu primer NPC con personalidad.',
+          nextEditor: 'Usa el editor visual para crear dialogos complejos.',
+          nextIdentity: 'Define identidades de personaje ricas.',
+          backToGuides: 'Volver a Guides',
+        },
+        en: {
+          navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor', navLocalization: 'Localization',
+          pageTitle: 'Quick Start',
+          pageDesc: 'In 5 minutes you will have your first AI conversation running in Godot.',
+          hPrereq: 'Prerequisites',
+          prereqDesc: 'Make sure you have completed the addon installation.',
+          prereqLink: 'See installation guide',
+          hStep1: 'Step 1: Open the Model Manager',
+          step1Desc: 'In the Godot toolbar, click the "AI" button and select "AI Models".',
+          step1Tip: 'The AI button appears after enabling the plugin and restarting the editor.',
+          hStep2: 'Step 2: Find a Model',
+          step2Desc: 'Click "Browse HuggingFace" to explore available models.',
+          step2Tip: 'We recommend starting with small models (1-2GB) like Qwen2.5-1.5B or Phi-3-mini.',
+          step2Search: 'Search by name or filter by size. Q4_K_M models offer good quality/size balance.',
+          hStep3: 'Step 3: Download the Model',
+          step3Desc: 'Select the model in the list and click "Download Model".',
+          step3Progress: 'Download progress appears in the bottom panel. You can cancel anytime.',
+          step3Location: 'Models are saved to res://models/ so they ship with your exported game.',
+          hStep4: 'Step 4: Load the Model',
+          step4Desc: 'Once downloaded, status changes to "Ready". Click "Load Model".',
+          step4Status: 'Status will change to "Loaded" (green) when ready.',
+          step4RAM: 'Loading a model consumes RAM. A 2GB model needs ~2.5GB available RAM.',
+          hStep5: 'Step 5: Test Generation',
+          step5Desc: 'Go to the "Generation" tab to test the model.',
+          step5Fields: 'System Prompt defines behavior. User Input is your message. Click "Generate".',
+          step5Stream: 'Response appears in real-time (streaming) in the output panel.',
+          hCode: 'Usage from Code',
+          codeDesc: 'You can also use AIService directly from GDScript.',
+          hModels: 'Recommended Models to Start',
+          modelSmall: 'Small (~1GB)',
+          modelSmallDesc: 'Fast, low RAM usage. Ideal for testing.',
+          modelMedium: 'Medium (~2-4GB)',
+          modelMediumDesc: 'Better response quality. Performance/quality balance.',
+          modelLarge: 'Large (~7GB+)',
+          modelLargeDesc: 'Maximum quality. GPU recommended.',
+          hTips: 'Tips',
+          tip1: 'Start with small models to verify everything works.',
+          tip2: 'Use "Generate AI Preset" to automatically create optimal configurations.',
+          tip3: 'Temperature controls creativity: 0.1 = deterministic, 1.0 = creative.',
+          tip4: 'Check Godot console if something fails - errors appear there.',
+          hTrouble: 'Troubleshooting',
+          troubleDesc: 'The most common errors when starting out, with the exact message you will see in the Godot console.',
+          troubleCause: 'Cause',
+          troubleFix: 'Fix',
+          faq1Q: 'The "AI" button does not appear in the toolbar',
+          faq1Cause: 'The plugin is not enabled, or you enabled it without restarting the editor.',
+          faq1Fix: 'Go to Project > Project Settings > Plugins, enable ohmydialog and restart Godot. The toolbar is only registered on editor startup.',
+          faq2Q: 'The model is not found when loading',
+          faq2Cause: 'The addon looks for the .gguf in res://models/. If you moved the file or cancelled the download, the path does not resolve.',
+          faq2Fix: 'Open the Model Manager and check the status reads "Ready". If you stored the model elsewhere, set the full path in the ModelConfig model_path field.',
+          faq3Q: 'Model loading fails',
+          faq3Cause: 'Not enough RAM, or the .gguf is corrupted from an interrupted download.',
+          faq3Fix: 'Delete the file and download it again. If it persists, use a smaller quantization (Q4_K_M) or a smaller model: a 2GB model needs ~2.5GB of free RAM.',
+          faq4Q: 'The prompt exceeds the model context',
+          faq4Cause: 'System prompt + CharacterIdentity + history together exceed the model n_ctx.',
+          faq4Fix: 'Raise n_ctx in the ModelConfig, shorten the character description, or switch to a model with a larger context window.',
+          faq5Q: 'Generation is extremely slow',
+          faq5Cause: 'The model runs fully on CPU because n_gpu_layers is 0.',
+          faq5Fix: 'The Generation tab shows "GPU Layers: X/Y on <backend>". If it reads 0 or CPU, raise n_gpu_layers in the ModelConfig as far as your VRAM allows.',
+          faq6Q: 'Godot does not recognize the LlamaInterface class',
+          faq6Cause: 'The GDExtension binary for your platform is missing.',
+          faq6Fix: 'Check that your platform library exists under addons/ohmydialog/gdextension/ and restart Godot. Binaries ship for Windows, Linux (x86_64) and macOS.',
+          faq7Q: 'Responses are incoherent or repetitive',
+          faq7Cause: 'Sampling parameters are not tuned for the model.',
+          faq7Fix: 'Lower the temperature for steadier answers or raise it for more variety. See the sampling parameters guide.',
+          faqSamplingLink: 'See sampling guide',
+          hNext: 'Next Steps',
+          nextNpc: 'Learn to create your first NPC with personality.',
+          nextEditor: 'Use the visual editor to create complex dialogues.',
+          nextIdentity: 'Define rich character identities.',
+          backToGuides: 'Back to Guides',
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) el.textContent = this.t[this.lang][key];
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
 </head>
-<body>
+
+<body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-
-  <div class="wiki-container">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
-        <div class="sidebar-logo">OhMyDialogSystem</div>
-        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+  <div class="flex min-h-screen relative z-10">
+    <!-- Sidebar -->
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">General</div>
-        <ul class="nav-links">
-          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
-        </ul>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Getting Started</div>
-        <ul class="nav-links">
-          <li><a href="quickstart.html" class="active"><span class="icon">🚀</span> Quick Start</a></li>
-          <li><a href="installation.html"><span class="icon">📦</span> Installation</a></li>
-          <li><a href="first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
-        </ul>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">API Reference</div>
-        <ul class="nav-links">
-          <li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li>
-          <li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li>
-          <li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
-          <li><a href="../API/memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
-          <li><a href="../API/tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
-          <li><a href="../API/resources.html"><span class="icon">📄</span> Resources</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Technical</div>
-        <ul class="nav-links">
-          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
-          <li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
-          <li><a href="../Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
-          <li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
-          <li><a href="../Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li>
-          <li><a href="../Technical/localization.html"><span class="icon">🌐</span> Localization</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Guides</div>
-        <ul class="nav-links">
-          <li><a href="index.html"><span class="icon">📖</span> Overview</a></li>
-          <li><a href="visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
-          <li><a href="character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
-          <li><a href="tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
-          <li><a href="csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Examples</div>
-        <ul class="nav-links">
-          <li><a href="example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
-          <li><a href="example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
-          <li><a href="example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">External Links</div>
-        <ul class="nav-links">
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
-          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li>
-        </ul>
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
+          <ul>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started
+          </div>
+          <ul>
+            <li><a href="installation.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="quickstart.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="first-npc.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="visual-editor.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
+          <ul>
+            <li><a href="../API/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
+          <ul>
+            <li><a href="../Technical/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span
+                  data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="../Technical/dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> Memory System</a></li>
+            <li><a href="../Technical/localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> <span data-i18n="navLocalization">Localizacion</span></a></li>
+            <li><a href="../Technical/gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
+          <ul>
+            <li><a href="character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="sampling-parameters.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F39B;&#xFE0F;</span> Sampling Parameters</a></li>
+            <li><a href="tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="csharp-bindings.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External
+          </div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <main class="main-content">
-      <div class="breadcrumbs">
-        <a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">Guides</a> <span>/</span> <span>Quick Start</span>
+    <!-- Main Content -->
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <!-- Breadcrumb -->
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Guides</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>Quick Start</span>
       </div>
 
-      <h1>Quick Start</h1>
+      <!-- Page Title -->
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">Quick Start</span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
 
-      <div class="ai-box" style="text-align: center; padding: 3rem;">
-        <p style="font-size: 3rem; margin-bottom: 1rem;">🚧</p>
-        <h2 style="color: var(--ai-cyan); margin-bottom: 1rem;">Coming Soon</h2>
-        <p style="color: var(--text-muted);">Esta seccion esta en desarrollo.</p>
-        <p style="margin-top: 1.5rem;">
-          <a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/183" target="_blank" class="badge badge-cyan">
-            Ver issue #183
-          </a>
+      <!-- Description -->
+      <p class="text-gray-400 mb-8 text-lg" data-i18n="pageDesc">
+        En 5 minutos tendras tu primera conversacion con IA funcionando en Godot.
+      </p>
+
+      <!-- Prerequisites -->
+      <section class="mb-10">
+        <div
+          class="relative p-5 rounded-xl border border-warning/30 bg-gradient-to-br from-warning/5 to-transparent">
+          <div class="flex items-start gap-4">
+            <div class="text-2xl">&#x26A0;</div>
+            <div>
+              <h3 class="font-bold text-warning" data-i18n="hPrereq">Prerequisitos</h3>
+              <p class="text-gray-300 text-sm mt-1" data-i18n="prereqDesc">Asegurate de haber completado la instalacion
+                del addon.</p>
+              <a href="installation.html"
+                class="inline-block mt-2 text-ai-cyan hover:text-ai-pink text-sm font-mono transition-colors"
+                data-i18n="prereqLink">Ver guia de instalacion &#x2192;</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 1 -->
+      <section class="mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-10 h-10 rounded-full bg-ai-green/20 text-ai-green flex items-center justify-center font-bold text-lg">
+            1</div>
+          <h2 class="text-2xl font-bold text-ai-green" data-i18n="hStep1">Paso 1: Abrir el Model Manager</h2>
+        </div>
+        <p class="text-gray-300 mb-4" data-i18n="step1Desc">En el toolbar de Godot, haz click en el boton "AI" y
+          selecciona "AI Models".</p>
+        <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 font-mono text-sm">
+          <span class="text-gray-500">Toolbar:</span> <span class="text-ai-cyan">[AI]</span> <span
+            class="text-gray-500">&#x2192;</span> <span class="text-ai-purple">AI Models</span>
+        </div>
+        <p class="text-gray-500 text-sm mt-3 italic" data-i18n="step1Tip">El boton AI aparece despues de activar el
+          plugin y reiniciar el editor.</p>
+      </section>
+
+      <!-- Step 2 -->
+      <section class="mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-10 h-10 rounded-full bg-ai-purple/20 text-ai-purple flex items-center justify-center font-bold text-lg">
+            2</div>
+          <h2 class="text-2xl font-bold text-ai-purple" data-i18n="hStep2">Paso 2: Buscar un Modelo</h2>
+        </div>
+        <p class="text-gray-300 mb-4" data-i18n="step2Desc">Haz click en "Browse HuggingFace" para explorar modelos
+          disponibles.</p>
+        <div
+          class="relative p-4 rounded-xl border border-ai-cyan/30 bg-gradient-to-br from-ai-cyan/5 to-transparent mb-4">
+          <div class="flex items-start gap-3">
+            <div class="text-xl">&#x1F4A1;</div>
+            <p class="text-gray-300 text-sm" data-i18n="step2Tip">Recomendamos empezar con modelos pequenos (1-2GB) como
+              Qwen2.5-1.5B o Phi-3-mini.</p>
+          </div>
+        </div>
+        <p class="text-gray-400 text-sm" data-i18n="step2Search">Busca por nombre o filtra por tamaño. Los modelos
+          Q4_K_M ofrecen buen balance calidad/tamaño.</p>
+      </section>
+
+      <!-- Step 3 -->
+      <section class="mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-10 h-10 rounded-full bg-ai-cyan/20 text-ai-cyan flex items-center justify-center font-bold text-lg">
+            3</div>
+          <h2 class="text-2xl font-bold text-ai-cyan" data-i18n="hStep3">Paso 3: Descargar el Modelo</h2>
+        </div>
+        <p class="text-gray-300 mb-4" data-i18n="step3Desc">Selecciona el modelo en la lista y haz click en "Download
+          Model".</p>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="text-ai-cyan">&#x25B6;</span>
+            <span class="text-gray-400" data-i18n="step3Progress">El progreso de descarga aparece en el panel inferior.
+              Puedes cancelar en cualquier momento.</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-ai-cyan">&#x25B6;</span>
+            <span class="text-gray-400" data-i18n="step3Location">Los modelos se guardan en
+              <code class="text-ai-purple">user://models/</code> por defecto.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 4 -->
+      <section class="mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-10 h-10 rounded-full bg-ai-orange/20 text-ai-orange flex items-center justify-center font-bold text-lg">
+            4</div>
+          <h2 class="text-2xl font-bold text-ai-orange" data-i18n="hStep4">Paso 4: Cargar el Modelo</h2>
+        </div>
+        <p class="text-gray-300 mb-4" data-i18n="step4Desc">Una vez descargado, el estado cambia a "Ready". Haz click en
+          "Load Model".</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-3 rounded-lg border border-border-default bg-bg-tertiary/30 text-sm">
+            <span class="text-gray-500">Status:</span>
+            <span class="text-ai-cyan ml-2">&#x25CF; Ready</span>
+            <span class="text-gray-500 mx-2">&#x2192;</span>
+            <span class="text-ai-green">&#x25CF; Loaded</span>
+          </div>
+          <div class="p-3 rounded-lg border border-warning/30 bg-warning/5 text-sm">
+            <span class="text-warning">&#x26A0;</span>
+            <span class="text-gray-400 ml-2" data-i18n="step4RAM">Un modelo de 2GB necesita ~2.5GB de RAM
+              disponible.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 5 -->
+      <section class="mb-10">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-10 h-10 rounded-full bg-ai-pink/20 text-ai-pink flex items-center justify-center font-bold text-lg">
+            5</div>
+          <h2 class="text-2xl font-bold text-ai-pink" data-i18n="hStep5">Paso 5: Probar Generacion</h2>
+        </div>
+        <p class="text-gray-300 mb-4" data-i18n="step5Desc">Ve a la pestaña "Generation" para probar el modelo.</p>
+        <div class="p-4 rounded-lg border border-border-default bg-bg-tertiary/30 space-y-2 text-sm">
+          <div><span class="text-ai-purple font-mono">System Prompt:</span> <span class="text-gray-400">Define el
+              comportamiento de la IA</span></div>
+          <div><span class="text-ai-cyan font-mono">User Input:</span> <span class="text-gray-400">Tu mensaje para la
+              IA</span></div>
+          <div><span class="text-ai-green font-mono">[Generate]:</span> <span class="text-gray-400">Inicia la
+              generacion</span></div>
+        </div>
+        <p class="text-gray-500 text-sm mt-3 italic" data-i18n="step5Stream">La respuesta aparece en tiempo real
+          (streaming) en el panel de salida.</p>
+      </section>
+
+      <!-- Code Example -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-cyan mb-4 flex items-center gap-2">
+          <span>&#x1F4BB;</span>
+          <span data-i18n="hCode">Uso desde Codigo</span>
+        </h2>
+        <p class="text-gray-400 mb-4" data-i18n="codeDesc">Tambien puedes usar AIService directamente desde GDScript.
         </p>
+        <div class="relative rounded-xl border border-border-default bg-bg-tertiary overflow-hidden">
+          <div
+            class="absolute top-0 right-0 bg-gradient-to-l from-ai-cyan to-ai-purple text-bg-primary text-xs px-3 py-1 rounded-bl-lg font-mono font-bold">
+            GDScript
+          </div>
+          <pre class="p-6 pt-10 overflow-x-auto text-sm font-mono text-gray-300 leading-relaxed"><code><span class="text-gray-500"># Obtener el servicio de IA</span>
+<span class="text-ai-purple">var</span> ai_service = <span class="text-ai-cyan">AIService</span>.get_singleton()
+
+<span class="text-gray-500"># Verificar si hay modelo cargado</span>
+<span class="text-ai-purple">if</span> ai_service.is_model_loaded():
+    <span class="text-gray-500"># Obtener la interfaz LLM</span>
+    <span class="text-ai-purple">var</span> llama = ai_service.get_llama()
+
+    <span class="text-gray-500"># Configurar parametros</span>
+    llama.set_temperature(<span class="text-ai-orange">0.7</span>)
+    llama.set_max_tokens(<span class="text-ai-orange">256</span>)
+
+    <span class="text-gray-500"># Generar respuesta</span>
+    <span class="text-ai-purple">var</span> prompt = <span class="text-ai-green">"You are a helpful assistant.\n\nUser: Hello!\nAssistant:"</span>
+    <span class="text-ai-purple">var</span> response = llama.generate(prompt)
+
+    <span class="text-ai-cyan">print</span>(response)
+<span class="text-ai-purple">else</span>:
+    <span class="text-ai-cyan">push_warning</span>(<span class="text-ai-green">"No hay modelo cargado"</span>)</code></pre>
+        </div>
+      </section>
+
+      <!-- Recommended Models -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-purple mb-4 flex items-center gap-2">
+          <span>&#x1F999;</span>
+          <span data-i18n="hModels">Modelos Recomendados para Empezar</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-5 rounded-xl border border-ai-green/30 bg-gradient-to-br from-ai-green/5 to-transparent">
+            <div class="text-2xl mb-2">&#x1F422;</div>
+            <h3 class="font-bold text-ai-green" data-i18n="modelSmall">Pequeno (~1GB)</h3>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="modelSmallDesc">Rapido, bajo consumo de RAM. Ideal para
+              pruebas.</p>
+            <div class="mt-3 text-xs font-mono text-gray-500">Qwen2.5-0.5B, TinyLlama</div>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-cyan/30 bg-gradient-to-br from-ai-cyan/5 to-transparent">
+            <div class="text-2xl mb-2">&#x1F40E;</div>
+            <h3 class="font-bold text-ai-cyan" data-i18n="modelMedium">Mediano (~2-4GB)</h3>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="modelMediumDesc">Mejor calidad de respuestas. Balance
+              rendimiento/calidad.</p>
+            <div class="mt-3 text-xs font-mono text-gray-500">Qwen2.5-1.5B, Phi-3-mini</div>
+          </div>
+          <div class="p-5 rounded-xl border border-ai-purple/30 bg-gradient-to-br from-ai-purple/5 to-transparent">
+            <div class="text-2xl mb-2">&#x1F98D;</div>
+            <h3 class="font-bold text-ai-purple" data-i18n="modelLarge">Grande (~7GB+)</h3>
+            <p class="text-gray-400 text-sm mt-1" data-i18n="modelLargeDesc">Maxima calidad. Requiere GPU recomendada.
+            </p>
+            <div class="mt-3 text-xs font-mono text-gray-500">Mistral-7B, Llama-3-8B</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tips -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-warning mb-4 flex items-center gap-2">
+          <span>&#x1F4A1;</span>
+          <span data-i18n="hTips">Tips</span>
+        </h2>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-3 rounded-lg border border-border-default bg-bg-tertiary/30">
+            <span class="text-warning">&#x2713;</span>
+            <span class="text-gray-300 text-sm" data-i18n="tip1">Empieza con modelos pequenos para verificar que todo
+              funciona.</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg border border-border-default bg-bg-tertiary/30">
+            <span class="text-warning">&#x2713;</span>
+            <span class="text-gray-300 text-sm" data-i18n="tip2">Usa "Generate AI Preset" para crear configuraciones
+              optimas automaticamente.</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg border border-border-default bg-bg-tertiary/30">
+            <span class="text-warning">&#x2713;</span>
+            <span class="text-gray-300 text-sm" data-i18n="tip3">La temperatura controla creatividad: 0.1 =
+              determinista, 1.0 = creativo.</span>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-lg border border-border-default bg-bg-tertiary/30">
+            <span class="text-warning">&#x2713;</span>
+            <span class="text-gray-300 text-sm" data-i18n="tip4">Revisa la consola de Godot si algo falla - los errores
+              aparecen ahi.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Troubleshooting -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-pink mb-4 flex items-center gap-2">
+          <span>&#x1F527;</span>
+          <span data-i18n="hTrouble">Troubleshooting</span>
+        </h2>
+        <p class="text-gray-400 mb-6" data-i18n="troubleDesc">Los errores mas comunes al empezar, con el mensaje exacto
+          que veras en la consola de Godot.</p>
+
+        <div class="space-y-4">
+          <!-- FAQ 1 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq1Q">El boton "AI" no aparece en el toolbar</h3>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq1Cause">El plugin no esta activado, o lo activaste sin reiniciar el editor.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq1Fix">Project &gt; Project Settings &gt; Plugins, activa ohmydialog y reinicia Godot.
+                El toolbar solo se registra al arrancar el editor.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq2Q">El modelo no se encuentra al cargarlo</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">AIService: Model file not found at res://models/&lt;archivo&gt;.gguf</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq2Cause">El addon busca el .gguf en res://models/. Si moviste el archivo o cancelaste
+                la descarga, la ruta no resuelve.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq2Fix">Abri el Model Manager y verifica que el estado sea "Ready". Si guardaste el
+                modelo en otra carpeta, asigna la ruta completa en el campo model_path del ModelConfig.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq3Q">La carga del modelo falla</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">AIService: Failed to load model: &lt;error&gt;</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq3Cause">RAM insuficiente, o el .gguf quedo corrupto por una descarga
+                interrumpida.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq3Fix">Borra el archivo y descargalo de nuevo. Si el problema persiste, usa una
+                cuantizacion menor (Q4_K_M) o un modelo mas chico: un modelo de 2GB necesita ~2.5GB de RAM libre.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 4 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq4Q">El prompt supera el contexto del modelo</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">DialogueManager: Prompt too long (3200 tokens) for model context (2048 tokens). Reduce prompt or use larger model.</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq4Cause">La suma de system prompt + CharacterIdentity + historial excede el n_ctx del
+                modelo.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq4Fix">Sube n_ctx en el ModelConfig, acorta la descripcion del personaje, o cambia a un
+                modelo con ventana de contexto mayor.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 5 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq5Q">La generacion es extremadamente lenta</h3>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq5Cause">El modelo corre 100% en CPU porque n_gpu_layers esta en 0.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq5Fix">La pestaña Generation muestra "GPU Layers: X/Y on &lt;backend&gt;". Si dice 0 o
+                CPU, sube n_gpu_layers en el ModelConfig hasta que la VRAM alcance.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 6 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq6Q">Godot no reconoce la clase LlamaInterface</h3>
+            <pre
+              class="mb-3 p-3 rounded-lg bg-bg-primary border border-error/30 overflow-x-auto"><code class="text-xs font-mono text-error">Identifier "LlamaInterface" not declared in the current scope.</code></pre>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq6Cause">Falta el binario de GDExtension para tu plataforma.</span>
+            </p>
+            <p class="text-gray-300 text-sm">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq6Fix">Verifica que exista la libreria de tu sistema en addons/ohmydialog/gdextension/
+                y reinicia Godot. Se distribuyen binarios para Windows, Linux (x86_64) y macOS.</span>
+            </p>
+          </div>
+
+          <!-- FAQ 7 -->
+          <div class="p-5 rounded-xl border border-border-default bg-bg-tertiary/30">
+            <h3 class="font-bold text-white mb-3" data-i18n="faq7Q">Las respuestas son incoherentes o se repiten</h3>
+            <p class="text-gray-400 text-sm mb-2">
+              <span class="text-ai-pink font-semibold" data-i18n="troubleCause">Causa</span>:
+              <span data-i18n="faq7Cause">Los parametros de sampling no estan ajustados al modelo.</span>
+            </p>
+            <p class="text-gray-300 text-sm mb-3">
+              <span class="text-ai-green font-semibold" data-i18n="troubleFix">Solucion</span>:
+              <span data-i18n="faq7Fix">Baja la temperatura para respuestas mas estables o subila para mas variedad.
+                Revisa la guia de parametros de sampling.</span>
+            </p>
+            <a href="sampling-parameters.html"
+              class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors text-sm font-mono">
+              <span data-i18n="faqSamplingLink">Ver guia de sampling</span>
+              <span>&#x2192;</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Next Steps -->
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold text-ai-green mb-4 flex items-center gap-2">
+          <span>&#x27A1;</span>
+          <span data-i18n="hNext">Siguientes Pasos</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a href="first-npc.html"
+            class="p-4 rounded-xl border border-border-default bg-bg-tertiary/30 hover:border-ai-cyan/50 transition-colors group">
+            <div class="text-xl mb-2 group-hover:scale-110 transition-transform">&#x1F3AE;</div>
+            <h3 class="font-bold text-white group-hover:text-ai-cyan transition-colors">First NPC</h3>
+            <p class="text-gray-500 text-sm mt-1" data-i18n="nextNpc">Aprende a crear tu primer NPC con personalidad.
+            </p>
+          </a>
+          <a href="visual-editor.html"
+            class="p-4 rounded-xl border border-border-default bg-bg-tertiary/30 hover:border-ai-purple/50 transition-colors group">
+            <div class="text-xl mb-2 group-hover:scale-110 transition-transform">&#x1F3A8;</div>
+            <h3 class="font-bold text-white group-hover:text-ai-purple transition-colors">Visual Editor</h3>
+            <p class="text-gray-500 text-sm mt-1" data-i18n="nextEditor">Usa el editor visual para crear dialogos
+              complejos.</p>
+          </a>
+          <a href="character-identity.html"
+            class="p-4 rounded-xl border border-border-default bg-bg-tertiary/30 hover:border-ai-pink/50 transition-colors group">
+            <div class="text-xl mb-2 group-hover:scale-110 transition-transform">&#x1F464;</div>
+            <h3 class="font-bold text-white group-hover:text-ai-pink transition-colors">Character Identity</h3>
+            <p class="text-gray-500 text-sm mt-1" data-i18n="nextIdentity">Define identidades de personaje ricas.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Back Link -->
+      <div class="mt-12 pt-8 border-t border-border-default">
+        <a href="index.html"
+          class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors font-mono">
+          <span>&#x2190;</span>
+          <span data-i18n="backToGuides">Volver a Guides</span>
+        </a>
       </div>
 
-      <hr>
-
-      <h2>Mientras tanto...</h2>
-      <ul>
-        <li>Revisa el <a href="../index.html">Home</a> para una vista general</li>
-        <li>Consulta la <a href="../API/llama-interface.html">API de LlamaInterface</a></li>
-        <li>Explora los <a href="../Technical/dialogue-nodes.html">Dialogue Nodes</a></li>
-      </ul>
-
-      <footer class="wiki-footer">
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+      <!-- Footer -->
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
-
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>

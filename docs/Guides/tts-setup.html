@@ -4,37 +4,163 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TTS Setup - OhMyDialogSystem Wiki</title>
-  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
+          pageTitle: 'TTS Setup', comingSoon: 'Proximamente',
+          comingSoonDesc: 'Esta funcionalidad esta planificada para el <strong>Milestone 6: Text-to-Speech</strong>.'
+        },
+        en: {
+          navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
+          pageTitle: 'TTS Setup', comingSoon: 'Coming Soon',
+          comingSoonDesc: 'This feature is planned for <strong>Milestone 6: Text-to-Speech</strong>.'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) {
+            if (el.dataset.i18nHtml) el.innerHTML = this.t[this.lang][key];
+            else el.textContent = this.t[this.lang][key];
+          }
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #0a0d12; color: #e6edf3; line-height: 1.7; }
+    .text-gradient-ai { background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-  <div class="wiki-container">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
-        <div class="sidebar-logo">OhMyDialogSystem</div>
-        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+  <div class="flex min-h-screen relative z-10">
+    <nav class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30"></div>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem" class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
-      <div class="nav-section"><div class="nav-section-title">General</div><ul class="nav-links"><li><a href="../index.html"><span class="icon">🏠</span> Home</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Getting Started</div><ul class="nav-links"><li><a href="quickstart.html"><span class="icon">🚀</span> Quick Start</a></li><li><a href="installation.html"><span class="icon">📦</span> Installation</a></li><li><a href="first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">API Reference</div><ul class="nav-links"><li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li><li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li><li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li><li><a href="../API/memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li><li><a href="../API/tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li><li><a href="../API/resources.html"><span class="icon">📄</span> Resources</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Technical</div><ul class="nav-links"><li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li><li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li><li><a href="../Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li><li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li><li><a href="../Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li><li><a href="../Technical/localization.html"><span class="icon">🌐</span> Localization</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Guides</div><ul class="nav-links"><li><a href="index.html"><span class="icon">📖</span> Overview</a></li><li><a href="visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li><li><a href="character-identity.html"><span class="icon">👤</span> Character Identity</a></li><li><a href="tts-setup.html" class="active"><span class="icon">🎤</span> TTS Setup</a></li><li><a href="csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Examples</div><ul class="nav-links"><li><a href="example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li><li><a href="example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li><li><a href="example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">External Links</div><ul class="nav-links"><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li><li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li></ul></div>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')" class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+      </div>
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> General</div>
+          <ul><li><a href="../home.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3E0;</span> Home</a></li></ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Getting Started</div>
+          <ul>
+            <li><a href="installation.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="quickstart.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="first-npc.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="visual-editor.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <ul>
+            <li><a href="../API/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <ul>
+            <li><a href="../Technical/index.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a></li>
+            <li><a href="../Technical/dialogue-nodes.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/memory-system.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F9E0;</span> Memory System</a></li>
+            <li><a href="../Technical/localization.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F310;</span> Localization</a></li>
+            <li><a href="../Technical/gdextension.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <ul>
+            <li><a href="character-identity.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="sampling-parameters.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F39B;&#xFE0F;</span> Sampling Parameters</a></li>
+            <li><a href="tts-setup.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="csharp-bindings.html" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F537;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono"><span class="text-gray-600 text-[0.65rem]">//</span> External</div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank" class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+          </ul>
+        </div>
+      </div>
     </nav>
-    <main class="main-content">
-      <div class="breadcrumbs"><a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">Guides</a> <span>/</span> <span>TTS Setup</span></div>
-      <h1>TTS Setup</h1>
-      <div class="ai-box" style="text-align: center; padding: 3rem;">
-        <p style="font-size: 3rem; margin-bottom: 1rem;">🚧</p>
-        <h2 style="color: var(--ai-cyan); margin-bottom: 1rem;">Coming Soon</h2>
-        <p style="color: var(--text-muted);">Esta funcionalidad esta planificada para el <strong>Milestone 6: Text-to-Speech</strong>.</p>
+
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Guides</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>TTS Setup</span>
       </div>
-      <footer class="wiki-footer"><p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p></footer>
+
+      <h1 class="text-4xl font-bold mb-8 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">TTS Setup</span>
+        <span class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
+
+      <div class="relative p-12 rounded-xl border border-border-default mb-8 overflow-hidden text-center bg-gradient-to-br from-ai-cyan/5 to-ai-purple/5 shadow-[0_0_30px_rgba(0,212,255,0.1),inset_0_0_60px_rgba(0,0,0,0.2)]">
+        <p class="text-6xl mb-4">&#x1F6A7;</p>
+        <h2 class="text-2xl font-bold text-ai-cyan mb-2" data-i18n="comingSoon">Proximamente</h2>
+        <p class="text-gray-400" data-i18n="comingSoonDesc" data-i18n-html="true">Esta funcionalidad esta planificada para el <strong>Milestone 6: Text-to-Speech</strong>.</p>
+      </div>
+
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726; &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank" class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
+      </footer>
     </main>
   </div>
   <script src="../ai-bg.js"></script>

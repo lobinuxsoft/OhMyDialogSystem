@@ -23,6 +23,23 @@ extends DialogueNodeData
 		emit_changed()
 
 
+## Text sent to the model before it writes a single token.
+## Single source of truth so every panel that counts tokens counts the same thing.
+func to_prompt_text(graph: DialogueGraph) -> String:
+	var parts := PackedStringArray()
+
+	if graph:
+		if graph.default_character:
+			parts.append(graph.default_character.to_system_prompt())
+		if graph.world_context:
+			parts.append(graph.world_context.to_context_prompt())
+
+	if not prompt_template.is_empty():
+		parts.append(prompt_template)
+
+	return "\n".join(parts)
+
+
 func _get_node_type() -> DialogueNodeData.NodeType:
 	return DialogueNodeData.NodeType.AI_RESPONSE
 

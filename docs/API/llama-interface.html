@@ -1,955 +1,1227 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LlamaInterface - OhMyDialogSystem Wiki</title>
-  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
+          pageTitle: 'LlamaInterface',
+          pageSubtitle: 'Interfaz de bajo nivel para llama.cpp. Carga modelos GGUF y gestiona su ciclo de vida.',
+          descTitle: 'Descripcion',
+          descContent: 'LlamaInterface proporciona una API de bajo nivel para cargar modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del backend, carga de modelos, gestión de memoria y contexto de inferencia.',
+          descSub: 'Es la base sobre la cual se construyen los componentes de más alto nivel como AIService y DialogueManager.',
+          methodsTitle: 'Metodos',
+          backToHome: 'Volver a Home',
+          notenative: 'Esta clase es parte del módulo GDExtension nativo. Requiere que el addon esté correctamente compilado para tu plataforma.',
+          inheritance: 'Herencia',
+          usageTitle: 'Uso Recomendado',
+          usageContent: 'Para la mayoría de casos, usar AIService en lugar de instanciar LlamaInterface directamente:',
+          usageSub: 'AIService gestiona el ciclo de vida del modelo, integra con ModelManager para descarga de modelos, y proporciona señales para cambios de estado.',
+          genText: 'Generacion de Texto',
+          asyncCtrl: 'Control de Generacion Asincrona',
+          sampling: 'Parametros de Sampling',
+          stopSeq: 'Stop Sequences',
+          timeout: 'Timeout',
+          methodDesc: 'Descripciones de Metodos',
+          // New keys
+          loadModelDesc: 'Carga un modelo GGUF desde la ruta especificada.',
+          paramsTitle: 'Parámetros',
+          pTableParam: 'Parámetro', pTableType: 'Tipo', pTableDesc: 'Descripción',
+          paramPathDesc: 'Ruta al archivo .gguf. Soporta res:// y user://',
+          paramParamsDesc: 'Parámetros opcionales de configuración',
+          paramsKeysTitle: 'Claves aceptadas en params',
+          pNGpuLayers: 'Capas a descargar en GPU. Por defecto 999 (todas las que entren)',
+          pNCtx: 'Tamaño de la ventana de contexto, en tokens. Por defecto 512',
+          pNBatch: 'Tamaño de lote para el procesado del prompt',
+          pNThreads: 'Hilos de CPU para generación',
+          pNThreadsBatch: 'Hilos de CPU para el procesado del prompt',
+          pUseMmap: 'Mapear el archivo en memoria en vez de leerlo entero',
+          pUseMlock: 'Forzar al sistema a mantener el modelo en RAM',
+          pVocabOnly: 'Cargar SOLO el vocabulario, sin los pesos. Ver "Tokenizar sin cargar el modelo"',
+          countTokensDesc: 'Devuelve la cantidad exacta de tokens que ocupa el texto, según el vocabulario del modelo. Devuelve -1 si no hay modelo cargado.',
+          countTokensWhy: 'Por qué importa',
+          countTokensWhyText: 'La regla de ~4 caracteres por token se rompe con tildes, ñ y emojis: en español subestima el costo real. Este método usa el tokenizador del propio modelo.',
+          vocabOnlyTitle: 'Tokenizar sin cargar el modelo',
+          vocabOnlyIntro: 'Contar tokens sólo necesita el vocabulario, no los pesos ni el contexto. Con vocab_only el modelo se abre sin leer un solo tensor y sin reservar KV cache: cuesta megabytes en vez de gigabytes.',
+          vocabOnlyNote: 'El addon ya hace esto por vos: TokenCounter (core/token_counter.gd) cachea un handle por ruta de modelo y lo usa el editor para mostrar el costo real de cada nodo AI Response.',
+          vocabOnlyWarn: 'Un handle vocab_only sirve para tokenizar, NO para generar. Además deja n_ctx_train sin poblar, así que el tamaño de contexto del archivo no se puede leer por esta vía.',
+          unloadModelDesc: 'Libera el modelo, el contexto y el sampler. No hace nada si no hay modelo cargado.',
+          isModelLoadedDesc: 'Devuelve true sólo cuando el modelo Y el contexto existen. Un handle a medio construir da false.',
+          getModelInfoDesc: 'Metadatos del modelo cargado. Devuelve un Dictionary vacío si no hay ninguno.',
+          getModelInfoKeys: 'Claves devueltas',
+          getModelInfoNote: 'bos_token y eos_token sólo aparecen si el modelo los define. chat_template sólo si el GGUF trae plantilla embebida.',
+          getModelPathDesc: 'Ruta del modelo cargado, tal cual se pasó a load_model. Cadena vacía si no hay ninguno.',
+          getSystemInfoDesc: 'Cadena de llama.cpp con las capacidades de CPU detectadas (AVX, NEON, etc.). Útil para reportes de bug.',
+          getChatTemplateDesc: 'Plantilla de chat embebida en el GGUF, en formato Jinja. Cadena vacía si el modelo no trae ninguna o no hay modelo cargado.',
+          applyChatTemplateDesc: 'Aplica la plantilla del modelo a una lista de mensajes y devuelve el prompt final.',
+          paramMessagesDesc: 'Array de Dictionary con las claves role y content. Los que no tengan ambas se descartan con un warning.',
+          paramAddGenDesc: 'Añade el encabezado que le indica al modelo que empiece a responder',
+          generateDesc: 'Genera la respuesta completa y la devuelve. Cadena vacía ante cualquier error.',
+          generateWarn: 'Bloquea el hilo que la llama',
+          generateWarnText: 'Llamada desde el hilo principal, congela el juego hasta el último token. Para gameplay usá generate_async o generate_streaming.',
+          generateAsyncDesc: 'Genera en el WorkerThreadPool y entrega el texto por generation_completed. No devuelve nada.',
+          generateStreamingDesc: 'Igual que generate_async, pero además emite token_generated por cada token a medida que sale.',
+          genSharedNote: 'Ambas emiten generation_started al arrancar. Si ya hay una generación en curso, avisan por consola y no hacen nada. Sin modelo cargado emiten generation_error.',
+          isGeneratingDesc: 'True mientras hay una generación async o streaming en curso. Es atómico: se puede consultar desde cualquier hilo.',
+          getProgressDesc: 'Progreso de 0.0 a 1.0, calculado como tokens emitidos sobre max_tokens. Devuelve 0.0 si no se está generando.',
+          getProgressNote: 'Es un progreso contra el techo, no contra la respuesta real: si el modelo termina antes de max_tokens, nunca llega a 1.0.',
+          cancelDesc: 'Pide abortar la generación en curso. No hace nada si no hay ninguna.',
+          cancelWarn: 'Espera a que el worker termine',
+          cancelWarnText: 'Esta llamada bloquea hasta que la tarea se detiene de verdad. Es lo que garantiza que no queden hilos sueltos, pero significa que cancelar desde el hilo principal cuesta un frame corto.',
+          propsTitle: 'Propiedades',
+          propsIntro: 'Expuestas como propiedades del objeto, con setter y getter. Se pueden asignar directo.',
+          propsNote: 'frequency_penalty, presence_penalty y repeat_last_n existen sólo como métodos (set_/get_), no como propiedades: hay que llamarlos, no asignarlos.',
+          signalsTitle: 'Señales',
+          sigStarted: 'Emitida al arrancar una generación async o streaming.',
+          sigToken: 'Un token recién generado, sólo en generate_streaming. Llega en el hilo principal.',
+          sigCompleted: 'Respuesta completa, al terminar una generación async o streaming.',
+          sigError: 'Algo falló: sin modelo cargado, prompt más largo que el contexto, o error de decodificación.',
+          sigProgress: 'Progreso de 0.0 a 1.0 durante la generación.',
+          sigCancelled: 'Emitida cuando cancel_generation detiene la generación.',
+          sigTimeout: 'El tiempo configurado con set_timeout se agotó y la generación se cortó.',
+          tblType: 'Tipo', tblKey: 'Clave', tblSignal: 'Señal', tblProp: 'Propiedad', tblRange: 'Rango'
+        },
+        en: {
+          navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
+          pageTitle: 'LlamaInterface',
+          pageSubtitle: 'Low-level interface for llama.cpp. Loads GGUF models and manages their lifecycle.',
+          descTitle: 'Description',
+          descContent: 'LlamaInterface provides a low-level API for loading GGUF language models using the llama.cpp library. This class handles backend initialization, model loading, memory management, and inference context.',
+          descSub: 'It is the foundation upon which higher-level components like AIService and DialogueManager are built.',
+          methodsTitle: 'Methods',
+          backToHome: 'Back to Home',
+          notenative: 'This class is part of the native GDExtension module. It requires the addon to be correctly compiled for your platform.',
+          inheritance: 'Inheritance',
+          usageTitle: 'Recommended Usage',
+          usageContent: 'For most cases, use AIService instead of instantiating LlamaInterface directly:',
+          usageSub: 'AIService manages the model lifecycle, integrates with ModelManager for model downloads, and provides signals for state changes.',
+          genText: 'Text Generation',
+          asyncCtrl: 'Async Generation Control',
+          sampling: 'Sampling Parameters',
+          stopSeq: 'Stop Sequences',
+          timeout: 'Timeout',
+          methodDesc: 'Method Descriptions',
+          // New keys
+          loadModelDesc: 'Loads a GGUF model from the specified path.',
+          paramsTitle: 'Parameters',
+          pTableParam: 'Parameter', pTableType: 'Type', pTableDesc: 'Description',
+          paramPathDesc: 'Path to .gguf file. Supports res:// and user://',
+          paramParamsDesc: 'Optional configuration parameters',
+          paramsKeysTitle: 'Keys accepted in params',
+          pNGpuLayers: 'Layers to offload to the GPU. Defaults to 999 (as many as fit)',
+          pNCtx: 'Context window size, in tokens. Defaults to 512',
+          pNBatch: 'Batch size for prompt processing',
+          pNThreads: 'CPU threads for generation',
+          pNThreadsBatch: 'CPU threads for prompt processing',
+          pUseMmap: 'Memory-map the file instead of reading it whole',
+          pUseMlock: 'Force the system to keep the model in RAM',
+          pVocabOnly: 'Load ONLY the vocabulary, no weights. See "Tokenizing without loading the model"',
+          countTokensDesc: 'Returns the exact number of tokens the text takes, according to the model vocabulary. Returns -1 when no model is loaded.',
+          countTokensWhy: 'Why it matters',
+          countTokensWhyText: 'The ~4 characters per token rule breaks on accents, ñ and emoji: in Spanish it underestimates the real cost. This method uses the model own tokenizer.',
+          vocabOnlyTitle: 'Tokenizing without loading the model',
+          vocabOnlyIntro: 'Counting tokens only needs the vocabulary, not the weights nor the context. With vocab_only the model opens without reading a single tensor and without allocating a KV cache: it costs megabytes instead of gigabytes.',
+          vocabOnlyNote: 'The addon already does this for you: TokenCounter (core/token_counter.gd) caches a handle per model path and the editor uses it to show the real cost of every AI Response node.',
+          vocabOnlyWarn: 'A vocab_only handle is for tokenizing, NOT for generating. It also leaves n_ctx_train unpopulated, so the context size of the file cannot be read this way.',
+          unloadModelDesc: 'Frees the model, the context and the sampler. Does nothing when no model is loaded.',
+          isModelLoadedDesc: 'Returns true only when both the model AND the context exist. A half-built handle returns false.',
+          getModelInfoDesc: 'Metadata of the loaded model. Returns an empty Dictionary when there is none.',
+          getModelInfoKeys: 'Returned keys',
+          getModelInfoNote: 'bos_token and eos_token only appear when the model defines them. chat_template only when the GGUF ships an embedded template.',
+          getModelPathDesc: 'Path of the loaded model, exactly as passed to load_model. Empty string when there is none.',
+          getSystemInfoDesc: 'llama.cpp string with the detected CPU capabilities (AVX, NEON, etc.). Useful for bug reports.',
+          getChatTemplateDesc: 'Chat template embedded in the GGUF, in Jinja format. Empty string when the model ships none or no model is loaded.',
+          applyChatTemplateDesc: 'Applies the model template to a list of messages and returns the final prompt.',
+          paramMessagesDesc: 'Array of Dictionary with the keys role and content. Entries missing either one are skipped with a warning.',
+          paramAddGenDesc: 'Appends the header that tells the model to start answering',
+          generateDesc: 'Generates the full response and returns it. Empty string on any error.',
+          generateWarn: 'Blocks the calling thread',
+          generateWarnText: 'Called from the main thread, it freezes the game until the last token. For gameplay use generate_async or generate_streaming.',
+          generateAsyncDesc: 'Generates on the WorkerThreadPool and delivers the text through generation_completed. Returns nothing.',
+          generateStreamingDesc: 'Same as generate_async, but it also emits token_generated for every token as it comes out.',
+          genSharedNote: 'Both emit generation_started on entry. When a generation is already running they warn on the console and do nothing. With no model loaded they emit generation_error.',
+          isGeneratingDesc: 'True while an async or streaming generation is running. It is atomic: safe to read from any thread.',
+          getProgressDesc: 'Progress from 0.0 to 1.0, computed as emitted tokens over max_tokens. Returns 0.0 when not generating.',
+          getProgressNote: 'It is progress against the ceiling, not against the real answer: if the model stops before max_tokens, it never reaches 1.0.',
+          cancelDesc: 'Requests aborting the running generation. Does nothing when there is none.',
+          cancelWarn: 'Waits for the worker to finish',
+          cancelWarnText: 'This call blocks until the task actually stops. That is what guarantees no thread is left running, but it means cancelling from the main thread costs a short frame.',
+          propsTitle: 'Properties',
+          propsIntro: 'Exposed as object properties, with setter and getter. They can be assigned directly.',
+          propsNote: 'frequency_penalty, presence_penalty and repeat_last_n exist only as methods (set_/get_), not as properties: they must be called, not assigned.',
+          signalsTitle: 'Signals',
+          sigStarted: 'Emitted when an async or streaming generation starts.',
+          sigToken: 'A freshly generated token, only in generate_streaming. Arrives on the main thread.',
+          sigCompleted: 'Full response, when an async or streaming generation finishes.',
+          sigError: 'Something failed: no model loaded, prompt longer than the context, or a decoding error.',
+          sigProgress: 'Progress from 0.0 to 1.0 during generation.',
+          sigCancelled: 'Emitted when cancel_generation stops the generation.',
+          sigTimeout: 'The time configured with set_timeout ran out and generation was cut.',
+          tblType: 'Type', tblKey: 'Key', tblSignal: 'Signal', tblProp: 'Property', tblRange: 'Range'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) el.textContent = this.t[this.lang][key];
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
 </head>
-<body>
+
+<body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-
-  <div class="wiki-container">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
-        <div class="sidebar-logo">OhMyDialogSystem</div>
-        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+  <div class="flex min-h-screen relative z-10">
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">General</div>
-        <ul class="nav-links">
-          <li><a href="../index.html"><span class="icon">🏠</span> Home</a></li>
-        </ul>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Getting Started</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li>
-          <li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li>
-          <li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li>
-        </ul>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
       </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">API Reference</div>
-        <ul class="nav-links">
-          <li><a href="index.html"><span class="icon">📚</span> Overview</a></li>
-          <li><a href="llama-interface.html" class="active"><span class="icon">🦙</span> LlamaInterface</a></li>
-          <li><a href="dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li>
-          <li><a href="memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li>
-          <li><a href="tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li>
-          <li><a href="resources.html"><span class="icon">📄</span> Resources</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Technical</div>
-        <ul class="nav-links">
-          <li><a href="../Technical/index.html"><span class="icon">⚙️</span> Overview</a></li>
-          <li><a href="../Technical/architecture.html"><span class="icon">🏗️</span> Architecture</a></li>
-          <li><a href="../Technical/dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li>
-          <li><a href="../Technical/gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li>
-          <li><a href="../Technical/memory-system.html"><span class="icon">💾</span> Memory System</a></li>
-          <li><a href="../Technical/localization.html"><span class="icon">🌐</span> Localization</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Guides</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/index.html"><span class="icon">📖</span> Overview</a></li>
-          <li><a href="../Guides/visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li>
-          <li><a href="../Guides/character-identity.html"><span class="icon">👤</span> Character Identity</a></li>
-          <li><a href="../Guides/tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li>
-          <li><a href="../Guides/csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">Examples</div>
-        <ul class="nav-links">
-          <li><a href="../Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li>
-          <li><a href="../Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li>
-          <li><a href="../Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li>
-        </ul>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-title">External Links</div>
-        <ul class="nav-links">
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li>
-          <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li>
-          <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li>
-        </ul>
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
+          <ul>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Getting Started
+          </div>
+          <ul>
+            <li><a href="../Guides/installation.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4E6;</span> <span data-i18n="navInstallation">Instalacion</span></a></li>
+            <li><a href="../Guides/quickstart.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> Quick Start</a></li>
+            <li><a href="../Guides/first-npc.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3AE;</span> <span data-i18n="navFirstNpc">Tu Primer NPC</span></a></li>
+            <li><a href="../Guides/visual-editor.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A8;</span> <span data-i18n="navVisualEditor">Editor Visual</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
+          <ul>
+            <li><a href="index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
+          <ul>
+            <li><a href="../Technical/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="../Technical/architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a>
+            </li>
+            <li><a href="../Technical/dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="../Technical/memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BE;</span> Memory System</a></li>
+            <li><a href="../Technical/localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> Localization</a></li>
+            <li><a href="../Technical/gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="../Technical/ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
+          <ul>
+            <li><a href="../Guides/character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="../Guides/tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="../Guides/csharp-bindings.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> External
+          </div>
+          <ul>
+            <li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F517;</span> GitHub</a></li>
+            <li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4CB;</span> Project Board</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
 
-    <main class="main-content">
-      <div class="breadcrumbs">
-        <a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">API Reference</a> <span>/</span> <span>LlamaInterface</span>
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">API Reference</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>LlamaInterface</span>
       </div>
 
-      <h1>🦙 LlamaInterface</h1>
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">LlamaInterface</span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
 
-      <p><span class="badge badge-cyan">GDExtension</span> <span class="badge badge-purple">C++</span></p>
+      <p class="mb-6"><span
+          class="inline-block px-2 py-1 text-xs rounded bg-ai-cyan/20 text-ai-cyan border border-ai-cyan/30">GDExtension</span>
+        <span
+          class="inline-block px-2 py-1 text-xs rounded bg-ai-purple/20 text-ai-purple border border-ai-purple/30">C++</span>
+      </p>
 
-      <p>Interfaz de bajo nivel para <a href="https://github.com/ggerganov/llama.cpp" target="_blank">llama.cpp</a>. Permite cargar modelos GGUF y gestionar su ciclo de vida.</p>
+      <p class="text-xl text-gray-300 mb-8" data-i18n="pageSubtitle">Interfaz de bajo nivel para llama.cpp. Carga
+        modelos GGUF y gestione su ciclo de vida.</p>
 
-      <blockquote>
-        <strong>Nota:</strong> Esta clase es parte del módulo GDExtension nativo. Requiere que el addon esté correctamente compilado para tu plataforma.
-      </blockquote>
-
-      <hr>
-
-      <h2>Herencia</h2>
-
-      <p><code>RefCounted</code> → <code>LlamaInterface</code></p>
-
-      <hr>
-
-      <h2>Descripción</h2>
-
-      <p><code>LlamaInterface</code> proporciona una API de bajo nivel para cargar modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
-
-      <p>Es la base sobre la cual se construyen los componentes de más alto nivel como <code>AIService</code> y <code>DialogueManager</code>.</p>
-
-      <div class="callout-info" style="margin: 1.5rem 0;">
-        <p><strong>Uso Recomendado:</strong> Para la mayoría de casos, usar <code>AIService</code> en lugar de instanciar <code>LlamaInterface</code> directamente:</p>
-        <pre data-lang="GDSCRIPT" style="margin-top: 0.75rem;"><code># Forma recomendada - usar AIService singleton
-var ai_service := AIService.get_singleton()
-if ai_service and ai_service.is_model_loaded():
-    # El modelo ya está disponible globalmente
-    pass
-
-# Forma directa (bajo nivel) - instanciar LlamaInterface
-var llama := LlamaInterface.new()
-llama.load_model("res://models/model.gguf")</code></pre>
-        <p style="margin-top: 0.75rem;"><code>AIService</code> gestiona el ciclo de vida del modelo, integra con <code>ModelManager</code> para descarga de modelos, y proporciona señales para cambios de estado.</p>
+      <div class="p-4 rounded-lg bg-ai-cyan/5 border border-ai-cyan/20 mb-12">
+        <strong class="text-ai-cyan">Nota:</strong> <span class="text-gray-300" data-i18n="notenative">Esta clase es
+          parte del módulo GDExtension nativo. Requiere que el addon esté correctamente compilado para tu
+          plataforma.</span>
       </div>
 
-      <hr>
+      <hr class="border-border-default mb-12">
 
-      <h2>Métodos</h2>
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="inheritance">Herencia</span>
+      </h2>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>Error</code></td>
-            <td><a href="#load_model">load_model</a>(path: String, params: Dictionary = {})</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#unload_model">unload_model</a>()</td>
-          </tr>
-          <tr>
-            <td><code>bool</code></td>
-            <td><a href="#is_model_loaded">is_model_loaded</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>Dictionary</code></td>
-            <td><a href="#get_model_info">get_model_info</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>String</code></td>
-            <td><a href="#get_model_path">get_model_path</a>() const</td>
-          </tr>
-        </tbody>
-      </table>
+      <p class="font-mono text-gray-400 mb-12"><span class="text-ai-purple">RefCounted</span> &#x2192; <span
+          class="text-ai-cyan">LlamaInterface</span></p>
 
-      <h3>Generación de Texto</h3>
+      <hr class="border-border-default mb-12">
 
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>String</code></td>
-            <td><a href="#generate">generate</a>(prompt: String)</td>
-          </tr>
-        </tbody>
-      </table>
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="descTitle">Descripcion</span>
+      </h2>
 
-      <h3>Parámetros de Sampling</h3>
+      <p class="text-gray-300 mb-4" data-i18n="descContent">LlamaInterface proporciona una API de bajo nivel para cargar
+        modelos de lenguaje en formato GGUF usando la librería llama.cpp. Esta clase maneja la inicialización del
+        backend, carga de modelos, gestión de memoria y contexto de inferencia.</p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_temperature">set_temperature</a>(temperature: float)</td>
-          </tr>
-          <tr>
-            <td><code>float</code></td>
-            <td><a href="#get_temperature">get_temperature</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_top_p">set_top_p</a>(top_p: float)</td>
-          </tr>
-          <tr>
-            <td><code>float</code></td>
-            <td><a href="#get_top_p">get_top_p</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_top_k">set_top_k</a>(top_k: int)</td>
-          </tr>
-          <tr>
-            <td><code>int</code></td>
-            <td><a href="#get_top_k">get_top_k</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_max_tokens">set_max_tokens</a>(max_tokens: int)</td>
-          </tr>
-          <tr>
-            <td><code>int</code></td>
-            <td><a href="#get_max_tokens">get_max_tokens</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_repeat_penalty">set_repeat_penalty</a>(penalty: float)</td>
-          </tr>
-          <tr>
-            <td><code>float</code></td>
-            <td><a href="#get_repeat_penalty">get_repeat_penalty</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_min_p">set_min_p</a>(min_p: float)</td>
-          </tr>
-          <tr>
-            <td><code>float</code></td>
-            <td><a href="#get_min_p">get_min_p</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_seed">set_seed</a>(seed: int)</td>
-          </tr>
-          <tr>
-            <td><code>int</code></td>
-            <td><a href="#get_seed">get_seed</a>() const</td>
-          </tr>
-        </tbody>
-      </table>
+      <p class="text-gray-300 mb-8" data-i18n="descSub">Es la base sobre la cual se construyen los componentes de más
+        alto nivel como AIService y DialogueManager.</p>
 
-      <h3>Stop Sequences</h3>
+      <div class="p-6 rounded-xl border border-border-default bg-bg-card/50 mb-12">
+        <h3 class="text-lg font-bold text-white mb-4" data-i18n="usageTitle">Uso Recomendado</h3>
+        <p class="text-gray-400 mb-4" data-i18n="usageContent">Para la mayoría de casos, usar AIService en lugar de
+          instanciar LlamaInterface directamente:</p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_stop_sequences">set_stop_sequences</a>(sequences: PackedStringArray)</td>
-          </tr>
-          <tr>
-            <td><code>PackedStringArray</code></td>
-            <td><a href="#get_stop_sequences">get_stop_sequences</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#clear_stop_sequences">clear_stop_sequences</a>()</td>
-          </tr>
-        </tbody>
-      </table>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-gray-500"># Forma recomendada - usar AIService singleton</span>
+<span class="text-ai-purple">var</span> ai_service := <span class="text-ai-cyan">AIService</span>.get_singleton()
+<span class="text-ai-purple">if</span> ai_service <span class="text-ai-purple">and</span> ai_service.is_model_loaded():
+    <span class="text-gray-500"># El modelo ya está disponible globalmente</span>
+    <span class="text-ai-purple">pass</span>
 
-      <h3>Timeout</h3>
+<span class="text-gray-500"># Forma directa (bajo nivel) - instanciar LlamaInterface</span>
+<span class="text-ai-purple">var</span> llama := <span class="text-ai-cyan">LlamaInterface</span>.new()
+llama.load_model(<span class="text-ai-orange">"res://models/model.gguf"</span>)</code></pre>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Retorno</th>
-            <th>Método</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>void</code></td>
-            <td><a href="#set_timeout">set_timeout</a>(timeout_ms: int)</td>
-          </tr>
-          <tr>
-            <td><code>int</code></td>
-            <td><a href="#get_timeout">get_timeout</a>() const</td>
-          </tr>
-          <tr>
-            <td><code>bool</code></td>
-            <td><a href="#has_generation_timed_out">has_generation_timed_out</a>() const</td>
-          </tr>
-        </tbody>
-      </table>
+        <p class="text-gray-400" data-i18n="usageSub">AIService gestiona el ciclo de vida del modelo, integra con
+          ModelManager para descarga de modelos, y proporciona señales para cambios de estado.</p>
+      </div>
 
-      <hr>
+      <hr class="border-border-default mb-12">
 
-      <h2>Descripciones de Métodos</h2>
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="methodsTitle">Metodos</span>
+      </h2>
 
-      <h3 id="load_model">load_model</h3>
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Error</td>
+              <td class="py-3 px-4 font-mono"><a href="#load_model"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">load_model</a>(path: String, params:
+                Dictionary = {})</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#unload_model"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">unload_model</a>()</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#is_model_loaded"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">is_model_loaded</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">Dictionary</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_model_info"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_model_info</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_model_path"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_model_path</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_system_info"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_system_info</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_chat_template"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_chat_template</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#apply_chat_template"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">apply_chat_template</a>(messages: Array,
+                add_generation_prompt: bool = true)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono"><a href="#count_tokens"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">count_tokens</a>(text: String) const</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <pre data-lang="GDSCRIPT"><code>Error load_model(path: String, params: Dictionary = {})</code></pre>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="genText">Generacion de Texto</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">String</td>
+              <td class="py-3 px-4 font-mono"><a href="#generate"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">generate</a>(prompt: String)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#generate_async"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">generate_async</a>(prompt: String)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#generate_streaming"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">generate_streaming</a>(prompt: String)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <p>Carga un modelo GGUF desde la ruta especificada.</p>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="asyncCtrl">Control de Generacion Asincrona</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono"><a href="#is_generating"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">is_generating</a>() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono"><a href="#get_generation_progress"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">get_generation_progress</a>() const</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono"><a href="#cancel_generation"
+                  class="text-gray-300 hover:text-ai-cyan transition-colors">cancel_generation</a>()</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h4>Parámetros</h4>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="sampling">Parametros de Sampling</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_temperature(temperature: float)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_temperature() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_top_p(top_p: float)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_top_p() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_top_k(top_k: int)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_top_k() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_min_p(min_p: float)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_min_p() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_max_tokens(max_tokens: int)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_max_tokens() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_repeat_penalty(penalty: float)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_repeat_penalty() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_repeat_last_n(n: int)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_repeat_last_n() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_frequency_penalty(penalty: float)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_frequency_penalty() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_presence_penalty(penalty: float)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_presence_penalty() const</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_seed(seed: int)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_seed() const</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Parámetro</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>path</code></td>
-            <td>String</td>
-            <td>Ruta al archivo .gguf. Soporta <code>res://</code> y <code>user://</code></td>
-          </tr>
-          <tr>
-            <td><code>params</code></td>
-            <td>Dictionary</td>
-            <td>Parámetros opcionales de configuración</td>
-          </tr>
-        </tbody>
-      </table>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="stopSeq">Stop Sequences</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_stop_sequences(sequences: PackedStringArray)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">PackedStringArray</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_stop_sequences() const</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">clear_stop_sequences()</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h4>Parámetros del Dictionary</h4>
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="timeout">Timeout</h3>
+      <div class="overflow-x-auto mb-8">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Retorno</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium">Metodo</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">void</td>
+              <td class="py-3 px-4 font-mono text-gray-300">set_timeout(timeout_ms: int)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">get_timeout() const</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">bool</td>
+              <td class="py-3 px-4 font-mono text-gray-300">has_generation_timed_out() const</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Tipo</th>
-            <th>Default</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>n_ctx</code></td>
-            <td>int</td>
-            <td>modelo</td>
-            <td>Tamaño de contexto en tokens</td>
-          </tr>
-          <tr>
-            <td><code>n_gpu_layers</code></td>
-            <td>int</td>
-            <td>0</td>
-            <td>Capas a offload a GPU (0 = solo CPU)</td>
-          </tr>
-          <tr>
-            <td><code>n_batch</code></td>
-            <td>int</td>
-            <td>512</td>
-            <td>Tamaño de batch para procesamiento</td>
-          </tr>
-          <tr>
-            <td><code>n_threads</code></td>
-            <td>int</td>
-            <td>auto</td>
-            <td>Threads para generación</td>
-          </tr>
-          <tr>
-            <td><code>n_threads_batch</code></td>
-            <td>int</td>
-            <td>auto</td>
-            <td>Threads para procesamiento de batch</td>
-          </tr>
-          <tr>
-            <td><code>use_mmap</code></td>
-            <td>bool</td>
-            <td>true</td>
-            <td>Usar memory-mapped file</td>
-          </tr>
-          <tr>
-            <td><code>use_mlock</code></td>
-            <td>bool</td>
-            <td>false</td>
-            <td>Bloquear modelo en RAM</td>
-          </tr>
-          <tr>
-            <td><code>vocab_only</code></td>
-            <td>bool</td>
-            <td>false</td>
-            <td>Solo cargar vocabulario (sin pesos)</td>
-          </tr>
-        </tbody>
-      </table>
+      <hr class="border-border-default mb-12">
 
-      <h4>Retorno</h4>
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="propsTitle">Propiedades</span>
+      </h2>
 
-      <p>Retorna <code>OK</code> si el modelo se cargó correctamente, o un código de error:</p>
+      <p class="text-gray-400 mb-4" data-i18n="propsIntro">Expuestas como propiedades del objeto, con setter y getter. Se pueden asignar directo.</p>
 
-      <ul>
-        <li><code>ERR_FILE_NOT_FOUND</code> - El archivo no existe</li>
-        <li><code>ERR_CANT_OPEN</code> - No se pudo abrir/parsear el modelo</li>
-        <li><code>ERR_CANT_CREATE</code> - No se pudo crear el contexto</li>
-      </ul>
+      <div class="overflow-x-auto mb-4">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="tblType">Tipo</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="tblProp">Propiedad</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="tblRange">Rango</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">temperature</td>
+              <td class="py-3 px-4 font-mono text-gray-400">0.0 - 2.0</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">top_p</td>
+              <td class="py-3 px-4 font-mono text-gray-400">0.0 - 1.0</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">top_k</td>
+              <td class="py-3 px-4 font-mono text-gray-400">0 - 100</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">max_tokens</td>
+              <td class="py-3 px-4 font-mono text-gray-400">1 - 4096</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">repeat_penalty</td>
+              <td class="py-3 px-4 font-mono text-gray-400">1.0 - 2.0</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">float</td>
+              <td class="py-3 px-4 font-mono text-gray-300">min_p</td>
+              <td class="py-3 px-4 font-mono text-gray-400">0.0 - 1.0</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">seed</td>
+              <td class="py-3 px-4 font-mono text-gray-400">—</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-purple">int</td>
+              <td class="py-3 px-4 font-mono text-gray-300">timeout</td>
+              <td class="py-3 px-4 font-mono text-gray-400">0 - 300000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <h4>Ejemplo</h4>
+      <div class="p-4 rounded-lg border border-warning/30 bg-warning/5 mb-12">
+        <p class="text-gray-300 text-sm" data-i18n="propsNote">frequency_penalty, presence_penalty y repeat_last_n existen sólo como métodos (set_/get_), no como propiedades: hay que llamarlos, no asignarlos.</p>
+      </div>
 
-      <pre data-lang="GDSCRIPT"><code>var llama = LlamaInterface.new()
-var err = llama.load_model("user://models/mistral-7b-q4.gguf", {
-    "n_ctx": 4096,
-    "n_gpu_layers": 0
+      <hr class="border-border-default mb-12">
+
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="signalsTitle">Señales</span>
+      </h2>
+
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default">
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="tblSignal">Señal</th>
+              <th class="text-left py-3 px-4 text-ai-cyan font-medium" data-i18n="pTableDesc">Descripción</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-cyan whitespace-nowrap">generation_started()</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigStarted">Emitida al arrancar una generación async o streaming.</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-cyan whitespace-nowrap">token_generated(token: String)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigToken">Un token recién generado, sólo en generate_streaming. Llega en el hilo principal.</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-cyan whitespace-nowrap">generation_completed(response: String)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigCompleted">Respuesta completa, al terminar una generación async o streaming.</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-cyan whitespace-nowrap">generation_progress(progress: float)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigProgress">Progreso de 0.0 a 1.0 durante la generación.</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-cyan whitespace-nowrap">generation_error(error: String)</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigError">Algo falló: sin modelo cargado, prompt más largo que el contexto, o error de decodificación.</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-3 px-4 font-mono text-ai-cyan whitespace-nowrap">generation_cancelled()</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigCancelled">Emitida cuando cancel_generation detiene la generación.</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-mono text-ai-cyan whitespace-nowrap">generation_timeout()</td>
+              <td class="py-3 px-4 text-gray-300" data-i18n="sigTimeout">El tiempo configurado con set_timeout se agotó y la generación se cortó.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="border-border-default mb-12">
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="methodDesc">Descripciones de Metodos</h3>
+
+      <div id="load_model" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">load_model</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">Error</span> load_model(path: <span class="text-ai-cyan">String</span>, params: <span class="text-ai-cyan">Dictionary</span> = {})</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="loadModelDesc">Carga un modelo GGUF desde la ruta especificada.</p>
+
+        <h5 class="text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider" data-i18n="paramsTitle">Parámetros
+        </h5>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="border-b border-border-default">
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableParam">Parámetro</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableType">Tipo</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableDesc">Descripción</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">path</td>
+                <td class="py-2 px-4 font-mono text-gray-400">String</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="paramPathDesc">Ruta al archivo .gguf. Soporta res:// y
+                  user://</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono text-ai-purple">params</td>
+                <td class="py-2 px-4 font-mono text-gray-400">Dictionary</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="paramParamsDesc">Parámetros opcionales de configuración
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h5 class="text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider" data-i18n="paramsKeysTitle">Claves
+          aceptadas en params</h5>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="border-b border-border-default">
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableParam">Parámetro</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableType">Tipo</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableDesc">Descripción</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_gpu_layers</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNGpuLayers">Capas a descargar en GPU. Por defecto 999
+                  (todas las que entren)</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_ctx</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNCtx">Tamaño de la ventana de contexto, en tokens. Por
+                  defecto 512</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_batch</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNBatch">Tamaño de lote para el procesado del prompt</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_threads</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNThreads">Hilos de CPU para generación</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_threads_batch</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNThreadsBatch">Hilos de CPU para el procesado del prompt
+                </td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">use_mmap</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pUseMmap">Mapear el archivo en memoria en vez de leerlo
+                  entero</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">use_mlock</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pUseMlock">Forzar al sistema a mantener el modelo en RAM
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono text-ai-green">vocab_only</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pVocabOnly">Cargar SOLO el vocabulario, sin los pesos. Ver
+                  "Tokenizar sin cargar el modelo"</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="unload_model" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">unload_model</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> unload_model()</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="unloadModelDesc">Libera el modelo, el contexto y el sampler. No hace nada si no hay modelo cargado.</p>
+      </div>
+
+      <div id="is_model_loaded" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">is_model_loaded</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">bool</span> is_model_loaded() const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="isModelLoadedDesc">Devuelve true sólo cuando el modelo Y el contexto existen. Un handle a medio construir da false.</p>
+      </div>
+
+      <div id="get_model_info" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_model_info</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">Dictionary</span> get_model_info() const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getModelInfoDesc">Metadatos del modelo cargado. Devuelve un Dictionary vacío si no hay ninguno.</p>
+        <h5 class="text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider" data-i18n="getModelInfoKeys">Claves devueltas</h5>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="border-b border-border-default">
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="tblKey">Clave</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableType">Tipo</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">description</td>
+                <td class="py-2 px-4 font-mono text-gray-400">String</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">path</td>
+                <td class="py-2 px-4 font-mono text-gray-400">String</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">size_bytes</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_params</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_ctx_train</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_embd</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_layer</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_head</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_ctx</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_batch</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">vocab_size</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">vocab_type</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">bos_token</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">eos_token</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">has_encoder</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">has_decoder</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">is_recurrent</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">rope_type</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">chat_template</td>
+                <td class="py-2 px-4 font-mono text-gray-400">String</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_gpu_layers</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">gpu_backend_name</td>
+                <td class="py-2 px-4 font-mono text-gray-400">String</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono text-ai-purple">gpu_backend_desc</td>
+                <td class="py-2 px-4 font-mono text-gray-400">String</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="p-4 rounded-lg border border-ai-cyan/30 bg-ai-cyan/5 mb-4">
+          <p class="text-gray-300 text-sm" data-i18n="getModelInfoNote">bos_token y eos_token sólo aparecen si el modelo los define. chat_template sólo si el GGUF trae plantilla embebida.</p>
+        </div>
+      </div>
+
+      <div id="get_model_path" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_model_path</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">String</span> get_model_path() const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getModelPathDesc">Ruta del modelo cargado, tal cual se pasó a load_model. Cadena vacía si no hay ninguno.</p>
+      </div>
+
+      <div id="get_system_info" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_system_info</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">String</span> get_system_info() const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getSystemInfoDesc">Cadena de llama.cpp con las capacidades de CPU detectadas (AVX, NEON, etc.). Útil para reportes de bug.</p>
+      </div>
+
+      <div id="get_chat_template" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_chat_template</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">String</span> get_chat_template() const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getChatTemplateDesc">Plantilla de chat embebida en el GGUF, en formato Jinja. Cadena vacía si el modelo no trae ninguna o no hay modelo cargado.</p>
+      </div>
+
+      <div id="apply_chat_template" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">apply_chat_template</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">String</span> apply_chat_template(messages: <span class="text-ai-cyan">Array</span>, add_generation_prompt: <span class="text-ai-cyan">bool</span> = <span class="text-ai-purple">true</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="applyChatTemplateDesc">Aplica la plantilla del modelo a una lista de mensajes y devuelve el prompt final.</p>
+        <h5 class="text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider" data-i18n="paramsTitle">Parámetros</h5>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="border-b border-border-default">
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableParam">Parámetro</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableType">Tipo</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableDesc">Descripción</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">messages</td>
+                <td class="py-2 px-4 font-mono text-gray-400">Array</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="paramMessagesDesc">Array de Dictionary con las claves role y content. Los que no tengan ambas se descartan con un warning.</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono text-ai-purple">add_generation_prompt</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="paramAddGenDesc">Añade el encabezado que le indica al modelo que empiece a responder</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">var</span> prompt := llama.<span class="text-ai-cyan">apply_chat_template</span>([
+    {<span class="text-ai-green">"role"</span>: <span class="text-ai-green">"system"</span>, <span class="text-ai-green">"content"</span>: <span class="text-ai-green">"Sos un herrero gruñón."</span>},
+    {<span class="text-ai-green">"role"</span>: <span class="text-ai-green">"user"</span>, <span class="text-ai-green">"content"</span>: <span class="text-ai-green">"¿Cuánto cuesta la espada?"</span>},
+])</code></pre>
+      </div>
+
+      <!-- count_tokens -->
+      <div id="count_tokens" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">count_tokens</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">int</span> count_tokens(text: <span class="text-ai-cyan">String</span>) const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="countTokensDesc">Devuelve la cantidad exacta de tokens que ocupa el
+          texto, según el vocabulario del modelo. Devuelve -1 si no hay modelo cargado.</p>
+
+        <div class="p-4 rounded-lg border border-warning/30 bg-warning/5 mb-6">
+          <p class="text-warning font-bold text-sm mb-1" data-i18n="countTokensWhy">Por qué importa</p>
+          <p class="text-gray-300 text-sm" data-i18n="countTokensWhyText">La regla de ~4 caracteres por token se rompe
+            con tildes, ñ y emojis: en español subestima el costo real. Este método usa el tokenizador del propio
+            modelo.</p>
+        </div>
+
+        <h5 class="text-lg font-bold text-ai-green mb-3" data-i18n="vocabOnlyTitle">Tokenizar sin cargar el modelo</h5>
+        <p class="text-gray-400 mb-4" data-i18n="vocabOnlyIntro">Contar tokens sólo necesita el vocabulario, no los pesos
+          ni el contexto. Con vocab_only el modelo se abre sin leer un solo tensor y sin reservar KV cache: cuesta
+          megabytes en vez de gigabytes.</p>
+
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">var</span> llama := <span class="text-ai-cyan">LlamaInterface</span>.new()
+llama.<span class="text-ai-cyan">load_model</span>(<span class="text-ai-green">"res://models/qwen2.5-3b-instruct-q4_k_m.gguf"</span>, {
+    <span class="text-ai-green">"vocab_only"</span>: <span class="text-ai-purple">true</span>,
+    <span class="text-ai-green">"n_gpu_layers"</span>: <span class="text-ai-purple">0</span>,
+    <span class="text-ai-green">"n_ctx"</span>: <span class="text-ai-purple">512</span>,
 })
 
-if err != OK:
-    push_error("Failed to load model: " + str(err))
-    return
-
-print("Model loaded successfully!")</code></pre>
-
-      <hr>
-
-      <h3 id="unload_model">unload_model</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void unload_model()</code></pre>
-
-      <p>Descarga el modelo actual y libera todos los recursos asociados (contexto, backend, memoria).</p>
-
-      <p>Es seguro llamar este método incluso si no hay modelo cargado.</p>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code>llama.unload_model()
-print("Model unloaded")</code></pre>
-
-      <hr>
-
-      <h3 id="is_model_loaded">is_model_loaded</h3>
-
-      <pre data-lang="GDSCRIPT"><code>bool is_model_loaded() const</code></pre>
-
-      <p>Verifica si hay un modelo cargado y listo para usar.</p>
-
-      <h4>Retorno</h4>
-
-      <p><code>true</code> si hay un modelo cargado, <code>false</code> en caso contrario.</p>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code>if llama.is_model_loaded():
-    print("Ready to generate!")
-else:
-    print("No model loaded")</code></pre>
-
-      <hr>
-
-      <h3 id="get_model_info">get_model_info</h3>
-
-      <pre data-lang="GDSCRIPT"><code>Dictionary get_model_info() const</code></pre>
-
-      <p>Retorna información detallada sobre el modelo cargado.</p>
-
-      <h4>Retorno</h4>
-
-      <p>Un Dictionary con las siguientes keys (vacío si no hay modelo cargado):</p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Key</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>description</code></td>
-            <td>String</td>
-            <td>Descripción del modelo</td>
-          </tr>
-          <tr>
-            <td><code>path</code></td>
-            <td>String</td>
-            <td>Ruta del archivo cargado</td>
-          </tr>
-          <tr>
-            <td><code>size_bytes</code></td>
-            <td>int</td>
-            <td>Tamaño del modelo en bytes</td>
-          </tr>
-          <tr>
-            <td><code>n_params</code></td>
-            <td>int</td>
-            <td>Número de parámetros</td>
-          </tr>
-          <tr>
-            <td><code>n_ctx_train</code></td>
-            <td>int</td>
-            <td>Contexto de entrenamiento</td>
-          </tr>
-          <tr>
-            <td><code>n_embd</code></td>
-            <td>int</td>
-            <td>Dimensión de embeddings</td>
-          </tr>
-          <tr>
-            <td><code>n_layer</code></td>
-            <td>int</td>
-            <td>Número de capas</td>
-          </tr>
-          <tr>
-            <td><code>n_head</code></td>
-            <td>int</td>
-            <td>Número de attention heads</td>
-          </tr>
-          <tr>
-            <td><code>n_ctx</code></td>
-            <td>int</td>
-            <td>Contexto actual configurado</td>
-          </tr>
-          <tr>
-            <td><code>n_batch</code></td>
-            <td>int</td>
-            <td>Batch size actual</td>
-          </tr>
-          <tr>
-            <td><code>vocab_size</code></td>
-            <td>int</td>
-            <td>Tamaño del vocabulario</td>
-          </tr>
-          <tr>
-            <td><code>vocab_type</code></td>
-            <td>int</td>
-            <td>Tipo de tokenizador (0=SPM, 1=BPE, etc.)</td>
-          </tr>
-          <tr>
-            <td><code>bos_token</code></td>
-            <td>int</td>
-            <td>ID del token BOS</td>
-          </tr>
-          <tr>
-            <td><code>eos_token</code></td>
-            <td>int</td>
-            <td>ID del token EOS</td>
-          </tr>
-          <tr>
-            <td><code>has_encoder</code></td>
-            <td>bool</td>
-            <td>Si el modelo tiene encoder</td>
-          </tr>
-          <tr>
-            <td><code>has_decoder</code></td>
-            <td>bool</td>
-            <td>Si el modelo tiene decoder</td>
-          </tr>
-          <tr>
-            <td><code>is_recurrent</code></td>
-            <td>bool</td>
-            <td>Si es recurrente (Mamba, RWKV)</td>
-          </tr>
-          <tr>
-            <td><code>rope_type</code></td>
-            <td>int</td>
-            <td>Tipo de RoPE</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code>var info = llama.get_model_info()
-if not info.is_empty():
-    print("Model: ", info.description)
-    print("Parameters: ", info.n_params / 1_000_000_000.0, "B")
-    print("Context: ", info.n_ctx, " tokens")
-    print("Layers: ", info.n_layer)</code></pre>
-
-      <hr>
-
-      <h3 id="get_model_path">get_model_path</h3>
-
-      <pre data-lang="GDSCRIPT"><code>String get_model_path() const</code></pre>
-
-      <p>Retorna la ruta del modelo actualmente cargado.</p>
-
-      <h4>Retorno</h4>
-
-      <p>La ruta del modelo, o un String vacío si no hay modelo cargado.</p>
-
-      <hr>
-
-      <h2>Generación de Texto</h2>
-
-      <h3 id="generate">generate</h3>
-
-      <pre data-lang="GDSCRIPT"><code>String generate(prompt: String)</code></pre>
-
-      <p>Genera texto de forma síncrona (bloqueante) a partir de un prompt.</p>
-
-      <h4>Parámetros</h4>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Parámetro</th>
-            <th>Tipo</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>prompt</code></td>
-            <td>String</td>
-            <td>El texto de entrada para continuar</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h4>Retorno</h4>
-
-      <p>El texto generado, o un String vacío si hay error o no hay modelo cargado.</p>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code>var llama = LlamaInterface.new()
-llama.load_model("res://models/mistral-7b-q4.gguf")
-
-# Configurar parámetros
-llama.set_temperature(0.7)
-llama.set_max_tokens(100)
-
-# Generar texto
-var response = llama.generate("The quick brown fox")
-print(response)  # " jumps over the lazy dog..."</code></pre>
-
-      <blockquote>
-        <strong>Nota:</strong> Esta operación es bloqueante. Para generación asíncrona, usa un Thread o espera la implementación de <code>generate_async()</code>.
-      </blockquote>
-
-      <hr>
-
-      <h2>Parámetros de Sampling</h2>
-
-      <h3 id="set_temperature">set_temperature / get_temperature</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_temperature(temperature: float)
-float get_temperature() const</code></pre>
-
-      <p>Controla la aleatoriedad de la generación.</p>
-
-      <ul>
-        <li><strong>0.0</strong> = Greedy (siempre elige el token más probable)</li>
-        <li><strong>0.7-0.9</strong> = Balance creatividad/coherencia (recomendado)</li>
-        <li><strong>1.0+</strong> = Más aleatorio/creativo</li>
-      </ul>
-
-      <p><strong>Default:</strong> <code>0.8</code></p>
-
-      <hr>
-
-      <h3 id="set_top_p">set_top_p / get_top_p</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_top_p(top_p: float)
-float get_top_p() const</code></pre>
-
-      <p>Nucleus sampling - considera solo tokens cuya probabilidad acumulada sea ≤ top_p.</p>
-
-      <p><strong>Default:</strong> <code>0.95</code> | <strong>Rango:</strong> <code>0.0 - 1.0</code></p>
-
-      <hr>
-
-      <h3 id="set_top_k">set_top_k / get_top_k</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_top_k(top_k: int)
-int get_top_k() const</code></pre>
-
-      <p>Considera solo los top-k tokens más probables. <code>0</code> = desactivado.</p>
-
-      <p><strong>Default:</strong> <code>40</code></p>
-
-      <hr>
-
-      <h3 id="set_max_tokens">set_max_tokens / get_max_tokens</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_max_tokens(max_tokens: int)
-int get_max_tokens() const</code></pre>
-
-      <p>Número máximo de tokens a generar. Mínimo: <code>1</code>.</p>
-
-      <p><strong>Default:</strong> <code>256</code></p>
-
-      <hr>
-
-      <h3 id="set_repeat_penalty">set_repeat_penalty / get_repeat_penalty</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_repeat_penalty(penalty: float)
-float get_repeat_penalty() const</code></pre>
-
-      <p>Penaliza la repetición de tokens. <code>1.0</code> = sin penalización.</p>
-
-      <p><strong>Default:</strong> <code>1.1</code> | <strong>Rango:</strong> <code>1.0 - 2.0</code></p>
-
-      <hr>
-
-      <h3 id="set_min_p">set_min_p / get_min_p</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_min_p(min_p: float)
-float get_min_p() const</code></pre>
-
-      <p>Filtra tokens con probabilidad menor a min_p * prob_max.</p>
-
-      <p><strong>Default:</strong> <code>0.05</code> | <strong>Rango:</strong> <code>0.0 - 1.0</code></p>
-
-      <hr>
-
-      <h3 id="set_seed">set_seed / get_seed</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_seed(seed: int)
-int get_seed() const</code></pre>
-
-      <p>Semilla para reproducibilidad. <code>0xFFFFFFFF</code> = aleatorio.</p>
-
-      <p><strong>Default:</strong> <code>0xFFFFFFFF</code> (aleatorio)</p>
-
-      <hr>
-
-      <h2>Stop Sequences</h2>
-
-      <h3 id="set_stop_sequences">set_stop_sequences</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_stop_sequences(sequences: PackedStringArray)</code></pre>
-
-      <p>Define secuencias que detienen la generación cuando se encuentran.</p>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code># Detener en fin de turno de diálogo
-llama.set_stop_sequences(["User:", "\n\n", "[END]"])</code></pre>
-
-      <hr>
-
-      <h3 id="get_stop_sequences">get_stop_sequences</h3>
-
-      <pre data-lang="GDSCRIPT"><code>PackedStringArray get_stop_sequences() const</code></pre>
-
-      <p>Retorna las secuencias de stop configuradas.</p>
-
-      <hr>
-
-      <h3 id="clear_stop_sequences">clear_stop_sequences</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void clear_stop_sequences()</code></pre>
-
-      <p>Elimina todas las secuencias de stop.</p>
-
-      <hr>
-
-      <h2>Timeout</h2>
-
-      <h3 id="set_timeout">set_timeout / get_timeout</h3>
-
-      <pre data-lang="GDSCRIPT"><code>void set_timeout(timeout_ms: int)
-int get_timeout() const</code></pre>
-
-      <p>Configura el timeout máximo para la generación en milisegundos.</p>
-
-      <ul>
-        <li><strong>0</strong> = Sin timeout (espera indefinidamente)</li>
-        <li><strong>>0</strong> = Tiempo máximo en ms</li>
-      </ul>
-
-      <p><strong>Default:</strong> <code>0</code> (sin timeout)</p>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code># Limitar generación a 10 segundos
-llama.set_timeout(10000)
-
-var response = llama.generate("Tell me a story")
-
-if llama.has_generation_timed_out():
-    print("Generation timed out!")
-    print("Partial response: ", response)</code></pre>
-
-      <hr>
-
-      <h3 id="has_generation_timed_out">has_generation_timed_out</h3>
-
-      <pre data-lang="GDSCRIPT"><code>bool has_generation_timed_out() const</code></pre>
-
-      <p>Verifica si la última generación terminó por timeout.</p>
-
-      <h4>Retorno</h4>
-
-      <p><code>true</code> si la última llamada a <code>generate()</code> terminó por timeout.</p>
-
-      <hr>
-
-      <h2>Señales</h2>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Señal</th>
-            <th>Descripción</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>generation_timeout()</code></td>
-            <td>Emitida cuando la generación excede el tiempo límite configurado</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h4>Ejemplo</h4>
-
-      <pre data-lang="GDSCRIPT"><code>func _ready():
-    llama = LlamaInterface.new()
-    llama.generation_timeout.connect(_on_timeout)
-
-func _on_timeout():
-    print("Generation took too long!")</code></pre>
-
-      <hr>
-
-      <h2>Ejemplo Completo</h2>
-
-      <pre data-lang="GDSCRIPT"><code>extends Node
-
-var llama: LlamaInterface
-
-func _ready():
-    llama = LlamaInterface.new()
-    llama.generation_timeout.connect(_on_generation_timeout)
-
-    # Cargar modelo con configuración personalizada
-    var err = llama.load_model("user://models/qwen2.5-7b-q4_k_m.gguf", {
-        "n_ctx": 8192,
-        "n_gpu_layers": 35,  # Offload a GPU si está disponible
-        "n_threads": 8
-    })
-
-    if err != OK:
-        push_error("Error loading model")
-        return
-
-    # Mostrar información del modelo
-    var info = llama.get_model_info()
-    print("=== Model Info ===")
-    print("Description: ", info.get("description", "Unknown"))
-    print("Size: ", info.get("size_bytes", 0) / (1024 * 1024), " MB")
-    print("Parameters: ", info.get("n_params", 0))
-
-    # Configurar generación
-    llama.set_temperature(0.7)
-    llama.set_max_tokens(150)
-    llama.set_timeout(30000)  # 30 segundos máximo
-    llama.set_stop_sequences(["User:", "\n\n"])
-
-    # Generar respuesta
-    var response = llama.generate("Hello! How are you today?")
-
-    if llama.has_generation_timed_out():
-        print("Warning: Generation timed out")
-        print("Partial response: ", response)
-    else:
-        print("Response: ", response)
-
-func _on_generation_timeout():
-    print("Generation exceeded time limit!")
-
-func _exit_tree():
-    if llama and llama.is_model_loaded():
-        llama.unload_model()</code></pre>
-
-      <hr>
-
-      <h2>Modelos Compatibles</h2>
-
-      <p>LlamaInterface soporta cualquier modelo en formato <strong>GGUF</strong>. Algunos modelos recomendados:</p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Modelo</th>
-            <th>Tamaño</th>
-            <th>VRAM (Q4)</th>
-            <th>Uso Recomendado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Qwen2.5-3B</td>
-            <td>~2 GB</td>
-            <td>~3 GB</td>
-            <td>NPCs simples, respuestas cortas</td>
-          </tr>
-          <tr>
-            <td>Mistral-7B</td>
-            <td>~4 GB</td>
-            <td>~6 GB</td>
-            <td>Balance calidad/velocidad</td>
-          </tr>
-          <tr>
-            <td>Qwen2.5-7B</td>
-            <td>~4 GB</td>
-            <td>~6 GB</td>
-            <td>Diálogos complejos</td>
-          </tr>
-          <tr>
-            <td>Llama-3.1-8B</td>
-            <td>~5 GB</td>
-            <td>~7 GB</td>
-            <td>Alta calidad general</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <blockquote>
-        <strong>Tip:</strong> Usa cuantizaciones Q4_K_M o Q5_K_M para el mejor balance entre calidad y rendimiento.
-      </blockquote>
-
-      <hr>
-
-      <h2>Notas Técnicas</h2>
-
-      <ul>
-        <li>La clase inicializa automáticamente el backend de llama.cpp al cargar un modelo</li>
-        <li>Solo puede haber un modelo cargado a la vez. Cargar un nuevo modelo descarga el anterior</li>
-        <li>El destructor libera automáticamente todos los recursos</li>
-        <li>Compatible con multi-threading via OpenMP</li>
-        <li>Soporta GPU offloading con CUDA, Vulkan o Metal (según compilación)</li>
-      </ul>
-
-      <hr>
-
-      <a href="index.html">← Volver a API Reference</a>
-
-      <footer class="wiki-footer">
-        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p>
+<span class="text-ai-purple">var</span> tokens := llama.<span class="text-ai-cyan">count_tokens</span>(<span class="text-ai-green">"¿Cuántos tokens ocupa esta frase?"</span>)</code></pre>
+
+        <div class="p-4 rounded-lg border border-ai-cyan/30 bg-ai-cyan/5 mb-4">
+          <p class="text-gray-300 text-sm" data-i18n="vocabOnlyNote">El addon ya hace esto por vos: TokenCounter
+            (core/token_counter.gd) cachea un handle por ruta de modelo y lo usa el editor para mostrar el costo real de
+            cada nodo AI Response.</p>
+        </div>
+
+        <div class="p-4 rounded-lg border border-error/30 bg-error/5">
+          <p class="text-gray-300 text-sm" data-i18n="vocabOnlyWarn">Un handle vocab_only sirve para tokenizar, NO para
+            generar. Además deja n_ctx_train sin poblar, así que el tamaño de contexto del archivo no se puede leer por
+            esta vía.</p>
+        </div>
+      </div>
+
+      <div id="generate" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">generate</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">String</span> generate(prompt: <span class="text-ai-cyan">String</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="generateDesc">Genera la respuesta completa y la devuelve. Cadena vacía ante cualquier error.</p>
+        <div class="p-4 rounded-lg border border-error/30 bg-error/5 mb-4">
+          <p class="text-error font-bold text-sm mb-1" data-i18n="generateWarn">Bloquea el hilo que la llama</p>
+          <p class="text-gray-300 text-sm" data-i18n="generateWarnText">Llamada desde el hilo principal, congela el juego hasta el último token. Para gameplay usá generate_async o generate_streaming.</p>
+        </div>
+      </div>
+
+      <div id="generate_async" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">generate_async</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> generate_async(prompt: <span class="text-ai-cyan">String</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="generateAsyncDesc">Genera en el WorkerThreadPool y entrega el texto por generation_completed. No devuelve nada.</p>
+      </div>
+
+      <div id="generate_streaming" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">generate_streaming</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> generate_streaming(prompt: <span class="text-ai-cyan">String</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="generateStreamingDesc">Igual que generate_async, pero además emite token_generated por cada token a medida que sale.</p>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code>llama.token_generated.<span class="text-ai-cyan">connect</span>(<span class="text-ai-purple">func</span>(token): label.text += token)
+llama.generation_completed.<span class="text-ai-cyan">connect</span>(<span class="text-ai-purple">func</span>(full): <span class="text-ai-cyan">print</span>(full))
+llama.<span class="text-ai-cyan">generate_streaming</span>(<span class="text-ai-green">"Hola, ¿qué vendés?"</span>)</code></pre>
+        <div class="p-4 rounded-lg border border-ai-cyan/30 bg-ai-cyan/5 mb-4">
+          <p class="text-gray-300 text-sm" data-i18n="genSharedNote">Ambas emiten generation_started al arrancar. Si ya hay una generación en curso, avisan por consola y no hacen nada. Sin modelo cargado emiten generation_error.</p>
+        </div>
+      </div>
+
+      <div id="is_generating" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">is_generating</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">bool</span> is_generating() const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="isGeneratingDesc">True mientras hay una generación async o streaming en curso. Es atómico: se puede consultar desde cualquier hilo.</p>
+      </div>
+
+      <div id="get_generation_progress" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_generation_progress</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">float</span> get_generation_progress() const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getProgressDesc">Progreso de 0.0 a 1.0, calculado como tokens emitidos sobre max_tokens. Devuelve 0.0 si no se está generando.</p>
+        <div class="p-4 rounded-lg border border-warning/30 bg-warning/5 mb-4">
+          <p class="text-gray-300 text-sm" data-i18n="getProgressNote">Es un progreso contra el techo, no contra la respuesta real: si el modelo termina antes de max_tokens, nunca llega a 1.0.</p>
+        </div>
+      </div>
+
+      <div id="cancel_generation" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">cancel_generation</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> cancel_generation()</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="cancelDesc">Pide abortar la generación en curso. No hace nada si no hay ninguna.</p>
+        <div class="p-4 rounded-lg border border-warning/30 bg-warning/5 mb-4">
+          <p class="text-warning font-bold text-sm mb-1" data-i18n="cancelWarn">Espera a que el worker termine</p>
+          <p class="text-gray-300 text-sm" data-i18n="cancelWarnText">Esta llamada bloquea hasta que la tarea se detiene de verdad. Es lo que garantiza que no queden hilos sueltos, pero significa que cancelar desde el hilo principal cuesta un frame corto.</p>
+        </div>
+      </div>
+
+      <!-- Back Link -->
+      <a href="../home.html"
+        class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors mb-8">
+        <span>&#x2190;</span>
+        <span data-i18n="backToHome">Volver a Home</span>
+      </a>
+
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+        <p class="mt-1">Apache 2.0 License - Made with &#x1F9E0; by lobinuxsoft</p>
       </footer>
     </main>
   </div>
-
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>

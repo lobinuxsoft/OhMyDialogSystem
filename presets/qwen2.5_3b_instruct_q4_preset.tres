@@ -1,12 +1,11 @@
-[gd_resource type="Resource" script_class="AIPreset" load_steps=2 format=3 uid="uid://dsggvjifsghg1"]
+[gd_resource type="Resource" script_class="AIPreset" load_steps=2 format=3 uid="uid://ck3pm0u53hrr6"]
 
-[ext_resource type="Script" uid="uid://dgi6tt3rvrbfm" path="res://addons/ohmydialog/resources/ai_preset.gd" id="1_k0mv3"]
+[ext_resource type="Script" uid="uid://dgi6tt3rvrbfm" path="res://addons/ohmydialog/resources/ai_preset.gd" id="1_gowpq"]
 
 [resource]
-script = ExtResource("1_k0mv3")
-preset_name = "Qwen2.5 1.5B Instruct Q4 (Recommended <1GB) Preset"
-description = "Generated from GGUF metadata. Template: chatml, Context: 32768 tokens."
-preset_type = 4
+script = ExtResource("1_gowpq")
+preset_name = "Qwen2.5 3B Instruct Q4 (Recommended) Preset"
+description = "Generated from GGUF metadata. Architecture: qwen2, Template: chatml, Context: 32768 tokens."
 stop_sequences = Array[String](["<|im_end|>", "<|im_start|>"])
 context_size = 32768
 source_chat_template = "{%- if tools %}
@@ -65,5 +64,8 @@ source_chat_template = "{%- if tools %}
 {%- endif %}
 "
 chat_template_format = "chatml"
+model_architecture = "qwen2"
+bos_token_id = 151643
+eos_token_id = 151645
 recommended_context_length = 32768
 derived_stop_sequences = Array[String](["<|im_end|>", "<|im_start|>"])

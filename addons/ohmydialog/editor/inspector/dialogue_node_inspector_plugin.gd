@@ -10,10 +10,18 @@ extends EditorInspectorPlugin
 ## Current DialogueGraph being edited (set by DialogueGraphEditor).
 var current_graph: DialogueGraph
 
+## Window opened when a node needs a model that is not loaded (set by the plugin).
+var _model_manager: ModelManagerWindow
+
 
 ## Sets the current graph context for variable lookups.
 func set_current_graph(graph: DialogueGraph) -> void:
 	current_graph = graph
+
+
+## Sets the window used to resolve a missing model from the inspector.
+func set_model_manager(window: ModelManagerWindow) -> void:
+	_model_manager = window
 
 
 func _can_handle(object: Object) -> bool:
@@ -41,7 +49,9 @@ func _create_editor_for_type(node_data: DialogueNodeData) -> Control:
 		DialogueNodeData.NodeType.STATIC_RESPONSE:
 			return StaticResponseEditor.new(node_data, current_graph)
 		DialogueNodeData.NodeType.AI_RESPONSE:
-			return AIResponseEditor.new(node_data, current_graph)
+			var ai_editor := AIResponseEditor.new(node_data, current_graph)
+			ai_editor.model_requested.connect(_on_model_requested)
+			return ai_editor
 		DialogueNodeData.NodeType.PLAYER_CHOICE:
 			return PlayerChoiceEditor.new(node_data, current_graph)
 		DialogueNodeData.NodeType.CONDITION:
@@ -58,3 +68,8 @@ func _create_editor_for_type(node_data: DialogueNodeData) -> Control:
 			return ReturnToGraphEditor.new(node_data, current_graph)
 		_:
 			return null
+
+
+func _on_model_requested() -> void:
+	if _model_manager:
+		_model_manager.show_window()

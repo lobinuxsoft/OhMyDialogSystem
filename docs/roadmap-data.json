@@ -1,14 +1,14 @@
 {
-  "updated_at": "2026-01-11T04:43:45Z",
+  "updated_at": "2026-06-29T20:58:26Z",
   "repository": "lobinuxsoft/OhMyDialogSystem",
   "milestones": [
     {
       "number": 1,
       "title": "M1: Fundación - GDExtension Core",
       "description": "Setup inicial, GDExtension con llama.cpp, LlamaInterface",
-      "open": 7,
-      "closed": 13,
-      "progress": 65,
+      "open": 6,
+      "closed": 14,
+      "progress": 70,
       "state": "open"
     },
     {
@@ -24,9 +24,9 @@
       "number": 10,
       "title": "M3: Editor Visual",
       "description": "DialogueGraphEditor completo con todos los nodos",
-      "open": 13,
-      "closed": 7,
-      "progress": 35,
+      "open": 4,
+      "closed": 16,
+      "progress": 80,
       "state": "open"
     },
     {
@@ -70,8 +70,8 @@
       "title": "M8: Ejemplos y Documentación",
       "description": "Ejemplos, API docs, guía de inicio rápido, CI/CD",
       "open": 10,
-      "closed": 8,
-      "progress": 44,
+      "closed": 9,
+      "progress": 47,
       "state": "open"
     },
     {
@@ -242,7 +242,7 @@
         {
           "number": 53,
           "title": "[GDExtension] Soporte Vulkan para aceleracion GPU",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M1: Fundación - GDExtension Core",
           "labels": [
             "priority:medium",
@@ -251,7 +251,7 @@
             "research"
           ],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "Medium",
             "Order": 11.0
           }
@@ -1063,7 +1063,7 @@
             "priority:high"
           ],
           "fields": {
-            "Status": "In Progress"
+            "Status": "Done"
           }
         },
         {
@@ -1074,6 +1074,20 @@
           "labels": [
             "documentation",
             "priority:high"
+          ],
+          "fields": {
+            "Status": "Done"
+          }
+        },
+        {
+          "number": 217,
+          "title": "fix(gdextension): agregar chunking de prompt a funciones async y streaming en LlamaInterface",
+          "state": "CLOSED",
+          "milestone": null,
+          "labels": [
+            "bug",
+            "priority:high",
+            "gdextension"
           ],
           "fields": {
             "Status": "Done"
@@ -1188,11 +1202,11 @@
         {
           "number": 113,
           "title": "[Editor] Implementar nodo de respuesta estática",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 1: Fundamentos",
             "Order": 25.0
@@ -1266,11 +1280,11 @@
         {
           "number": 108,
           "title": "[Editor] Implementar nodo de respuesta con IA",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 2: IA + Decisiones",
             "Order": 13.0
@@ -1292,11 +1306,11 @@
         {
           "number": 109,
           "title": "[Editor] Implementar nodo de opciones del jugador",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 2: IA + Decisiones",
             "Order": 21.0
@@ -1357,11 +1371,11 @@
         {
           "number": 110,
           "title": "[Editor] Implementar nodo de condición",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "Medium",
             "Sprint": "Sprint 3: Lógica",
             "Order": 22.0
@@ -1370,11 +1384,11 @@
         {
           "number": 111,
           "title": "[Editor] Implementar nodo de evento",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "Medium",
             "Sprint": "Sprint 3: Lógica",
             "Order": 23.0
@@ -1383,11 +1397,11 @@
         {
           "number": 117,
           "title": "[Editor] Implementar nodo SetVariable",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "Medium",
             "Sprint": "Sprint 3: Lógica",
             "Order": 29.0
@@ -1396,11 +1410,11 @@
         {
           "number": 118,
           "title": "[Editor] Implementar nodo Jump",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "Medium",
             "Sprint": "Sprint 3: Lógica",
             "Order": 30.0
@@ -1470,11 +1484,11 @@
         {
           "number": 119,
           "title": "[Editor] Implementar nodo JumpToFree (NUEVO)",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 4: Polish",
             "Order": 31.0
@@ -1483,11 +1497,11 @@
         {
           "number": 120,
           "title": "[Editor] Implementar nodo ReturnToGraph (NUEVO)",
-          "state": "OPEN",
+          "state": "CLOSED",
           "milestone": "M3: Editor Visual",
           "labels": [],
           "fields": {
-            "Status": "Todo",
+            "Status": "Done",
             "Priority": "High",
             "Sprint": "Sprint 4: Polish",
             "Order": 32.0
@@ -1793,11 +1807,11 @@
     {
       "number": 108,
       "title": "[Editor] Implementar nodo de respuesta con IA",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 2: IA + Decisiones",
         "Order": 13.0
@@ -1806,11 +1820,11 @@
     {
       "number": 109,
       "title": "[Editor] Implementar nodo de opciones del jugador",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 2: IA + Decisiones",
         "Order": 21.0
@@ -1819,11 +1833,11 @@
     {
       "number": 110,
       "title": "[Editor] Implementar nodo de condición",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "Medium",
         "Sprint": "Sprint 3: Lógica",
         "Order": 22.0
@@ -1832,11 +1846,11 @@
     {
       "number": 111,
       "title": "[Editor] Implementar nodo de evento",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "Medium",
         "Sprint": "Sprint 3: Lógica",
         "Order": 23.0
@@ -2216,7 +2230,7 @@
     {
       "number": 53,
       "title": "[GDExtension] Soporte Vulkan para aceleracion GPU",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M1: Fundación - GDExtension Core",
       "labels": [
         "priority:medium",
@@ -2225,7 +2239,7 @@
         "research"
       ],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "Medium",
         "Order": 11.0
       }
@@ -2264,11 +2278,11 @@
     {
       "number": 113,
       "title": "[Editor] Implementar nodo de respuesta estática",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 1: Fundamentos",
         "Order": 25.0
@@ -2435,11 +2449,11 @@
     {
       "number": 117,
       "title": "[Editor] Implementar nodo SetVariable",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "Medium",
         "Sprint": "Sprint 3: Lógica",
         "Order": 29.0
@@ -2448,11 +2462,11 @@
     {
       "number": 118,
       "title": "[Editor] Implementar nodo Jump",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "Medium",
         "Sprint": "Sprint 3: Lógica",
         "Order": 30.0
@@ -2461,11 +2475,11 @@
     {
       "number": 119,
       "title": "[Editor] Implementar nodo JumpToFree (NUEVO)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 4: Polish",
         "Order": 31.0
@@ -2474,11 +2488,11 @@
     {
       "number": 120,
       "title": "[Editor] Implementar nodo ReturnToGraph (NUEVO)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "milestone": "M3: Editor Visual",
       "labels": [],
       "fields": {
-        "Status": "Todo",
+        "Status": "Done",
         "Priority": "High",
         "Sprint": "Sprint 4: Polish",
         "Order": 32.0
@@ -2866,7 +2880,7 @@
         "priority:high"
       ],
       "fields": {
-        "Status": "In Progress"
+        "Status": "Done"
       }
     },
     {
@@ -2881,6 +2895,30 @@
       "fields": {
         "Status": "Done"
       }
+    },
+    {
+      "number": 217,
+      "title": "fix(gdextension): agregar chunking de prompt a funciones async y streaming en LlamaInterface",
+      "state": "CLOSED",
+      "milestone": null,
+      "labels": [
+        "bug",
+        "priority:high",
+        "gdextension"
+      ],
+      "fields": {
+        "Status": "Done"
+      }
+    },
+    {
+      "number": 223,
+      "title": "feat(docs): Documentar páginas placeholder con implementación existente",
+      "state": "CLOSED",
+      "milestone": "M8: Ejemplos y Documentación",
+      "labels": [
+        "documentation"
+      ],
+      "fields": {}
     },
     {
       "number": 188,

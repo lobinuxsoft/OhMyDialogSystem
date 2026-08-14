@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CI/CD y Releases - OhMyDialogSystem Wiki</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          pageTitle: 'CI/CD y Sistema de Releases',
+          pageDesc: 'OhMyDialogSystem utiliza GitHub Actions para automatizar la compilacion y publicacion de releases. El sistema soporta deteccion automatica de backends en runtime.',
+          hReleaseFlow: 'Flujo de Release',
+          step1Title: 'Crear Tag de Version',
+          step1Desc: 'El desarrollador crea un tag siguiendo SemVer',
+          step2Title: 'GitHub Actions Detecta',
+          step2Desc: 'El workflow release-gdextension.yml se dispara automaticamente al detectar el patron v*.*.*',
+          step3Title: 'Compilacion Paralela',
+          step3Desc: 'Se compila para Windows, Linux y macOS simultaneamente con todos los backends habilitados',
+          step4Title: 'GitHub Release',
+          step4Desc: 'Se crea automaticamente un Release con paquetes optimizados para cada plataforma',
+          hManualTrigger: 'Ejecucion Manual',
+          pManualTrigger: 'El workflow puede ejecutarse manualmente para testing sin crear un release oficial:',
+          noteManual: 'Las ejecuciones manuales con create_release=false solo compilan y suben artefactos. Utiles para verificar que el build funciona antes de crear un tag oficial.',
+          hBackends: 'Backends Disponibles',
+          pBackends: 'El addon detecta automaticamente el mejor backend disponible en el sistema del usuario:',
+          vulkanDesc: 'API grafica multiplataforma. Soporta GPUs AMD, Intel y NVIDIA. Backend GPU recomendado.',
+          cpuDesc: 'Funciona en cualquier sistema. Utiliza instrucciones SIMD (AVX2, AVX512) cuando estan disponibles. Fallback automatico.',
+          metalDesc: 'Optimizado para Apple Silicon (M1/M2/M3/M4). Nativo en macOS, maximo rendimiento en Mac.',
+          hDetection: 'Deteccion Automatica',
+          pDetection: 'Cuando se carga un modelo, el sistema ejecuta el siguiente proceso de seleccion:',
+          noteDetection: 'Cada backend exporta una funcion ggml_backend_score() que retorna un valor numerico basado en la disponibilidad del hardware. El sistema selecciona automaticamente el backend con mayor score.',
+          hPlatforms: 'Paquetes por Plataforma',
+          hLocalBuild: 'Compilacion Local',
+          pLocalBuild: 'Para compilar localmente con todos los backends habilitados:',
+          noteLocalBuild: 'Los flags --all-backends y --dynamic habilitan GGML_BACKEND_DL=ON, compilando cada backend como una biblioteca dinamica separada.',
+          hWorkflow: 'Estructura del Workflow',
+          pWorkflow: 'El workflow de GitHub Actions ejecuta los siguientes jobs:',
+          hActions: 'Actions Reutilizables',
+          pActions: 'El proyecto incluye GitHub Actions personalizadas en .github/actions/:',
+          backToTech: 'Volver a Technical'
+        },
+        en: {
+          pageTitle: 'CI/CD and Release System',
+          pageDesc: 'OhMyDialogSystem uses GitHub Actions to automate build and release publishing. The system supports automatic backend detection at runtime.',
+          hReleaseFlow: 'Release Flow',
+          step1Title: 'Create Version Tag',
+          step1Desc: 'Developer creates a tag following SemVer',
+          step2Title: 'GitHub Actions Detects',
+          step2Desc: 'The release-gdextension.yml workflow triggers automatically on v*.*.* pattern',
+          step3Title: 'Parallel Compilation',
+          step3Desc: 'Compiles for Windows, Linux and macOS simultaneously with all backends enabled',
+          step4Title: 'GitHub Release',
+          step4Desc: 'Automatically creates a Release with optimized packages for each platform',
+          hManualTrigger: 'Manual Execution',
+          pManualTrigger: 'The workflow can be executed manually for testing without creating an official release:',
+          noteManual: 'Manual executions with create_release=false only compile and upload artifacts. Useful for verifying the build works before creating an official tag.',
+          hBackends: 'Available Backends',
+          pBackends: 'The addon automatically detects the best available backend on the user system:',
+          vulkanDesc: 'Cross-platform graphics API. Supports AMD, Intel and NVIDIA GPUs. Recommended GPU backend.',
+          cpuDesc: 'Works on any system. Uses SIMD instructions (AVX2, AVX512) when available. Automatic fallback.',
+          metalDesc: 'Optimized for Apple Silicon (M1/M2/M3/M4). Native on macOS, maximum performance on Mac.',
+          hDetection: 'Automatic Detection',
+          pDetection: 'When loading a model, the system executes the following selection process:',
+          noteDetection: 'Each backend exports a ggml_backend_score() function that returns a numeric value based on hardware availability. The system automatically selects the backend with the highest score.',
+          hPlatforms: 'Platform Packages',
+          hLocalBuild: 'Local Build',
+          pLocalBuild: 'To compile locally with all backends enabled:',
+          noteLocalBuild: 'The --all-backends and --dynamic flags enable GGML_BACKEND_DL=ON, compiling each backend as a separate dynamic library.',
+          hWorkflow: 'Workflow Structure',
+          pWorkflow: 'The GitHub Actions workflow executes the following jobs:',
+          hActions: 'Reusable Actions',
+          pActions: 'The project includes custom GitHub Actions in .github/actions/:',
+          backToTech: 'Back to Technical'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) {
+            if (el.dataset.i18nHtml) el.innerHTML = this.t[this.lang][key];
+            else el.textContent = this.t[this.lang][key];
+          }
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Backend color palette */
+    :root {
+      --backend-cpu: #6b7280;
+      --backend-vulkan: #ac162c;
+      --backend-metal: #a3aaae;
+    }
+
+    /* Release Flow Diagram */
+    .release-flow-diagram {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(0, 212, 255, 0.02) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .release-flow-diagram::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00d4ff, #a855f7, #ec4899);
+    }
+
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .flow-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00d4ff, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #0a0d12;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    }
+
+    .flow-content {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.8);
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px;
+      border-left: 3px solid #00d4ff;
+      transition: all 0.3s ease;
+    }
+
+    .flow-content:hover {
+      border-left-color: #a855f7;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transform: translateX(4px);
+    }
+
+    .flow-content h4 {
+      margin: 0 0 0.5rem 0;
+      color: #00d4ff;
+      font-size: 1rem;
+    }
+
+    .flow-content p {
+      margin: 0;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+
+    .flow-connector {
+      width: 48px;
+      display: flex;
+      justify-content: center;
+      padding: 0.5rem 0;
+    }
+
+    .flow-connector svg {
+      width: 24px;
+      height: 32px;
+    }
+
+    .flow-connector .arrow-path {
+      stroke: #a855f7;
+      stroke-width: 2;
+      fill: none;
+      stroke-dasharray: 4 2;
+      animation: flow-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes flow-pulse {
+      0%, 100% { opacity: 0.4; stroke-dashoffset: 0; }
+      50% { opacity: 1; stroke-dashoffset: 6; }
+    }
+
+    /* Backend Cards */
+    .backend-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .backend-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .backend-card.cpu::before { background: var(--backend-cpu); }
+    .backend-card.vulkan::before { background: var(--backend-vulkan); }
+    .backend-card.metal::before { background: var(--backend-metal); }
+
+    .backend-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      border-color: #00d4ff;
+    }
+
+    .backend-card .icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .backend-card.cpu .icon-wrapper { background: rgba(107, 114, 128, 0.15); color: var(--backend-cpu); }
+    .backend-card.vulkan .icon-wrapper { background: rgba(172, 22, 44, 0.15); color: var(--backend-vulkan); }
+    .backend-card.metal .icon-wrapper { background: rgba(163, 170, 174, 0.15); color: var(--backend-metal); }
+
+    .backend-card h4 {
+      margin: 0 0 0.5rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.1rem;
+    }
+
+    .backend-card.cpu h4 { color: var(--backend-cpu); }
+    .backend-card.vulkan h4 { color: var(--backend-vulkan); }
+    .backend-card.metal h4 { color: var(--backend-metal); }
+
+    .backend-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0.75rem;
+      background: rgba(30, 41, 59, 0.8);
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #00d4ff;
+    }
+
+    .backend-score::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00d4ff;
+      animation: score-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes score-pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; box-shadow: 0 0 8px rgba(0, 212, 255, 0.6); }
+    }
+
+    /* Flowchart */
+    .detection-flowchart {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .flowchart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .flowchart-node {
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .flowchart-node.start {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.2));
+      border: 2px solid #10b981;
+      color: #10b981;
+      border-radius: 24px;
+    }
+
+    .flowchart-node.process {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e6edf3;
+    }
+
+    .flowchart-node.decision {
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(249, 115, 22, 0.1));
+      border: 2px solid #f97316;
+      color: #f97316;
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      width: 200px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flowchart-arrow {
+      color: #6b7280;
+      font-size: 1.5rem;
+    }
+
+    .flowchart-branches {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .flowchart-branch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .flowchart-branch .backend-box {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .flowchart-branch .backend-box:hover {
+      border-color: #00d4ff;
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }
+
+    .flowchart-branch .api-call {
+      font-size: 0.7rem;
+      color: #6b7280;
+      font-family: 'JetBrains Mono', monospace;
+      background: #0a0d12;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    /* Platform Cards */
+    .platform-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .platform-card:hover {
+      border-color: #00d4ff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .platform-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: rgba(30, 41, 59, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+      color: #9ca3af;
+    }
+
+    .backend-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .backend-tag.cpu {
+      background: rgba(107, 114, 128, 0.2);
+      color: var(--backend-cpu);
+      border: 1px solid var(--backend-cpu);
+    }
+
+    .backend-tag.vulkan {
+      background: rgba(172, 22, 44, 0.2);
+      color: var(--backend-vulkan);
+      border: 1px solid var(--backend-vulkan);
+    }
+
+    .backend-tag.metal {
+      background: rgba(163, 170, 174, 0.2);
+      color: var(--backend-metal);
+      border: 1px solid var(--backend-metal);
+    }
+
+    /* Workflow Diagram */
+    .workflow-diagram {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .workflow-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .workflow-job {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      min-width: 180px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .workflow-job:hover {
+      border-color: #00d4ff;
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    }
+
+    .workflow-job .job-icon {
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #9ca3af;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .workflow-job .job-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #e6edf3;
+    }
+
+    .workflow-job .job-desc {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    .workflow-job.final {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(168, 85, 247, 0.1));
+      border-color: #a855f7;
+    }
+
+    .workflow-connector {
+      display: flex;
+      justify-content: center;
+      padding: 0.5rem 0;
+      color: #6b7280;
+      font-size: 0.8rem;
+    }
+
+    /* Actions Grid */
+    .action-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .action-item:hover {
+      border-color: #00d4ff;
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .action-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(30, 41, 59, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+      color: #00d4ff;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+  <canvas id="neural-bg"></canvas>
+  <div class="flex min-h-screen relative z-10">
+    <!-- Navbar -->
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
+      </div>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
+      </div>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+      </div>
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General
+          </div>
+          <ul>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference
+          </div>
+          <ul>
+            <li><a href="../API/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical
+          </div>
+          <ul>
+            <li><a href="index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> Architecture</a></li>
+            <li><a href="dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BE;</span> Memory System</a></li>
+            <li><a href="localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> Localization</a></li>
+            <li><a href="gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F680;</span> CI/CD & Releases</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides
+          </div>
+          <ul>
+            <li><a href="../Guides/character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="../Guides/tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="../Guides/csharp-bindings.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <!-- Breadcrumbs -->
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Technical</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span>CI/CD & Releases</span>
+      </div>
+
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">CI/CD y Sistema de Releases</span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
+
+      <p class="text-gray-400 mb-8 leading-relaxed" data-i18n="pageDesc">OhMyDialogSystem utiliza GitHub Actions para
+        automatizar la compilacion y publicacion de releases. El sistema soporta deteccion automatica de backends en
+        runtime.</p>
+
+      <!-- Release Flow Section -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hReleaseFlow">Flujo de Release</span>
+      </h2>
+
+      <div class="release-flow-diagram">
+        <div class="flow-container">
+          <div class="flow-step">
+            <div class="flow-number">1</div>
+            <div class="flow-content">
+              <h4 data-i18n="step1Title">Crear Tag de Version</h4>
+              <p data-i18n="step1Desc">El desarrollador crea un tag siguiendo SemVer</p>
+              <pre
+                class="bg-black/30 border border-white/10 rounded-lg p-3 mt-3 overflow-x-auto font-mono text-sm"><code class="text-gray-300">git tag v1.0.0 && git push origin v1.0.0</code></pre>
+            </div>
+          </div>
+
+          <div class="flow-connector">
+            <svg viewBox="0 0 24 32">
+              <path class="arrow-path" d="M12 0 L12 24 M6 18 L12 24 L18 18" />
+            </svg>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">2</div>
+            <div class="flow-content">
+              <h4 data-i18n="step2Title">GitHub Actions Detecta</h4>
+              <p data-i18n="step2Desc">El workflow release-gdextension.yml se dispara automaticamente al detectar el
+                patron v*.*.*</p>
+            </div>
+          </div>
+
+          <div class="flow-connector">
+            <svg viewBox="0 0 24 32">
+              <path class="arrow-path" d="M12 0 L12 24 M6 18 L12 24 L18 18" />
+            </svg>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">3</div>
+            <div class="flow-content">
+              <h4 data-i18n="step3Title">Compilacion Paralela</h4>
+              <p data-i18n="step3Desc">Se compila para Windows, Linux y macOS simultaneamente con todos los backends
+                habilitados</p>
+            </div>
+          </div>
+
+          <div class="flow-connector">
+            <svg viewBox="0 0 24 32">
+              <path class="arrow-path" d="M12 0 L12 24 M6 18 L12 24 L18 18" />
+            </svg>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">4</div>
+            <div class="flow-content">
+              <h4 data-i18n="step4Title">GitHub Release</h4>
+              <p data-i18n="step4Desc">Se crea automaticamente un Release con paquetes optimizados para cada plataforma
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual Trigger Section -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hManualTrigger">Ejecucion Manual</span>
+      </h2>
+
+      <p class="text-gray-400 mb-6" data-i18n="pManualTrigger">El workflow puede ejecutarse manualmente para testing sin
+        crear un release oficial:</p>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-bg-card/50 border border-border-default rounded-xl overflow-hidden">
+          <div class="bg-bg-tertiary px-4 py-3 border-b border-border-default flex items-center gap-3">
+            <span class="font-mono text-ai-cyan font-bold">GH</span>
+            <span class="font-medium">GitHub CLI</span>
+          </div>
+          <div class="p-4">
+            <pre
+              class="bg-black/30 border border-white/10 rounded-lg p-4 overflow-x-auto font-mono text-sm"><code class="text-gray-300"><span class="text-gray-500"># Solo compilar (sin release)</span>
+gh workflow run "Release GDExtension" \
+  -f version=v0.0.0-test \
+  -f create_release=false
+
+<span class="text-gray-500"># Compilar y crear release de prueba</span>
+gh workflow run "Release GDExtension" \
+  -f version=v1.0.0-rc1 \
+  -f create_release=true</code></pre>
+          </div>
+        </div>
+
+        <div class="bg-bg-card/50 border border-border-default rounded-xl overflow-hidden">
+          <div class="bg-bg-tertiary px-4 py-3 border-b border-border-default flex items-center gap-3">
+            <span class="font-mono text-ai-cyan font-bold">WEB</span>
+            <span class="font-medium">GitHub Web UI</span>
+          </div>
+          <div class="p-4 text-gray-400 text-sm">
+            <p>1. Ir a <strong class="text-white">Actions</strong> → <strong class="text-white">Release
+                GDExtension</strong></p>
+            <p>2. Click en <strong class="text-white">Run workflow</strong></p>
+            <p>3. Ingresar version (ej: <code class="text-ai-cyan">v0.0.0-test</code>)</p>
+            <p>4. Seleccionar si crear release</p>
+            <p>5. Click en <strong class="text-white">Run workflow</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-blue-500/10 border-l-4 border-blue-500 p-4 rounded-r-lg mb-12">
+        <p class="text-gray-300"><strong class="text-ai-cyan">Nota:</strong> <span data-i18n="noteManual">Las
+            ejecuciones manuales con create_release=false solo compilan y suben artefactos. Utiles para verificar que el
+            build funciona antes de crear un tag oficial.</span></p>
+      </div>
+
+      <!-- Backends Section -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hBackends">Backends Disponibles</span>
+      </h2>
+
+      <p class="text-gray-400 mb-6" data-i18n="pBackends">El addon detecta automaticamente el mejor backend disponible
+        en el sistema del usuario:</p>
+
+      <div class="grid md:grid-cols-3 gap-6 mb-12">
+        <div class="backend-card vulkan">
+          <div class="icon-wrapper">VK</div>
+          <h4>Vulkan</h4>
+          <p class="text-gray-400 text-sm mb-3" data-i18n="vulkanDesc">API grafica multiplataforma. Soporta GPUs AMD,
+            Intel y NVIDIA. Backend GPU recomendado.</p>
+          <div class="backend-score">Score: 80+</div>
+        </div>
+
+        <div class="backend-card cpu">
+          <div class="icon-wrapper">CPU</div>
+          <h4>CPU</h4>
+          <p class="text-gray-400 text-sm mb-3" data-i18n="cpuDesc">Funciona en cualquier sistema. Utiliza instrucciones
+            SIMD (AVX2, AVX512) cuando estan disponibles. Fallback automatico.</p>
+          <div class="backend-score">Score: 10 - 170</div>
+        </div>
+
+        <div class="backend-card metal">
+          <div class="icon-wrapper">MTL</div>
+          <h4>Metal</h4>
+          <p class="text-gray-400 text-sm mb-3" data-i18n="metalDesc">Optimizado para Apple Silicon (M1/M2/M3/M4).
+            Nativo en macOS, maximo rendimiento en Mac.</p>
+          <div class="backend-score">Score: 90</div>
+        </div>
+      </div>
+
+      <!-- Detection Flowchart -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hDetection">Deteccion Automatica</span>
+      </h2>
+
+      <p class="text-gray-400 mb-6" data-i18n="pDetection">Cuando se carga un modelo, el sistema ejecuta el siguiente
+        proceso de seleccion:</p>
+
+      <div class="detection-flowchart">
+        <div class="flowchart-container">
+          <div class="flowchart-node start">ggml_backend_load_all()</div>
+          <div class="flowchart-arrow">&#x2193;</div>
+          <div class="flowchart-node process">Escanea DLLs/SOs de backend en directorio</div>
+          <div class="flowchart-arrow">&#x2193;</div>
+          <div class="flowchart-branches">
+            <div class="flowchart-branch">
+              <div class="backend-box">ggml-vulkan.dll</div>
+              <div class="api-call">vkEnumeratePhysicalDevices()</div>
+            </div>
+            <div class="flowchart-branch">
+              <div class="backend-box">ggml-cpu.dll</div>
+              <div class="api-call">Siempre disponible</div>
+            </div>
+          </div>
+          <div class="flowchart-arrow">&#x2193;</div>
+          <div class="flowchart-node decision">Mayor Score</div>
+        </div>
+      </div>
+
+      <div class="bg-blue-500/10 border-l-4 border-blue-500 p-4 rounded-r-lg mb-12">
+        <p class="text-gray-300" data-i18n="noteDetection">Cada backend exporta una funcion ggml_backend_score() que
+          retorna un valor numerico basado en la disponibilidad del hardware. El sistema selecciona automaticamente el
+          backend con mayor score.</p>
+      </div>
+
+      <!-- Platforms Section -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hPlatforms">Paquetes por Plataforma</span>
+      </h2>
+
+      <div class="grid md:grid-cols-2 gap-4 mb-12">
+        <div class="platform-card">
+          <div class="platform-icon">WIN</div>
+          <div>
+            <h4 class="font-medium text-white mb-1">Windows x64</h4>
+            <div class="font-mono text-xs text-ai-cyan mb-2">OhMyDialogSystem-vX.X.X-windows-x64.zip</div>
+            <div class="flex gap-2">
+              <span class="backend-tag vulkan">Vulkan</span>
+              <span class="backend-tag cpu">CPU</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="platform-card">
+          <div class="platform-icon">TUX</div>
+          <div>
+            <h4 class="font-medium text-white mb-1">Linux x64</h4>
+            <div class="font-mono text-xs text-ai-cyan mb-2">OhMyDialogSystem-vX.X.X-linux-x64.tar.gz</div>
+            <div class="flex gap-2">
+              <span class="backend-tag vulkan">Vulkan</span>
+              <span class="backend-tag cpu">CPU</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="platform-card">
+          <div class="platform-icon">MAC</div>
+          <div>
+            <h4 class="font-medium text-white mb-1">macOS ARM64</h4>
+            <div class="font-mono text-xs text-ai-cyan mb-2">OhMyDialogSystem-vX.X.X-macos-arm64.tar.gz</div>
+            <div class="flex gap-2">
+              <span class="backend-tag cpu">CPU</span>
+              <span class="backend-tag metal">Metal</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="platform-card">
+          <div class="platform-icon">MAC</div>
+          <div>
+            <h4 class="font-medium text-white mb-1">macOS x64</h4>
+            <div class="font-mono text-xs text-ai-cyan mb-2">OhMyDialogSystem-vX.X.X-macos-x64.tar.gz</div>
+            <div class="flex gap-2">
+              <span class="backend-tag cpu">CPU</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Build Section -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hLocalBuild">Compilacion Local</span>
+      </h2>
+
+      <p class="text-gray-400 mb-6" data-i18n="pLocalBuild">Para compilar localmente con todos los backends habilitados:
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-bg-card/50 border border-border-default rounded-xl overflow-hidden">
+          <div class="bg-bg-tertiary px-4 py-3 border-b border-border-default flex items-center gap-3">
+            <span class="font-mono text-ai-cyan font-bold">WIN</span>
+            <span class="font-medium">Windows</span>
+          </div>
+          <div class="p-4">
+            <pre
+              class="bg-black/30 border border-white/10 rounded-lg p-4 overflow-x-auto font-mono text-sm"><code class="text-gray-300">cd gdextension
+build.bat release --all-backends --dynamic</code></pre>
+          </div>
+        </div>
+
+        <div class="bg-bg-card/50 border border-border-default rounded-xl overflow-hidden">
+          <div class="bg-bg-tertiary px-4 py-3 border-b border-border-default flex items-center gap-3">
+            <span class="font-mono text-ai-cyan font-bold">TUX</span>
+            <span class="font-medium">Linux / macOS</span>
+          </div>
+          <div class="p-4">
+            <pre
+              class="bg-black/30 border border-white/10 rounded-lg p-4 overflow-x-auto font-mono text-sm"><code class="text-gray-300">cd gdextension
+./build.sh release --all-backends --dynamic</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-green-500/10 border-l-4 border-green-500 p-4 rounded-r-lg mb-12">
+        <p class="text-gray-300" data-i18n="noteLocalBuild">Los flags --all-backends y --dynamic habilitan
+          GGML_BACKEND_DL=ON, compilando cada backend como una biblioteca dinamica separada.</p>
+      </div>
+
+      <!-- Workflow Structure -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hWorkflow">Estructura del Workflow</span>
+      </h2>
+
+      <p class="text-gray-400 mb-6" data-i18n="pWorkflow">El workflow de GitHub Actions ejecuta los siguientes jobs:</p>
+
+      <div class="workflow-diagram">
+        <div class="flex flex-col gap-4">
+          <div class="workflow-row">
+            <div class="workflow-job">
+              <div class="job-icon">WIN</div>
+              <div class="job-name">build-windows</div>
+              <div class="job-desc">Vulkan + CPU</div>
+            </div>
+            <div class="workflow-job">
+              <div class="job-icon">TUX</div>
+              <div class="job-name">build-linux</div>
+              <div class="job-desc">Vulkan + CPU</div>
+            </div>
+            <div class="workflow-job">
+              <div class="job-icon">MAC</div>
+              <div class="job-name">build-macos-arm64</div>
+              <div class="job-desc">Metal</div>
+            </div>
+            <div class="workflow-job">
+              <div class="job-icon">MAC</div>
+              <div class="job-name">build-macos-x64</div>
+              <div class="job-desc">CPU only</div>
+            </div>
+          </div>
+
+          <div class="workflow-connector">&#x2193; dependencia</div>
+
+          <div class="workflow-row">
+            <div class="workflow-job final">
+              <div class="job-icon">PKG</div>
+              <div class="job-name">create-release</div>
+              <div class="job-desc">Empaqueta y publica</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reusable Actions -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hActions">Actions Reutilizables</span>
+      </h2>
+
+      <p class="text-gray-400 mb-6" data-i18n="pActions">El proyecto incluye GitHub Actions personalizadas en
+        .github/actions/:</p>
+
+      <div class="grid md:grid-cols-2 gap-4 mb-12">
+        <div class="action-item">
+          <div class="action-icon">VK</div>
+          <div>
+            <code class="text-ai-cyan">setup-vulkan-windows</code>
+            <p class="text-gray-500 text-sm mt-1">Vulkan SDK para Windows</p>
+          </div>
+        </div>
+        <div class="action-item">
+          <div class="action-icon">VK</div>
+          <div>
+            <code class="text-ai-cyan">setup-vulkan-linux</code>
+            <p class="text-gray-500 text-sm mt-1">Vulkan SDK para Linux</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back Link -->
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors mb-8">
+        <span>&#x2190;</span>
+        <span data-i18n="backToTech">Volver a Technical</span>
+      </a>
+
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+      </footer>
+    </main>
+  </div>
+  <script src="../ai-bg.js"></script>
+</body>
+
+</html>

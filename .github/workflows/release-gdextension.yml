@@ -1,0 +1,378 @@
+# GitHub Actions workflow for releasing OhMyDialogSystem GDExtension
+# Triggered when a version tag (vX.Y.Z or vX.Y.Z-suffix) is pushed, or manually
+# via workflow_dispatch
+# Builds for Windows, Linux, and macOS with dynamic backend loading
+
+name: Release GDExtension
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      # Pre-releases (v1.0.0-rc1, v0.4.0-dev). Without this the tag is pushed
+      # and nothing runs: the filter has to match the whole ref name.
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+  # Manual trigger for testing builds without creating a release
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0-test)'
+        required: true
+        default: 'v0.0.0-manual'
+      create_release:
+        description: 'Create GitHub Release'
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  GODOT_CPP_REF: "4.3"
+
+jobs:
+  # ============================================================
+  # WINDOWS BUILD
+  # ============================================================
+  build-windows:
+    name: Windows x64
+    runs-on: windows-2022
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug, template_release, editor]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install SCons
+        run: pip install scons
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Setup Vulkan SDK
+        uses: ./.github/actions/setup-vulkan-windows
+
+      - name: Cache llama.cpp build
+        uses: actions/cache@v4
+        with:
+          path: gdextension/thirdparty/llama.cpp/build
+          key: llama-windows-all-${{ hashFiles('gdextension/thirdparty/llama.cpp/**/*.cpp', 'gdextension/thirdparty/llama.cpp/**/*.h') }}
+
+      - name: Build GDExtension
+        working-directory: gdextension
+        run: |
+          ./build.bat ${{ matrix.target }} --all-backends --dynamic --no-native -j $env:NUMBER_OF_PROCESSORS
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ohmydialog-windows-x64-${{ matrix.target }}
+          path: |
+            addons/ohmydialog/gdextension/*.dll
+            addons/ohmydialog/gdextension/*.lib
+            addons/ohmydialog/gdextension/*.exp
+          if-no-files-found: error
+
+  # ============================================================
+  # LINUX BUILD
+  # ============================================================
+  build-linux:
+    name: Linux x64
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug, template_release, editor]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+          pip install scons
+
+      - name: Setup Vulkan SDK
+        uses: ./.github/actions/setup-vulkan-linux
+
+      - name: Cache llama.cpp build
+        uses: actions/cache@v4
+        with:
+          path: gdextension/thirdparty/llama.cpp/build
+          key: llama-linux-all-${{ hashFiles('gdextension/thirdparty/llama.cpp/**/*.cpp', 'gdextension/thirdparty/llama.cpp/**/*.h') }}
+
+      - name: Build GDExtension
+        working-directory: gdextension
+        run: |
+          chmod +x build.sh scripts/build_llama.sh
+          ./build.sh ${{ matrix.target }} --all-backends --dynamic --no-native -j $(nproc)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ohmydialog-linux-x64-${{ matrix.target }}
+          path: |
+            addons/ohmydialog/gdextension/*.so
+          if-no-files-found: error
+
+  # ============================================================
+  # MACOS BUILD (ARM64 - Apple Silicon)
+  # ============================================================
+  build-macos-arm64:
+    name: macOS ARM64
+    runs-on: macos-14
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug, template_release, editor]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          brew install cmake
+          pip install scons
+
+      - name: Cache llama.cpp build
+        uses: actions/cache@v4
+        with:
+          path: gdextension/thirdparty/llama.cpp/build
+          key: llama-macos-arm64-all-${{ hashFiles('gdextension/thirdparty/llama.cpp/**/*.cpp', 'gdextension/thirdparty/llama.cpp/**/*.h') }}
+
+      - name: Build GDExtension
+        working-directory: gdextension
+        run: |
+          chmod +x build.sh scripts/build_llama.sh
+          ./build.sh ${{ matrix.target }} --all-backends --dynamic -j $(sysctl -n hw.ncpu)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ohmydialog-macos-arm64-${{ matrix.target }}
+          path: |
+            addons/ohmydialog/gdextension/*.dylib
+            addons/ohmydialog/gdextension/*.framework
+          if-no-files-found: error
+
+  # ============================================================
+  # MACOS BUILD (x64 - Intel)
+  # ============================================================
+  build-macos-x64:
+    name: macOS x64
+    runs-on: macos-13
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug, template_release, editor]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          brew install cmake
+          pip install scons
+
+      - name: Cache llama.cpp build
+        uses: actions/cache@v4
+        with:
+          path: gdextension/thirdparty/llama.cpp/build
+          key: llama-macos-x64-cpu-${{ hashFiles('gdextension/thirdparty/llama.cpp/**/*.cpp', 'gdextension/thirdparty/llama.cpp/**/*.h') }}
+
+      - name: Build GDExtension
+        working-directory: gdextension
+        run: |
+          chmod +x build.sh scripts/build_llama.sh
+          ./build.sh ${{ matrix.target }} --cpu --no-native -j $(sysctl -n hw.ncpu)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ohmydialog-macos-x64-${{ matrix.target }}
+          path: |
+            addons/ohmydialog/gdextension/*.dylib
+            addons/ohmydialog/gdextension/*.framework
+          if-no-files-found: error
+
+  # ============================================================
+  # CREATE RELEASE
+  # ============================================================
+  create-release:
+    name: Create Release
+    needs:
+      - build-windows
+      - build-linux
+      - build-macos-arm64
+      - build-macos-x64
+    runs-on: ubuntu-latest
+    # Only create release on tag push OR when manually triggered with create_release=true
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.create_release)
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Prepare release packages
+        run: |
+          # Get version from tag or input
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+          # Create package directories
+          mkdir -p release
+
+          # Function to create a platform package
+          create_package() {
+            local platform=$1
+            local pkg_name="OhMyDialogSystem-${VERSION}-${platform}"
+            local pkg_dir="release/${pkg_name}"
+
+            mkdir -p "${pkg_dir}/addons/ohmydialog"
+
+            # Copy addon files (excluding gdextension binaries)
+            cp -r addons/ohmydialog/* "${pkg_dir}/addons/ohmydialog/" 2>/dev/null || true
+            rm -rf "${pkg_dir}/addons/ohmydialog/gdextension" 2>/dev/null || true
+            mkdir -p "${pkg_dir}/addons/ohmydialog/gdextension"
+
+            # Copy the .gdextension file
+            cp addons/ohmydialog/ohmydialog.gdextension "${pkg_dir}/addons/ohmydialog/" 2>/dev/null || true
+          }
+
+          # Create Windows package
+          create_package "windows-x64"
+          for target in template_debug template_release editor; do
+            if [ -d "artifacts/ohmydialog-windows-x64-${target}" ]; then
+              cp artifacts/ohmydialog-windows-x64-${target}/*.dll "release/OhMyDialogSystem-${VERSION}-windows-x64/addons/ohmydialog/gdextension/" 2>/dev/null || true
+            fi
+          done
+          cd release && zip -r "OhMyDialogSystem-${VERSION}-windows-x64.zip" "OhMyDialogSystem-${VERSION}-windows-x64" && cd ..
+
+          # Create Linux package
+          create_package "linux-x64"
+          for target in template_debug template_release editor; do
+            if [ -d "artifacts/ohmydialog-linux-x64-${target}" ]; then
+              cp artifacts/ohmydialog-linux-x64-${target}/*.so "release/OhMyDialogSystem-${VERSION}-linux-x64/addons/ohmydialog/gdextension/" 2>/dev/null || true
+            fi
+          done
+          cd release && tar -czvf "OhMyDialogSystem-${VERSION}-linux-x64.tar.gz" "OhMyDialogSystem-${VERSION}-linux-x64" && cd ..
+
+          # Create macOS ARM64 package
+          create_package "macos-arm64"
+          for target in template_debug template_release editor; do
+            if [ -d "artifacts/ohmydialog-macos-arm64-${target}" ]; then
+              cp -r artifacts/ohmydialog-macos-arm64-${target}/* "release/OhMyDialogSystem-${VERSION}-macos-arm64/addons/ohmydialog/gdextension/" 2>/dev/null || true
+            fi
+          done
+          cd release && tar -czvf "OhMyDialogSystem-${VERSION}-macos-arm64.tar.gz" "OhMyDialogSystem-${VERSION}-macos-arm64" && cd ..
+
+          # Create macOS x64 package
+          create_package "macos-x64"
+          for target in template_debug template_release editor; do
+            if [ -d "artifacts/ohmydialog-macos-x64-${target}" ]; then
+              cp -r artifacts/ohmydialog-macos-x64-${target}/* "release/OhMyDialogSystem-${VERSION}-macos-x64/addons/ohmydialog/gdextension/" 2>/dev/null || true
+            fi
+          done
+          cd release && tar -czvf "OhMyDialogSystem-${VERSION}-macos-x64.tar.gz" "OhMyDialogSystem-${VERSION}-macos-x64" && cd ..
+
+          # List created packages
+          echo "Created packages:"
+          ls -la release/*.zip release/*.tar.gz
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # A tag carrying a suffix (-dev, -rc1) is not a stable release
+          prerelease: ${{ contains(env.VERSION, '-') }}
+          files: |
+            release/*.zip
+            release/*.tar.gz
+          body: |
+            ## OhMyDialogSystem ${{ env.VERSION }}
+
+            Sistema de diálogos con IA para Godot 4.5+
+
+            ### Paquetes disponibles
+
+            | Plataforma | Backends | Archivo |
+            |------------|----------|---------|
+            | **Windows x64** | CPU, Vulkan | `OhMyDialogSystem-${{ env.VERSION }}-windows-x64.zip` |
+            | **Linux x64** | CPU, Vulkan | `OhMyDialogSystem-${{ env.VERSION }}-linux-x64.tar.gz` |
+            | **macOS ARM64** | CPU, Metal | `OhMyDialogSystem-${{ env.VERSION }}-macos-arm64.tar.gz` |
+            | **macOS x64** | CPU | `OhMyDialogSystem-${{ env.VERSION }}-macos-x64.tar.gz` |
+
+            ### Detección automática de backends
+
+            El addon detecta automáticamente el mejor backend disponible en tu sistema:
+            - **GPU (AMD/Intel/NVIDIA)**: Usa Vulkan automáticamente
+            - **Apple Silicon**: Usa Metal automáticamente
+            - **Sin GPU compatible**: Usa CPU como fallback
+
+            ### Instalación
+
+            1. Descarga el paquete para tu plataforma
+            2. Extrae el contenido en tu proyecto de Godot
+            3. Habilita el addon en Project > Project Settings > Plugins
+
+            ---
+
+            Generado automáticamente por GitHub Actions
+          generate_release_notes: true

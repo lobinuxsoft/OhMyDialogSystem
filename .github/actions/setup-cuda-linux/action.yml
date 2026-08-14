@@ -1,0 +1,42 @@
+name: "Setup CUDA Toolkit (Linux)"
+description: "Install CUDA Toolkit on Linux for llama.cpp compilation"
+
+inputs:
+  cuda-version:
+    description: "CUDA version to install"
+    required: false
+    default: "12.4"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install CUDA Toolkit
+      shell: bash
+      run: |
+        CUDA_VERSION="${{ inputs.cuda-version }}"
+        CUDA_VERSION_MAJOR=$(echo $CUDA_VERSION | cut -d. -f1)
+        CUDA_VERSION_MINOR=$(echo $CUDA_VERSION | cut -d. -f2)
+
+        echo "Installing CUDA Toolkit $CUDA_VERSION..."
+
+        # Add NVIDIA package repositories
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+        sudo dpkg -i cuda-keyring_1.1-1_all.deb
+        sudo apt-get update
+
+        # Install CUDA toolkit (compilation tools only, no driver)
+        sudo apt-get install -y \
+          cuda-nvcc-${CUDA_VERSION_MAJOR}-${CUDA_VERSION_MINOR} \
+          cuda-cudart-dev-${CUDA_VERSION_MAJOR}-${CUDA_VERSION_MINOR} \
+          libcublas-dev-${CUDA_VERSION_MAJOR}-${CUDA_VERSION_MINOR}
+
+        # Add CUDA to PATH
+        CUDA_PATH="/usr/local/cuda-${CUDA_VERSION}"
+        echo "${CUDA_PATH}/bin" >> $GITHUB_PATH
+        echo "CUDA_PATH=${CUDA_PATH}" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${CUDA_PATH}/lib64:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+    - name: Verify CUDA installation
+      shell: bash
+      run: |
+        nvcc --version

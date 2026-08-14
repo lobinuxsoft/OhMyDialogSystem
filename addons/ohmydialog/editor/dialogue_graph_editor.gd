@@ -40,6 +40,10 @@ var current_graph: DialogueGraph
 ## Reference to save file dialog.
 @onready var save_file_dialog: FileDialog = %SaveFileDialog
 
+## Reference to search UI.
+@onready var _search_bar: LineEdit = %SearchBar
+@onready var _search_results_label: Label = %SearchResultsLabel
+
 ## Currently selected visual node.
 var _selected_node: BaseDialogueNode
 
@@ -70,6 +74,7 @@ func _ready() -> void:
 	_setup_graph_edit()
 	_setup_toolbar()
 	_setup_context_menu()
+	_setup_search()
 	_update_ui_state()
 
 
@@ -114,6 +119,9 @@ func _setup_toolbar() -> void:
 	popup.clear()
 
 	for i in DialogueNodeData.NodeType.size():
+		# Skip internal-only nodes (RETURN_TO_GRAPH is handled internally by JUMP_TO_FREE)
+		if i == DialogueNodeData.NodeType.RETURN_TO_GRAPH:
+			continue
 		var type_name := DialogueNodeData.get_type_name_static(i)
 		popup.add_item(type_name, i)
 		# Add icon color indicator
@@ -129,6 +137,9 @@ func _setup_context_menu() -> void:
 	# Add Node submenu
 	add_node_submenu.clear()
 	for i in DialogueNodeData.NodeType.size():
+		# Skip internal-only nodes (RETURN_TO_GRAPH is handled internally by JUMP_TO_FREE)
+		if i == DialogueNodeData.NodeType.RETURN_TO_GRAPH:
+			continue
 		var type_name := DialogueNodeData.get_type_name_static(i)
 		add_node_submenu.add_item(type_name, i)
 	add_node_submenu.id_pressed.connect(_on_add_node_submenu_id_pressed)
@@ -142,6 +153,110 @@ func _setup_context_menu() -> void:
 	context_menu.add_item("Center View", 103)
 
 	context_menu.id_pressed.connect(_on_context_menu_id_pressed)
+
+
+func _setup_search() -> void:
+	if not _search_bar:
+		push_error("DialogueGraphEditor: SearchBar not found!")
+		return
+
+	_search_bar.text_changed.connect(_on_search_text_changed)
+	_search_bar.text_submitted.connect(_on_search_text_submitted)
+
+
+func _input(event: InputEvent) -> void:
+	if not Engine.is_editor_hint():
+		return
+
+	if event is InputEventKey and event.pressed:
+		if event.ctrl_pressed and event.keycode == KEY_F:
+			if is_visible_in_tree() and _search_bar:
+				_search_bar.grab_focus()
+				_search_bar.select_all()
+				get_viewport().set_input_as_handled()
+
+
+func _on_search_text_changed(text: String) -> void:
+	_highlight_matching_nodes(text)
+
+
+func _on_search_text_submitted(_text: String) -> void:
+	# Navigate to first matching node
+	for node_id in _visual_nodes:
+		var visual_node: BaseDialogueNode = _visual_nodes[node_id]
+		if visual_node.modulate == Color("#fbbf24"):  # Highlighted
+			_center_on_node(visual_node)
+			visual_node.selected = true
+			break
+
+
+func _center_on_node(node: BaseDialogueNode) -> void:
+	var node_center := node.position_offset + node.size / 2
+	var view_center := graph_edit.size / 2
+	graph_edit.scroll_offset = node_center * graph_edit.zoom - view_center
+
+
+func _highlight_matching_nodes(query: String) -> void:
+	var matches := 0
+
+	for node_id in _visual_nodes:
+		var visual_node: BaseDialogueNode = _visual_nodes[node_id]
+		var node_data: DialogueNodeData = visual_node.node_data
+
+		if _node_matches_query(node_data, query):
+			visual_node.modulate = Color("#fbbf24")  # Amarillo highlight
+			matches += 1
+		else:
+			visual_node.modulate = Color.WHITE
+
+	if query.is_empty():
+		_search_results_label.text = ""
+	else:
+		_search_results_label.text = "%d encontrado%s" % [matches, "s" if matches != 1 else ""]
+
+
+func _node_matches_query(data: DialogueNodeData, query: String) -> bool:
+	if query.is_empty():
+		return false
+
+	query = query.to_lower()
+
+	# Buscar en ID del nodo
+	if data.node_id.to_lower().contains(query):
+		return true
+
+	# Buscar en nombre del tipo
+	var type_name := DialogueNodeData.get_type_name_static(data.node_type)
+	if type_name.to_lower().contains(query):
+		return true
+
+	# Buscar en propiedades específicas del nodo
+	return _search_node_content(data, query)
+
+
+func _search_node_content(data: DialogueNodeData, query: String) -> bool:
+	# Buscar en propiedades comunes de texto según el tipo
+	var searchable_properties := [
+		"text", "response_text", "prompt", "system_prompt",
+		"variable", "value", "event_name", "event_data",
+		"expression", "target_graph_id", "target_node_id"
+	]
+
+	for prop in searchable_properties:
+		if prop in data:
+			var value = data.get(prop)
+			if value is String and value.to_lower().contains(query):
+				return true
+
+	# Buscar en choices de PlayerChoice
+	if "choices" in data:
+		var choices = data.get("choices")
+		if choices is Array:
+			for choice in choices:
+				if choice is String and choice.to_lower().contains(query):
+					return true
+
+	return false
 
 
 ## Creates a simple colored texture for menu icons.
@@ -222,15 +337,19 @@ func _rebuild_connections() -> void:
 		return
 
 	for conn in current_graph.connections:
-		var from_node: String = conn.from_node
-		var to_node: String = conn.to_node
+		var from_id: String = conn.from_node
+		var to_id: String = conn.to_node
 
 		# Verify both nodes exist visually
-		if _visual_nodes.has(from_node) and _visual_nodes.has(to_node):
+		if _visual_nodes.has(from_id) and _visual_nodes.has(to_id):
+			# Use the actual GraphNode name (may differ from node_id due to Godot naming)
+			var from_name: StringName = _visual_nodes[from_id].name
+			var to_name: StringName = _visual_nodes[to_id].name
+
 			graph_edit.connect_node(
-				from_node,
+				from_name,
 				conn.from_slot,
-				to_node,
+				to_name,
 				conn.to_slot
 			)
 
@@ -300,10 +419,11 @@ func _remove_node(node_id: String) -> void:
 	# Remove visual node
 	if _visual_nodes.has(node_id):
 		var visual_node: BaseDialogueNode = _visual_nodes[node_id]
+		var visual_name: StringName = visual_node.name
 
-		# Remove connections involving this node
+		# Remove connections involving this node (compare by GraphEdit name)
 		for conn in graph_edit.get_connection_list():
-			if conn.from_node == node_id or conn.to_node == node_id:
+			if conn.from_node == visual_name or conn.to_node == visual_name:
 				graph_edit.disconnect_node(
 					conn.from_node,
 					conn.from_port,
@@ -331,9 +451,17 @@ func _on_connection_request(from_node: StringName, from_port: int, to_node: Stri
 	if not current_graph:
 		return
 
-	# Try to create connection in data
-	if current_graph.connect_nodes(String(from_node), from_port, String(to_node), to_port):
-		# Visual connection
+	# Get actual node_id from visual nodes (GraphEdit may send incorrect names)
+	var from_id := _get_node_id_from_visual(from_node)
+	var to_id := _get_node_id_from_visual(to_node)
+
+	if from_id.is_empty() or to_id.is_empty():
+		push_error("DialogueGraphEditor: Could not resolve node IDs for connection")
+		return
+
+	# Create connection in data using real node_id
+	if current_graph.connect_nodes(from_id, from_port, to_id, to_port):
+		# Visual connection uses GraphEdit's node names
 		graph_edit.connect_node(from_node, from_port, to_node, to_port)
 		graph_modified.emit()
 
@@ -342,12 +470,26 @@ func _on_disconnection_request(from_node: StringName, from_port: int, to_node: S
 	if not current_graph:
 		return
 
+	# Get actual node_id from visual nodes
+	var from_id := _get_node_id_from_visual(from_node)
+	var to_id := _get_node_id_from_visual(to_node)
+
 	# Remove from data
-	current_graph.disconnect_nodes(String(from_node), from_port, String(to_node), to_port)
+	current_graph.disconnect_nodes(from_id, from_port, to_id, to_port)
 
 	# Remove visual connection
 	graph_edit.disconnect_node(from_node, from_port, to_node, to_port)
 	graph_modified.emit()
+
+
+## Resolves the actual node_id from a GraphEdit node name.
+## GraphEdit may report incorrect names (e.g., @GraphNode@XXXXX) when the
+## visual node's name property doesn't match its node_data.node_id.
+func _get_node_id_from_visual(node_name: StringName) -> String:
+	var visual_node := graph_edit.get_node_or_null(NodePath(node_name))
+	if visual_node is BaseDialogueNode:
+		return visual_node.node_data.node_id
+	return String(node_name)
 
 
 func _on_node_selected(node: Node) -> void:

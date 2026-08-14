@@ -1,43 +1,657 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Architecture - OhMyDialogSystem Wiki</title>
-  <link rel="stylesheet" href="../styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind.config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+
+  <script>
+    const I18n = {
+      lang: new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('wiki-lang') || (navigator.language.startsWith('es') ? 'es' : 'en'),
+      t: {
+        es: {
+          navInstallation: 'Instalacion', navFirstNpc: 'Tu Primer NPC', navArchitecture: 'Arquitectura',
+          navCiCd: 'CI/CD y Releases', navVisualEditor: 'Editor Visual',
+          pageTitle: 'Arquitectura',
+          pageDesc: 'OhMyDialogSystem sigue una arquitectura en capas que separa claramente las responsabilidades entre el runtime nativo (C++), la logica de juego (GDScript), y las herramientas del editor.',
+          hLayers: 'Capas del Sistema',
+          pLayers: 'El addon se organiza en 5 capas principales, cada una con responsabilidades especificas:',
+          layerEditor: 'Editor Layer', descEditor: 'Herramientas visuales para crear y configurar dialogos. Solo se ejecuta en el editor de Godot.',
+          layerAI: 'AI Layer', descAI: 'Gestion de modelos, descarga desde HuggingFace, y construccion de prompts.',
+          layerCore: 'Core Layer', descCore: 'Logica principal de dialogos. DialogueManager coordina GraphRunner y AIService.',
+          layerResources: 'Resources Layer', descResources: 'Datos serializables: grafos de dialogo, personajes, mundos, configuracion de modelos.',
+          layerGDExt: 'GDExtension Layer (C++)', descGDExt: 'Wrapper nativo de llama.cpp. Inferencia LLM con soporte GPU (Vulkan/CUDA/Metal).',
+          hComponents: 'Componentes Principales',
+          hHighLevelFlow: 'Flujo de Alto Nivel',
+          pHighLevelFlow: 'La interaccion entre los componentes principales sigue este flujo:',
+          flowDM: 'DialogueManager', flowDMDesc: 'Coordina todo el sistema',
+          flowGR: 'GraphRunner', flowGRDesc: 'Ejecuta el grafo de nodos',
+          flowAIS: 'AIService', flowAISDesc: 'Genera respuestas IA',
+          hAISingleton: 'AIService Singleton',
+          pAISingleton: '`AIService` es un singleton global que proporciona acceso centralizado a la inferencia LLM:',
+          singleGlobal: 'Singleton Global', singleDesc: 'Gestiona el ciclo de vida de LlamaInterface. Carga/descarga modelos en runtime.',
+          hDM: 'DialogueManager',
+          pDM: '`DialogueManager` es el punto de entrada para los desarrolladores. Coordina:',
+          liDM1: 'GraphRunner - Ejecuta grafos de dialogo nodo por nodo',
+          liDM2: 'AIService - Genera respuestas dinamicas via LLM',
+          liDM3: 'PromptBuilder - Construye prompts con contexto (personaje, mundo, historial)',
+          liDM4: 'Query System - Permite al juego influir en los dialogos',
+          hGraphExec: 'Ejecucion de Grafos',
+          pGraphExec: '`GraphRunner` interpreta los `DialogueGraph` ejecutando cada nodo en secuencia:',
+          calloutStrategy: 'Patron Strategy: Cada tipo de nodo tiene un NodeExecutor dedicado que implementa su logica especifica.',
+          hExecutors: 'Node Executors',
+          execStart: 'Punto de entrada', execEnd: 'Fin del dialogo', execAI: 'Respuesta LLM',
+          execStatic: 'Texto fijo', execChoice: 'Opciones al jugador', execCond: 'Bifurcacion logica',
+          execEvent: 'Dispara eventos', execVar: 'Modifica variables', execJump: 'Entra modo libre',
+          execReturn: 'Vuelve al grafo',
+          hStates: 'Estados de Ejecucion',
+          pStates: '`GraphRunner` mantiene un estado interno que determina el comportamiento:',
+          thState: 'Estado', thDesc: 'Descripcion',
+          stIdle: 'Sin grafo activo', stRunning: 'Ejecutando nodos', stWaiting: 'Esperando input del jugador (choice/text)',
+          stFree: 'Conversacion libre con IA', stPaused: 'Pausado manualmente', stCompleted: 'Grafo finalizado normalmente', stError: 'Error durante ejecucion',
+          hModes: 'Modos de Dialogo',
+          pModes: 'OhMyDialogSystem soporta tres modos de dialogo, cada uno con diferentes niveles de control:',
+          modeFree: 'FREE', subFree: 'Conversacion 100% IA',
+          liFree1: 'Sin grafo predefinido', liFree2: 'El jugador escribe libremente', liFree3: 'IA genera todas las respuestas', liFree4: 'Ideal para NPCs emergentes',
+          modeScripted: 'SCRIPTED', subScripted: 'Grafo tradicional',
+          liScript1: 'Sigue el grafo estrictamente', liScript2: 'Respuestas predefinidas', liScript3: 'Choices fijos', liScript4: 'Maximo control narrativo',
+          modeHybrid: 'HYBRID', subHybrid: 'Lo mejor de ambos',
+          liHybrid1: 'Grafo como esqueleto', liHybrid2: 'IA enriquece respuestas', liHybrid3: 'JumpToFree para zonas libres', liHybrid4: 'Balance control/dinamismo',
+          hHierarchy: 'Jerarquia de Resources',
+          pHierarchy: 'El sistema utiliza Resources de Godot para almacenar datos serializables:',
+          hDataFlow: 'Flujo de Datos',
+          hAIResponse: 'Generacion de Respuesta IA',
+          pAIResponse: 'Cuando un nodo `AIResponse` se ejecuta, el flujo es:',
+          step1: 'GraphRunner ejecuta AIResponseNodeData',
+          step2: 'DialogueManager recibe senal de inferencia requerida',
+          step3: 'PromptBuilder construye prompt con: sistema, personaje, mundo, historial',
+          step4: 'AIService obtiene LlamaInterface y llama generate_streaming()',
+          step5: 'LlamaInterface (C++) ejecuta inferencia en llama.cpp',
+          step6: 'Tokens emitidos via token_generated signal',
+          step7: 'DialogueManager emite npc_speaking para actualizar UI',
+          hEditorRuntime: 'Editor vs Runtime',
+          warnEditor: 'Separacion Critica: El codigo del editor NUNCA debe estar acoplado al codigo de runtime. Los builds exportados no incluyen el editor.',
+          thType: 'Tipo', thLoc: 'Ubicacion', thExport: 'Se ejecuta en export?',
+          rowRuntime: 'Runtime', rowEditor: 'Editor-only',
+          hConsiderations: 'Consideraciones',
+          liCon1: 'AutoLoad: AIServiceAutoload se registra automaticamente para runtime',
+          liCon2: 'Export Plugin: ModelExportPlugin copia los modelos GGUF al build',
+          liCon3: 'res:// es read-only en exports - los modelos van en user://',
+          hDirStructure: 'Estructura de Directorios',
+          hSeeAlso: 'Ver Tambien',
+          backToHome: 'Volver a Technical'
+        },
+        en: {
+          navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
+          navCiCd: 'CI/CD & Releases', navVisualEditor: 'Visual Editor',
+          pageTitle: 'Architecture',
+          pageDesc: 'OhMyDialogSystem follows a layered architecture that clearly separates responsibilities between the native runtime (C++), game logic (GDScript), and editor tools.',
+          hLayers: 'System Layers',
+          pLayers: 'The addon is organized into 5 main layers, each with specific responsibilities:',
+          layerEditor: 'Editor Layer', descEditor: 'Visual tools to create and configure dialogues. Only runs in the Godot editor.',
+          layerAI: 'AI Layer', descAI: 'Model management, HuggingFace downloading, and prompt construction.',
+          layerCore: 'Core Layer', descCore: 'Main dialogue logic. DialogueManager coordinates GraphRunner and AIService.',
+          layerResources: 'Resources Layer', descResources: 'Serializable data: dialogue graphs, characters, worlds, model configuration.',
+          layerGDExt: 'GDExtension Layer (C++)', descGDExt: 'Native wrapper for llama.cpp. LLM inference with GPU support (Vulkan/CUDA/Metal).',
+          hComponents: 'Core Components',
+          hHighLevelFlow: 'High Level Flow',
+          pHighLevelFlow: 'Interaction between main components follows this flow:',
+          flowDM: 'DialogueManager', flowDMDesc: 'Coordinates the entire system',
+          flowGR: 'GraphRunner', flowGRDesc: 'Executes the node graph',
+          flowAIS: 'AIService', flowAISDesc: 'Generates AI responses',
+          hAISingleton: 'AIService Singleton',
+          pAISingleton: '`AIService` is a global singleton providing centralized access to LLM inference:',
+          singleGlobal: 'Global Singleton', singleDesc: 'Manages LlamaInterface lifecycle. Loads/unloads models at runtime.',
+          hDM: 'DialogueManager',
+          pDM: '`DialogueManager` is the entry point for developers. Coordinates:',
+          liDM1: 'GraphRunner - Executes dialogue graphs node by node',
+          liDM2: 'AIService - Generates dynamic responses via LLM',
+          liDM3: 'PromptBuilder - Constructs prompts with context (character, world, history)',
+          liDM4: 'Query System - Allows the game to influence dialogues',
+          hGraphExec: 'Graph Execution',
+          pGraphExec: '`GraphRunner` interprets `DialogueGraph` by executing each node in sequence:',
+          calloutStrategy: 'Strategy Pattern: Each node type has a dedicated NodeExecutor implementing its specific logic.',
+          hExecutors: 'Node Executors',
+          execStart: 'Entry point', execEnd: 'End of dialogue', execAI: 'LLM Response',
+          execStatic: 'Fixed text', execChoice: 'Player options', execCond: 'Logical branching',
+          execEvent: 'Triggers events', execVar: 'Modifies variables', execJump: 'Enter free mode',
+          execReturn: 'Returns to graph',
+          hStates: 'Execution States',
+          pStates: '`GraphRunner` maintains internal state determining behavior:',
+          thState: 'State', thDesc: 'Description',
+          stIdle: 'No active graph', stRunning: 'Executing nodes', stWaiting: 'Waiting for player input (choice/text)',
+          stFree: 'Free conversation with AI', stPaused: 'Manually paused', stCompleted: 'Graph finished normally', stError: 'Error during execution',
+          hModes: 'Dialogue Modes',
+          pModes: 'OhMyDialogSystem supports three dialogue modes, each with different control levels:',
+          modeFree: 'FREE', subFree: '100% AI Conversation',
+          liFree1: 'No predefined graph', liFree2: 'Player types freely', liFree3: 'AI generates all responses', liFree4: 'Ideal for emergent NPCs',
+          modeScripted: 'SCRIPTED', subScripted: 'Traditional Graph',
+          liScript1: 'Follows graph strictly', liScript2: 'Predefined responses', liScript3: 'Fixed choices', liScript4: 'Max narrative control',
+          modeHybrid: 'HYBRID', subHybrid: 'Best of both',
+          liHybrid1: 'Graph as skeleton', liHybrid2: 'AI enriches responses', liHybrid3: 'JumpToFree for open zones', liHybrid4: 'Control/dynamism balance',
+          hHierarchy: 'Resource Hierarchy',
+          pHierarchy: 'The system uses Godot Resources to store serializable data:',
+          hDataFlow: 'Data Flow',
+          hAIResponse: 'AI Response Generation',
+          pAIResponse: 'When an `AIResponse` node runs, the flow is:',
+          step1: 'GraphRunner executes AIResponseNodeData',
+          step2: 'DialogueManager receives inference required signal',
+          step3: 'PromptBuilder constructs prompt with: system, character, world, history',
+          step4: 'AIService gets LlamaInterface and calls generate_streaming()',
+          step5: 'LlamaInterface (C++) executes inference in llama.cpp',
+          step6: 'Tokens emitted via token_generated signal',
+          step7: 'DialogueManager emits npc_speaking to update UI',
+          hEditorRuntime: 'Editor vs Runtime',
+          warnEditor: 'Critical Separation: Editor code must NEVER be coupled to runtime code. Exported builds do not include the editor.',
+          thType: 'Type', thLoc: 'Location', thExport: 'Runs in export?',
+          rowRuntime: 'Runtime', rowEditor: 'Editor-only',
+          hConsiderations: 'Considerations',
+          liCon1: 'AutoLoad: AIServiceAutoload registers automatically for runtime',
+          liCon2: 'Export Plugin: ModelExportPlugin copies GGUF models to build',
+          liCon3: 'res:// is read-only in exports - models go to user://',
+          hDirStructure: 'Directory Structure',
+          hSeeAlso: 'See Also',
+          backToHome: 'Back to Technical'
+        }
+      },
+      init() {
+        localStorage.setItem('wiki-lang', this.lang);
+        document.documentElement.lang = this.lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (this.t[this.lang][key]) {
+            if (el.dataset.i18nHtml) el.innerHTML = this.t[this.lang][key];
+            else el.textContent = this.t[this.lang][key];
+          }
+        });
+        document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+          const isActive = btn.dataset.langSwitch === this.lang;
+          btn.classList.toggle('bg-ai-cyan/20', isActive);
+          btn.classList.toggle('text-ai-cyan', isActive);
+          btn.classList.toggle('border-ai-cyan', isActive);
+          btn.classList.toggle('text-gray-500', !isActive);
+          btn.classList.toggle('border-transparent', !isActive);
+        });
+      },
+      switch(lang) {
+        this.lang = lang;
+        localStorage.setItem('wiki-lang', lang);
+        const url = new URL(window.location);
+        url.searchParams.set('lang', lang);
+        history.replaceState({}, '', url);
+        this.init();
+      }
+    };
+    document.addEventListener('DOMContentLoaded', () => I18n.init());
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0a0d12;
+      color: #e6edf3;
+      line-height: 1.7;
+    }
+
+    .text-gradient-ai {
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* File Tree Visuals */
+    .file-tree-item::before {
+      content: "";
+      position: absolute;
+      left: -14px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: #334155;
+    }
+
+    .file-tree-item::after {
+      content: "";
+      position: absolute;
+      left: -14px;
+      top: 14px;
+      width: 10px;
+      height: 1px;
+      background-color: #334155;
+    }
+
+    .file-tree-container ul {
+      margin-left: 20px;
+      position: relative;
+    }
+
+    .file-tree-container ul::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: #334155;
+      opacity: 0.3;
+    }
+
+    /* Diagram custom styles simplified for Tailwind integration */
+    .arch-diagram-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899);
+    }
+  </style>
 </head>
-<body>
+
+<body class="min-h-screen">
   <canvas id="neural-bg"></canvas>
-  <div class="wiki-container">
-    <nav class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo-icon"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"></div>
-        <div class="sidebar-logo">OhMyDialogSystem</div>
-        <div class="sidebar-subtitle">AI-Powered Dialogues</div>
+  <div class="flex min-h-screen relative z-10">
+    <!-- Navbar -->
+    <nav
+      class="w-72 fixed top-0 left-0 h-screen overflow-y-auto bg-gradient-to-b from-bg-secondary to-bg-primary border-r border-border-default z-50 shadow-[4px_0_20px_rgba(0,0,0,0.5)]">
+      <div
+        class="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-ai-cyan to-transparent opacity-30">
       </div>
-      <div class="nav-section"><div class="nav-section-title">General</div><ul class="nav-links"><li><a href="../index.html"><span class="icon">🏠</span> Home</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Getting Started</div><ul class="nav-links"><li><a href="../Guides/quickstart.html"><span class="icon">🚀</span> Quick Start</a></li><li><a href="../Guides/installation.html"><span class="icon">📦</span> Installation</a></li><li><a href="../Guides/first-npc.html"><span class="icon">🎮</span> Your First NPC</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">API Reference</div><ul class="nav-links"><li><a href="../API/index.html"><span class="icon">📚</span> Overview</a></li><li><a href="../API/llama-interface.html"><span class="icon">🦙</span> LlamaInterface</a></li><li><a href="../API/dialogue-manager.html"><span class="icon">💬</span> DialogueManager</a></li><li><a href="../API/memory-manager.html"><span class="icon">🧠</span> MemoryManager</a></li><li><a href="../API/tts-manager.html"><span class="icon">🔊</span> TTSManager</a></li><li><a href="../API/resources.html"><span class="icon">📄</span> Resources</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Technical</div><ul class="nav-links"><li><a href="index.html"><span class="icon">⚙️</span> Overview</a></li><li><a href="architecture.html" class="active"><span class="icon">🏗️</span> Architecture</a></li><li><a href="dialogue-nodes.html"><span class="icon">🔷</span> Dialogue Nodes</a></li><li><a href="gdextension.html"><span class="icon">🔧</span> GDExtension Build</a></li><li><a href="memory-system.html"><span class="icon">💾</span> Memory System</a></li><li><a href="localization.html"><span class="icon">🌐</span> Localization</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Guides</div><ul class="nav-links"><li><a href="../Guides/index.html"><span class="icon">📖</span> Overview</a></li><li><a href="../Guides/visual-editor.html"><span class="icon">🎨</span> Visual Editor</a></li><li><a href="../Guides/character-identity.html"><span class="icon">👤</span> Character Identity</a></li><li><a href="../Guides/tts-setup.html"><span class="icon">🎤</span> TTS Setup</a></li><li><a href="../Guides/csharp-bindings.html"><span class="icon">🔷</span> C# Bindings</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">Examples</div><ul class="nav-links"><li><a href="../Guides/example-basic-npc.html"><span class="icon">🤖</span> Basic NPC</a></li><li><a href="../Guides/example-branching.html"><span class="icon">🌳</span> Branching Dialogue</a></li><li><a href="../Guides/example-merchant.html"><span class="icon">🛒</span> Dynamic Merchant</a></li></ul></div>
-      <div class="nav-section"><div class="nav-section-title">External Links</div><ul class="nav-links"><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"><span class="icon">🔗</span> GitHub Repository</a></li><li><a href="https://github.com/users/lobinuxsoft/projects/5" target="_blank"><span class="icon">📋</span> Project Board</a></li><li><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues" target="_blank"><span class="icon">🐛</span> Issues</a></li></ul></div>
+      <div class="p-6 text-center border-b border-border-default">
+        <div class="w-16 h-16 mx-auto mb-4"><img src="../logo-eldritch.png" alt="OhMyDialogSystem"
+            class="w-full h-full drop-shadow-[0_0_10px_rgba(0,212,255,0.4)]"></div>
+        <div class="text-lg font-bold uppercase tracking-wider text-gradient-ai">OhMyDialogSystem</div>
+        <div class="text-xs text-gray-500 uppercase tracking-widest mt-1">AI-Powered Dialogues</div>
+      </div>
+      <div class="px-6 py-3 border-b border-border-default flex gap-2">
+        <button data-lang-switch="es" onclick="I18n.switch('es')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">ES</button>
+        <button data-lang-switch="en" onclick="I18n.switch('en')"
+          class="flex-1 py-1.5 text-center text-xs font-medium rounded border transition-colors hover:bg-ai-cyan/10">EN</button>
+      </div>
+      <div class="p-4">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> General</div>
+          <ul>
+            <li><a href="../home.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3E0;</span> Home</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> API Reference</div>
+          <ul>
+            <li><a href="../API/index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4DA;</span> Overview</a></li>
+            <li><a href="../API/llama-interface.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F999;</span> LlamaInterface</a></li>
+            <li><a href="../API/dialogue-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4AC;</span> DialogueManager</a></li>
+            <li><a href="../API/memory-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F9E0;</span> MemoryManager</a></li>
+            <li><a href="../API/tts-manager.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F50A;</span> TTSManager</a></li>
+            <li><a href="../API/resources.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4C4;</span> Resources</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Technical</div>
+          <ul>
+            <li><a href="index.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x2699;&#xFE0F;</span> Overview</a></li>
+            <li><a href="architecture.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm bg-gradient-to-r from-ai-cyan/10 to-transparent text-ai-cyan border-l-2 border-ai-cyan"><span
+                  class="opacity-70">&#x1F3D7;&#xFE0F;</span> <span data-i18n="navArchitecture">Arquitectura</span></a>
+            </li>
+            <li><a href="dialogue-nodes.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F537;</span> Dialogue Nodes</a></li>
+            <li><a href="memory-system.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BE;</span> Memory System</a></li>
+            <li><a href="localization.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F310;</span> Localization</a></li>
+            <li><a href="gdextension.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F527;</span> GDExtension Build</a></li>
+            <li><a href="ci-cd-release.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F680;</span> <span data-i18n="navCiCd">CI/CD y Releases</span></a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-widest text-ai-purple mb-2 pl-2 flex items-center gap-2 font-mono">
+            <span class="text-gray-600 text-[0.65rem]">//</span> Guides</div>
+          <ul>
+            <li><a href="../Guides/character-identity.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F464;</span> Character Identity</a></li>
+            <li><a href="../Guides/tts-setup.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F3A4;</span> TTS Setup</a></li>
+            <li><a href="../Guides/csharp-bindings.html"
+                class="flex items-center gap-2 py-2 px-4 rounded-md text-sm text-gray-400 hover:bg-bg-tertiary hover:text-ai-cyan transition-all"><span
+                  class="opacity-70">&#x1F4BB;</span> C# Bindings</a></li>
+          </ul>
+        </div>
+      </div>
     </nav>
-    <main class="main-content">
-      <div class="breadcrumbs"><a href="../index.html">Wiki</a> <span>/</span> <a href="index.html">Technical</a> <span>/</span> <span>Architecture</span></div>
-      <h1>Architecture</h1>
-      <div class="ai-box" style="text-align: center; padding: 3rem;">
-        <p style="font-size: 3rem; margin-bottom: 1rem;">🚧</p>
-        <h2 style="color: var(--ai-cyan); margin-bottom: 1rem;">Coming Soon</h2>
-        <p style="color: var(--text-muted);">Esta seccion esta en desarrollo.</p>
-        <p style="margin-top: 1.5rem;"><a href="https://github.com/lobinuxsoft/OhMyDialogSystem/issues/185" target="_blank" class="badge badge-cyan">Ver issue #185</a></p>
+
+    <main class="flex-1 ml-72 p-12 max-w-5xl">
+      <!-- Breadcrumbs -->
+      <div class="text-sm text-gray-500 mb-8 pb-4 border-b border-border-default font-mono">
+        <a href="../home.html" class="text-gray-400 hover:text-ai-cyan">Wiki</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <a href="index.html" class="text-gray-400 hover:text-ai-cyan">Technical</a>
+        <span class="mx-2 text-ai-purple">/</span>
+        <span data-i18n="pageTitle">Arquitectura</span>
       </div>
-      <footer class="wiki-footer"><p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank">GitHub</a></p></footer>
+
+      <h1 class="text-4xl font-bold mb-4 pb-4 border-b border-border-default relative">
+        <span class="text-gradient-ai" data-i18n="pageTitle">Arquitectura</span>
+        <span
+          class="absolute bottom-0 left-0 w-24 h-0.5 bg-gradient-to-r from-ai-cyan to-ai-purple shadow-glow-cyan"></span>
+      </h1>
+
+      <p class="text-gray-400 mb-8 leading-relaxed" data-i18n="pageDesc">OhMyDialogSystem sigue una arquitectura en
+        capas que separa claramente las responsabilidades.</p>
+
+      <!-- System Layers -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hLayers">Capas del Sistema</span>
+      </h2>
+      <p class="text-gray-400 mb-6" data-i18n="pLayers">El addon se organiza en 5 capas principales:</p>
+
+      <div
+        class="arch-diagram-bg relative overflow-hidden rounded-xl border border-border-default bg-gradient-to-br from-bg-card to-transparent p-8 mb-12">
+        <div class="flex flex-col gap-4 max-w-3xl mx-auto">
+          <!-- Editor Layer -->
+          <div
+            class="bg-bg-tertiary border border-border-default rounded-lg p-5 relative transition-all hover:translate-x-2 hover:border-ai-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.2)] group">
+            <div class="flex items-center gap-4 mb-2">
+              <div
+                class="w-10 h-10 rounded-lg bg-gradient-to-br from-ai-green to-emerald-700 flex items-center justify-center text-xl shadow-lg">
+                🎨</div>
+              <span class="font-mono font-bold text-white" data-i18n="layerEditor">Editor Layer</span>
+            </div>
+            <p class="text-sm text-gray-400 ml-14 mb-3" data-i18n="descEditor">Herramientas visuales...</p>
+            <div class="flex flex-wrap gap-2 ml-14">
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">model_manager_window.gd</span>
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">dialogue_graph_editor.gd</span>
+            </div>
+          </div>
+
+          <!-- AI Layer -->
+          <div
+            class="bg-bg-tertiary border border-border-default rounded-lg p-5 relative transition-all hover:translate-x-2 hover:border-ai-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.2)] group">
+            <div class="flex items-center gap-4 mb-2">
+              <div
+                class="w-10 h-10 rounded-lg bg-gradient-to-br from-ai-orange to-orange-700 flex items-center justify-center text-xl shadow-lg">
+                🤖</div>
+              <span class="font-mono font-bold text-white" data-i18n="layerAI">AI Layer</span>
+            </div>
+            <p class="text-sm text-gray-400 ml-14 mb-3" data-i18n="descAI">Gestion de modelos...</p>
+            <div class="flex flex-wrap gap-2 ml-14">
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">prompt_builder.gd</span>
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">huggingface_api.gd</span>
+            </div>
+          </div>
+
+          <!-- Core Layer -->
+          <div
+            class="bg-bg-tertiary border border-border-default rounded-lg p-5 relative transition-all hover:translate-x-2 hover:border-ai-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.2)] group">
+            <div class="flex items-center gap-4 mb-2">
+              <div
+                class="w-10 h-10 rounded-lg bg-gradient-to-br from-ai-cyan to-cyan-700 flex items-center justify-center text-xl shadow-lg">
+                🧠</div>
+              <span class="font-mono font-bold text-white" data-i18n="layerCore">Core Layer</span>
+            </div>
+            <p class="text-sm text-gray-400 ml-14 mb-3" data-i18n="descCore">Logica principal...</p>
+            <div class="flex flex-wrap gap-2 ml-14">
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">dialogue_manager.gd</span>
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">ai_service.gd</span>
+            </div>
+          </div>
+
+          <!-- Resources Layer -->
+          <div
+            class="bg-bg-tertiary border border-border-default rounded-lg p-5 relative transition-all hover:translate-x-2 hover:border-ai-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.2)] group">
+            <div class="flex items-center gap-4 mb-2">
+              <div
+                class="w-10 h-10 rounded-lg bg-gradient-to-br from-ai-purple to-purple-800 flex items-center justify-center text-xl shadow-lg">
+                📦</div>
+              <span class="font-mono font-bold text-white" data-i18n="layerResources">Resources Layer</span>
+            </div>
+            <p class="text-sm text-gray-400 ml-14 mb-3" data-i18n="descResources">Datos serializables...</p>
+            <div class="flex flex-wrap gap-2 ml-14">
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">dialogue_graph.gd</span>
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">character_identity.gd</span>
+            </div>
+          </div>
+
+          <!-- GDExtension Layer -->
+          <div
+            class="bg-bg-tertiary border border-border-default rounded-lg p-5 relative transition-all hover:translate-x-2 hover:border-ai-cyan hover:shadow-[0_0_20px_rgba(0,212,255,0.2)] group">
+            <div class="flex items-center gap-4 mb-2">
+              <div
+                class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-xl shadow-lg">
+                ⚡</div>
+              <span class="font-mono font-bold text-white" data-i18n="layerGDExt">GDExtension Layer (C++)</span>
+            </div>
+            <p class="text-sm text-gray-400 ml-14 mb-3" data-i18n="descGDExt">Wrapper nativo...</p>
+            <div class="flex flex-wrap gap-2 ml-14">
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">llama_interface.cpp</span>
+              <span
+                class="px-2 py-0.5 bg-bg-card border border-border-default rounded text-xs font-mono text-gray-500">thirdparty/llama.cpp</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Components -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hComponents">Componentes Principales</span>
+      </h2>
+
+      <h3 class="text-xl font-bold text-white mb-4" data-i18n="hHighLevelFlow">Flujo de Alto Nivel</h3>
+      <p class="text-gray-400 mb-6" data-i18n="pHighLevelFlow">Interaccion entre componentes:</p>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_1fr] gap-4 items-center p-8 bg-bg-card border border-border-default rounded-xl mb-12">
+        <div
+          class="bg-bg-tertiary border-2 border-border-default rounded-lg p-4 text-center hover:border-ai-cyan hover:shadow-[0_0_15px_rgba(0,212,255,0.3)] transition-all">
+          <div class="font-mono font-bold text-ai-cyan mb-1" data-i18n="flowDM">DialogueManager</div>
+          <div class="text-xs text-gray-500" data-i18n="flowDMDesc">Coordina todo el sistema</div>
+        </div>
+        <div class="text-ai-purple text-2xl flex justify-center transform md:rotate-0 rotate-90">➔</div>
+        <div
+          class="bg-bg-tertiary border-2 border-border-default rounded-lg p-4 text-center hover:border-ai-cyan hover:shadow-[0_0_15px_rgba(0,212,255,0.3)] transition-all">
+          <div class="font-mono font-bold text-ai-cyan mb-1" data-i18n="flowGR">GraphRunner</div>
+          <div class="text-xs text-gray-500" data-i18n="flowGRDesc">Ejecuta el grafo de nodos</div>
+        </div>
+        <div class="text-ai-purple text-2xl flex justify-center transform md:rotate-0 rotate-90">➔</div>
+        <div
+          class="bg-bg-tertiary border-2 border-border-default rounded-lg p-4 text-center hover:border-ai-cyan hover:shadow-[0_0_15px_rgba(0,212,255,0.3)] transition-all">
+          <div class="font-mono font-bold text-ai-cyan mb-1" data-i18n="flowAIS">AIService</div>
+          <div class="text-xs text-gray-500" data-i18n="flowAISDesc">Genera respuestas IA</div>
+        </div>
+      </div>
+
+      <h3 class="text-xl font-bold text-white mb-4" data-i18n="hAISingleton">AIService Singleton</h3>
+      <p class="text-gray-400 mb-6" data-i18n="pAISingleton">Singleton global para inferencia:</p>
+
+      <div
+        class="flex flex-col items-center gap-2 p-8 mb-8 rounded-xl border-2 border-dashed border-ai-cyan bg-gradient-to-br from-ai-cyan/10 to-ai-purple/10">
+        <span class="font-mono text-xs text-ai-cyan uppercase tracking-widest" data-i18n="singleGlobal">Singleton
+          Global</span>
+        <span class="font-mono text-xl font-bold text-white">AIService</span>
+        <span class="text-sm text-gray-400 text-center max-w-md" data-i18n="singleDesc">Gestiona el ciclo de
+          vida...</span>
+      </div>
+
+      <h3 class="text-xl font-bold text-white mb-4" data-i18n="hDM">DialogueManager</h3>
+      <p class="text-gray-400 mb-4" data-i18n="pDM">Coordina:</p>
+      <ul class="space-y-2 text-gray-400 list-disc pl-5 mb-12">
+        <li data-i18n="liDM1">GraphRunner...</li>
+        <li data-i18n="liDM2">AIService...</li>
+        <li data-i18n="liDM3">PromptBuilder...</li>
+        <li data-i18n="liDM4">Query System...</li>
+      </ul>
+
+      <!-- Graph Execution -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hGraphExec">Ejecucion de Grafos</span>
+      </h2>
+
+      <div class="p-4 rounded-lg border-l-4 border-ai-cyan bg-ai-cyan/5 mb-8">
+        <p class="text-gray-300 font-bold" data-i18n="calloutStrategy">Patron Strategy...</p>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="hExecutors">Node Executors</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        <!-- Executor Cards -->
+        <div
+          class="bg-bg-card border border-border-default rounded-lg p-4 hover:border-ai-purple hover:-translate-y-1 transition-all">
+          <div class="font-mono text-sm text-ai-cyan mb-1">StartNodeExecutor</div>
+          <div class="flex items-center gap-2 text-xs text-gray-500"><span
+              class="w-2 h-2 rounded-full bg-emerald-500"></span> <span data-i18n="execStart">Punto de entrada</span>
+          </div>
+        </div>
+        <div
+          class="bg-bg-card border border-border-default rounded-lg p-4 hover:border-ai-purple hover:-translate-y-1 transition-all">
+          <div class="font-mono text-sm text-ai-cyan mb-1">EndNodeExecutor</div>
+          <div class="flex items-center gap-2 text-xs text-gray-500"><span
+              class="w-2 h-2 rounded-full bg-red-500"></span> <span data-i18n="execEnd">Fin</span></div>
+        </div>
+        <div
+          class="bg-bg-card border border-border-default rounded-lg p-4 hover:border-ai-purple hover:-translate-y-1 transition-all">
+          <div class="font-mono text-sm text-ai-cyan mb-1">AIResponseExecutor</div>
+          <div class="flex items-center gap-2 text-xs text-gray-500"><span
+              class="w-2 h-2 rounded-full bg-blue-500"></span> <span data-i18n="execAI">AI Res</span></div>
+        </div>
+        <div
+          class="bg-bg-card border border-border-default rounded-lg p-4 hover:border-ai-purple hover:-translate-y-1 transition-all">
+          <div class="font-mono text-sm text-ai-cyan mb-1">PlayerChoiceExecutor</div>
+          <div class="flex items-center gap-2 text-xs text-gray-500"><span
+              class="w-2 h-2 rounded-full bg-yellow-500"></span> <span data-i18n="execChoice">Choice</span></div>
+        </div>
+        <!-- More executors... -->
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="hStates">Estados de Ejecucion</h3>
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="border-b border-border-default text-ai-cyan">
+              <th class="text-left py-2 px-4" data-i18n="thState">Estado</th>
+              <th class="text-left py-2 px-4" data-i18n="thDesc">Descripcion</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm font-mono text-gray-400">
+            <tr class="border-b border-border-default/30">
+              <td class="py-2 px-4">IDLE</td>
+              <td class="py-2 px-4" data-i18n="stIdle">Sin grafo</td>
+            </tr>
+            <tr class="border-b border-border-default/30">
+              <td class="py-2 px-4">RUNNING</td>
+              <td class="py-2 px-4" data-i18n="stRunning">Ejecutando</td>
+            </tr>
+            <tr class="border-b border-border-default/30">
+              <td class="py-2 px-4">WAITING_INPUT</td>
+              <td class="py-2 px-4" data-i18n="stWaiting">Esperando input</td>
+            </tr>
+            <!-- ... -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Dialogue Modes -->
+      <h2 class="text-2xl font-bold text-ai-cyan mb-6 flex items-center gap-2">
+        <span class="text-ai-purple">//</span>
+        <span data-i18n="hModes">Modos de Dialogo</span>
+      </h2>
+      <div class="grid md:grid-cols-3 gap-6 mb-12">
+        <div
+          class="bg-bg-card border border-border-default rounded-xl p-6 text-center hover:border-ai-cyan transition-colors">
+          <h4 class="text-ai-cyan font-bold mb-2" data-i18n="modeFree">FREE</h4>
+          <p class="text-xs text-gray-500 mb-4" data-i18n="subFree">Conversation 100% IA</p>
+          <ul class="text-left text-sm text-gray-400 space-y-1 list-disc pl-4">
+            <li data-i18n="liFree1">No graph</li>
+            <li data-i18n="liFree2">Free typing</li>
+          </ul>
+        </div>
+        <div
+          class="bg-bg-card border border-border-default rounded-xl p-6 text-center hover:border-ai-cyan transition-colors">
+          <h4 class="text-ai-cyan font-bold mb-2" data-i18n="modeScripted">SCRIPTED</h4>
+          <p class="text-xs text-gray-500 mb-4" data-i18n="subScripted">Grafo Tradicional</p>
+          <ul class="text-left text-sm text-gray-400 space-y-1 list-disc pl-4">
+            <li data-i18n="liScript1">Strict flow</li>
+            <li data-i18n="liScript2">Fixed responses</li>
+          </ul>
+        </div>
+        <div
+          class="bg-bg-card border border-border-default rounded-xl p-6 text-center hover:border-ai-cyan transition-colors">
+          <h4 class="text-ai-cyan font-bold mb-2" data-i18n="modeHybrid">HYBRID</h4>
+          <p class="text-xs text-gray-500 mb-4" data-i18n="subHybrid">Hybrid</p>
+          <ul class="text-left text-sm text-gray-400 space-y-1 list-disc pl-4">
+            <li data-i18n="liHybrid1">Graph skeleton</li>
+            <li data-i18n="liHybrid2">AI enriched</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Back Link -->
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-ai-cyan hover:text-ai-pink transition-colors mb-8">
+        <span>&#x2190;</span>
+        <span data-i18n="backToHome">Volver a Technical</span>
+      </a>
+
+      <footer class="mt-16 pt-8 border-t border-border-default text-center text-gray-500 text-sm relative">
+        <span
+          class="absolute -top-3 left-1/2 -translate-x-1/2 bg-bg-primary px-4 text-ai-purple text-xs tracking-widest">&#x2726;
+          &#x2726; &#x2726;</span>
+        <p>OhMyDialogSystem Wiki | <a href="https://github.com/lobinuxsoft/OhMyDialogSystem" target="_blank"
+            class="text-ai-cyan hover:text-ai-pink">GitHub</a></p>
+      </footer>
     </main>
   </div>
   <script src="../ai-bg.js"></script>
 </body>
+
 </html>

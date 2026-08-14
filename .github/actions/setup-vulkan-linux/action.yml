@@ -1,0 +1,43 @@
+name: "Setup Vulkan SDK (Linux)"
+description: "Install Vulkan SDK on Linux for llama.cpp compilation"
+
+inputs:
+  vulkan-version:
+    description: "Vulkan SDK version to install"
+    required: false
+    default: "latest"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Vulkan SDK version
+      id: vulkan-version
+      shell: bash
+      run: |
+        version="${{ inputs.vulkan-version }}"
+        if [ "$version" = "latest" ]; then
+          version=$(curl -s https://vulkan.lunarg.com/sdk/latest/linux.txt)
+        fi
+        echo "Vulkan SDK version: $version"
+        echo "version=$version" >> $GITHUB_OUTPUT
+
+    - name: Install Vulkan SDK
+      shell: bash
+      run: |
+        # Add LunarG package repository
+        wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
+        sudo wget -qO /etc/apt/sources.list.d/lunarg-vulkan-jammy.list \
+          https://packages.lunarg.com/vulkan/lunarg-vulkan-jammy.list
+        sudo apt-get update
+
+        # Install Vulkan SDK
+        sudo apt-get install -y vulkan-sdk
+
+        # Verify installation
+        echo "Vulkan SDK installed"
+
+    - name: Set Vulkan environment
+      shell: bash
+      run: |
+        # The SDK is installed system-wide, set environment variables
+        echo "VULKAN_SDK=/usr" >> $GITHUB_ENV

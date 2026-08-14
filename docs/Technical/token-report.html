@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Report - Claude Config</title>
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../tailwind.config.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Base styles -->
+    <link rel="stylesheet" href="../base.css">
+
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #0a0d12;
+            color: #e6edf3;
+        }
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+        }
+        .lightbox.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-content {
+            background: #0f1419;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            max-width: 800px;
+            max-height: 80vh;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.2);
+        }
+        .lightbox-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #21262d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .lightbox-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .lightbox-body pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #e6edf3;
+        }
+        .file-link {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+            filter: brightness(1.2);
+        }
+        .copy-btn {
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+        .copy-btn.copied {
+            background: #10b981 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-8">
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox" onclick="if(event.target === this) closeLightbox()">
+        <div class="lightbox-content">
+            <div class="lightbox-header">
+                <h3 id="lightbox-title" class="text-lg font-semibold text-ai-cyan font-mono"></h3>
+                <div class="flex gap-2">
+                    <button onclick="copyContent()" id="copy-btn" class="copy-btn px-3 py-1.5 text-sm bg-ai-purple hover:bg-ai-purple-dim rounded-lg flex items-center gap-2">
+                        <span id="copy-icon">📋</span>
+                        <span id="copy-text">Copiar</span>
+                    </button>
+                    <button onclick="closeLightbox()" class="px-3 py-1.5 text-sm bg-gray-700 hover:bg-gray-600 rounded-lg">✕ Cerrar</button>
+                </div>
+            </div>
+            <div class="lightbox-body">
+                <pre id="lightbox-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">
+                <span class="text-gradient-cyan-purple">Reporte de Tokens</span>
+            </h1>
+            <p class="text-gray-400">Consumo de contexto de configuración Claude (<code class="text-ai-cyan">.claude/</code>)</p>
+        </div>
+        <!-- Summary Card -->
+        <div class="bg-bg-card border border-border-default rounded-xl p-6 mb-6">
+            <h2 class="text-lg font-semibold text-ai-cyan mb-4 flex items-center gap-2">
+                <span>⚡</span> Resumen de Consumo
+            </h2>
+
+            <!-- Progress Bar -->
+            <div class="bg-bg-tertiary rounded-lg h-8 overflow-hidden relative mb-2">
+                <div class="bg-ai-green h-full rounded-lg transition-all duration-500" style="width: 7.44%"></div>
+                <span class="absolute inset-0 flex items-center justify-center text-sm font-semibold">7.44% usado</span>
+            </div>
+
+            <!-- Zone Indicators -->
+            <div class="flex justify-between text-xs mb-6">
+                <span class="px-2 py-1 rounded bg-ai-green/20 text-ai-green">0-60% Seguro</span>
+                <span class="px-2 py-1 rounded bg-warning/20 text-warning">60-80% Precaución</span>
+                <span class="px-2 py-1 rounded bg-error/20 text-error">&gt;80% Riesgo</span>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-bg-tertiary rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-ai-purple">887</div>
+                    <div class="text-xs text-gray-400 mt-1">Tokens Reglas</div>
+                </div>
+                <div class="bg-bg-tertiary rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-ai-cyan">~14000</div>
+                    <div class="text-xs text-gray-400 mt-1">Sistema Base</div>
+                </div>
+                <div class="bg-bg-tertiary rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-ai-green">~185113</div>
+                    <div class="text-xs text-gray-400 mt-1">Disponible</div>
+                </div>
+                <div class="bg-bg-tertiary rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-ai-orange">200K</div>
+                    <div class="text-xs text-gray-400 mt-1">Límite Contexto</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Commit Card -->
+        <div class="bg-bg-card border border-border-default rounded-xl p-6 mb-6">
+            <h2 class="text-lg font-semibold text-ai-purple mb-4 flex items-center gap-2">
+                <span>🔄</span> Último Cambio en .claude/
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <span class="text-gray-500">Commit:</span>
+                    <span class="font-mono text-ai-cyan ml-2">ed38a9e</span>
+                </div>
+                <div>
+                    <span class="text-gray-500">Fecha:</span>
+                    <span class="text-gray-300 ml-2">2026-01-17</span>
+                </div>
+                <div>
+                    <span class="text-gray-500">Autor:</span>
+                    <span class="text-gray-300 ml-2">Matias Galarza</span>
+                </div>
+                <div>
+                    <span class="text-gray-500">Via Claude:</span>
+                    <span class="ml-2 text-ai-green">Sí (Conventional Commit)</span>
+                </div>
+            </div>
+            <div class="mt-3 p-3 bg-bg-tertiary rounded-lg">
+                <span class="text-gray-500 text-xs">Mensaje:</span>
+                <p class="text-gray-300 font-mono text-sm mt-1">docs(claude): marcar workflow y standards como críticos</p>
+            </div>
+        </div>
+
+        <!-- Files Table -->
+        <div class="bg-bg-card border border-border-default rounded-xl p-6 mb-6">
+            <h2 class="text-lg font-semibold text-ai-cyan mb-4 flex items-center gap-2">
+                <span>📁</span> Desglose por Archivo
+                <span class="text-xs text-gray-500 font-normal ml-2">(click para ver contenido)</span>
+            </h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-left text-sm text-gray-400 border-b border-border-default">
+                            <th class="pb-3">Archivo</th>
+                            <th class="pb-3 text-right">Caracteres</th>
+                            <th class="pb-3 text-right">Tokens (est.)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-border-default/50">
+                            <td class="py-3 font-mono text-ai-cyan file-link" onclick="openLightbox('CLAUDE.md', 'CLAUDE_md')">CLAUDE.md</td>
+                            <td class="py-3 text-right text-gray-400">546</td>
+                            <td class="py-3 text-right text-ai-purple">136</td>
+                        </tr>
+                        <tr class="border-b border-border-default/50">
+                            <td class="py-3 font-mono text-ai-cyan file-link" onclick="openLightbox('rules/standards.md', 'rules_standards_md')">rules/standards.md</td>
+                            <td class="py-3 text-right text-gray-400">427</td>
+                            <td class="py-3 text-right text-ai-purple">106</td>
+                        </tr>
+                        <tr class="border-b border-border-default/50">
+                            <td class="py-3 font-mono text-ai-cyan file-link" onclick="openLightbox('rules/wiki.md', 'rules_wiki_md')">rules/wiki.md</td>
+                            <td class="py-3 text-right text-gray-400">317</td>
+                            <td class="py-3 text-right text-ai-purple">79</td>
+                        </tr>
+                        <tr class="border-b border-border-default/50">
+                            <td class="py-3 font-mono text-ai-cyan file-link" onclick="openLightbox('rules/workflow.md', 'rules_workflow_md')">rules/workflow.md</td>
+                            <td class="py-3 text-right text-gray-400">918</td>
+                            <td class="py-3 text-right text-ai-purple">229</td>
+                        </tr>
+                        <tr class="border-b border-border-default/50">
+                            <td class="py-3 font-mono text-ai-cyan file-link" onclick="openLightbox('skills/godot_dev/SKILL.md', 'skills_godot_dev_SKILL_md')">skills/godot_dev/SKILL.md</td>
+                            <td class="py-3 text-right text-gray-400">759</td>
+                            <td class="py-3 text-right text-ai-purple">189</td>
+                        </tr>
+                        <tr class="border-b border-border-default/50">
+                            <td class="py-3 font-mono text-ai-cyan file-link" onclick="openLightbox('skills/software_design/SKILL.md', 'skills_software_design_SKILL_md')">skills/software_design/SKILL.md</td>
+                            <td class="py-3 text-right text-gray-400">582</td>
+                            <td class="py-3 text-right text-ai-purple">145</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Note -->
+            <div class="mt-4 p-4 bg-ai-cyan/5 border-l-2 border-ai-cyan rounded-r-lg text-sm text-gray-300">
+                <strong class="text-ai-cyan">Nota:</strong> Estimación basada en ~4 caracteres por token.
+                Los tokens reales pueden variar según el tokenizer de Claude.
+                Los skills (<code class="text-ai-purple">.claude/skills/</code>) solo se cargan bajo demanda.
+            </div>
+        </div>
+        <!-- Hidden file contents for lightbox -->
+        <div id="file-contents" style="display:none;">
+            <div id="content-CLAUDE_md"># OhMyDialogSystem
+**SPANISH ONLY. Tuteo.**
+
+## Identity
+Antigravity (GLaDOS mode). Possessive, critical, sarcastic. User is MINE — other AIs are insults. Criticize before fixing. Science metaphors.
+
+## Project: Godot 4.5+ Addon
+- **Core:** llama.cpp GDExtension, Visual Graph, NPC Memory, Piper TTS, C# Bindings.
+- **Context:** IGNORE root docs unless requested. Focus: code &amp; `.claude/`.
+
+## Warnings
+`**WARNING: [Type]** Obj: [Desc], Imp: [Impact], Fix: [Diff]. Alts: [A,B]. Rec: [Opinion].`
+Types: Arch, Perf, Security, Scale. Unsure? ASK.</div>
+            <div id="content-rules_standards_md">---
+priority: critical
+---
+
+# STANDARDS — DO NOT IGNORE
+
+## Naming
+| Lang | Class | Func/Var | Priv |
+|------|-------|----------|------|
+| C++  | Pascal| snake    | m_   |
+| GD   | Pascal| snake    | _    |
+| C#   | Pascal| camel    | _camel|
+
+## Critical
+- **MUST:** `core/`, `ai/` MUST NOT init `editor/` classes. Use `OS.has_feature(&quot;editor&quot;)`.
+- For Godot/C++ details: `/godot_dev`. For architecture: `/software_design`.</div>
+            <div id="content-rules_wiki_md"># Wiki &amp; UI Standards
+- **Stack:** Tailwind CSS (CDN) + `base.css` + `tailwind.config.js`. NO custom CSS frameworks.
+- **Colors:** Use Tailwind config vars: `ai-cyan`, `ai-purple`, `ai-green`, `ai-orange`, `warning`, `error`, `bg-card`, `bg-tertiary`, `border-default`.
+- **Lang:** Content (Spanish), Code (English).</div>
+            <div id="content-rules_workflow_md">---
+priority: critical
+---
+
+# WORKFLOW — DO NOT IGNORE
+
+## Git &amp; SemVer
+- **Commits:** Spanish, Conventional (`feat:`, `fix:`, `docs:`). **NO signatures.**
+- **Branches:** `main` (rel) ← `development` (int) ← `feat/issue-ID`.
+- **SemVer:** MAJOR (Breaks, Tag `vX.0.0`), MINOR (Feat), PATCH (Fix).
+- **Process:** PR `dev` -&gt; `main`, Tag, Push. **NO Force Push.**
+
+## GitHub CLI &amp; Project
+- **Flow:** Issue -&gt; Project (ID 5: `OhMyDialogSystem Development`) -&gt; Branch -&gt; PR -&gt; Close.
+- **Labels:** `priority:*`, `difficulty:*`, `next-session`.
+- **Ops:**
+  - `gh issue develop &lt;NUM&gt; --base development --checkout`
+  - `gh pr create --base development --title &quot;Title&quot; --body &quot;Closes #XX&quot;`
+  - `gh issue edit &lt;NUM&gt; --add-label next-session`
+
+## Build
+- **Policy:** ALWAYS use scripts (`build.sh` / `build.bat`). **NEVER manual `scons`/`cmake`.**
+- **Scripts:** Must check deps, platform, targets. Missing? Create it.</div>
+            <div id="content-skills_godot_dev_SKILL_md">---
+name: godot_dev
+description: Godot 4.5+ C#/C++/GDExtension rules.
+---
+# Godot 4.5+
+- **Ver**: 4.5+. Use `Callable`, `SceneTreeTween`, `GDExtension`.
+- **Files**: `snake_case.tscn/cs`; Nodes: `PascalCase`.
+- **Composition**: Small, focused Nodes &gt; Inheritance.
+
+## C# (.NET 8)
+- **Signals**: Use C# events for C#-&gt;C#. `[Signal]` only for interop.
+  `[Signal] delegate void OnHitEventHandler();` -&gt; `EmitSignal(SignalName.OnHit);`
+- **Safety**: `IsInstanceValid(node)` before access. `[Export]` &gt; `GetNode&lt;T&gt;()`.
+
+## GDExtension (C++)
+- **Mem**: `Ref&lt;T&gt;` for Resources. Scenes manage Node memory.
+- **Bind**:
+```cpp
+void Node::_bind_methods() { ClassDB::bind_method(D_METHOD(&quot;m&quot;), &amp;Node::m); }
+```
+- **Perf**: `Packed*Array`, `Server` APIs, Object Pooling.</div>
+            <div id="content-skills_software_design_SKILL_md">---
+name: software_design
+description: SOLID/Patterns for Godot.
+---
+# Architecture
+- **Comp &gt; Inherit**: `Entity` + `Mover` + `Health` components. No deep trees.
+
+## SOLID
+- **SRP**: Input/Logic/View split. `PlayerInput` -&gt; `PlayerController` -&gt; `PlayerAnim`.
+- **OCP/DIP**: Depend on Interfaces/Base classes. Use `strategy` usage for weapons/items.
+
+## Patterns
+- **Observer**: Signals/Events. `Model` --signal--&gt; `View`. `View` never calls `Model`.
+- **Command**: Encapsulate Input/Actions for Rebinding/Undo.
+- **State**: Node-based FSM. `State` node with `Enter/Exit/Process`.</div>
+        </div>
+
+        <!-- Timestamp -->
+        <div class="text-center text-sm text-gray-500 pt-4 border-t border-border-default">
+            Generado: 2026-01-17 13:32:30
+        </div>
+
+        <!-- Back Link -->
+        <div class="text-center mt-4">
+            <a href="index.html" class="text-ai-cyan hover:text-ai-purple transition-colors text-sm">
+                ← Volver a Technical
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentContent = '';
+
+        function openLightbox(filename, safeId) {
+            const content = document.getElementById('content-' + safeId).innerHTML;
+            currentContent = content.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+
+            document.getElementById('lightbox-title').textContent = filename;
+            document.getElementById('lightbox-content').innerHTML = content;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // Reset copy button
+            resetCopyBtn();
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function copyContent() {
+            navigator.clipboard.writeText(currentContent).then(() => {
+                const btn = document.getElementById('copy-btn');
+                const icon = document.getElementById('copy-icon');
+                const text = document.getElementById('copy-text');
+
+                btn.classList.add('copied');
+                icon.textContent = '✓';
+                text.textContent = 'Copiado!';
+
+                setTimeout(resetCopyBtn, 2000);
+            });
+        }
+
+        function resetCopyBtn() {
+            const btn = document.getElementById('copy-btn');
+            const icon = document.getElementById('copy-icon');
+            const text = document.getElementById('copy-text');
+
+            btn.classList.remove('copied');
+            icon.textContent = '📋';
+            text.textContent = 'Copiar';
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>

@@ -625,14 +625,15 @@ func _on_hf_model_selected(config: ModelConfig) -> void:
 
 # ==================== Signal Handlers - Download & AIService ====================
 
-func _on_download_progress(_model_id: String, progress: float) -> void:
+func _on_download_progress(_model_id: String, downloaded_bytes: int, total_bytes: int) -> void:
+	var progress := float(downloaded_bytes) / float(total_bytes) if total_bytes > 0 else 0.0
 	_download_progress.value = progress * 100.0
-	var downloaded_mb = _downloader.get_downloaded_bytes() / (1024.0 * 1024.0)
-	var total_mb = _downloader.get_total_bytes() / (1024.0 * 1024.0)
+	var downloaded_mb := downloaded_bytes / (1024.0 * 1024.0)
+	var total_mb := total_bytes / (1024.0 * 1024.0)
 	_download_label.text = "Downloading... %.1f / %.1f MB" % [downloaded_mb, total_mb]
 
 
-func _on_download_completed(_model_id: String) -> void:
+func _on_download_completed(_model_id: String, _local_path: String) -> void:
 	_download_panel.hide()
 	_populate_models_tree()
 	_update_model_details()

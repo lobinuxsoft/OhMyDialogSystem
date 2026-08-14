@@ -18,14 +18,15 @@ extends Control
 
 var dialogue_manager: DialogueManager
 
+# Test configuration - set these in the Inspector
+@export_group("Test Resources")
+@export var test_character: CharacterIdentity
+@export var test_world: WorldContext
+@export var test_dialogue: DialogueGraph
+
 # Debug tracking
 var last_player_input: String = ""
 var pending_choices: Array[Dictionary] = []
-
-# Resources
-var merchant_character: CharacterIdentity
-var fantasy_world: WorldContext
-var merchant_dialogue: DialogueGraph
 
 
 func _ready() -> void:
@@ -55,14 +56,18 @@ func _check_ai_service() -> void:
 
 
 func _load_resources() -> void:
-	merchant_character = load("res://examples/resources/merchant_character.tres")
-	fantasy_world = load("res://examples/resources/fantasy_world.tres")
-	merchant_dialogue = load("res://examples/resources/merchant_dialogue.tres")
+	# Use exported resources if set, otherwise load defaults
+	if not test_character:
+		test_character = load("res://examples/resources/merchant_character.tres")
+	if not test_world:
+		test_world = load("res://examples/resources/fantasy_world.tres")
+	if not test_dialogue:
+		test_dialogue = load("res://examples/resources/merchant_dialogue.tres")
 
-	if merchant_character:
-		dialogue_manager.default_character = merchant_character
-	if fantasy_world:
-		dialogue_manager.world_context = fantasy_world
+	if test_character:
+		dialogue_manager.default_character = test_character
+	if test_world:
+		dialogue_manager.world_context = test_world
 	# Note: ai_preset is now set on DialogueGraph, not DialogueManager
 
 
@@ -140,6 +145,33 @@ func _update_debug() -> void:
 
 		lines.append("Mode: %s" % info.get("mode", "?"))
 		lines.append("Model: %s" % info.get("model", "none"))
+
+		# Backend info
+		var ai_service := AIService.get_singleton()
+		if ai_service and ai_service.is_model_loaded():
+			var model_info := ai_service.get_model_info()
+			var backend_name: String = model_info.get("gpu_backend_name", "")
+			var backend_desc: String = model_info.get("gpu_backend_desc", "")
+			var gpu_layers: int = model_info.get("n_gpu_layers", 0)
+			var total_layers: int = model_info.get("n_layer", 0)
+
+			if not backend_name.is_empty():
+				if backend_name != "CPU" and gpu_layers > 0:
+					lines.append("Backend: %s" % backend_name)
+					lines.append("  GPU: %s" % backend_desc)
+					lines.append("  Layers: %d/%d on GPU" % [gpu_layers, total_layers])
+				else:
+					lines.append("Backend: CPU")
+					lines.append("  %s" % backend_desc)
+
+			# System info (CPU features)
+			var sys_info := ai_service.get_system_info()
+			if not sys_info.is_empty():
+				# Parse and show relevant CPU features
+				var features := _parse_system_features(sys_info)
+				if not features.is_empty():
+					lines.append("  CPU: %s" % features)
+
 		lines.append("")
 		lines.append("Character: %s" % info.get("character", "none"))
 		if not info.get("character_personality", "").is_empty():
@@ -160,8 +192,8 @@ func _update_debug() -> void:
 
 
 func _on_start_pressed() -> void:
-	if merchant_dialogue:
-		dialogue_manager.start_dialogue(merchant_dialogue, DialogueManager.DialogueMode.SCRIPTED)
+	if test_dialogue:
+		dialogue_manager.start_dialogue(test_dialogue, DialogueManager.DialogueMode.SCRIPTED)
 	else:
 		push_error("No dialogue graph loaded!")
 
@@ -232,8 +264,12 @@ func _on_npc_speaking(speaker: String, text: String, is_streaming: bool) -> void
 
 func _on_npc_response_completed(full_text: String) -> void:
 	dialogue_text.text = full_text
-	# Show continue button after AI response completes
-	_show_continue()
+	# In free mode, show input field to continue conversation
+	# Otherwise show continue button for confirmation
+	if dialogue_manager.is_in_free_mode():
+		_show_input()
+	else:
+		_show_continue()
 	_update_debug()
 
 
@@ -259,3 +295,23 @@ func _on_variable_changed(var_name: String, old_value: Variant, new_value: Varia
 func _on_error(message: String) -> void:
 	push_error("[DialogueTest] Error: %s" % message)
 	status_label.text = "ERROR: %s" % message
+
+
+# ==================== Helper Functions ====================
+
+
+## Parses llama.cpp system info and extracts relevant CPU/GPU features
+func _parse_system_features(sys_info: String) -> String:
+	# sys_info format: "AVX = 1 | AVX_VNNI = 0 | AVX2 = 1 | ... | VULKAN = 1"
+	var enabled_features: Array[String] = []
+
+	# Key features to show
+	var important_features := ["AVX2", "AVX512", "FMA", "F16C", "NEON", "VULKAN", "CUDA", "METAL"]
+
+	for feature: String in important_features:
+		# Check if feature is enabled (= 1)
+		var pattern: String = feature + " = 1"
+		if pattern in sys_info:
+			enabled_features.append(feature)
+
+	return ", ".join(enabled_features)
