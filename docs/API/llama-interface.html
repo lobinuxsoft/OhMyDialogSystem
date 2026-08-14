@@ -44,7 +44,23 @@
           paramsTitle: 'Parámetros',
           pTableParam: 'Parámetro', pTableType: 'Tipo', pTableDesc: 'Descripción',
           paramPathDesc: 'Ruta al archivo .gguf. Soporta res:// y user://',
-          paramParamsDesc: 'Parámetros opcionales de configuración'
+          paramParamsDesc: 'Parámetros opcionales de configuración',
+          paramsKeysTitle: 'Claves aceptadas en params',
+          pNGpuLayers: 'Capas a descargar en GPU. Por defecto 999 (todas las que entren)',
+          pNCtx: 'Tamaño de la ventana de contexto, en tokens. Por defecto 512',
+          pNBatch: 'Tamaño de lote para el procesado del prompt',
+          pNThreads: 'Hilos de CPU para generación',
+          pNThreadsBatch: 'Hilos de CPU para el procesado del prompt',
+          pUseMmap: 'Mapear el archivo en memoria en vez de leerlo entero',
+          pUseMlock: 'Forzar al sistema a mantener el modelo en RAM',
+          pVocabOnly: 'Cargar SOLO el vocabulario, sin los pesos. Ver "Tokenizar sin cargar el modelo"',
+          countTokensDesc: 'Devuelve la cantidad exacta de tokens que ocupa el texto, según el vocabulario del modelo. Devuelve -1 si no hay modelo cargado.',
+          countTokensWhy: 'Por qué importa',
+          countTokensWhyText: 'La regla de ~4 caracteres por token se rompe con tildes, ñ y emojis: en español subestima el costo real. Este método usa el tokenizador del propio modelo.',
+          vocabOnlyTitle: 'Tokenizar sin cargar el modelo',
+          vocabOnlyIntro: 'Contar tokens sólo necesita el vocabulario, no los pesos ni el contexto. Con vocab_only el modelo se abre sin leer un solo tensor y sin reservar KV cache: cuesta megabytes en vez de gigabytes.',
+          vocabOnlyNote: 'El addon ya hace esto por vos: TokenCounter (core/token_counter.gd) cachea un handle por ruta de modelo y lo usa el editor para mostrar el costo real de cada nodo AI Response.',
+          vocabOnlyWarn: 'Un handle vocab_only sirve para tokenizar, NO para generar. Además deja n_ctx_train sin poblar, así que el tamaño de contexto del archivo no se puede leer por esta vía.'
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
@@ -72,7 +88,23 @@
           paramsTitle: 'Parameters',
           pTableParam: 'Parameter', pTableType: 'Type', pTableDesc: 'Description',
           paramPathDesc: 'Path to .gguf file. Supports res:// and user://',
-          paramParamsDesc: 'Optional configuration parameters'
+          paramParamsDesc: 'Optional configuration parameters',
+          paramsKeysTitle: 'Keys accepted in params',
+          pNGpuLayers: 'Layers to offload to the GPU. Defaults to 999 (as many as fit)',
+          pNCtx: 'Context window size, in tokens. Defaults to 512',
+          pNBatch: 'Batch size for prompt processing',
+          pNThreads: 'CPU threads for generation',
+          pNThreadsBatch: 'CPU threads for prompt processing',
+          pUseMmap: 'Memory-map the file instead of reading it whole',
+          pUseMlock: 'Force the system to keep the model in RAM',
+          pVocabOnly: 'Load ONLY the vocabulary, no weights. See "Tokenizing without loading the model"',
+          countTokensDesc: 'Returns the exact number of tokens the text takes, according to the model vocabulary. Returns -1 when no model is loaded.',
+          countTokensWhy: 'Why it matters',
+          countTokensWhyText: 'The ~4 characters per token rule breaks on accents, ñ and emoji: in Spanish it underestimates the real cost. This method uses the model own tokenizer.',
+          vocabOnlyTitle: 'Tokenizing without loading the model',
+          vocabOnlyIntro: 'Counting tokens only needs the vocabulary, not the weights nor the context. With vocab_only the model opens without reading a single tensor and without allocating a KV cache: it costs megabytes instead of gigabytes.',
+          vocabOnlyNote: 'The addon already does this for you: TokenCounter (core/token_counter.gd) caches a handle per model path and the editor uses it to show the real cost of every AI Response node.',
+          vocabOnlyWarn: 'A vocab_only handle is for tokenizing, NOT for generating. It also leaves n_ctx_train unpopulated, so the context size of the file cannot be read this way.'
         }
       },
       init() {
@@ -489,6 +521,111 @@ llama.load_model(<span class="text-ai-orange">"res://models/model.gguf"</span>)<
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <h5 class="text-sm font-bold text-gray-300 mb-2 uppercase tracking-wider" data-i18n="paramsKeysTitle">Claves
+          aceptadas en params</h5>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="border-b border-border-default">
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableParam">Parámetro</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableType">Tipo</th>
+                <th class="text-left py-2 px-4 text-ai-cyan text-sm" data-i18n="pTableDesc">Descripción</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_gpu_layers</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNGpuLayers">Capas a descargar en GPU. Por defecto 999
+                  (todas las que entren)</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_ctx</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNCtx">Tamaño de la ventana de contexto, en tokens. Por
+                  defecto 512</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_batch</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNBatch">Tamaño de lote para el procesado del prompt</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_threads</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNThreads">Hilos de CPU para generación</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">n_threads_batch</td>
+                <td class="py-2 px-4 font-mono text-gray-400">int</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pNThreadsBatch">Hilos de CPU para el procesado del prompt
+                </td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">use_mmap</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pUseMmap">Mapear el archivo en memoria en vez de leerlo
+                  entero</td>
+              </tr>
+              <tr class="border-b border-border-default/50">
+                <td class="py-2 px-4 font-mono text-ai-purple">use_mlock</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pUseMlock">Forzar al sistema a mantener el modelo en RAM
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono text-ai-green">vocab_only</td>
+                <td class="py-2 px-4 font-mono text-gray-400">bool</td>
+                <td class="py-2 px-4 text-gray-300" data-i18n="pVocabOnly">Cargar SOLO el vocabulario, sin los pesos. Ver
+                  "Tokenizar sin cargar el modelo"</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- count_tokens -->
+      <div id="count_tokens" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">count_tokens</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">int</span> count_tokens(text: <span class="text-ai-cyan">String</span>) const</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="countTokensDesc">Devuelve la cantidad exacta de tokens que ocupa el
+          texto, según el vocabulario del modelo. Devuelve -1 si no hay modelo cargado.</p>
+
+        <div class="p-4 rounded-lg border border-warning/30 bg-warning/5 mb-6">
+          <p class="text-warning font-bold text-sm mb-1" data-i18n="countTokensWhy">Por qué importa</p>
+          <p class="text-gray-300 text-sm" data-i18n="countTokensWhyText">La regla de ~4 caracteres por token se rompe
+            con tildes, ñ y emojis: en español subestima el costo real. Este método usa el tokenizador del propio
+            modelo.</p>
+        </div>
+
+        <h5 class="text-lg font-bold text-ai-green mb-3" data-i18n="vocabOnlyTitle">Tokenizar sin cargar el modelo</h5>
+        <p class="text-gray-400 mb-4" data-i18n="vocabOnlyIntro">Contar tokens sólo necesita el vocabulario, no los pesos
+          ni el contexto. Con vocab_only el modelo se abre sin leer un solo tensor y sin reservar KV cache: cuesta
+          megabytes en vez de gigabytes.</p>
+
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">var</span> llama := <span class="text-ai-cyan">LlamaInterface</span>.new()
+llama.<span class="text-ai-cyan">load_model</span>(<span class="text-ai-green">"res://models/qwen2.5-3b-instruct-q4_k_m.gguf"</span>, {
+    <span class="text-ai-green">"vocab_only"</span>: <span class="text-ai-purple">true</span>,
+    <span class="text-ai-green">"n_gpu_layers"</span>: <span class="text-ai-purple">0</span>,
+    <span class="text-ai-green">"n_ctx"</span>: <span class="text-ai-purple">512</span>,
+})
+
+<span class="text-ai-purple">var</span> tokens := llama.<span class="text-ai-cyan">count_tokens</span>(<span class="text-ai-green">"¿Cuántos tokens ocupa esta frase?"</span>)</code></pre>
+
+        <div class="p-4 rounded-lg border border-ai-cyan/30 bg-ai-cyan/5 mb-4">
+          <p class="text-gray-300 text-sm" data-i18n="vocabOnlyNote">El addon ya hace esto por vos: TokenCounter
+            (core/token_counter.gd) cachea un handle por ruta de modelo y lo usa el editor para mostrar el costo real de
+            cada nodo AI Response.</p>
+        </div>
+
+        <div class="p-4 rounded-lg border border-error/30 bg-error/5">
+          <p class="text-gray-300 text-sm" data-i18n="vocabOnlyWarn">Un handle vocab_only sirve para tokenizar, NO para
+            generar. Además deja n_ctx_train sin poblar, así que el tamaño de contexto del archivo no se puede leer por
+            esta vía.</p>
         </div>
       </div>
 
