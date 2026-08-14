@@ -98,7 +98,25 @@
           sigCondQuery: 'El diálogo necesita verificar una condición. Llamar callback.call(result: bool).',
           sigActionQuery: 'El diálogo necesita ejecutar una acción. Llamar callback.call() cuando termine.',
           sigValueQuery: 'El diálogo necesita obtener un valor. Llamar callback.call(value).',
-          sigError: 'Emitida cuando ocurre un error durante la ejecución'
+          sigError: 'Emitida cuando ocurre un error durante la ejecución',
+          // Metodos sin seccion previa
+          endDialogueDesc: 'Termina la sesión activa. No hace nada si no hay ninguna.',
+          endDialogueNote: 'Espera a que el hilo de inferencia termine y SIEMPRE descarga el modelo para liberar memoria. El parámetro reason viaja tal cual en la señal dialogue_ended.',
+          selectChoiceDesc: 'Elige una de las opciones ofrecidas por player_choices_available, por índice. Avisa por consola si no hay diálogo activo.',
+          setCharacterDesc: 'Cambia el personaje activo para las respuestas de IA, en caliente.',
+          setWorldContextDesc: 'Cambia el contexto de mundo usado al construir el prompt.',
+          setStreamingDesc: 'Activa o desactiva el streaming token a token. Con streaming apagado la respuesta llega entera por npc_response_completed.',
+          isActiveDesc: 'True entre start_dialogue y end_dialogue.',
+          setVariableDesc: 'Escribe una variable del contexto. scope acepta "local" (se borra al terminar el diálogo) o "global" (persiste).',
+          evaluateConditionDesc: 'Evalúa una expresión contra las variables del contexto y devuelve el resultado.',
+          getHistoryDesc: 'El ConversationHistory de la sesión: los turnos de jugador y NPC que se están usando como contexto.',
+          getContextManagerDesc: 'El ContextManager, dueño de las variables locales y globales.',
+          clearHistoryDesc: 'Borra el historial de conversación sin terminar el diálogo. El modelo sigue cargado.',
+          queryActionDesc: 'Pide al juego que ejecute una acción. Emite action_query_requested y espera el callback.',
+          queryValueDesc: 'Pide al juego un valor. Emite value_query_requested y espera el callback.',
+          queryNoHandler: 'Si no hay nadie conectado a la señal, query_action devuelve false y query_value devuelve default_value. El diálogo no se cuelga esperando.',
+          deprecatedTitle: 'Obsoleto',
+          setAiPresetDep: 'set_ai_preset() está marcado como obsoleto en el código y emite un warning: el preset se define en DialogueGraph.ai_preset.'
         },
         en: {
           navInstallation: 'Installation', navFirstNpc: 'Your First NPC', navArchitecture: 'Architecture',
@@ -180,7 +198,25 @@
           sigCondQuery: 'Dialogue needs to verify a condition. Call callback.call(result: bool).',
           sigActionQuery: 'Dialogue needs to execute an action. Call callback.call() when finished.',
           sigValueQuery: 'Dialogue needs to get a value. Call callback.call(value).',
-          sigError: 'Emitted when an execution error occurs'
+          sigError: 'Emitted when an execution error occurs',
+          // Methods with no previous section
+          endDialogueDesc: 'Ends the active session. Does nothing when there is none.',
+          endDialogueNote: 'It waits for the inference thread to finish and ALWAYS unloads the model to free memory. The reason parameter travels as-is in the dialogue_ended signal.',
+          selectChoiceDesc: 'Picks one of the options offered by player_choices_available, by index. Warns on the console when no dialogue is active.',
+          setCharacterDesc: 'Swaps the active character for AI responses, at runtime.',
+          setWorldContextDesc: 'Swaps the world context used when building the prompt.',
+          setStreamingDesc: 'Turns token-by-token streaming on or off. With streaming off the response arrives whole through npc_response_completed.',
+          isActiveDesc: 'True between start_dialogue and end_dialogue.',
+          setVariableDesc: 'Writes a context variable. scope accepts "local" (cleared when the dialogue ends) or "global" (persists).',
+          evaluateConditionDesc: 'Evaluates an expression against the context variables and returns the result.',
+          getHistoryDesc: 'The session ConversationHistory: the player and NPC turns currently used as context.',
+          getContextManagerDesc: 'The ContextManager, owner of the local and global variables.',
+          clearHistoryDesc: 'Clears the conversation history without ending the dialogue. The model stays loaded.',
+          queryActionDesc: 'Asks the game to run an action. Emits action_query_requested and waits for the callback.',
+          queryValueDesc: 'Asks the game for a value. Emits value_query_requested and waits for the callback.',
+          queryNoHandler: 'When nothing is connected to the signal, query_action returns false and query_value returns default_value. The dialogue does not hang waiting.',
+          deprecatedTitle: 'Deprecated',
+          setAiPresetDep: 'set_ai_preset() is marked deprecated in the code and emits a warning: the preset is set on DialogueGraph.ai_preset.'
         }
       },
       init() {
@@ -926,6 +962,107 @@
           class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">bool</span> query_condition(key: <span class="text-ai-cyan">String</span>, expected: <span class="text-ai-cyan">Variant</span> = true, default: <span class="text-ai-cyan">bool</span> = false)</code></pre>
         <p class="text-gray-400 mb-4" data-i18n="queryConditionDesc">Consulta una condición al código del juego. Emite
           condition_query_requested y espera respuesta.</p>
+      </div>
+
+      <div id="end_dialogue" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">end_dialogue</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> end_dialogue(reason: <span class="text-ai-cyan">String</span> = "ended")</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="endDialogueDesc">Termina la sesión activa. No hace nada si no hay ninguna.</p>
+        <div class="p-4 rounded-lg border border-warning/30 bg-warning/5 mb-4">
+          <p class="text-gray-300 text-sm" data-i18n="endDialogueNote">Espera a que el hilo de inferencia termine y SIEMPRE descarga el modelo para liberar memoria. El parámetro reason viaja tal cual en la señal dialogue_ended.</p>
+        </div>
+      </div>
+
+      <div id="select_choice" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">select_choice</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> select_choice(choice_index: <span class="text-ai-cyan">int</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="selectChoiceDesc">Elige una de las opciones ofrecidas por player_choices_available, por índice. Avisa por consola si no hay diálogo activo.</p>
+      </div>
+
+      <div id="is_active" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">is_active</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">bool</span> is_active()</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="isActiveDesc">True entre start_dialogue y end_dialogue.</p>
+      </div>
+
+      <div id="set_character" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">set_character</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> set_character(character: <span class="text-ai-cyan">CharacterIdentity</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="setCharacterDesc">Cambia el personaje activo para las respuestas de IA, en caliente.</p>
+      </div>
+
+      <div id="set_world_context" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">set_world_context</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> set_world_context(context: <span class="text-ai-cyan">WorldContext</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="setWorldContextDesc">Cambia el contexto de mundo usado al construir el prompt.</p>
+        <div class="p-4 rounded-lg border border-warning/30 bg-warning/5 mb-4">
+          <p class="text-warning font-bold text-sm mb-1" data-i18n="deprecatedTitle">Obsoleto</p>
+          <p class="text-gray-300 text-sm" data-i18n="setAiPresetDep">set_ai_preset() está marcado como obsoleto en el código y emite un warning: el preset se define en DialogueGraph.ai_preset.</p>
+        </div>
+      </div>
+
+      <div id="set_streaming_enabled" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">set_streaming_enabled</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> set_streaming_enabled(enabled: <span class="text-ai-cyan">bool</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="setStreamingDesc">Activa o desactiva el streaming token a token. Con streaming apagado la respuesta llega entera por npc_response_completed.</p>
+      </div>
+
+      <div id="set_variable" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">set_variable</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> set_variable(name: <span class="text-ai-cyan">String</span>, value: <span class="text-ai-cyan">Variant</span>, scope: <span class="text-ai-cyan">String</span> = "local")</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="setVariableDesc">Escribe una variable del contexto. scope acepta "local" (se borra al terminar el diálogo) o "global" (persiste).</p>
+      </div>
+
+      <div id="evaluate_condition" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">evaluate_condition</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">bool</span> evaluate_condition(expression: <span class="text-ai-cyan">String</span>)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="evaluateConditionDesc">Evalúa una expresión contra las variables del contexto y devuelve el resultado.</p>
+      </div>
+
+      <div id="query_action" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">query_action</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">bool</span> query_action(key: <span class="text-ai-cyan">String</span>, value: <span class="text-ai-cyan">Variant</span> = null)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="queryActionDesc">Pide al juego que ejecute una acción. Emite action_query_requested y espera el callback.</p>
+      </div>
+
+      <div id="query_value" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">query_value</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">Variant</span> query_value(key: <span class="text-ai-cyan">String</span>, default_value: <span class="text-ai-cyan">Variant</span> = null)</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="queryValueDesc">Pide al juego un valor. Emite value_query_requested y espera el callback.</p>
+        <div class="p-4 rounded-lg border border-ai-cyan/30 bg-ai-cyan/5 mb-4">
+          <p class="text-gray-300 text-sm" data-i18n="queryNoHandler">Si no hay nadie conectado a la señal, query_action devuelve false y query_value devuelve default_value. El diálogo no se cuelga esperando.</p>
+        </div>
+      </div>
+
+      <div id="get_conversation_history" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_conversation_history</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">ConversationHistory</span> get_conversation_history()</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getHistoryDesc">El ConversationHistory de la sesión: los turnos de jugador y NPC que se están usando como contexto.</p>
+      </div>
+
+      <div id="get_context_manager" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">get_context_manager</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">ContextManager</span> get_context_manager()</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="getContextManagerDesc">El ContextManager, dueño de las variables locales y globales.</p>
+      </div>
+
+      <div id="clear_history" class="mb-12">
+        <h4 class="text-xl font-bold text-gray-200 mb-4">clear_history</h4>
+        <pre
+          class="p-4 rounded-lg bg-black/40 border border-border-default font-mono text-sm text-gray-300 mb-4 overflow-x-auto"><code><span class="text-ai-purple">void</span> clear_history()</code></pre>
+        <p class="text-gray-400 mb-4" data-i18n="clearHistoryDesc">Borra el historial de conversación sin terminar el diálogo. El modelo sigue cargado.</p>
       </div>
 
       <div id="get_debug_info" class="mb-12">

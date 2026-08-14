@@ -36,6 +36,8 @@
           nodeStart: 'StartNode', subStart: 'Punto de entrada', descStart: 'Marca el inicio del grafo de dialogo. Cada grafo debe tener exactamente un StartNode.',
           nodeEnd: 'EndNode', subEnd: 'Termina dialogo', descEnd: 'Finaliza la ejecucion del grafo. Puede indicar una razon para analytics.',
           nodeAI: 'AIResponseNode', subAI: 'IA genera respuesta', descAI: 'La IA genera texto dinamicamente usando LlamaInterface y el CharacterIdentity del NPC.',
+          lbAICostTitle: 'Costo en tokens en el editor',
+          lbAICostText: 'El nodo muestra lo que cuesta su prompt (CharacterIdentity + WorldContext + plantilla). Si el grafo tiene un modelo asignado, se tokeniza con el vocabulario real de ese modelo sin cargarlo en memoria; si no, se cae a la estimacion de ~4 caracteres por token y el numero se muestra con "~". La barra de uso solo aparece cuando hay un modelo cargado: sin el no hay ventana de contexto contra la cual medir.',
           nodeStatic: 'StaticResponseNode', subStatic: 'Texto pre-escrito', descStatic: 'Muestra texto fijo, sin generacion de IA. Soporta sustitucion de variables.',
           nodeChoice: 'PlayerChoiceNode', subChoice: 'Opciones del jugador', descChoice: 'Presenta opciones al jugador. Cada opcion puede tener condiciones de visibilidad.',
           nodeCond: 'ConditionNode', subCond: 'Bifurcacion logica', descCond: 'Evalua una condicion y bifurca el flujo. Soporta 10 operadores de comparacion.',
@@ -89,6 +91,8 @@
           nodeStart: 'StartNode', subStart: 'Entry Point', descStart: 'Marks the start of the dialogue graph. Each graph must have exactly one StartNode.',
           nodeEnd: 'EndNode', subEnd: 'Ends Dialogue', descEnd: 'Terminates graph execution. Can indicate a reason for analytics.',
           nodeAI: 'AIResponseNode', subAI: 'AI Generates Response', descAI: 'AI dynamically generates text using LlamaInterface and the NPC CharacterIdentity.',
+          lbAICostTitle: 'Token cost in the editor',
+          lbAICostText: 'The node shows what its prompt costs (CharacterIdentity + WorldContext + template). If the graph has a model assigned, it is tokenized with that model real vocabulary without loading it into memory; otherwise it falls back to the ~4 characters per token estimate and the number is shown with a "~". The usage bar only appears when a model is loaded: without one there is no context window to measure against.',
           nodeStatic: 'StaticResponseNode', subStatic: 'Pre-written Text', descStatic: 'Shows fixed text, no AI generation. Supports variable substitution.',
           nodeChoice: 'PlayerChoiceNode', subChoice: 'Player Options', descChoice: 'Presents options to the player. Each option can have visibility conditions.',
           nodeCond: 'ConditionNode', subCond: 'Logical Branching', descCond: 'Evaluates a condition and branches flow. Supports 10 comparison operators.',
@@ -735,6 +739,16 @@
           </div>
           <div class="p-8 space-y-8">
             <p class="text-gray-400 text-sm leading-relaxed" data-i18n="descAI">La IA genera texto...</p>
+
+            <div class="p-4 rounded-lg border border-ai-green/30 bg-ai-green/5">
+              <p class="text-ai-green font-bold text-sm mb-1" data-i18n="lbAICostTitle">Costo en tokens en el editor</p>
+              <p class="text-gray-300 text-sm" data-i18n="lbAICostText">El nodo muestra lo que cuesta su prompt
+                (CharacterIdentity + WorldContext + plantilla). Si el grafo tiene un modelo asignado, se tokeniza con el
+                vocabulario real de ese modelo sin cargarlo en memoria; si no, se cae a la estimación de ~4 caracteres
+                por token y el número se muestra con "~". La barra de uso sólo aparece cuando hay un modelo cargado:
+                sin él no hay ventana de contexto contra la cual medir.</p>
+            </div>
+
             <div>
               <h4 class="text-ai-cyan font-bold mb-4 flex items-center gap-2 border-b border-border-default pb-2"><span
                   class="w-1 h-4 bg-ai-cyan rounded-full"></span> <span data-i18n="lbParams">Parametros</span></h4>
