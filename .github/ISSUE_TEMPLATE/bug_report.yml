@@ -56,7 +56,7 @@ body:
       value: |
         - OS: [e.g., Windows 11, Ubuntu 22.04]
         - Godot version: [e.g., 4.5]
-        - OhMyDialogSystem version: [e.g., 0.3.0-dev]
+        - OhMyDialogSystem version: [e.g., 0.4.0]
         - LLM Model: [e.g., Qwen2.5-0.5B-Q4]
     validations:
       required: true
