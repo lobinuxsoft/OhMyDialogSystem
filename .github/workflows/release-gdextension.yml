@@ -1,5 +1,6 @@
 # GitHub Actions workflow for releasing OhMyDialogSystem GDExtension
-# Triggered when a version tag (vX.X.X) is pushed or manually via workflow_dispatch
+# Triggered when a version tag (vX.Y.Z or vX.Y.Z-suffix) is pushed, or manually
+# via workflow_dispatch
 # Builds for Windows, Linux, and macOS with dynamic backend loading
 
 name: Release GDExtension
@@ -8,6 +9,9 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
+      # Pre-releases (v1.0.0-rc1, v0.4.0-dev). Without this the tag is pushed
+      # and nothing runs: the filter has to match the whole ref name.
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
 
   # Manual trigger for testing builds without creating a release
   workflow_dispatch:
@@ -334,8 +338,10 @@ jobs:
           ls -la release/*.zip release/*.tar.gz
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
+          # A tag carrying a suffix (-dev, -rc1) is not a stable release
+          prerelease: ${{ contains(env.VERSION, '-') }}
           files: |
             release/*.zip
             release/*.tar.gz

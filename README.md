@@ -4,7 +4,7 @@
 
 ![Godot 4.5+](https://img.shields.io/badge/Godot-4.5%2B-blue?logo=godot-engine)
 ![License Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue)
-![Version](https://img.shields.io/badge/Version-0.3.0--dev-orange)
+![Version](https://img.shields.io/badge/Version-0.4.0-orange)
 ![Core](https://img.shields.io/badge/Core-88%25-green)
 ![Editor](https://img.shields.io/badge/Editor-35%25-yellow)
 
@@ -78,7 +78,7 @@
 
 ## Installation
 
-> **Note:** The addon is currently in active development (v0.3.0-dev).
+> **Note:** The addon is currently in active development (v0.4.0).
 > Check the [Releases](https://github.com/lobinuxsoft/OhMyDialogSystem/releases) page for the latest version.
 
 1. Download the latest release or clone the repository
