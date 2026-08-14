@@ -25,9 +25,9 @@
           pageSubtitle: 'Los Resources son objetos de datos serializables de Godot que almacenan configuración reutilizable. OhMyDialogSystem usa Resources para definir personajes, mundos, grafos de diálogo y más.',
           tipTitle: 'Tip',
           tipContent: 'Los Resources se guardan como archivos .tres y se pueden crear desde el menú New Resource en Godot, o desde el FileSystem haciendo click derecho.',
-          propGroup: 'Grupo', propProp: 'Propiedad', propType: 'Tipo', propDesc: 'Descripción', propDefault: 'Default',
+          propGroup: 'Grupo', propProp: 'Propiedad', propType: 'Tipo', propDesc: 'Descripción',
           tableSignal: 'Signal', tableParams: 'Parámetros',
-          enumTitle: 'Enum', methodsTitle: 'Métodos', exampleTitle: 'Ejemplo de Uso',
+          enumTitle: 'Enum', methodsTitle: 'Métodos',
           backToHome: 'Volver a API Reference',
           // DialogueNodeData
           dndTitle: 'DialogueNodeData',
@@ -72,6 +72,7 @@
           ciEx: 'Líneas de ejemplo que demuestran la voz',
           ciMToPrompt: 'Genera el system prompt para el LLM. Este es el método principal que convierte los datos del personaje en instrucciones para la IA.',
           ciMIsValid: 'Retorna true si tiene character_id y character_name.',
+          ciMEstTok: 'Aproxima el costo del prompt a razón de ~4 caracteres por token. Es una estimación: para el número exacto, el editor usa el tokenizador del propio modelo vía TokenCounter.',
           // WorldContext
           wcTitle: 'WorldContext',
           wcDesc: 'Define el contexto del mundo para la generación de diálogos. Incluye setting, lore, eventos actuales y estado dinámico que puede cambiar durante el juego.',
@@ -103,6 +104,8 @@
           dgDescProp: 'Descripción del diálogo',
           dgChar: 'Personaje por defecto para respuestas IA',
           dgWorld: 'Contexto del mundo',
+          dgPreset: 'Preset de sampling aplicado al arrancar el diálogo',
+          dgModelPath: 'Modelo .gguf fijado a este grafo. start_dialogue lo carga solo, y el editor lo usa para contar tokens',
           dgNodes: 'node_id → DialogueNodeData',
           dgConn: 'Conexiones entre nodos',
           dgStart: 'ID del nodo de inicio',
@@ -139,6 +142,18 @@
           aiFreqPen: 'Penaliza por frecuencia (estilo OpenAI)',
           aiPresPen: 'Penaliza si apareció (estilo OpenAI)',
           aiCtx: 'Tamaño máximo de contexto en tokens',
+          aiSeed: 'Semilla del generador. -1 = aleatoria en cada respuesta',
+          aiMiro: 'Modo Mirostat: 0 apagado, 1 v1, 2 v2. Sustituye a top_k/top_p cuando está activo',
+          aiSrcTpl: 'Plantilla Jinja copiada del GGUF, si el modelo trae una',
+          aiTplFmt: 'Formato detectado de la plantilla (chatml, llama3, etc.)',
+          aiArch: 'Arquitectura leída del GGUF (qwen2, llama, etc.)',
+          aiBos: 'ID del token de inicio de secuencia. -1 si el modelo no lo define',
+          aiEos: 'ID del token de fin de secuencia. -1 si el modelo no lo define',
+          aiRecCtx: 'n_ctx_train del modelo: el contexto con el que fue entrenado',
+          aiDerStop: 'Stop sequences deducidas del formato de plantilla',
+          aiMCons: 'Crea preset consistente (baja temperatura).',
+          aiMTech: 'Crea preset técnico (respuestas precisas).',
+          aiMGet: 'Devuelve el preset correspondiente a un PresetType.',
           aiRes: 'Tokens reservados para respuesta',
           aiSeed: 'Semilla (-1 = aleatorio)',
           aiMiro: 'Modo Mirostat (0=off, 1=v1, 2=v2)',
@@ -175,6 +190,23 @@
           mcGpu: 'Capas GPU (-1 = todas, 0 = CPU)',
           mcBatch: 'Batch size para prompt (512)',
           mcArch: 'Arquitectura (llama, qwen2, phi...)',
+          mcMetaUrl: 'Endpoint con los metadatos del GGUF, para leerlos sin descargar el archivo',
+          mcCustom: 'El usuario lo añadió a mano, no viene del registro',
+          mcExport: 'Empaquetar este modelo en la build exportada',
+          mcDefTopP: 'top_p por defecto (0.95)',
+          mcDefTopK: 'top_k por defecto (40)',
+          mcDefMax: 'Máximo de tokens por respuesta (256)',
+          mcDefRep: 'Penalización por repetición (1.1)',
+          mcBatch: 'Tamaño de lote para el prompt (512)',
+          mcBos: 'ID del token de inicio. -1 si no está definido',
+          mcEos: 'ID del token de fin. -1 si no está definido',
+          mcPreset: 'Preset derivado de estos metadatos',
+          mcMLoad: 'Arma el Dictionary para load_model con n_ctx, n_gpu_layers y n_batch.',
+          mcMApply: 'Escribe los seis default_* sobre las propiedades de sampling de la instancia.',
+          mcMFile: 'Nombre del archivo, sacado de download_url o construido como id.gguf.',
+          mcMHas: 'True si ya se leyeron los metadatos del GGUF.',
+          mcMPop: 'Rellena arquitectura, plantilla y tokens especiales desde los metadatos del GGUF.',
+          mcMPreset: 'Construye un AIPreset a partir de estos metadatos.',
           mcChatT: 'Chat template Jinja2 del modelo',
           mcFormat: 'Formato detectado (chatml, llama3...)',
           mcBos: 'ID del token BOS (-1 si no existe)',
@@ -197,9 +229,9 @@
           pageSubtitle: 'Resources are serializable Godot data objects that store reusable configuration. OhMyDialogSystem uses Resources to define characters, worlds, dialogue graphs, and more.',
           tipTitle: 'Tip',
           tipContent: 'Resources are saved as .tres files and can be created from the New Resource menu in Godot, or by right-clicking in the FileSystem.',
-          propGroup: 'Group', propProp: 'Property', propType: 'Type', propDesc: 'Description', propDefault: 'Default',
+          propGroup: 'Group', propProp: 'Property', propType: 'Type', propDesc: 'Description',
           tableSignal: 'Signal', tableParams: 'Parameters',
-          enumTitle: 'Enum', methodsTitle: 'Methods', exampleTitle: 'Usage Example',
+          enumTitle: 'Enum', methodsTitle: 'Methods',
           backToHome: 'Back to API Reference',
           // DialogueNodeData (EN)
           dndTitle: 'DialogueNodeData',
@@ -244,6 +276,7 @@
           ciEx: 'Example lines demonstrating voice',
           ciMToPrompt: 'Generates system prompt for LLM. Main method converting character data into AI instructions.',
           ciMIsValid: 'Returns true if has character_id and character_name.',
+          ciMEstTok: 'Approximates the prompt cost at ~4 characters per token. It is an estimate: for the exact number the editor uses the model own tokenizer through TokenCounter.',
           // WorldContext (EN)
           wcTitle: 'WorldContext',
           wcDesc: 'Defines world context for dialogue generation. Includes setting, lore, current events, and dynamic state changing during game.',
@@ -275,6 +308,8 @@
           dgDescProp: 'Dialogue description',
           dgChar: 'Default character for AI responses',
           dgWorld: 'World context',
+          dgPreset: 'Sampling preset applied when the dialogue starts',
+          dgModelPath: 'The .gguf model pinned to this graph. start_dialogue loads it on its own, and the editor uses it to count tokens',
           dgNodes: 'node_id → DialogueNodeData',
           dgConn: 'Connections between nodes',
           dgStart: 'Start node ID',
@@ -311,6 +346,18 @@
           aiFreqPen: 'Frequency penalty (OpenAI style)',
           aiPresPen: 'Presence penalty (OpenAI style)',
           aiCtx: 'Maximum context size in tokens',
+          aiSeed: 'Generator seed. -1 = random on every response',
+          aiMiro: 'Mirostat mode: 0 off, 1 v1, 2 v2. It replaces top_k/top_p while active',
+          aiSrcTpl: 'Jinja template copied from the GGUF, when the model ships one',
+          aiTplFmt: 'Detected template format (chatml, llama3, etc.)',
+          aiArch: 'Architecture read from the GGUF (qwen2, llama, etc.)',
+          aiBos: 'Beginning-of-sequence token ID. -1 when the model does not define it',
+          aiEos: 'End-of-sequence token ID. -1 when the model does not define it',
+          aiRecCtx: 'The model n_ctx_train: the context it was trained with',
+          aiDerStop: 'Stop sequences derived from the template format',
+          aiMCons: 'Creates a consistent preset (low temperature).',
+          aiMTech: 'Creates a technical preset (precise answers).',
+          aiMGet: 'Returns the preset matching a PresetType.',
           aiRes: 'Reserved tokens for response',
           aiSeed: 'Seed (-1 = random)',
           aiMiro: 'Mirostat mode (0=off, 1=v1, 2=v2)',
@@ -347,6 +394,23 @@
           mcGpu: 'GPU layers (-1 = all, 0 = CPU)',
           mcBatch: 'Prompt batch size (512)',
           mcArch: 'Architecture (llama, qwen2, phi...)',
+          mcMetaUrl: 'Endpoint with the GGUF metadata, to read it without downloading the file',
+          mcCustom: 'The user added it by hand, it does not come from the registry',
+          mcExport: 'Pack this model into the exported build',
+          mcDefTopP: 'Default top_p (0.95)',
+          mcDefTopK: 'Default top_k (40)',
+          mcDefMax: 'Max tokens per response (256)',
+          mcDefRep: 'Repetition penalty (1.1)',
+          mcBatch: 'Prompt batch size (512)',
+          mcBos: 'Beginning token ID. -1 when undefined',
+          mcEos: 'End token ID. -1 when undefined',
+          mcPreset: 'Preset derived from this metadata',
+          mcMLoad: 'Builds the load_model Dictionary with n_ctx, n_gpu_layers and n_batch.',
+          mcMApply: 'Writes the six default_* onto the sampling properties of the instance.',
+          mcMFile: 'File name, taken from download_url or built as id.gguf.',
+          mcMHas: 'True when the GGUF metadata has already been read.',
+          mcMPop: 'Fills architecture, template and special tokens from the GGUF metadata.',
+          mcMPreset: 'Builds an AIPreset from this metadata.',
           mcChatT: 'Model Jinja2 chat template',
           mcFormat: 'Detected format (chatml, llama3...)',
           mcBos: 'BOS token ID (-1 if none)',
@@ -801,6 +865,22 @@
         </table>
       </div>
 
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="methodsTitle">Métodos</h3>
+      <div class="grid grid-cols-1 gap-4 mb-8">
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func to_system_prompt() -> String</div>
+          <p class="text-gray-400 text-sm" data-i18n="ciMToPrompt">Genera el system prompt para el LLM. Este es el método principal que convierte los datos del personaje en instrucciones para la IA.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func is_valid() -> bool</div>
+          <p class="text-gray-400 text-sm" data-i18n="ciMIsValid">Retorna true si tiene character_id y character_name.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func estimate_tokens() -> int</div>
+          <p class="text-gray-400 text-sm" data-i18n="ciMEstTok">Aproxima el costo del prompt a razón de ~4 caracteres por token. Es una estimación: para el número exacto, el editor usa el tokenizador del propio modelo vía TokenCounter.</p>
+        </div>
+      </div>
+
       <hr class="border-border-default mb-12">
 
       <!-- ==================== WorldContext ==================== -->
@@ -979,7 +1059,7 @@
               <td class="py-2 px-4 text-gray-300" data-i18n="dgDescProp">Descripción del diálogo</td>
             </tr>
             <tr class="border-b border-border-default/50">
-              <td rowspan="2" class="py-2 px-4 font-bold text-gray-500">Context</td>
+              <td rowspan="4" class="py-2 px-4 font-bold text-gray-500">Context</td>
               <td class="py-2 px-4 font-mono text-ai-purple">default_character</td>
               <td class="py-2 px-4 font-mono text-gray-400">CharacterIdentity</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="dgChar">Personaje por defecto para respuestas IA</td>
@@ -988,6 +1068,16 @@
               <td class="py-2 px-4 font-mono text-ai-purple">world_context</td>
               <td class="py-2 px-4 font-mono text-gray-400">WorldContext</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="dgWorld">Contexto del mundo</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">ai_preset</td>
+              <td class="py-2 px-4 font-mono text-gray-400">AIPreset</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="dgPreset">Preset de sampling aplicado al arrancar el diálogo</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-green">model_path</td>
+              <td class="py-2 px-4 font-mono text-gray-400">String</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="dgModelPath">Modelo .gguf fijado a este grafo. start_dialogue lo carga solo, y el editor lo usa para contar tokens</td>
             </tr>
             <tr class="border-b border-border-default/50">
               <td rowspan="3" class="py-2 px-4 font-bold text-gray-500">Graph Data</td>
@@ -1085,6 +1175,22 @@
           <p class="text-gray-400 text-sm" data-i18n="dgMValidate">Valida la estructura del grafo. Retorna array de
             errores.</p>
         </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func get_node(node_id: String) -> DialogueNodeData</div>
+          <p class="text-gray-400 text-sm" data-i18n="dgMGetNode">Obtiene un nodo por su ID.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func get_start_node() -> DialogueNodeData</div>
+          <p class="text-gray-400 text-sm" data-i18n="dgMGetStart">Obtiene el nodo de inicio del grafo.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func disconnect_nodes(from_node: String, from_slot: int, to_node: String, to_slot: int = 0) -> void</div>
+          <p class="text-gray-400 text-sm" data-i18n="dgMDisconn">Elimina una conexión específica.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func get_next_nodes(node_id: String, slot: int = 0) -> Array[DialogueNodeData]</div>
+          <p class="text-gray-400 text-sm" data-i18n="dgMNext">Obtiene los nodos siguientes desde un slot de salida.</p>
+        </div>
       </div>
 
       <hr class="border-border-default mb-12">
@@ -1170,10 +1276,60 @@
               <td class="py-2 px-4 font-mono text-ai-purple">presence_penalty</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="aiPresPen">Penaliza si apareció (estilo OpenAI)</td>
             </tr>
-            <tr>
-              <td class="py-2 px-4 font-bold text-gray-500">Context</td>
+            <tr class="border-b border-border-default/50">
+              <td rowspan="2" class="py-2 px-4 font-bold text-gray-500">Context</td>
               <td class="py-2 px-4 font-mono text-ai-purple">context_size</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="aiCtx">Tamaño máximo de contexto en tokens</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">response_reserve</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiRes">Tokens reservados para la respuesta: el prompt no puede pasar de context_size menos esto</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td rowspan="4" class="py-2 px-4 font-bold text-gray-500">Advanced</td>
+              <td class="py-2 px-4 font-mono text-ai-purple">seed</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiSeed">Semilla del generador. -1 = aleatoria en cada respuesta</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">mirostat</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiMiro">Modo Mirostat: 0 apagado, 1 v1, 2 v2. Sustituye a top_k/top_p cuando está activo</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">mirostat_tau</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiMTau">Entropía objetivo de Mirostat</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">mirostat_eta</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiMEta">Tasa de aprendizaje de Mirostat</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td rowspan="7" class="py-2 px-4 font-bold text-gray-500">Model Metadata</td>
+              <td class="py-2 px-4 font-mono text-ai-purple">source_chat_template</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiSrcTpl">Plantilla Jinja copiada del GGUF, si el modelo trae una</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">chat_template_format</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiTplFmt">Formato detectado de la plantilla (chatml, llama3, etc.)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">model_architecture</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiArch">Arquitectura leída del GGUF (qwen2, llama, etc.)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">bos_token_id</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiBos">ID del token de inicio de secuencia. -1 si el modelo no lo define</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">eos_token_id</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiEos">ID del token de fin de secuencia. -1 si el modelo no lo define</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">recommended_context_length</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiRecCtx">n_ctx_train del modelo: el contexto con el que fue entrenado</td>
+            </tr>
+            <tr>
+              <td class="py-2 px-4 font-mono text-ai-purple">derived_stop_sequences</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="aiDerStop">Stop sequences deducidas del formato de plantilla</td>
             </tr>
           </tbody>
         </table>
@@ -1202,6 +1358,26 @@
             func create_roleplay() -> AIPreset</div>
           <p class="text-gray-400 text-sm" data-i18n="aiMRole">Crea preset roleplay.</p>
         </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">static func create_consistent() -> AIPreset</div>
+          <p class="text-gray-400 text-sm" data-i18n="aiMCons">Crea preset consistente (baja temperatura).</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">static func create_technical() -> AIPreset</div>
+          <p class="text-gray-400 text-sm" data-i18n="aiMTech">Crea preset técnico (respuestas precisas).</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">static func get_preset(type: PresetType) -> AIPreset</div>
+          <p class="text-gray-400 text-sm" data-i18n="aiMGet">Devuelve el preset correspondiente a un PresetType.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">static func create_from_gguf_metadata(metadata: Dictionary, base_type: PresetType = BALANCED, model_name: String = "") -> AIPreset</div>
+          <p class="text-gray-400 text-sm" data-i18n="aiMFromGGUF">Construye un preset a partir de los metadatos de un GGUF: plantilla, arquitectura, tokens especiales y stop sequences derivadas.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func get_summary() -> String</div>
+          <p class="text-gray-400 text-sm" data-i18n="aiMSum">Retorna resumen del preset para debug.</p>
+        </div>
       </div>
 
       <hr class="border-border-default mb-12">
@@ -1228,7 +1404,7 @@
           </thead>
           <tbody class="text-sm">
             <tr class="border-b border-border-default/50">
-              <td rowspan="5" class="py-2 px-4 font-bold text-gray-500">Model Info</td>
+              <td rowspan="10" class="py-2 px-4 font-bold text-gray-500">Model Info</td>
               <td class="py-2 px-4 font-mono text-ai-purple">id</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="mcId">ID único del modelo</td>
             </tr>
@@ -1237,23 +1413,64 @@
               <td class="py-2 px-4 text-gray-300" data-i18n="mcName">Nombre legible</td>
             </tr>
             <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">description</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcMDesc">Para qué sirve este modelo, mostrado en el Model Manager</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
               <td class="py-2 px-4 font-mono text-ai-purple">model_path</td>
-              <td class="py-2 px-4 text-gray-300" data-i18n="mcPath">Ruta al archivo GGUF</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcPath">Ruta al archivo GGUF. Si está vacía se deduce de get_filename()</td>
             </tr>
             <tr class="border-b border-border-default/50">
               <td class="py-2 px-4 font-mono text-ai-purple">download_url</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="mcUrl">URL de HuggingFace para descarga</td>
             </tr>
             <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">documentation_url</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcDoc">Ficha del modelo en HuggingFace</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">file_metadata_url</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcMetaUrl">Endpoint con los metadatos del GGUF, para leerlos sin descargar el archivo</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
               <td class="py-2 px-4 font-mono text-ai-purple">size_mb</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="mcSize">Tamaño estimado en MB</td>
             </tr>
             <tr class="border-b border-border-default/50">
-              <td rowspan="3" class="py-2 px-4 font-bold text-gray-500">Defaults</td>
+              <td class="py-2 px-4 font-mono text-ai-purple">is_custom</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcCustom">El usuario lo añadió a mano, no viene del registro</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">include_in_export</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcExport">Empaquetar este modelo en la build exportada</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td rowspan="6" class="py-2 px-4 font-bold text-gray-500">Default Sampling</td>
               <td class="py-2 px-4 font-mono text-ai-purple">default_temperature</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="mcDefTemp">Temperatura por defecto (0.7)</td>
             </tr>
             <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">default_top_p</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcDefTopP">top_p por defecto (0.95)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">default_top_k</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcDefTopK">top_k por defecto (40)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">default_max_tokens</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcDefMax">Máximo de tokens por respuesta (256)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">default_repeat_penalty</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcDefRep">Penalización por repetición (1.1)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">default_min_p</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcDefMin">min_p por defecto (0.05)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td rowspan="3" class="py-2 px-4 font-bold text-gray-500">Context</td>
               <td class="py-2 px-4 font-mono text-ai-purple">n_ctx</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="mcCtx">Tamaño de contexto en tokens (2048)</td>
             </tr>
@@ -1261,13 +1478,73 @@
               <td class="py-2 px-4 font-mono text-ai-purple">n_gpu_layers</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="mcGpu">Capas GPU (-1 = todas)</td>
             </tr>
-            <tr>
-              <td class="py-2 px-4 font-bold text-gray-500">Metadata</td>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">n_batch</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcBatch">Tamaño de lote para el prompt (512)</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td rowspan="6" class="py-2 px-4 font-bold text-gray-500">GGUF Metadata</td>
               <td class="py-2 px-4 font-mono text-ai-purple">architecture</td>
               <td class="py-2 px-4 text-gray-300" data-i18n="mcArch">Arquitectura (llama, qwen2...)</td>
             </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">raw_chat_template</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcChatT">Plantilla Jinja tal cual viene en el GGUF</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">chat_template_format</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcFormat">Formato detectado de la plantilla</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">bos_token_id</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcBos">ID del token de inicio. -1 si no está definido</td>
+            </tr>
+            <tr class="border-b border-border-default/50">
+              <td class="py-2 px-4 font-mono text-ai-purple">eos_token_id</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcEos">ID del token de fin. -1 si no está definido</td>
+            </tr>
+            <tr>
+              <td class="py-2 px-4 font-mono text-ai-purple">ai_preset</td>
+              <td class="py-2 px-4 text-gray-300" data-i18n="mcPreset">Preset derivado de estos metadatos</td>
+            </tr>
           </tbody>
         </table>
+      </div>
+
+      <h3 class="text-lg font-bold text-white mb-4" data-i18n="methodsTitle">Métodos</h3>
+      <div class="grid grid-cols-1 gap-4 mb-8">
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func get_effective_path() -> String</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcmPath">Dónde está el archivo: model_path si tiene valor, si no res://models/ más get_filename().</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func get_load_params() -> Dictionary</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcMLoad">Arma el Dictionary para load_model con n_ctx, n_gpu_layers y n_batch.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func apply_defaults_to(llama: LlamaInterface) -> void</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcMApply">Escribe los seis default_* sobre las propiedades de sampling de la instancia.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func is_downloaded() -> bool</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcMDown">True si el archivo existe en la ruta efectiva.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func get_filename() -> String</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcMFile">Nombre del archivo, sacado de download_url o construido como id.gguf.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func has_metadata() -> bool</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcMHas">True si ya se leyeron los metadatos del GGUF.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func populate_from_metadata(metadata: Dictionary) -> void</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcMPop">Rellena arquitectura, plantilla y tokens especiales desde los metadatos del GGUF.</p>
+        </div>
+        <div>
+          <div class="font-mono text-sm bg-black/40 p-2 rounded border border-border-default mb-2 text-gray-300">func create_ai_preset() -> AIPreset</div>
+          <p class="text-gray-400 text-sm" data-i18n="mcMPreset">Construye un AIPreset a partir de estos metadatos.</p>
+        </div>
       </div>
 
       <hr class="border-border-default mb-12">
