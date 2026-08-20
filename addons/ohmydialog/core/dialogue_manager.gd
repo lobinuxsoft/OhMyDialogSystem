@@ -206,6 +206,11 @@ func start_dialogue(graph: DialogueGraph = null, mode: DialogueMode = DialogueMo
 	if effective_preset and llama_interface:
 		effective_preset.apply_to(llama_interface)
 
+	# The prompt shape is the preset's too, and the node executors receive this
+	# same builder through the execution context.
+	if effective_preset:
+		effective_preset.apply_to_builder(prompt_builder)
+
 	dialogue_started.emit(graph)
 
 	# Start execution based on mode

@@ -127,6 +127,18 @@ enum PresetType {
 @export var derived_stop_sequences: Array[String] = []
 
 
+## Applies this preset's template settings to a PromptBuilder instance.
+## Sampling goes to the LlamaInterface via apply_to(); prompt shape goes here.
+func apply_to_builder(builder: PromptBuilder) -> void:
+	if not builder:
+		push_error("AIPreset: Cannot apply to null builder")
+		return
+
+	if not chat_template_format.is_empty():
+		builder.set_format_from_string(chat_template_format)
+	builder.assistant_prefill = assistant_prefill
+
+
 ## Applies this preset's settings to a LlamaInterface instance.
 func apply_to(llama: Object) -> void:
 	if not llama:
