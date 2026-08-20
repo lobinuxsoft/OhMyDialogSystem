@@ -57,6 +57,12 @@ enum PresetType {
 ## Sequences that stop generation when encountered.
 @export var stop_sequences: Array[String] = []
 
+## Text injected where the assistant turn opens, before it writes anything.
+## A reasoning model opens a <think> block on its first token and can spend the
+## whole max_tokens budget inside it without ever answering; handing it a block
+## that is already closed puts it straight into the reply.
+@export_multiline var assistant_prefill: String = ""
+
 
 @export_group("Repetition")
 
@@ -169,6 +175,7 @@ func to_dict() -> Dictionary:
 		"typical_p": typical_p,
 		"max_tokens": max_tokens,
 		"stop_sequences": stop_sequences.duplicate(),
+		"assistant_prefill": assistant_prefill,
 		"repeat_penalty": repeat_penalty,
 		"repeat_last_n": repeat_last_n,
 		"frequency_penalty": frequency_penalty,
@@ -191,6 +198,7 @@ static func from_dict(dict: Dictionary) -> AIPreset:
 	preset.min_p = dict.get("min_p", 0.05)
 	preset.typical_p = dict.get("typical_p", 1.0)
 	preset.max_tokens = dict.get("max_tokens", 256)
+	preset.assistant_prefill = dict.get("assistant_prefill", "")
 	preset.repeat_penalty = dict.get("repeat_penalty", 1.1)
 	preset.repeat_last_n = dict.get("repeat_last_n", 64)
 	preset.frequency_penalty = dict.get("frequency_penalty", 0.0)
@@ -361,6 +369,9 @@ static func create_from_gguf_metadata(
 		preset.recommended_context_length = ctx_len
 		preset.context_size = mini(ctx_len, 32768)  # Clamp to reasonable max
 
+	# A reasoning model needs its thinking channel closed up front
+	preset.assistant_prefill = _derive_prefill_from_template(preset.source_chat_template)
+
 	# Derive stop sequences from chat template format
 	preset.derived_stop_sequences = _derive_stop_sequences_from_format(preset.chat_template_format)
 
@@ -373,6 +384,15 @@ static func create_from_gguf_metadata(
 	preset.description = _generate_metadata_description(preset)
 
 	return preset
+
+
+## Returns the prefill a model needs, or an empty string when it does not think.
+## Reasoning templates carry an enable_thinking switch that the C chat-template
+## API cannot set, so the closed block is written into the prompt instead.
+static func _derive_prefill_from_template(template: String) -> String:
+	if "enable_thinking" in template or "<think>" in template:
+		return "<think>\n\n</think>\n\n"
+	return ""
 
 
 ## Derives stop sequences from a known chat template format.

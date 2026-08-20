@@ -30,7 +30,7 @@ const TEMPLATE_CHATML := """<|im_start|>system
 <|im_start|>user
 {user_content}<|im_end|>
 <|im_start|>assistant
-"""
+{assistant_prefill}"""
 
 const TEMPLATE_LLAMA2 := """<s>[INST] <<SYS>>
 {system_prompt}
@@ -44,7 +44,7 @@ const TEMPLATE_LLAMA3 := """<|begin_of_text|><|start_header_id|>system<|end_head
 
 {user_content}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
-"""
+{assistant_prefill}"""
 
 const TEMPLATE_MISTRAL := """<s>[INST] {system_prompt}
 
@@ -69,7 +69,7 @@ const TEMPLATE_GEMMA := """<start_of_turn>user
 
 {user_content}<end_of_turn>
 <start_of_turn>model
-"""
+{assistant_prefill}"""
 
 ## Legacy template for build_prompt() method (ChatML format with full context)
 const DEFAULT_TEMPLATE := """<|im_start|>system
@@ -91,7 +91,7 @@ Memories: {memories}<|im_end|>
 {history}
 {player_input}{instruction}<|im_end|>
 <|im_start|>assistant
-{character_name}:"""
+{assistant_prefill}{character_name}:"""
 
 
 ## Approximate characters per token (rough estimate for most LLMs).
@@ -108,6 +108,12 @@ var template_format: TemplateFormat = TemplateFormat.CHATML
 
 ## Reference to LlamaInterface for native template application (optional)
 var llama_interface: Object = null
+
+## Text injected where the assistant turn opens, before it writes anything.
+## Reasoning models open a <think> block on their first token and spend the
+## whole budget in it, so handing them a closed one puts them straight into
+## the reply. See AIPreset.assistant_prefill.
+var assistant_prefill: String = ""
 
 
 ## Builds a complete prompt from the provided components.
@@ -157,7 +163,8 @@ func build_prompt(
 		"memories": memories_text,
 		"history": history_text,
 		"player_input": player_input,
-		"instruction": instruction_text
+		"instruction": instruction_text,
+		"assistant_prefill": assistant_prefill
 	})
 
 	return prompt
@@ -176,10 +183,11 @@ You are {name}. Keep responses brief (1-3 sentences). {prompt}<|im_end|>
 <|im_start|>user
 {input}<|im_end|>
 <|im_start|>assistant
-{name}:""".format({
+{prefill}{name}:""".format({
 		"name": character_name,
 		"prompt": character_prompt,
-		"input": player_input
+		"input": player_input,
+		"prefill": assistant_prefill
 	})
 
 
@@ -352,7 +360,7 @@ func build_prompt_native(
 
 			var result = llama_interface.apply_chat_template(messages, true)
 			if not result.is_empty():
-				return result
+				return result + assistant_prefill
 
 	# Fallback to format-based template
 	return _apply_format_template(system_prompt, user_input, history)
@@ -381,7 +389,8 @@ func _apply_format_template(
 
 	return template.format({
 		"system_prompt": system_prompt,
-		"user_content": user_content
+		"user_content": user_content,
+		"assistant_prefill": assistant_prefill
 	})
 
 

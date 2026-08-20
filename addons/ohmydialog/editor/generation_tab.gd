@@ -346,6 +346,9 @@ func _build_prompt_with_context(user_input: String) -> String:
 	if _current_preset != null and not _current_preset.chat_template_format.is_empty():
 		_prompt_builder.set_format_from_string(_current_preset.chat_template_format)
 
+	if _current_preset != null:
+		_prompt_builder.assistant_prefill = _current_preset.assistant_prefill
+
 	# Build the full prompt
 	var memories: Array[String] = []  # Empty for now, could add memory system later
 	var history: Array[Dictionary] = []  # Empty conversation history for testing
