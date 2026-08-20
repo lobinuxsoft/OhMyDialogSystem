@@ -342,9 +342,8 @@ func _build_prompt_with_context(user_input: String) -> String:
 	if llama != null:
 		_prompt_builder.set_llama_interface(llama)
 
-	# Set template format from preset if available
-	if _current_preset != null and not _current_preset.chat_template_format.is_empty():
-		_prompt_builder.set_format_from_string(_current_preset.chat_template_format)
+	if _current_preset != null:
+		_current_preset.apply_to_builder(_prompt_builder)
 
 	# Build the full prompt
 	var memories: Array[String] = []  # Empty for now, could add memory system later

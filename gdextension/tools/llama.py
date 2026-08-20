@@ -229,11 +229,11 @@ def _configure_linking(env, build_dir):
         print("[llama.py] Dynamic backend loading enabled - linking core libs only")
         # ggml contains backend registry functions (ggml_backend_load_all, etc.)
         # ggml-base contains base tensor operations
-        core_libs = ["llama", "common", "ggml", "ggml-base"]
+        core_libs = ["llama", "llama-common", "ggml", "ggml-base"]
         env.Append(LIBS=core_libs)
     else:
         # Static linking: Core libraries (order matters for static linking)
-        core_libs = ["llama", "common", "ggml", "ggml-cpu", "ggml-base"]
+        core_libs = ["llama", "llama-common", "ggml", "ggml-cpu", "ggml-base"]
         env.Append(LIBS=core_libs)
 
         # All backends mode: link all available backend libraries
@@ -314,7 +314,7 @@ def _find_all_library_dirs(build_dir, platform):
                 os.path.join(build_dir, "bin"),
                 os.path.join(build_dir, "ggml", "src", "Release"),
             ],
-            "common.lib": [
+            "llama-common.lib": [
                 os.path.join(build_dir, "common", "Release"),
                 os.path.join(build_dir, "common"),
             ],
@@ -343,7 +343,7 @@ def _find_all_library_dirs(build_dir, platform):
                 os.path.join(build_dir, "bin"),
                 os.path.join(build_dir, "ggml", "src"),
             ],
-            "libcommon.a": [
+            "libllama-common.a": [
                 os.path.join(build_dir, "common"),
             ],
             # Backend-specific libraries
