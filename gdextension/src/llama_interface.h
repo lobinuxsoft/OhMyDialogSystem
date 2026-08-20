@@ -83,7 +83,8 @@ public:
 
 	/// Load a GGUF model from the specified path.
 	/// @param path Path to the .gguf model file (supports user:// and res://)
-	/// @param params Optional parameters: n_ctx (int), n_gpu_layers (int), use_mmap (bool), use_mlock (bool)
+	/// @param params Optional parameters: n_ctx (int), n_gpu_layers (int), use_mmap (bool), use_mlock (bool).
+	/// Omit both to let llama.cpp pick the load mode for the device.
 	/// @return OK on success, or an error code
 	Error load_model(const String &path, const Dictionary &params = Dictionary());
 

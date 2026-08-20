@@ -53,8 +53,13 @@ void LlamaInterface::_cleanup() {
 llama_sampler *LlamaInterface::_create_sampler() const {
 	llama_sampler *smpl = llama_sampler_chain_init(llama_sampler_chain_default_params());
 
-	// Add penalties for repetition
+	// Add penalties for repetition. llama.cpp now takes the vocabulary size
+	// as the first argument.
+	const int32_t n_vocab = m_model != nullptr
+			? llama_vocab_n_tokens(llama_model_get_vocab(m_model))
+			: 0;
 	llama_sampler_chain_add(smpl, llama_sampler_init_penalties(
+		n_vocab,
 		m_repeat_last_n,
 		m_repeat_penalty,
 		m_frequency_penalty,
@@ -261,11 +266,21 @@ Error LlamaInterface::load_model(const String &path, const Dictionary &params) {
 	if (params.has("n_gpu_layers")) {
 		model_params.n_gpu_layers = static_cast<int32_t>(static_cast<int>(params["n_gpu_layers"]));
 	}
-	if (params.has("use_mmap")) {
-		model_params.use_mmap = static_cast<bool>(params["use_mmap"]);
-	}
-	if (params.has("use_mlock")) {
-		model_params.use_mlock = static_cast<bool>(params["use_mlock"]);
+	// llama.cpp folded use_mmap and use_mlock into a single load_mode enum.
+	// The two booleans stay on the GDScript side and are combined here; leaving
+	// both unset keeps llama.cpp's own auto-detection.
+	if (params.has("use_mmap") || params.has("use_mlock")) {
+		const bool mmap = params.has("use_mmap") ? static_cast<bool>(params["use_mmap"]) : true;
+		const bool mlock = params.has("use_mlock") ? static_cast<bool>(params["use_mlock"]) : false;
+		if (mmap && mlock) {
+			model_params.load_mode = LLAMA_LOAD_MODE_MMAP_MLOCK;
+		} else if (mmap) {
+			model_params.load_mode = LLAMA_LOAD_MODE_MMAP;
+		} else if (mlock) {
+			model_params.load_mode = LLAMA_LOAD_MODE_MLOCK;
+		} else {
+			model_params.load_mode = LLAMA_LOAD_MODE_NONE;
+		}
 	}
 	if (params.has("vocab_only")) {
 		model_params.vocab_only = static_cast<bool>(params["vocab_only"]);
