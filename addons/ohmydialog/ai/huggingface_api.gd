@@ -30,8 +30,11 @@ var _pending_metadata_filename: String = ""
 ## GGUF parser for extracting metadata from file headers
 var _gguf_parser: GGUFParser
 
-## Size of GGUF header to fetch (10MB should cover all metadata)
-const METADATA_FETCH_SIZE := 10 * 1024 * 1024
+## Size of GGUF header to fetch.
+## Qwen-class vocabularies push the tail of the metadata block past 10MB, and
+## tokenizer.chat_template is stored after them, so a short window silently
+## costs us the template.
+const METADATA_FETCH_SIZE := 32 * 1024 * 1024
 
 
 ## Search for GGUF models on HuggingFace

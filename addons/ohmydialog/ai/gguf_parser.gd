@@ -53,13 +53,18 @@ var _pos: int = 0
 ## Data buffer being parsed
 var _data: PackedByteArray
 
+## Set when a read ran past the end of the buffer
+var _truncated: bool = false
+
 
 ## Parses GGUF header from raw bytes.
-## [param data]: Raw bytes from the beginning of a GGUF file (at least 10MB recommended)
+## [param data]: Raw bytes from the beginning of a GGUF file. Must span the whole
+## metadata block - see HuggingFaceAPI.METADATA_FETCH_SIZE.
 ## Returns true if parsing succeeded, false otherwise
 func parse(data: PackedByteArray) -> bool:
 	_data = data
 	_pos = 0
+	_truncated = false
 	metadata.clear()
 	errors.clear()
 
@@ -94,6 +99,11 @@ func parse(data: PackedByteArray) -> bool:
 		if not _parse_kv_pair():
 			# If we hit an error mid-parse, we might still have useful data
 			break
+
+	# A short buffer yields partial metadata that looks perfectly valid, so the
+	# caller has to be told the difference between "absent" and "not fetched".
+	if _truncated:
+		errors.append("Metadata block is longer than the %d bytes provided" % _data.size())
 
 	return errors.is_empty()
 
@@ -199,6 +209,8 @@ func _skip_array_contents(element_type: int, count: int) -> void:
 
 	if element_size > 0:
 		# Fixed size elements - can skip directly
+		if _pos + element_size * count > _data.size():
+			_truncated = true
 		_pos += element_size * count
 	else:
 		# Variable size elements (strings, nested arrays) - must read each
@@ -251,6 +263,7 @@ func _read_int16() -> int:
 
 func _read_uint32() -> int:
 	if _pos + 4 > _data.size():
+		_truncated = true
 		return 0
 	var value := _data[_pos] | (_data[_pos + 1] << 8) | (_data[_pos + 2] << 16) | (_data[_pos + 3] << 24)
 	_pos += 4
@@ -264,6 +277,7 @@ func _read_int32() -> int:
 
 func _read_uint64() -> int:
 	if _pos + 8 > _data.size():
+		_truncated = true
 		return 0
 	# GDScript integers are 64-bit, but we need to handle the unsigned case
 	var low := _read_uint32()
